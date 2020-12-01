@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace Caf.Midden.Core.Models
+namespace Caf.Midden.Core.Models.v0_1_0alpha4
 {
     public class Person
     {

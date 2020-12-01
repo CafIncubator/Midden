@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace Caf.Midden.Core.Models
+namespace Caf.Midden.Core.Models.v0_1_0alpha3
 {
     public class Variable
     {
@@ -42,13 +43,21 @@ namespace Caf.Midden.Core.Models
         [JsonPropertyName("spatialRepeats")]
         public int? SpatialRepeats { get; set; }
 
+        //[JsonPropertyName("qcAppliedCode")]
+        //public string? QCAppliedCode { get; set; }
+
         [JsonPropertyName("isQCSpecified")]
         public bool IsQCSpecified { get; set; }
 
         [JsonPropertyName("qcApplied")]
-        public List<string>? QCApplied { get; set; }
+        public QCApplied? QCApplied { get; set; }
 
         [JsonPropertyName("processingLevel")]
-        public string? ProcessingLevel { get; set; }
+        public ProcessingLevels ProcessingLevel { get; set; }
+
+        public Variable()
+        {
+            //QCApplied = new QCApplied();
+        }
     }
 }
