@@ -8,7 +8,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Caf.Midden.Metadata
+namespace Caf.Midden.Wasm
 {
     public class Program
     {

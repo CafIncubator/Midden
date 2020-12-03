@@ -1,6 +1,6 @@
 {
-  "name": "Caf.Midden.Metadata",
-  "short_name": "Caf.Midden.Metadata",
+  "name": "Caf.Midden.Wasm",
+  "short_name": "Caf.Midden.Wasm",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#ffffff",

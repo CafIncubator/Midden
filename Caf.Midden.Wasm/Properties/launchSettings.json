@@ -3,8 +3,8 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:52838",
-      "sslPort": 44320
+      "applicationUrl": "http://localhost:60130",
+      "sslPort": 44321
     }
   },
   "profiles": {
@@ -16,7 +16,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "Caf.Midden.Metadata": {
+    "Caf.Midden.Wasm": {
       "commandName": "Project",
       "dotnetRunMessages": "true",
       "launchBrowser": true,
