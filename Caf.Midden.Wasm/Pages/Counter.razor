@@ -1,10 +1,28 @@
 ﻿@page "/counter"
 
+@inject Caf.Midden.Components.StateContainers.EditorStateContainer State
+@implements IDisposable
+
 <h1>Counter</h1>
 
 <p>Current count: @currentCount</p>
 
 <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+
+<p>@State.SchemaVersion</p>
+
+@if (State.Metadata != null)
+{
+    <p>@State.Metadata.CreationDate</p>
+}
+else
+{
+    <p>Not loaded</p>
+}
+
+<div class="alert alert-info">
+    <MetadataEditor />
+</div>
 
 @code {
     private int currentCount = 0;
@@ -13,4 +31,29 @@
     {
         currentCount++;
     }
+
+
+    private async Task State_StateChanged(
+            ComponentBase source,
+            string property)
+    {
+        if (source != this)
+        {
+            // Do work here, provided change of state. Perhaps inspect Metadata to see if changed and save to local cache?
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        State.StateChanged += async (source, property) =>
+            await State_StateChanged(source, property);
+    }
+
+    void IDisposable.Dispose()
+    {
+        State.StateChanged -= async (source, property) =>
+            await State_StateChanged(source, property);
+    }
+
 }
