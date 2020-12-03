@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace Caf.Midden.Core.Models.v0_1_0alpha4
 {
@@ -12,7 +8,7 @@ namespace Caf.Midden.Core.Models.v0_1_0alpha4
     {
         [JsonPropertyName("schemaVersion")]
         [Required]
-        public string SchemaVersion { get; set; }
+        public string SchemaVersion { get; private set; }
 
         [JsonPropertyName("creationDate")]
         [Required]
@@ -25,5 +21,10 @@ namespace Caf.Midden.Core.Models.v0_1_0alpha4
         [JsonPropertyName("dataset")]
         [Required]
         public Dataset Dataset { get; set; }
+
+        public Metadata()
+        {
+            this.SchemaVersion = "v0.1.0-alpha4";
+        }
     }
 }

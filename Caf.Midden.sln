@@ -5,9 +5,11 @@ VisualStudioVersion = 16.0.30709.132
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Caf.Midden.Metadata", "Caf.Midden.Metadata\Caf.Midden.Metadata.csproj", "{24987D89-784D-49B7-B0EA-3B237265A9FF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Caf.Midden.Core", "Caf.Midden.Core\Caf.Midden.Core.csproj", "{EFB9CA87-5B92-499F-8626-2CE95A8038BA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Caf.Midden.Core", "Caf.Midden.Core\Caf.Midden.Core.csproj", "{EFB9CA87-5B92-499F-8626-2CE95A8038BA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Caf.Midden.Components", "Caf.Midden.Components\Caf.Midden.Components.csproj", "{01D2F220-BD84-44D8-877E-54F340AF236F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Caf.Midden.Components", "Caf.Midden.Components\Caf.Midden.Components.csproj", "{01D2F220-BD84-44D8-877E-54F340AF236F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Caf.Midden.Core.Tests", "Caf.Midden.Core.Tests\Caf.Midden.Core.Tests.csproj", "{B9E45E7B-1D6A-418A-BAB4-320584720B76}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{01D2F220-BD84-44D8-877E-54F340AF236F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{01D2F220-BD84-44D8-877E-54F340AF236F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{01D2F220-BD84-44D8-877E-54F340AF236F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9E45E7B-1D6A-418A-BAB4-320584720B76}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9E45E7B-1D6A-418A-BAB4-320584720B76}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9E45E7B-1D6A-418A-BAB4-320584720B76}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9E45E7B-1D6A-418A-BAB4-320584720B76}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

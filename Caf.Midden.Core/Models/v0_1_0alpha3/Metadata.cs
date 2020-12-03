@@ -12,5 +12,13 @@ namespace Caf.Midden.Core.Models.v0_1_0alpha3
         [JsonPropertyName("dataset")]
         [Required]
         public Dataset Dataset { get; set; }
+
+        public Metadata()
+        {
+            this.File = new File()
+            {
+                SchemaVersion = "v0.1.0-alpha3"
+            };
+        }
     }
 }

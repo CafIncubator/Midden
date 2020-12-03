@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace Caf.Midden.Core.Services.Metadata
 {
-    public class MetadataFactory
+    public interface IMetadataParser
     {
+        Models.v0_1_0alpha4.Metadata Parse(string json);
     }
 }

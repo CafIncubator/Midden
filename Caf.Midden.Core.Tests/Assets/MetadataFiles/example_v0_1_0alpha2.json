@@ -1,0 +1,57 @@
+{
+  "file": {
+    "schema-version": "v0.1.0-alpha2",
+    "creation-date": "2020-11-16"
+  },
+  "dataset": {
+    "zone": "Production",
+    "project": "CafModelingAgroecologicalClasses",
+    "name": "Anthrome_v1",
+    "description": "Raster map that depicts stable (no change in 10 years) and dynamic (at least one change in 10 years) land-cover classification (agriculture, rangeland, forest, water and other, urban) as defined by the higher order Anderson Classification System (see Table 2; https://pubs.usgs.gov/pp/0964/report.pdf). Each pixel represents 30 m2. \n\nThis map was generated from 10 years of land-use data defined by the USDA Cropland Data Layer (https://www.nass.usda.gov/Research_and_Science/Cropland/SARS1a.php). ",
+    "format": "geotiff",
+    "filePathTemplate": "{YYYY}/anthrome_{YYYY-YYYY}_{YYYYMMDD}.tif",
+    "filePathDescriptor": "{YYYY} represents the year the data were generated, where YYYY is a four digit year\n{YYYY-YYYY} represents the earliest year and the most recent year of the USDA Cropland Data Layer used, respectively. Where YYYY is a four digit year\n{YYYYMMDD} represents the date the file was generated, where YYYY is four digit year, MM is two digit month, DD is two digit day",
+    "structure": "Multiple",
+    "tags": [],
+    "contacts": [
+      {
+        "name": "David Huggins",
+        "email": "david.huggins@usda.gov",
+        "role": "Owner, Principal Investigator"
+      },
+      {
+        "name": "Bryan Carlson",
+        "email": "bryan.carlson@usda.gov",
+        "role": "Custodian, Point of Contact, Processor"
+      }
+    ],
+    "areaOfInterest": "CAF",
+    "methods": [
+      "https://github.com/cafltar/CafModelingAgroecosystemClasses_Python"
+    ],
+    "temporalResolution": "1",
+    "startDate": "2019",
+    "endDate": "2019",
+    "spatialRepeats": 104232710,
+    "variables": [
+      {
+        "name": "Value",
+        "description": "Pixel classification, where:\n\nValue\t\tClassification\n-----\t\t--------------\n1\t\t\tUrban, Stable\n3\t\t\tRangeland, Stable\n4\t\t\tForest, Stable\n50\t\t\tAgriculture, Stable\n51\t\t\tWater and Other, Stable\n101\t\t\tUrban, Dynamic\n103\t\t\tRangeland, Dynamic\n104\t\t\tForest, Dynamic\n150\t\t\tAgriculture, Dynamic\n151\t\t\tWater and Other, Dynamic",
+        "units": "unitless",
+        "methods": [
+          "https://github.com/cafltar/CafModelingAgroecosystemClasses_Python/blob/master/ScriptTablesFigures/scriptGenerateAnthromeMap.py"
+        ],
+        "isQCSpecified": true,
+        "qcApplied": {
+          "assurance": true,
+          "point": false,
+          "observation": false,
+          "dataset": false,
+          "external": false,
+          "review": false
+        },
+        "processingLevel": "Modeled"
+      }
+    ]
+  }
+}

@@ -34,11 +34,8 @@ namespace Caf.Midden.Core.Models.v0_1_0alpha4
         [JsonPropertyName("temporalResolution")]
         public string? TemporalResolution { get; set; }
 
-        [JsonPropertyName("startDate")]
-        public string? StartDate { get; set; }
-
-        [JsonPropertyName("endDate")]
-        public string? EndDate { get; set; }
+        [JsonPropertyName("temporalExtent")]
+        public string? TemporalExtent { get; set; }
 
         [JsonPropertyName("spatialRepeats")]
         public int? SpatialRepeats { get; set; }
