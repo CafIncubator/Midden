@@ -9,13 +9,13 @@ namespace Caf.Midden.Wasm.Services
 {
     public class StateContainer
     {
-        public Metadata Metadata { get; private set; }
+        public Metadata MetadataForEdit { get; private set; }
 
         public void SetMetadata(ComponentBase source, Metadata value)
         {
-            this.Metadata = value;
+            this.MetadataForEdit = value;
 
-            NotifyStateChanged(source, "Metadata");
+            NotifyStateChanged(source, "MetadataForEdit");
         }
 
         public event Action<ComponentBase, string> StateChanged;
