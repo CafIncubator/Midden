@@ -9,6 +9,7 @@ namespace Caf.Midden.Components.Common
 {
     public interface INotifyStateChange
     {
-        public event Action<ComponentBase, string> StateChanged;
+        event Action<ComponentBase, string> StateChanged;
+        void NotifyStateChange(ComponentBase source, string property);
     }
 }
