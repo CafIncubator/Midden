@@ -8,6 +8,8 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Caf.Midden.Components.StateContainers;
+using Caf.Midden.Components;
+using Caf.Midden.Wasm.Services;
 
 namespace Caf.Midden.Wasm
 {
@@ -19,7 +21,8 @@ namespace Caf.Midden.Wasm
             builder.RootComponents.Add<App>("#app");
 
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
-            builder.Services.AddScoped<EditorStateContainer>();
+            builder.Services.AddScoped<IUpdateMetadata, StateContainer>();
+            builder.Services.AddScoped<IUpdateMessage, StateContainer>();
 
             await builder.Build().RunAsync();
         }

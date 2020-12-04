@@ -1,6 +1,8 @@
 ﻿@page "/counter"
 
-@inject Caf.Midden.Components.StateContainers.EditorStateContainer State
+@inject IUpdateMessage MessageState
+@inject IUpdateMetadata MetadataState
+
 @implements IDisposable
 
 <h1>Counter</h1>
@@ -9,11 +11,11 @@
 
 <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
 
-<p>@State.SchemaVersion</p>
+<p>@MessageState.Message</p>
 
-@if (State.Metadata != null)
+@if (MetadataState.Metadata != null)
 {
-    <p>@State.Metadata.CreationDate</p>
+    <p>@MetadataState.Metadata.CreationDate</p>
 }
 else
 {
@@ -46,14 +48,14 @@ else
 
     protected override void OnInitialized()
     {
-        State.StateChanged += async (source, property) =>
+        MetadataState.StateChanged += async (source, property) =>
             await State_StateChanged(source, property);
     }
 
     void IDisposable.Dispose()
     {
-        State.StateChanged -= async (source, property) =>
-            await State_StateChanged(source, property);
+        MetadataState.StateChanged -= async (source, property) =>
+        await State_StateChanged(source, property);
     }
 
 }

@@ -1,8 +1,8 @@
-﻿@inject StateContainers.EditorStateContainer State
+﻿@inject IUpdateMetadata State
+
 @implements IDisposable
 
 <h3>MetadataEditor</h3>
-<p>@State.SchemaVersion</p>
 
 @if (State.Metadata != null)
 {
