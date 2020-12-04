@@ -6,12 +6,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Caf.Midden.Components
+namespace Caf.Midden.Components.Common
 {
-    public interface IUpdateMetadata : INotifyStateChange
+    public interface IUpdateMessage : INotifyStateChange
     {
-        Metadata Metadata { get; }
+        string Message { get; }
 
-        void SetMetadata(ComponentBase source, Metadata value);
+        void SetMessage(ComponentBase source, string value);
     }
 }

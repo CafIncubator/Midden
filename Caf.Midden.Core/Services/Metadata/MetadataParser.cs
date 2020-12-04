@@ -17,23 +17,14 @@ namespace Caf.Midden.Core.Services.Metadata
             string json)
         {
             string version = GetVersion(json);
-
-            Models.v0_1_0alpha4.Metadata result;
-
-            switch(version)
+            Models.v0_1_0alpha4.Metadata result = version switch
             {
-                case "v0.1.0-alpha1":
-                case "v0.1.0-alpha2":
-                case "v0.1.0-alpha3":
-                    result = Deserialize_v0_1_0alpha3(json);
-                    break;
-                case "v0.1.0-alpha4":
-                    result = Deserialize_v0_1_0alpha4(json);
-                    break;
-                default:
-                    throw new ArgumentException("Unable to parse JSON");
-            }
-
+                "v0.1.0-alpha1" or 
+                "v0.1.0-alpha2" or 
+                "v0.1.0-alpha3" => Deserialize_v0_1_0alpha3(json),
+                "v0.1.0-alpha4" => Deserialize_v0_1_0alpha4(json),
+                _ => throw new ArgumentException("Unable to parse JSON"),
+            };
             return result;
         }
 
@@ -85,9 +76,9 @@ namespace Caf.Midden.Core.Services.Metadata
             var jsonDoc = JsonDocument.Parse(json);
 
             string version;
-
-            JsonElement jsonElement;
-            if (jsonDoc.RootElement.TryGetProperty("file", out jsonElement))
+            if (jsonDoc.RootElement.TryGetProperty(
+                "file", 
+                out _))
             {
                 version = jsonDoc
                     .RootElement

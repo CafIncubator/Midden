@@ -1,11 +1,16 @@
 ﻿@page "/counter"
 
-@inject IUpdateMessage MessageState
-@inject IUpdateMetadata MetadataState
+@inject Caf.Midden.Components.Common.IUpdateMessage MessageState
+@inject Caf.Midden.Components.Common.IUpdateMetadata MetadataState
+@inject Services.StateContainer state
 
 @implements IDisposable
 
 <h1>Counter</h1>
+<h2>GetHashCode() of injected properties</h2>
+<p>MessageState: @(MessageState.GetHashCode())</p>
+<p>MetadataState: @(MetadataState.GetHashCode())</p>
+<p>state: @(state.GetHashCode())</p>
 
 <p>Current count: @currentCount</p>
 
@@ -20,6 +25,16 @@
 else
 {
     <p>Not loaded</p>
+}
+
+@if (state != null)
+{
+    <p>LastUpdated: @state.LastUpdated</p>
+    <p>State CreationDate: @state.Metadata.CreationDate</p>
+}
+else
+{
+    <p>None loaded</p>
 }
 
 <div class="alert alert-info">
@@ -55,7 +70,7 @@ else
     void IDisposable.Dispose()
     {
         MetadataState.StateChanged -= async (source, property) =>
-        await State_StateChanged(source, property);
+            await State_StateChanged(source, property);
     }
 
 }

@@ -9,11 +9,12 @@ namespace Caf.Midden.Core.Services.Metadata
             Models.v0_1_0alpha3.Metadata metadata)
         {
             Models.v0_1_0alpha4.Metadata result =
-                new Models.v0_1_0alpha4.Metadata();
-
-            result.CreationDate = DateTime.Parse(
-                metadata.File.CreationDate);
-            result.ModifiedDate = DateTime.UtcNow;
+                new Models.v0_1_0alpha4.Metadata
+                {
+                    CreationDate = DateTime.Parse(
+                metadata.File.CreationDate),
+                    ModifiedDate = DateTime.UtcNow
+                };
 
             Models.v0_1_0alpha4.Dataset d;
             if(metadata.Dataset != null)
