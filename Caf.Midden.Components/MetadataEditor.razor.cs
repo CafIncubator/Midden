@@ -37,6 +37,9 @@ namespace Caf.Midden.Components
 
             State.SetMetadata(this, metadata);
         }
+        private EditContext EditContext;
+        public string LastCached { get; set; } = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
+        
         private async Task State_StateChanged(
             ComponentBase source,
             string property)
@@ -45,13 +48,24 @@ namespace Caf.Midden.Components
             {
                 // Do work here, provided change of state. Perhaps inspect Metadata to see if changed and save to local cache?
                 await InvokeAsync(StateHasChanged);
+
             }
+            LastCached = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
         }
 
         protected override void OnInitialized()
         {
             State.StateChanged += async (source, property) =>
                 await State_StateChanged(source, property);
+
+            this.EditContext = new EditContext(State);
+            this.EditContext.OnFieldChanged +=
+                EditContext_OnFieldChange;
+        }
+
+        private void EditContext_OnFieldChange(object sender, FieldChangedEventArgs e)
+        {
+            State.NotifyStateChanged(this, "");
         }
 
         void IDisposable.Dispose()

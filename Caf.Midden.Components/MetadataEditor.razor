@@ -4,12 +4,12 @@
 @using Microsoft.AspNetCore.Components.Forms
 
 <h3>MetadataEditor</h3>
-
+<pre>@LastCached</pre>
 @if (State.Metadata != null)
 {
     <p>@State.Metadata.CreationDate</p>
     <p>@State.Metadata.Dataset.Zone</p>
-    <EditForm Model="@State.Metadata">
+    <EditForm EditContext="@EditContext">
         <CascadingValue Value="@State.Metadata">
             <InputText @bind-Value="@State.Metadata.Dataset.Zone" />
         </CascadingValue>

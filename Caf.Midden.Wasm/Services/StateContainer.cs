@@ -35,7 +35,7 @@ namespace Caf.Midden.Wasm.Services
 
         public event Action<ComponentBase, string> StateChanged;
 
-        private void NotifyStateChanged(
+        public void NotifyStateChanged(
             ComponentBase source,
             string property) => StateChanged?.Invoke(source, property);
     }
