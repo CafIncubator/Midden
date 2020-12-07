@@ -21,6 +21,7 @@ namespace Caf.Midden.Components
                 return;
             }
 
+            // TODO IoC?
             MetadataReader metadataReader =
                     new MetadataReader(
                         new MetadataParser(

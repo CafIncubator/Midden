@@ -1,8 +1,8 @@
-﻿@using Microsoft.AspNetCore.Components.Forms
-@inject Common.IHaveMetadataState State
+﻿@inject Common.IHaveMetadataState State
 @implements IDisposable
 
-<h3>MetadataLoaderFileSystem</h3>
+@using Microsoft.AspNetCore.Components.Forms
+
 <InputFile id="inputFileMetadata"
            OnChange="OnInputFileMetadataChange"
-           accept="application/json,.midden"/>
+           accept="application/json,.midden" />
