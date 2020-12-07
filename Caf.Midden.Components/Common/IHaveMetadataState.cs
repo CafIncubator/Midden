@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Caf.Midden.Components.Common
 {
-    public interface IMetadataState : INotifyStateChange
+    public interface IHaveMetadataState : INotifyStateChange
     {
         Metadata Metadata { get; }
 

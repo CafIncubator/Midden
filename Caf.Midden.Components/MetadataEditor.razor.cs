@@ -11,8 +11,13 @@ namespace Caf.Midden.Components
 {
     public partial class MetadataEditor : ComponentBase
     {
+        private EditContext EditContext;
+        public string LastUpdated { get; set; } =
+            DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
+
         void LoadMetadataFile()
         {
+            // Mock for now
             var now = DateTime.UtcNow;
 
             Metadata metadata = new Metadata()
@@ -37,8 +42,6 @@ namespace Caf.Midden.Components
 
             State.SetMetadata(this, metadata);
         }
-        private EditContext EditContext;
-        public string LastCached { get; set; } = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
         
         private async Task State_StateChanged(
             ComponentBase source,
@@ -50,7 +53,7 @@ namespace Caf.Midden.Components
                 await InvokeAsync(StateHasChanged);
 
             }
-            LastCached = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
+            LastUpdated = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
         }
 
         protected override void OnInitialized()

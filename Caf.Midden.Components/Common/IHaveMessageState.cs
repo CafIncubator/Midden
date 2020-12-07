@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Caf.Midden.Components.Common
 {
-    public interface IMessageState : INotifyStateChange
+    public interface IHaveMessageState : INotifyStateChange
     {
         string Message { get; }
 

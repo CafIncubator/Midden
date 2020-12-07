@@ -1,10 +1,10 @@
-﻿@inject Common.IMetadataState State
+﻿@inject Common.IHaveMetadataState State
 @implements IDisposable
 
 @using Microsoft.AspNetCore.Components.Forms
 
 <h3>MetadataEditor</h3>
-<pre>@LastCached</pre>
+<pre>@LastUpdated</pre>
 @if (State.Metadata != null)
 {
     <p>@State.Metadata.CreationDate</p>
