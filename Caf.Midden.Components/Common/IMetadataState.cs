@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace Caf.Midden.Components.Common
 {
-    public interface IUpdateMessage : INotifyStateChange
+    public interface IMetadataState : INotifyStateChange
     {
-        string Message { get; }
+        Metadata Metadata { get; }
 
-        void SetMessage(ComponentBase source, string value);
+        void SetMetadata(ComponentBase source, Metadata value);
     }
 }

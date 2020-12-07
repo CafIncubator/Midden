@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace Caf.Midden.Wasm.Services
 {
-    public class StateContainer : IUpdateMetadata, IUpdateMessage
+    public class StateContainer : IMetadataState, IMessageState
     {
         public string Message { get; private set; } = "v0.1.0-alpha4";
         public string LastUpdated { get; private set; } = 

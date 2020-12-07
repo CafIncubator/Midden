@@ -22,9 +22,9 @@ namespace Caf.Midden.Wasm
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
             
             builder.Services.AddScoped<StateContainer>();
-            builder.Services.AddScoped<IUpdateMetadata>(x =>
+            builder.Services.AddScoped<IMetadataState>(x =>
                 x.GetRequiredService<StateContainer>());
-            builder.Services.AddScoped<IUpdateMessage>(x =>
+            builder.Services.AddScoped<IMessageState>(x =>
                 x.GetRequiredService<StateContainer>());
 
             await builder.Build().RunAsync();
