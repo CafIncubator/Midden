@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace Caf.Midden.Core.Services.Metadata
 {
-    public class MetadataParser
+    public class MetadataParser : IMetadataParser
     {
         private readonly IMetadataConverter converter;
 
