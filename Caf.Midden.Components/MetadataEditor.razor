@@ -1,6 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Components.Forms
 
-<h3>MetadataEditor</h3>
+<h3>Metadata Editor</h3>
 <pre>@LastUpdated</pre>
 
 @if (Metadata != null)
@@ -12,16 +12,17 @@
         <p>@Metadata.Dataset.Zone</p>
     }
 
-    <EditForm EditContext="@EditContext">
-        <CascadingValue Value="@Metadata">
+        <EditForm EditContext="@EditContext">
+            @if(Metadata?.Dataset?.Zone != null)
+            {
             <InputText @bind-Value="@Metadata.Dataset.Zone" />
-        </CascadingValue>
-    </EditForm>
-
+            }
+        </EditForm>
 }
 else
 {
-    <p>Not loaded</p>
+    <p>No Metadata loaded</p>
 }
 
-<button class="btn btn-primary" @onclick="LoadMetadataFile">Load</button>
+<button class="btn btn-primary" 
+        @onclick="LoadMetadataFile">Load Test Data</button>

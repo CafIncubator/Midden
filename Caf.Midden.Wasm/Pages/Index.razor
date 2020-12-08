@@ -1,5 +1,5 @@
 ﻿@page "/"
-@inject Services.StateContainer state
+@inject Services.StateContainer State
 
 <h1>Hello, world!</h1>
 
@@ -7,9 +7,9 @@ Welcome to your new app.
 
 <SurveyPrompt Title="How is Blazor working for you?" />
 
-@if (state != null)
+@if (State != null)
 {
-    <p>LastUpdated: @state.LastUpdated</p>
+    <p>LastUpdated: @State.LastUpdated</p>
 }
 else
 {
@@ -17,11 +17,11 @@ else
 }
 
 <div class="alert alert-info">
-    <MetadataLoaderFileSystem @bind-Metadata="state.MetadataTwoWayBining" />
-    @if(state.MetadataTwoWayBining != null)
+    <MetadataLoaderFileSystem @bind-Metadata="State.MetadataEdit" />
+    @if(State.MetadataEdit != null)
     {
-        <p>Creation: @state.MetadataTwoWayBining.CreationDate</p>
+        <p>Creation: @State.MetadataEdit.CreationDate</p>
     }
 </div>
 
-<MetadataEditor @bind-Metadata="state.MetadataTwoWayBining" />
+<MetadataEditor @bind-Metadata="State.MetadataEdit" />

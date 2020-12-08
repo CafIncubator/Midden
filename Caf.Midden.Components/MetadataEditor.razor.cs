@@ -17,12 +17,22 @@ namespace Caf.Midden.Components
         [Parameter]
         public EventCallback<Metadata> MetadataChanged { get; set; }
 
-        private EditContext EditContext;
-        public string LastUpdated { get; set; } =
+        private string LastUpdated { get; set; } =
             DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
 
-       
-        void LoadMetadataFile()
+        private void SetMetadata(Metadata m)
+        {
+            if(this.Metadata != m)
+            {
+                this.Metadata = m;
+                LastUpdated = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
+                MetadataChanged.InvokeAsync(this.Metadata);
+            }
+        }
+
+        private EditContext EditContext { get; set; }
+        
+        public void LoadMetadataFile()
         {
             // Mock for now
             var now = DateTime.UtcNow;
@@ -47,23 +57,19 @@ namespace Caf.Midden.Components
                 }
             };
 
-            this.Metadata = metadata;
-
-            MetadataChanged.InvokeAsync(this.Metadata);
+            SetMetadata(metadata);  
         }
-        
 
         protected override void OnInitialized()
         {
-            if (this.Metadata == null)
-                LoadMetadataFile();
-
             this.EditContext = new EditContext(this.Metadata);
             this.EditContext.OnFieldChanged +=
                 EditContext_OnFieldChange;
         }
 
-        private void EditContext_OnFieldChange(object sender, FieldChangedEventArgs e)
+        private void EditContext_OnFieldChange(
+            object sender, 
+            FieldChangedEventArgs e)
         {
             MetadataChanged.InvokeAsync(this.Metadata);
             LastUpdated = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
