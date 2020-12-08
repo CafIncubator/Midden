@@ -34,6 +34,8 @@ namespace Caf.Midden.Wasm.Services
             NotifyStateChanged(source, "Metadata");
         }
 
+        public Metadata MetadataTwoWayBining { get; set; }
+
         public event Action<ComponentBase, string> StateChanged;
 
         public void NotifyStateChanged(

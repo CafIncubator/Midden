@@ -17,7 +17,11 @@ else
 }
 
 <div class="alert alert-info">
-    <MetadataLoaderFileSystem />
+    <MetadataLoaderFileSystem @bind-Metadata="state.MetadataTwoWayBining" />
+    @if(state.MetadataTwoWayBining != null)
+    {
+        <p>Creation: @state.MetadataTwoWayBining.CreationDate</p>
+    }
 </div>
 
 <MetadataEditor />

@@ -13,6 +13,12 @@ namespace Caf.Midden.Components
 {
     public partial class MetadataLoaderFileSystem : ComponentBase
     {
+        [Parameter]
+        public Metadata Metadata { get; set; }
+
+        [Parameter]
+        public EventCallback<Metadata> MetadataChanged { get; set; }
+
         private async Task OnInputFileMetadataChange(
             InputFileChangeEventArgs e)
         {
@@ -27,33 +33,10 @@ namespace Caf.Midden.Components
                         new MetadataParser(
                             new MetadataConverter()));
 
-            Metadata metadata =
+            this.Metadata =
                 await metadataReader.ReadAsync(e.File.OpenReadStream());
 
-            State.SetMetadata(this, metadata);
-        }
-
-        private async Task State_StateChanged(
-            ComponentBase source,
-            string property)
-        {
-            if(source != this)
-            {
-                // Do work?
-                await InvokeAsync(StateHasChanged);
-            }
-        }
-
-        protected override void OnInitialized()
-        {
-            State.StateChanged += async (source, property) =>
-                await State_StateChanged(source, property);
-        }
-
-        void IDisposable.Dispose()
-        {
-            State.StateChanged -= async (source, property) =>
-                await State_StateChanged(source, property);
+            await MetadataChanged.InvokeAsync(this.Metadata);
         }
     }
 }
