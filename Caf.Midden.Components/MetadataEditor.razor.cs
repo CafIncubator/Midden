@@ -11,10 +11,17 @@ namespace Caf.Midden.Components
 {
     public partial class MetadataEditor : ComponentBase
     {
+        [Parameter]
+        public Metadata Metadata { get; set; }
+
+        [Parameter]
+        public EventCallback<Metadata> MetadataChanged { get; set; }
+
         private EditContext EditContext;
         public string LastUpdated { get; set; } =
             DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
 
+       
         void LoadMetadataFile()
         {
             // Mock for now
@@ -40,41 +47,26 @@ namespace Caf.Midden.Components
                 }
             };
 
-            State.SetMetadata(this, metadata);
+            this.Metadata = metadata;
+
+            MetadataChanged.InvokeAsync(this.Metadata);
         }
         
-        private async Task State_StateChanged(
-            ComponentBase source,
-            string property)
-        {
-            if(source != this)
-            {
-                // Do work here, provided change of state. Perhaps inspect Metadata to see if changed and save to local cache?
-                await InvokeAsync(StateHasChanged);
-
-            }
-            LastUpdated = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
-        }
 
         protected override void OnInitialized()
         {
-            State.StateChanged += async (source, property) =>
-                await State_StateChanged(source, property);
+            if (this.Metadata == null)
+                LoadMetadataFile();
 
-            this.EditContext = new EditContext(State);
+            this.EditContext = new EditContext(this.Metadata);
             this.EditContext.OnFieldChanged +=
                 EditContext_OnFieldChange;
         }
 
         private void EditContext_OnFieldChange(object sender, FieldChangedEventArgs e)
         {
-            State.NotifyStateChanged(this, "");
-        }
-
-        void IDisposable.Dispose()
-        {
-            State.StateChanged -= async (source, property) =>
-                await State_StateChanged(source, property);
+            MetadataChanged.InvokeAsync(this.Metadata);
+            LastUpdated = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
         }
     }
 }

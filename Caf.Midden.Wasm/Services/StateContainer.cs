@@ -35,6 +35,7 @@ namespace Caf.Midden.Wasm.Services
         }
 
         public Metadata MetadataTwoWayBining { get; set; }
+        public Metadata MetadataEdit { get; set; }
 
         public event Action<ComponentBase, string> StateChanged;
 

@@ -1,20 +1,23 @@
-﻿@inject Common.IHaveMetadataState State
-@implements IDisposable
-
-@using Microsoft.AspNetCore.Components.Forms
+﻿@using Microsoft.AspNetCore.Components.Forms
 
 <h3>MetadataEditor</h3>
 <pre>@LastUpdated</pre>
-@if (State.Metadata != null)
+
+@if (Metadata != null)
 {
-    <p>@State.Metadata.CreationDate</p>
-    <p>@State.Metadata.Dataset.Zone</p>
+    <p>@Metadata.CreationDate</p>
+
+    @if (Metadata.Dataset?.Zone != null)
+    {
+        <p>@Metadata.Dataset.Zone</p>
+    }
+
     <EditForm EditContext="@EditContext">
-        <CascadingValue Value="@State.Metadata">
-            <InputText @bind-Value="@State.Metadata.Dataset.Zone" />
+        <CascadingValue Value="@Metadata">
+            <InputText @bind-Value="@Metadata.Dataset.Zone" />
         </CascadingValue>
     </EditForm>
-    
+
 }
 else
 {
