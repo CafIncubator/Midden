@@ -11,24 +11,26 @@ namespace Caf.Midden.Components
 {
     public partial class MetadataEditor : ComponentBase
     {
+        private Metadata metadata { set; get; }
         [Parameter]
-        public Metadata Metadata { get; set; }
+        //public Metadata Metadata { get; set; }
+        public Metadata Metadata
+        {
+            get => metadata;
+            set
+            {
+                if (metadata == value) return;
+                metadata = value;
+                LastUpdated = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
+                MetadataChanged.InvokeAsync(value);
+            }
+        }
 
         [Parameter]
         public EventCallback<Metadata> MetadataChanged { get; set; }
 
         private string LastUpdated { get; set; } =
             DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
-
-        private void SetMetadata(Metadata m)
-        {
-            if(this.Metadata != m)
-            {
-                this.Metadata = m;
-                LastUpdated = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
-                MetadataChanged.InvokeAsync(this.Metadata);
-            }
-        }
 
         private EditContext EditContext { get; set; }
         
@@ -56,8 +58,8 @@ namespace Caf.Midden.Components
                     }
                 }
             };
-
-            SetMetadata(metadata);  
+            
+            this.Metadata = metadata;
         }
 
         protected override void OnInitialized()
