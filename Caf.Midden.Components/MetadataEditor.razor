@@ -12,17 +12,31 @@
         <p>@Metadata.Dataset.Zone</p>
     }
 
-        <EditForm EditContext="@EditContext">
-            @if(Metadata?.Dataset?.Zone != null)
-            {
+    <EditForm EditContext="@EditContext">
+        @if (Metadata?.Dataset?.Zone != null)
+        {
             <InputText @bind-Value="@Metadata.Dataset.Zone" />
-            }
-        </EditForm>
+        }
+    </EditForm>
 }
 else
 {
     <p>No Metadata loaded</p>
 }
 
-<button class="btn btn-primary" 
-        @onclick="LoadMetadataFile">Load Test Data</button>
+<button class="btn btn-primary"
+        @onclick="LoadMetadataFile">
+    Load Test Data
+</button>
+
+@if (AppConfig != null)
+{
+    <p>Org Name: @AppConfig.OrganizationName</p>
+    <select id="zones">
+        <option></option>
+        @foreach (var zone in AppConfig.Zones)
+        {
+            <option value="@zone">@zone</option>
+        }
+    </select>
+}

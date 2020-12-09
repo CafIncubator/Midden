@@ -11,6 +11,9 @@ namespace Caf.Midden.Components
 {
     public partial class MetadataEditor : ComponentBase
     {
+        [Parameter]
+        public Configuration AppConfig { get; set; }
+
         private Metadata metadata { set; get; }
         [Parameter]
         //public Metadata Metadata { get; set; }

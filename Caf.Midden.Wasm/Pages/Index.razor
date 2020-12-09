@@ -1,6 +1,8 @@
 ﻿@page "/"
 @inject Services.StateContainer State
 
+<ConfigLoader @bind-Configuration="State.AppConfig" />
+
 <h1>Hello, world!</h1>
 
 Welcome to your new app.
@@ -18,10 +20,11 @@ else
 
 <div class="alert alert-info">
     <MetadataLoaderFileSystem @bind-Metadata="State.MetadataEdit" />
-    @if(State.MetadataEdit != null)
+    @if (State.MetadataEdit != null)
     {
         <p>Creation: @State.MetadataEdit.CreationDate</p>
     }
 </div>
 
-<MetadataEditor @bind-Metadata="State.MetadataEdit" />
+<MetadataEditor @bind-Metadata="State.MetadataEdit"
+                AppConfig="State.AppConfig"/>

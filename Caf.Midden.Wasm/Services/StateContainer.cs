@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Caf.Midden.Components.Common;
@@ -36,6 +37,8 @@ namespace Caf.Midden.Wasm.Services
 
         public Metadata MetadataTwoWayBining { get; set; } = new Metadata();
         public Metadata MetadataEdit { get; set; } = new Metadata();
+
+        public Configuration AppConfig { get; set; }
 
         public event Action<ComponentBase, string> StateChanged;
 

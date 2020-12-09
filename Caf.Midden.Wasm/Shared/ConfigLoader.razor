@@ -1,0 +1,32 @@
+﻿@inject HttpClient Http
+@using Caf.Midden.Core.Models.v0_1_0alpha4
+
+<h3>ConfigLoader</h3>
+
+@code {
+    private Configuration configuration { set; get; }
+    [Parameter]
+    public Configuration Configuration
+    {
+        get => configuration;
+        set
+        {
+            if (configuration == value) return;
+            configuration = value;
+            ConfigurationChanged.InvokeAsync(value);
+        }
+    }
+
+    [Parameter]
+    public EventCallback<Configuration> ConfigurationChanged { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        var config = await Http.GetFromJsonAsync<Configuration>("app-config.json");
+        //string json = File.ReadAllText("app-config.json");
+        //var config =
+        //System.Text.Json.JsonSerializer.Deserialize<Configuration>(json);
+        this.Configuration = config;
+    }
+}

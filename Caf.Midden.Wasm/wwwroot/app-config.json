@@ -1,0 +1,16 @@
+{
+  "organizationName": "R.J. Cook Agronomy Farm",
+  "zones": [
+    "Raw",
+    "Work",
+    "Production",
+    "Scratch",
+    "Sensitive",
+    "Intermediate"
+  ],
+  "processingLevels": [
+    "Measured",
+    "Calculated",
+    "Modeled"
+  ]
+}
