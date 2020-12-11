@@ -16,14 +16,14 @@ namespace Caf.Midden.Core.Tests
 {
     public class ConfigurationReaderFileTest
     {
-        [Fact]
+        /*[Fact]
         public async void Read_ValidFile_ReturnsExpected()
         {
             // Not sure how to moq static method of httpclient
             // and since that's the only function (so far) that sut is doing
             // no reason to test it.
 
-            /*
+            
             string filePath = @"Assets\ConfigFiles\app-config_v0_1_0-alpha4.json";
             string jsonData = File.ReadAllText(filePath);
 
@@ -56,7 +56,7 @@ namespace Caf.Midden.Core.Tests
             Assert.Equal(expectedZones, actual.Zones.Count);
             Assert.Equal(expectedProcessingLevels, actual.ProcessingLevels.Count);
             Assert.Equal(expectedOrgName, actual.OrganizationName);
-            */
-        }
+            
+        }*/
     }
 }
