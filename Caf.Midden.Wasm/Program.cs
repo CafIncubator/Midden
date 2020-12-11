@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Caf.Midden.Components.Common;
 using Caf.Midden.Wasm.Services;
 using Caf.Midden.Core.Services.Configuration;
 

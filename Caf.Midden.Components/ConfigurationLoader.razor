@@ -1,32 +1,7 @@
-﻿@using Caf.Midden.Core.Models.v0_1_0alpha4
-@inject Caf.Midden.Core.Services.Configuration.IReadConfiguration configReader
+﻿@inject Caf.Midden.Core.Services.Configuration.IReadConfiguration ConfigReader
 
 <h3>ConfigLoader</h3>
 @if(Configuration?.OrganizationName != null)
 {
     <p>Org: @Configuration.OrganizationName</p>
-}
-
-@code {
-    private Configuration configuration { set; get; }
-    [Parameter]
-    public Configuration Configuration
-    {
-        get => configuration;
-        set
-        {
-            if (configuration == value) return;
-            configuration = value;
-            ConfigurationChanged.InvokeAsync(value);
-        }
-    }
-
-    [Parameter]
-    public EventCallback<Configuration> ConfigurationChanged { get; set; }
-
-    protected override async Task OnInitializedAsync()
-    {
-        var config = await configReader.Read();
-        this.Configuration = config;
-    }
 }
