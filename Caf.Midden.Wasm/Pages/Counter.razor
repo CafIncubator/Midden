@@ -1,36 +1,27 @@
 ﻿@page "/counter"
 
-@inject Caf.Midden.Components.Common.IHaveMessageState MessageState
-@inject Caf.Midden.Components.Common.IHaveMetadataState MetadataState
-@inject Services.StateContainer state
-
-@implements IDisposable
+@inject Services.StateContainer State
 
 <h1>Counter</h1>
-<h2>GetHashCode() of injected properties</h2>
-<p>MessageState: @(MessageState.GetHashCode())</p>
-<p>MetadataState: @(MetadataState.GetHashCode())</p>
-<p>state: @(state.GetHashCode())</p>
 
 <p>Current count: @currentCount</p>
 
 <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
 
-<p>@MessageState.Message</p>
 
-@if (MetadataState.Metadata != null)
+@if (State?.Metadata != null)
 {
-    <p>@MetadataState.Metadata.CreationDate</p>
+    <p>@State.Metadata.CreationDate</p>
 }
 else
 {
     <p>Not loaded</p>
 }
 
-@if (state != null)
+@if (State != null)
 {
-    <p>LastUpdated: @state.LastUpdated</p>
-    <p>State CreationDate: @state.Metadata.CreationDate</p>
+    <p>LastUpdated: @State.LastUpdated</p>
+    <p>State CreationDate: @State.Metadata.CreationDate</p>
 }
 else
 {
@@ -60,17 +51,4 @@ else
             await InvokeAsync(StateHasChanged);
         }
     }
-
-    protected override void OnInitialized()
-    {
-        MetadataState.StateChanged += async (source, property) =>
-            await State_StateChanged(source, property);
-    }
-
-    void IDisposable.Dispose()
-    {
-        MetadataState.StateChanged -= async (source, property) =>
-            await State_StateChanged(source, property);
-    }
-
 }

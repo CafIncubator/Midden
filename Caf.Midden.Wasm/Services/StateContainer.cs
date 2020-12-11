@@ -9,20 +9,11 @@ using Microsoft.AspNetCore.Components;
 
 namespace Caf.Midden.Wasm.Services
 {
-    public class StateContainer : IHaveMetadataState, IHaveMessageState
+    public class StateContainer
     {
         public string SchemaVersion { get; } = "v0.1.0-alpha4";
-        public string Message { get; private set; } = "";
         public string LastUpdated { get; private set; } = 
             DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-
-        public void SetMessage(ComponentBase source, string value)
-        {
-            this.Message = value;
-
-            LastUpdated = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-            NotifyStateChanged(source, "Message");
-        }
 
         public Metadata Metadata { get; private set; }
 
