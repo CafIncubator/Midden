@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Caf.Midden.Components.Common;
 using Caf.Midden.Wasm.Services;
+using Caf.Midden.Core.Services.Configuration;
 
 namespace Caf.Midden.Wasm
 {
@@ -26,6 +27,10 @@ namespace Caf.Midden.Wasm
                 x.GetRequiredService<StateContainer>());
             builder.Services.AddScoped<IHaveMessageState>(x =>
                 x.GetRequiredService<StateContainer>());
+            
+            builder.Services.AddScoped<IReadConfiguration>(sp => new ConfigurationReaderHttp(
+                sp.GetRequiredService<HttpClient>(),
+                "app-config.json"));
 
             await builder.Build().RunAsync();
         }

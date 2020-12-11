@@ -1,7 +1,11 @@
-﻿@inject HttpClient Http
-@using Caf.Midden.Core.Models.v0_1_0alpha4
+﻿@using Caf.Midden.Core.Models.v0_1_0alpha4
+@inject Caf.Midden.Core.Services.Configuration.IReadConfiguration configReader
 
 <h3>ConfigLoader</h3>
+@if(Configuration?.OrganizationName != null)
+{
+    <p>Org: @Configuration.OrganizationName</p>
+}
 
 @code {
     private Configuration configuration { set; get; }
@@ -22,11 +26,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-
-        var config = await Http.GetFromJsonAsync<Configuration>("app-config.json");
-        //string json = File.ReadAllText("app-config.json");
-        //var config =
-        //System.Text.Json.JsonSerializer.Deserialize<Configuration>(json);
+        var config = await configReader.Read();
         this.Configuration = config;
     }
 }
