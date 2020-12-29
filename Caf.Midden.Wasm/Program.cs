@@ -31,6 +31,8 @@ namespace Caf.Midden.Wasm
                     sp.GetRequiredService<HttpClient>(),
                     "app-config.json"));
 
+            builder.Services.AddAntDesign();
+
             await builder.Build().RunAsync();
         }
     }
