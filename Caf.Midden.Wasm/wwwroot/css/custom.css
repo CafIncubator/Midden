@@ -1,0 +1,30 @@
+﻿.ant-layout-header {
+    height: 40px;
+    padding: 5px;
+    line-height: 0px;
+    background: #40A9FF;
+    position: relative;
+    z-index: 10;
+    -webkit-box-shadow: 0px 0px 5px 3px rgba(41,41,41,.25);
+    -moz-box-shadow: 0px 0px 5px 3px rgba(41,41,41,.25);
+    box-shadow: 0px 0px 5px 3px rgba(41,41,41,.25);
+}
+
+.site-layout .site-layout-background {
+    background: #fff;
+}
+
+.menu-toggle {
+    text-align: right;
+}
+
+.trigger {
+    font-size: 16px;
+    padding: 5px;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+    .trigger:hover {
+        color: #1890ff;
+    }

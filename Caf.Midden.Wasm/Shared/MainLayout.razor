@@ -15,64 +15,101 @@
     </div>
 </div>-->
 
-<Layout Style="min-height: 100vh; ">
-    <Sider 
-           Collapsible 
-           Collapsed=@collapsed 
-           OnCollapse=@onCollapse 
-           Theme=SiderTheme.Light 
-           Breakpoint="BreakpointType.Lg">
-        
-        <div class="logo"><p>CAF</p></div>
-        
-        <Menu Theme="MenuTheme.Light" DefaultSelectedKeys=@(new[]{"1"}) Mode="MenuMode.Inline">
-            <MenuItem Key="1" RouterLink="" RouterMatch="NavLinkMatch.All">
-                <Icon Type="home" Theme="outline" />
-                <span>Home</span>
-            </MenuItem>
-            <MenuItem Key="2" RouterLink="/catalog" RouterMatch="NavLinkMatch.All">
-                <Icon Type="container" Theme="outline" />
-                <span>Catalog</span>
-            </MenuItem>
-            <MenuItem Key="3" RouterLink="/editor" RouterMatch="NavLinkMatch.All">
-                <Icon Type="edit" Theme="outline" />
-                <span>Editor</span>
-            </MenuItem>
-        </Menu>
-    </Sider>
-    <Layout Class="site-layout">
-        <Content Style="margin:0 16px;">
-            <Breadcrumb Style="margin:16px 0;">
-                <BreadcrumbItem>User</BreadcrumbItem>
-                <BreadcrumbItem>Bill</BreadcrumbItem>
-            </Breadcrumb>
-            <div class="site-layout-background" style="padding: 24; min-height: 360px">
-                @Body
+<Layout Style="min-height: 100vh;">
+    <Header Class="header">
+    </Header>
+    <Layout>
+        <Sider Collapsible
+               Collapsed=@collapsed
+               NoTrigger
+               OnCollapse=@OnCollapse
+               Theme=SiderTheme.Light
+               Breakpoint="BreakpointType.Lg">
+            <div class="menu-toggle">
+                @if (collapsed)
+                {
+                    <Icon Type="menu-unfold" Theme="outline" Class="trigger" OnClick="toggle" />
+                }
+                else
+                {
+                    <Icon Type="menu-fold" Theme="outline" Class="trigger" OnClick="toggle" />
+                }
             </div>
-        </Content>
-        <Footer Style="text-align:center ">Midden ©2020 Created by CAF LTAR</Footer>
+            <Menu Theme="MenuTheme.Light" DefaultSelectedKeys=@(new[]{"1"}) Mode="MenuMode.Inline">
+                <MenuItem Key="1" RouterLink="" RouterMatch="NavLinkMatch.All">
+                    <Icon Type="home" Theme="outline" />
+                    <span>Home</span>
+                </MenuItem>
+                <MenuItem Key="2" RouterLink="/catalog" RouterMatch="NavLinkMatch.All">
+                    <Icon Type="container" Theme="outline" />
+                    <span>Catalog</span>
+                </MenuItem>
+                <MenuItem Key="3" RouterLink="/editor" RouterMatch="NavLinkMatch.All">
+                    <Icon Type="edit" Theme="outline" />
+                    <span>Editor</span>
+                </MenuItem>
+            </Menu>
+        </Sider>
+        <Layout Class="site-layout">
+            <Content Style="margin:0 16px;">
+                <Breadcrumb Style="margin:16px 0;">
+                    <BreadcrumbItem>User</BreadcrumbItem>
+                    <BreadcrumbItem>Bill</BreadcrumbItem>
+                </Breadcrumb>
+                <div class="site-layout-background" style="padding: 24; min-height: 360px">
+                    @Body
+                </div>
+            </Content>
+            <Footer Style="text-align:center ">Midden ©2020 Created by CAF LTAR</Footer>
+        </Layout>
     </Layout>
 </Layout>
-
 
 @code {
     bool collapsed;
 
-    void onCollapse(bool collapsed)
+    void OnCollapse(bool isCollapsed)
     {
-        this.collapsed = collapsed;
+        // Nothing
+    }
+
+    void toggle()
+    {
+        collapsed = !collapsed;
     }
 }
 
 
 <style>
-    #components-layout-demo-side .logo {
-        height: 32px;
-        background: rgba(255, 255, 255, 0.2);
-        margin: 16px;
+    /*
+    .ant-layout-header {
+        height: 40px;
+        padding: 5px;
+        line-height: 0px;
+        background: #40A9FF;
+        position: relative;
+        z-index: 10;
+        -webkit-box-shadow: 0px 0px 5px 3px rgba(41,41,41,.25);
+        -moz-box-shadow: 0px 0px 5px 3px rgba(41,41,41,.25);
+        box-shadow: 0px 0px 5px 3px rgba(41,41,41,.25);
     }
 
     .site-layout .site-layout-background {
         background: #fff;
     }
+
+    .menu-toggle {
+        text-align: right;
+    }
+
+    .trigger {
+        font-size: 16px;
+        padding: 5px;
+        cursor: pointer;
+        transition: color 0.3s;
+    }
+
+        .trigger:hover {
+            color: #1890ff;
+        }*/
 </style>
