@@ -3,7 +3,12 @@
 
 
 
-<h1>Hello, world!</h1>
+@if(State.AppConfig != null)
+{
+    <PageHeader Class="site-page-header" 
+                Title="@State.AppConfig.OrganizationName"
+                Subtitle="Metadata Tool" />
+}
 
 
 @if (State != null)
@@ -15,3 +20,29 @@ else
     <p>None loaded</p>
 }
 
+
+<div>
+    <Row Gutter="16">
+        <AntDesign.Col Span="8">
+            <Card Hoverable Cover="coverTemplate">
+                <CardMeta Title="Dashboard" Description="Stats for nerds" />
+            </Card>
+        </AntDesign.Col>
+        <AntDesign.Col Span="8">
+            <Card Hoverable Cover="coverTemplate">
+                <CardMeta Title="Catalog" Description="Find and view datasets" />
+            </Card>
+        </AntDesign.Col>
+        <AntDesign.Col Span="8">
+            <Card Hoverable Cover="coverTemplate">
+                <CardMeta Title="Editor" Description="Add dataset" />
+            </Card>
+        </AntDesign.Col>
+    </Row>
+    
+</div>
+
+
+@code{
+    private RenderFragment coverTemplate = @<img alt="example" src="https://phenocam.sr.unh.edu/data/latest/cafcookeastltar01.jpg" />;
+}
