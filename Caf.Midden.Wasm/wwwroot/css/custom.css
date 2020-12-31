@@ -28,3 +28,34 @@
     .trigger:hover {
         color: #1890ff;
     }
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    padding-left: 25px;
+}
+    .header #org-name {
+        font-weight: bold;
+        color: #FFF;
+    }
+
+.icn-spinner {
+    animation: spin-animation 0.5s infinite;
+    display: inline-block;
+}
+
+@keyframes spin-animation {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(359deg);
+    }
+}
+
+.site-layout-background {
+    padding: 24px;
+    min-height: 360px
+}
