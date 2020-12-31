@@ -1,14 +1,10 @@
 ﻿@page "/"
 @inject Services.StateContainer State
-@using AntDesign
 
 
 
 <h1>Hello, world!</h1>
 
-Welcome to your new app.
-
-<SurveyPrompt Title="How is Blazor working for you?" />
 
 @if (State != null)
 {
@@ -19,15 +15,3 @@ else
     <p>None loaded</p>
 }
 
-<div class="alert alert-info">
-    <MetadataLoaderFileSystem @bind-Metadata="State.MetadataEdit" />
-    @if (State.MetadataEdit != null)
-    {
-        <p>Creation: @State.MetadataEdit.CreationDate</p>
-    }
-</div>
-
-<MetadataEditor @bind-Metadata="State.MetadataEdit"
-                AppConfig="State.AppConfig" />
-
-<Button Type="primary">Hello</Button>

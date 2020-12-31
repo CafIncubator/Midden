@@ -34,14 +34,22 @@
     align-items: center;
     justify-content: left;
     padding-left: 25px;
+    padding-right: 25px;
 }
-    .header #org-name {
+    .header .tool-name {
         font-weight: bold;
         color: #FFF;
     }
 
+    .header .configure-icon {
+        margin-left: auto;
+    }
+        .header .configure-icon a {
+            color: #FFF;
+        }
+
 .icn-spinner {
-    animation: spin-animation 0.5s infinite;
+    animation: spin-animation 1s infinite;
     display: inline-block;
 }
 
@@ -59,3 +67,4 @@
     padding: 24px;
     min-height: 360px
 }
+

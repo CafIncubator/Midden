@@ -1,5 +1,18 @@
 ﻿@page "/editor"
-<h3>Editor</h3>
+@inject Services.StateContainer State
+
+<PageHeader Class="site-page-header" Title="Editor" />
+
+<div class="alert alert-info">
+    <MetadataLoaderFileSystem @bind-Metadata="State.MetadataEdit" />
+    @if (State.MetadataEdit != null)
+    {
+        <p>Creation: @State.MetadataEdit.CreationDate</p>
+    }
+</div>
+
+<MetadataEditor @bind-Metadata="State.MetadataEdit"
+                AppConfig="State.AppConfig" />
 
 @code {
 

@@ -6,9 +6,13 @@
         <ConfigurationLoader @bind-Configuration="State.AppConfig" />
         @if (State.AppConfig != null)
         {
-            <div id="org-name">@State.AppConfig.ToolName</div>
+            <div class="tool-name">@State.AppConfig.ToolName</div>
         }
-
+        <div class="configure-icon">
+            <a href="#">
+                <Icon Type="setting" Theme="outline" />
+            </a>
+        </div>
     </Header>
     <Layout>
         <Sider Collapsible
@@ -32,11 +36,15 @@
                     <Icon Type="home" Theme="outline" />
                     <span>Home</span>
                 </MenuItem>
-                <MenuItem Key="2" RouterLink="/catalog" RouterMatch="NavLinkMatch.All">
-                    <Icon Type="container" Theme="outline" />
+                <MenuItem Key="2" RouterLink="/dashboard" RouterMatch="NavLinkMatch.All">
+                    <Icon Type="dashboard" Theme="outline" />
+                    <span>Dashboard</span>
+                </MenuItem>
+                <MenuItem Key="3" RouterLink="/catalog" RouterMatch="NavLinkMatch.All">
+                    <Icon Type="read" Theme="outline" />
                     <span>Catalog</span>
                 </MenuItem>
-                <MenuItem Key="3" RouterLink="/editor" RouterMatch="NavLinkMatch.All">
+                <MenuItem Key="4" RouterLink="/editor" RouterMatch="NavLinkMatch.All">
                     <Icon Type="edit" Theme="outline" />
                     <span>Editor</span>
                 </MenuItem>
@@ -45,7 +53,7 @@
         <Layout Class="site-layout">
             <Content Style="margin:0 16px;">
                 <Breadcrumb Style="margin:16px 0;">
-                    <BreadcrumbItem>User</BreadcrumbItem>
+                    <BreadcrumbItem><Icon Type="home" Theme="fill" /></BreadcrumbItem>
                     <BreadcrumbItem>Bill</BreadcrumbItem>
                 </Breadcrumb>
                 <div class="site-layout-background">
