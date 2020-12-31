@@ -11,6 +11,7 @@ namespace Caf.Midden.Components
     public partial class ConfigurationLoader
     {
         private Configuration configuration { set; get; }
+        
         [Parameter]
         public Configuration Configuration
         {

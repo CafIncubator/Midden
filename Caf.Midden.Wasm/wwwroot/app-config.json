@@ -2,6 +2,7 @@
   "schemaVersion": "v0.1.0-alpha4",
   "isConfigured": true,
   "organizationName": "R.J. Cook Agronomy Farm",
+  "toolName":  "CAF Metadata",
   "zones": [
     "Raw",
     "Work",

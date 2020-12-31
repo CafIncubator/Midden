@@ -18,6 +18,9 @@ namespace Caf.Midden.Core.Models.v0_1_0alpha4
         [JsonPropertyName("organizationName")]
         public string OrganizationName { get; set; }
 
+        [JsonPropertyName("toolName")]
+        public string ToolName { get; set; }
+
         [JsonPropertyName("zones")]
         public List<string> Zones { get; set; }
 

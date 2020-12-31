@@ -1,8 +1,14 @@
 ﻿@inherits LayoutComponentBase
-
+@inject Services.StateContainer State
+ 
 <Layout Style="min-height: 100vh;">
     <Header Class="header">
-        <div id="org-name">CAF Metadata</div>
+        <ConfigurationLoader @bind-Configuration="State.AppConfig" />
+        @if (State.AppConfig != null)
+        {
+            <div id="org-name">@State.AppConfig.ToolName</div>
+        }
+
     </Header>
     <Layout>
         <Sider Collapsible
