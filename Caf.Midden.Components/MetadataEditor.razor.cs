@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Components.Forms;
 
 namespace Caf.Midden.Components
 {
-    public partial class MetadataEditor : ComponentBase
+    public partial class MetadataEditor : ComponentBase, IDisposable
     {
         [Parameter]
         public Configuration AppConfig { get; set; }
@@ -78,6 +78,13 @@ namespace Caf.Midden.Components
         {
             MetadataChanged.InvokeAsync(this.Metadata);
             LastUpdated = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
+        }
+
+        // TODO: Verify this is correct way to implement
+        public void Dispose()
+        {
+            this.EditContext.OnFieldChanged -=
+                EditContext_OnFieldChange;
         }
     }
 }

@@ -3,11 +3,12 @@
 
 
 
-@if(State.AppConfig != null)
+@if (State?.AppConfig != null)
 {
-    <PageHeader Class="site-page-header" 
+    <!---<PageHeader Class="site-page-header"
                 Title="@State.AppConfig.OrganizationName"
-                Subtitle="Metadata Tool" />
+                Subtitle="Metadata Tool" />-->
+<h2>@State.AppConfig.OrganizationName</h2>
 }
 
 
@@ -39,10 +40,10 @@ else
             </Card>
         </AntDesign.Col>
     </Row>
-    
+
 </div>
 
 
 @code{
-    private RenderFragment coverTemplate = @<img alt="example" src="https://phenocam.sr.unh.edu/data/latest/cafcookeastltar01.jpg" />;
+    private RenderFragment coverTemplate =@<img alt="example" src="https://phenocam.sr.unh.edu/data/latest/cafcookeastltar01.jpg" />;
 }
