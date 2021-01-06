@@ -5,10 +5,9 @@
 
 @if (State?.AppConfig != null)
 {
-    <!---<PageHeader Class="site-page-header"
+    <PageHeader Class="site-page-header"
                 Title="@State.AppConfig.OrganizationName"
-                Subtitle="Metadata Tool" />-->
-<h2>@State.AppConfig.OrganizationName</h2>
+                Subtitle="Metadata Tool" />
 }
 
 
@@ -21,7 +20,7 @@ else
     <p>None loaded</p>
 }
 
-
+<p>@DebugMsg</p>
 <div>
     <Row Gutter="16">
         <AntDesign.Col Span="8">
@@ -45,5 +44,28 @@ else
 
 
 @code{
+    public string DebugMsg { get; set; } = "";
     private RenderFragment coverTemplate =@<img alt="example" src="https://phenocam.sr.unh.edu/data/latest/cafcookeastltar01.jpg" />;
+
+    private async Task AppConfig_StateChanged(
+            ComponentBase source,
+            string appConfig)
+    {
+        if (source != this)
+        {
+            await InvokeAsync(StateHasChanged);
+            DebugMsg = "StateHasChanged";
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        State.StateChanged += async (source, property)
+            => await AppConfig_StateChanged(source, property);
+    }
+    public void Dispose()
+    {
+        State.StateChanged -= async (source, property)
+            => await AppConfig_StateChanged(source, property);
+    }
 }

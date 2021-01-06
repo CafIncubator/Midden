@@ -10,7 +10,7 @@ namespace Caf.Midden.Components
 {
     public partial class ConfigurationLoader
     {
-        private Configuration configuration { set; get; }
+        /*private Configuration configuration { set; get; }
         
         [Parameter]
         public Configuration Configuration
@@ -25,12 +25,13 @@ namespace Caf.Midden.Components
         }
 
         [Parameter]
-        public EventCallback<Configuration> ConfigurationChanged { get; set; }
+        public EventCallback<Configuration> ConfigurationChanged { get; set; }*/
 
-        protected override async Task OnParametersSetAsync()
+        string DebugMsg { get; set; } = "";
+        protected override async Task OnInitializedAsync()
         {
             var config = await ConfigReader.Read();
-            this.Configuration = config;
+            State.UpdateAppConfig(this, config);
         }
     }
 }

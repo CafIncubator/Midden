@@ -3,11 +3,12 @@
  
 <Layout Style="min-height: 100vh;">
     <Header Class="header">
-        <ConfigurationLoader @bind-Configuration="State.AppConfig" />
+        <ConfigurationLoader />
         @if (State.AppConfig != null)
         {
             <div class="tool-name">@State.AppConfig.ToolName</div>
         }
+        <div id="last-updated">@State.LastUpdated</div>
         <div class="configure-icon">
             <a href="#">
                 <Icon Type="setting" Theme="outline" />

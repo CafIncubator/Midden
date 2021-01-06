@@ -17,8 +17,4 @@
     <ProjectReference Include="..\Caf.Midden.Core\Caf.Midden.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Common\" />
-  </ItemGroup>
-
 </Project>
