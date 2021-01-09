@@ -1,42 +1,96 @@
 ﻿@using Microsoft.AspNetCore.Components.Forms
+@using AntDesign
 @inject Common.IUpdateLastUpdated State
 
-<h3>Metadata Editor</h3>
+<Space>
+    <SpaceItem>
+        <Popconfirm Title="Confirm reset"
+                    OkText="Reset"
+                    CancelText="Cancel"
+                    OnConfirm="NewMetadata">
+            <Button>Reset</Button>
+        </Popconfirm>
+    </SpaceItem>
+    <SpaceItem>
+        <Button OnClick="LoadMetadataTest">Test</Button>
+    </SpaceItem>
+</Space>
 
-@if (Metadata != null)
+
+@if (Metadata != null & AppConfig != null)
 {
-    <p>@Metadata.CreationDate</p>
+<AntDesign.Form Model="@this.Metadata"
+                LabelColSpan="8"
+                WrapperColSpan="16">
+    <FormItem Label="Zone">
+        <SimpleSelect @bind-Value="@context.Dataset.Zone"
+                      Placeholder="Zone that holds dataset">
+            <SelectOptions>
+                @foreach (var zone in AppConfig.Zones)
+                {
+                    <SimpleSelectOption Value=@zone Label=@zone />
+                }
+            </SelectOptions>
+        </SimpleSelect>
+    </FormItem>
+    <FormItem Label="Name">
+        <AntDesign.Input @bind-Value="context.Dataset.Name"
+                         Placeholder="Name of dataset" />
+    </FormItem>
+    <FormItem Label="Project">
+        <AntDesign.Input @bind-Value="context.Dataset.Project"
+                         Placeholder="Name of project that produced the dataset" />
+    </FormItem>
+    <FormItem Label="Description">
+        <AntDesign.TextArea @bind-Value="context.Dataset.Description"
+                            Placeholder="Description of dataset" />
+    </FormItem>
+    <FormItem Label="Contacts">
+        <Button OnClick="AddContactHandler">Add</Button>
+        <AntList DataSource="@context.Dataset.Contacts"
+                 Split="false"
+                 Size="small">
+            <ChildContent Context="contact">
+                <ListItem>
+                    <InputGroup Compact>
+                        <FormItem NoStyle>
+                            <AntDesign.Input @bind-Value="contact.Name"
+                                             Placeholder="Name of contact" />
+                        </FormItem>
+                        <FormItem NoStyle>
+                            <AntDesign.Input @bind-Value="contact.Email"
+                                             Placeholder="Email of contact" />
+                        </FormItem>
+                        <FormItem NoStyle>
+                            <SimpleSelect @bind-Value="contact.Role"
+                                          Placeholder="Role of contact">
+                                <SelectOptions>
+                                    @foreach (var role in AppConfig.Roles)
+                                    {
+                                        <SimpleSelectOption Value=@role Label=@role />
+                                    }
+                                </SelectOptions>
+                            </SimpleSelect>
+                        </FormItem>
+                        <Button Danger OnClick="@(() => { DeleteContactHandler(contact); })" >
+                            <Icon Type="delete" />
+                        </Button>
+                    </InputGroup>
+                </ListItem>
+            </ChildContent>
+        </AntList>
+        
+    </FormItem>
+</AntDesign.Form>
 
-    @if (Metadata.Dataset?.Zone != null)
-    {
-        <p>@Metadata.Dataset.Zone</p>
-    }
+    <!-- <EditForm EditContext="@EditContext">
 
-    <EditForm EditContext="@EditContext">
-        @if (Metadata?.Dataset?.Zone != null)
-        {
-            <InputText @bind-Value="@Metadata.Dataset.Zone" />
-        }
-    </EditForm>
+    </EditForm>-->
 }
 else
 {
     <p>No Metadata loaded</p>
 }
-
-<button class="btn btn-primary"
-        @onclick="LoadMetadataFile">
-    Load Test Data
-</button>
-
-@if (AppConfig != null)
-{
-    <p>Org Name: @AppConfig.OrganizationName</p>
-    <select id="zones">
-        <option></option>
-        @foreach (var zone in AppConfig.Zones)
-        {
-            <option value="@zone">@zone</option>
-        }
-    </select>
+@code {
+     //static RenderFragment delete = @<AntDesign.Button Danger><Icon Type="delete"></Icon></AntDesign.Button>
 }

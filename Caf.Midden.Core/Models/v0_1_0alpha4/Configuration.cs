@@ -24,6 +24,9 @@ namespace Caf.Midden.Core.Models.v0_1_0alpha4
         [JsonPropertyName("zones")]
         public List<string> Zones { get; set; }
 
+        [JsonPropertyName("roles")]
+        public List<string> Roles { get; set; }
+
         [JsonPropertyName("processingLevels")]
         public List<string> ProcessingLevels { get; set; }
     }

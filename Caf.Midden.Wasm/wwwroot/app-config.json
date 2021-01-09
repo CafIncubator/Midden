@@ -11,6 +11,19 @@
     "Sensitive",
     "Intermediate"
   ],
+  "roles": [
+    "Author",
+    "Custodian",
+    "Distributor",
+    "Originator",
+    "Owner",
+    "Point of contact",
+    "Principal investigator",
+    "Processor",
+    "Publisher",
+    "Resource provider",
+    "User"
+  ],
   "processingLevels": [
     "Measured",
     "Calculated",

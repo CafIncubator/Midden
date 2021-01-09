@@ -68,3 +68,6 @@
     min-height: 360px
 }
 
+.ant-page-header {
+    padding: 0 0 16px 0;
+}

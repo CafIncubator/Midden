@@ -6,6 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.Forms;
+using AntDesign;
+using Microsoft.AspNetCore.Components.Web;
 
 namespace Caf.Midden.Components
 {
@@ -36,8 +38,9 @@ namespace Caf.Midden.Components
         //    DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
 
         private EditContext EditContext { get; set; }
+        Form<Metadata> _form;
         
-        public void LoadMetadataFile()
+        public void LoadMetadataTest()
         {
             // Mock for now
             var now = DateTime.UtcNow;
@@ -56,7 +59,7 @@ namespace Caf.Midden.Components
                         {
                             Name = "Test",
                             Email = "Test@test.com",
-                            Role = "Tool"
+                            Role = "User"
                         }
                     }
                 }
@@ -81,11 +84,34 @@ namespace Caf.Midden.Components
             State.UpdateLastUpdated(this, DateTime.UtcNow);
         }
 
-        // TODO: Verify this is correct way to implement
+        private void NewMetadata()
+        {
+            DateTime dt = DateTime.UtcNow;
+
+            this.Metadata = new Metadata()
+            {
+                Dataset = new Dataset(),
+                CreationDate = dt,
+                ModifiedDate = dt
+            };
+        }
+
         public void Dispose()
         {
             this.EditContext.OnFieldChanged -=
                 EditContext_OnFieldChange;
+        }
+
+        private void AddContactHandler()
+        {
+            if (this.Metadata.Dataset.Contacts == null)
+                this.Metadata.Dataset.Contacts = new List<Person>();
+            this.Metadata.Dataset.Contacts.Add(new Person());
+        }
+
+        private void DeleteContactHandler(Person person)
+        {
+            this.Metadata.Dataset.Contacts.Remove(person);
         }
     }
 }
