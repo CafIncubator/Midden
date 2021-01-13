@@ -29,5 +29,8 @@ namespace Caf.Midden.Core.Models.v0_1_0alpha4
 
         [JsonPropertyName("processingLevels")]
         public List<string> ProcessingLevels { get; set; }
+
+        [JsonPropertyName("geometries")]
+        public List<Geometry> Geometries { get; set; }
     }
 }

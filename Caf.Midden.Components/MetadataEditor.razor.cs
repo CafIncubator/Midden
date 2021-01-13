@@ -113,5 +113,10 @@ namespace Caf.Midden.Components
         {
             this.Metadata.Dataset.Contacts.Remove(person);
         }
+
+        private void OnGeometryItemChangedHandler(string value)
+        {
+            this.Metadata.Dataset.Geometry = value;
+        }
     }
 }
