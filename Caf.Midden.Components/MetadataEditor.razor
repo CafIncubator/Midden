@@ -49,21 +49,22 @@
     </FormItem>
     <FormItem Label="Contacts">
         <Button OnClick="AddContactHandler">Add</Button>
-        <AntList DataSource="@context.Dataset.Contacts"
+        <AntList Id="contacts"
+                 DataSource="@context.Dataset.Contacts"
                  Split="false"
                  Size="small">
             <ChildContent Context="contact">
                 <ListItem>
                     <InputGroup Compact>
-                        <FormItem NoStyle>
+                        <FormItem Class="thirty-percent">
                             <AntDesign.Input @bind-Value="contact.Name"
                                              Placeholder="Name of contact" />
                         </FormItem>
-                        <FormItem NoStyle>
+                        <FormItem Class="thirty-percent">
                             <AntDesign.Input @bind-Value="contact.Email"
                                              Placeholder="Email of contact" />
                         </FormItem>
-                        <FormItem NoStyle>
+                        <FormItem Class="thirty-percent">
                             <SimpleSelect @bind-Value="contact.Role"
                                           Placeholder="Role of contact">
                                 <SelectOptions>
@@ -81,6 +82,10 @@
                 </ListItem>
             </ChildContent>
         </AntList>
+    </FormItem>
+    <FormItem Label="Spatial Repeats">
+        <AntDesign.InputNumber id="spatial-repeats"
+                               @bind-Value="context.Dataset.SpatialRepeats" />
     </FormItem>
     <FormItem Label="Spatial Extent">
             <FormItem>

@@ -71,3 +71,20 @@
 .ant-page-header {
     padding: 0 0 16px 0;
 }
+
+/* Editor */
+#contacts .ant-list-item {
+    padding-left: 0;
+}
+
+    #contacts .ant-list-item .ant-form-item {
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+.thirty-percent {
+    width: 30%;
+}
+
+#spatial-repeats {
+    width: 100%;
+}
