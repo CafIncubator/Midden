@@ -118,5 +118,42 @@ namespace Caf.Midden.Components
         {
             this.Metadata.Dataset.Geometry = value;
         }
+
+        private bool TagInputVisible { get; set; } = false;
+        string _inputValue;
+        Input<string> _inputRef;
+        async Task AddTagHandler()
+        {
+            TagInputVisible = !TagInputVisible;
+            if (_inputRef != null)
+                await _inputRef.Focus();
+        }
+        async Task OnChecked()
+        {
+            TagInputVisible = !TagInputVisible;
+            if (_inputRef != null)
+                await _inputRef.Focus();
+        }
+        private void OnTagClose(string tag)
+        {
+            this.Metadata.Dataset.Tags.Remove(tag);
+        }
+        private void HandleTagInputConfirm()
+        {
+            if (this.Metadata.Dataset.Tags == null)
+                this.Metadata.Dataset.Tags = new List<string>();
+
+            if (string.IsNullOrEmpty(_inputValue)) return;
+
+            string res = this.Metadata.Dataset.Tags.Find(s => s == _inputValue);
+
+            if(string.IsNullOrEmpty(res))
+            {
+                this.Metadata.Dataset.Tags.Add(_inputValue);
+            }
+
+            this._inputValue = "";
+            this.TagInputVisible = false;
+        }
     }
 }

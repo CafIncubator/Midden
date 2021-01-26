@@ -48,7 +48,7 @@
                             AutoSize="true" />
     </FormItem>
     <FormItem Label="Contacts">
-        <Button OnClick="AddContactHandler">Add</Button>
+        <Button OnClick="(() => { AddContactHandler(); })">Add</Button>
         <AntList Id="contacts"
                  DataSource="@context.Dataset.Contacts"
                  Split="false"
@@ -82,6 +82,26 @@
                 </ListItem>
             </ChildContent>
         </AntList>
+    </FormItem>
+    <FormItem Label="Tags">
+        <Button OnClick="OnChecked">Add</Button>
+    @if (context.Dataset.Tags != null)
+    {
+        @foreach (string tag in context.Dataset.Tags)
+        {
+            <Tag Mode="closeable" OnClose="()=>OnTagClose(tag)">@tag</Tag>
+        }
+    }
+    @if(TagInputVisible)
+    {
+        <Input @ref="_inputRef" @bind-Value="_inputValue" OnBlur="HandleTagInputConfirm" OnPressEnter="HandleTagInputConfirm" />
+    }
+    else
+    {
+        <Tag Mode="checkable" Class="editable-tag" OnClick="OnChecked">
+            <Icon Type="plus" />New Tag
+        </Tag>
+    }
     </FormItem>
     <FormItem Label="Spatial Repeats">
         <AntDesign.InputNumber id="spatial-repeats"
