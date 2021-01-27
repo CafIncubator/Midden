@@ -70,6 +70,7 @@ namespace Caf.Midden.Cli
 
             Console.WriteLine($"Will write 'catalog.json' to {outdir}");
 
+            // TODO: Create unit tests instead of junk code
             Configuration config = new Configuration()
             {
                 DataStores = new List<DataStore>()
@@ -87,7 +88,9 @@ namespace Caf.Midden.Cli
 
             foreach(string store in datastores)
             {
-                var currStore = config.DataStores.FirstOrDefault(s => s.Name == store);
+                var currStore = config
+                    .DataStores
+                    .FirstOrDefault(s => s.Name == store);
 
                 if (currStore == null)
                 {
@@ -97,6 +100,8 @@ namespace Caf.Midden.Cli
 
                 switch(currStore.Type)
                 {
+                    // TODO: Create an ICrawler and use builder pattern
+                    // TODO: Clean this up, move to private funcs
                     case DataStoreTypes.LocalFileSystem:
                         Console.WriteLine("Crawling files");
                         LocalFileSystemCrawler crawler =
@@ -115,6 +120,7 @@ namespace Caf.Midden.Cli
                     
             }
 
+            // TODO: Create unit tests instead of junk code
             foreach(var middenFile in middenFiles)
             {
                 Console.WriteLine(middenFile);
