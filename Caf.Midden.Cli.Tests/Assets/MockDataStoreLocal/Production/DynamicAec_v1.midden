@@ -1,0 +1,64 @@
+{
+	"file": {
+		"schema-version": "v0.1.0-alpha2",
+		"creation-date": "2020-07-29"
+	},
+	"dataset": {
+		"zone": "Production",
+		"project": "CafModelingAgroecologicalClasses",
+		"name": "DynamicAec_v1",
+		"description": "Dynamic agroecological classes",
+		"format": "Geotiff",
+		"filePathTemplate": "dynamicAec{YYYY}_{YYYYMMDD}_P3A1.tif",
+		"filePathDescriptor": "{YYYY} is the year the data represent, {YYYYMMDD} is date file was generated where YYYY is four digit year, MM is two digit month, DD is two digit day",
+		"structure": "Multiple",
+		"tags": [],
+		"contacts": [
+			{
+				"name": "David Huggins",
+				"email": "david.huggins@usda.gov",
+				"role": "Owner"
+			},
+			{
+				"name": "Bryan Carlson",
+				"email": "bryan.carlson@usda.gov",
+				"role": "Manager"
+			}
+		],
+		"areaOfInterest": "CAF",
+		"methods": [],
+		"temporalResolution": "0 year",
+		"startDate": "2017",
+		"endDate": "2017",
+		"spatialRepeats": 104232757,
+		"variables": [
+			{
+				"name": "Value",
+				"description": "Dynamic AEC classification, where values < 100 are stable, values > 100 & < 200 are dynamic, values > 200 are unstable; 1 = urban, 3 = rangeland, 4 = forest, 5 = water, 6 = wetlands, 7 = barren, 9 = wilderness, 11 = annual, 12 = transition, 13 = grain-fallow, 14 = irrigated, 15 = orchard, 50 = agriculture, 51 = water and other",
+				"units": "unitless",
+				"height": 0,
+				"tags": [
+					"DynamicAgroecologicalClass"
+				],
+				"methods": [
+					"https://drive.google.com/a/cafltar.org/file/d/1O744yjrdPfXiCuMDeDIqc72mCWCTopNu/view?usp=sharing",
+					"https://github.com/cafltar/CafModelingAgroecosystemClasses_Python/tree/396b60b447eebcdb61121ca95ea7b9a9be19626a"
+				],
+				"temporalResolution": "0 year",
+				"startDate": "2017",
+				"endDate": "2017",
+				"spatialRepeats": 104232757,
+				"isQCSpecified": true,
+				"qcApplied": {
+					"assurance": true,
+					"point": false,
+					"observation": false,
+					"dataset": false,
+					"external": false,
+					"review": true
+				},
+				"processingLevel": "Modeled"
+			}
+		]
+	}
+}

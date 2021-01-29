@@ -1,0 +1,42 @@
+{
+	"file": {
+		"schema-version": "v0.1.0-alpha2",
+		"creation-date": "2020-07-29"
+	},
+	"dataset": {
+  "zone": "Work",
+  "project": "CafPlantGridPointSurvey",
+  "name": "HY1999-2016_P3A1_IntermediateValues_v1",
+  "description": "Legacy harvest data aggregated from harvest year 1999 to harvest year 2016. Includes intermediate values used for calculating modeled values. Also specifies processing levels for variables above processing level 2",
+  "format": ".csv",
+  "filePathTemplate": "HY1999-2016_{YYYMMDD}_P3A1_IntermediateValues.csv",
+  "filePathDescriptor": "{YYYYMMDD} is date file was generated where YYYY is four digit year, MM is two digit month, DD is two digit day",
+  "structure": "Single",
+  "tags": [
+    "Productivity",
+    "Yield",
+    "Crop"
+  ],
+  "contacts": [
+    {
+      "name": "David Huggins",
+      "email": "david.huggins@usda.gov",
+      "role": "Owner"
+    },
+    {
+      "name": "Bryan Carlson",
+      "email": "bryan.carlson@usda.gov",
+      "role": "Manager"
+    }
+  ],
+  "areaOfInterest": "CookEast",
+  "methods": [
+    "https://github.com/cafltar/CafPlantGridPointSurvey_R_AggregateYieldAndBiomass/tree/17092f5da12c7707992c04bd679c8260faaa0cfc"
+  ],
+  "temporalResolution": "1 year",
+  "startDate": "1999",
+  "endDate": "2016",
+  "spatialRepeats": 369,
+  "variables": []
+}
+}

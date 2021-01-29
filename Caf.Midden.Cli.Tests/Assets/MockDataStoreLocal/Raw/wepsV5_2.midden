@@ -1,0 +1,25 @@
+{
+	"file": {
+		"schema-version": "v0.1.0-alpha2",
+		"creation-date": "2020-07-29"
+	},
+	"dataset": {
+  "zone": "Raw",
+  "project": "CafModelingRegionalSoilConditioningIndex",
+  "name": "wepsV5_2",
+  "description": "Model results from CSIP pub/sub service running weps/5.2 model",
+  "format": ".json",
+  "structure": "Multiple",
+  "tags": [],
+  "contacts": [
+    {
+      "name": "Bryan Carlson",
+      "email": "bryan.carlson@usda.gov",
+      "role": "Manager"
+    }
+  ],
+  "areaOfInterest": "CAF",
+  "methods": [],
+  "variables": []
+}
+}

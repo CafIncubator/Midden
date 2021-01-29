@@ -15,35 +15,35 @@ namespace Caf.Midden.Cli
     {
         static int Main(string[] args)
         {
-            var greeting = new Command("greeting", "Say hi.")
-            {
-                new Argument<string>("name", "Your name."),
-                new Option<string?>(new[] {"--greeting", "-g" }, "The greeting to use."),
-                new Option(new[] {"--verbose", "-v" }, "Show the deets.")
-            };
+            //var greeting = new Command("greeting", "Say hi.")
+            //{
+            //    new Argument<string>("name", "Your name."),
+            //    new Option<string?>(new[] {"--greeting", "-g" }, "The greeting to use."),
+            //    new Option(new[] {"--verbose", "-v" }, "Show the deets.")
+            //};
 
             var collate = new Command("collate", "Create a Midden catalog file from one or more data stores.")
             {
-                new Argument<List<string>>("datastores", "Comma separated names of data stores to crawl"),
+                new Argument<List<string>>("datastores", "List of names of data stores to crawl"),
                 new Option<string?>(new[] {"--outdir", "-o" }, "Directory to write the catalog.json file.")
             };
 
-            var col = new Command("col", "Create a Midden catalog file from one or more data stores.")
-            {
-                new Argument<string>("datastores", "Your name."),
-                new Option<string?>(new[] {"--outdir", "-o" }, "The greeting to use.")
-            };
+            //var col = new Command("col", "Create a Midden catalog file from one or more data stores.")
+            //{
+            //    new Argument<string>("datastores", "Your name."),
+            //    new Option<string?>(new[] {"--outdir", "-o" }, "The greeting to use.")
+            //};
 
 
-            greeting.Handler = CommandHandler.Create<string, string?, bool, IConsole>(HandleGreeting);
-            col.Handler = CommandHandler.Create<string, string?, IConsole>(HandleCol);
+            //greeting.Handler = CommandHandler.Create<string, string?, bool, IConsole>(HandleGreeting);
+            //col.Handler = CommandHandler.Create<string, string?, IConsole>(HandleCol);
             collate.Handler = CommandHandler.Create<List<string>, string?, IConsole>(HandleCollate);
 
             var cmd = new RootCommand
             {
-                greeting,
-                collate,
-                col
+                //greeting,
+                collate
+                //col
             };
 
             return cmd.Invoke(args);
@@ -118,7 +118,7 @@ namespace Caf.Midden.Cli
                 }
                 var files = crawler?.GetFileNames();
                 //var files = crawler != null ? crawler.GetFileNames() : new List<string>();
-                middenFiles.AddRange(files);
+                if(files != null) middenFiles.AddRange(files);
 
             }
 

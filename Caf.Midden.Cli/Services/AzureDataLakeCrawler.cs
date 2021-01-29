@@ -9,7 +9,7 @@ namespace Caf.Midden.Cli.Services
 {
     public class AzureDataLakeCrawler : ICrawl
     {
-        public IEnumerable<string> GetFileNames()
+        public List<string> GetFileNames()
         {
             throw new NotImplementedException();
         }

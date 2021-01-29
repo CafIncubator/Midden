@@ -8,6 +8,6 @@ namespace Caf.Midden.Cli.Common
 {
     public interface ICrawl
     {
-        IEnumerable<string> GetFileNames();
+        List<string> GetFileNames();
     }
 }

@@ -13,14 +13,15 @@ namespace Caf.Midden.Cli.Services
         private readonly string rootDirectory;
         public LocalFileSystemCrawler(string rootDirectory)
         {
-            if (!String.IsNullOrEmpty(rootDirectory))
-            {
+            if (string.IsNullOrEmpty(rootDirectory))
                 throw new ArgumentNullException("Directory not specified");
-            }
-            
+
+            if(!Directory.Exists(rootDirectory))
+                throw new ArgumentNullException("Directory does nto exist");
+
             this.rootDirectory = rootDirectory;
         }
-        public IEnumerable<string> GetFileNames()
+        public List<string> GetFileNames()
         {
             string[] files = Directory.GetFiles(
                 rootDirectory, 

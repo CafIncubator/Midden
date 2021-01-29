@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Caf.Midden.Core.Tests", "Ca
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Caf.Midden.Wasm", "Caf.Midden.Wasm\Caf.Midden.Wasm.csproj", "{DB5E77D5-671C-4516-BC7E-580566A780B6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Caf.Midden.Cli", "Caf.Midden.Cli\Caf.Midden.Cli.csproj", "{F2B9716B-1DCE-43B8-84A3-38029B693E90}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Caf.Midden.Cli", "Caf.Midden.Cli\Caf.Midden.Cli.csproj", "{F2B9716B-1DCE-43B8-84A3-38029B693E90}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Caf.Midden.Cli.Tests", "Caf.Midden.Cli.Tests\Caf.Midden.Cli.Tests.csproj", "{92D543A8-BF96-47F9-A278-70C0E1054BAD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{F2B9716B-1DCE-43B8-84A3-38029B693E90}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F2B9716B-1DCE-43B8-84A3-38029B693E90}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F2B9716B-1DCE-43B8-84A3-38029B693E90}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92D543A8-BF96-47F9-A278-70C0E1054BAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92D543A8-BF96-47F9-A278-70C0E1054BAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92D543A8-BF96-47F9-A278-70C0E1054BAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92D543A8-BF96-47F9-A278-70C0E1054BAD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
