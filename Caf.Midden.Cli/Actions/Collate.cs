@@ -44,8 +44,6 @@ namespace Caf.Midden.Cli.Actions
             // Foreach .midden file; parse (use MetadataParser?) and add to global List<Metadata>
             // Write "catalog.json" to writeDirectory
 
-            //var storesList = Regex.Replace(datastores, @"\s+", "").Split(",");
-
             foreach (string store in datastores)
             {
                 Console.WriteLine(store);
@@ -88,7 +86,7 @@ namespace Caf.Midden.Cli.Actions
                         break;
                 }
                 var files = crawler?.GetFileNames();
-                //var files = crawler != null ? crawler.GetFileNames() : new List<string>();
+
                 if (files != null) middenFiles.AddRange(files);
 
             }
