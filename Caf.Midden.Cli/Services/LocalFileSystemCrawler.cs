@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Caf.Midden.Cli.Common;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,12 +8,22 @@ using System.Threading.Tasks;
 
 namespace Caf.Midden.Cli.Services
 {
-    public class LocalFileSystemCrawler
+    public class LocalFileSystemCrawler: ICrawl
     {
-        public List<string> GetFileNames(string rootDir)
+        private readonly string rootDirectory;
+        public LocalFileSystemCrawler(string rootDirectory)
+        {
+            if (!String.IsNullOrEmpty(rootDirectory))
+            {
+                throw new ArgumentNullException("Directory not specified");
+            }
+            
+            this.rootDirectory = rootDirectory;
+        }
+        public IEnumerable<string> GetFileNames()
         {
             string[] files = Directory.GetFiles(
-                rootDir, 
+                rootDirectory, 
                 "*.midden", 
                 SearchOption.AllDirectories);
 

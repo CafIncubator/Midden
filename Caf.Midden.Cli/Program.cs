@@ -1,4 +1,5 @@
-﻿using Caf.Midden.Cli.Models;
+﻿using Caf.Midden.Cli.Common;
+using Caf.Midden.Cli.Models;
 using Caf.Midden.Cli.Services;
 using System;
 using System.Collections.Generic;
@@ -98,26 +99,27 @@ namespace Caf.Midden.Cli
                     continue;
                 }
 
+                ICrawl crawler = null;
                 switch(currStore.Type)
                 {
                     // TODO: Create an ICrawler and use builder pattern
                     // TODO: Clean this up, move to private funcs
                     case DataStoreTypes.LocalFileSystem:
                         Console.WriteLine("Crawling files");
-                        LocalFileSystemCrawler crawler =
-                            new LocalFileSystemCrawler();
-                        if(!String.IsNullOrEmpty(currStore.LocalPath))
-                        {
-                            middenFiles.AddRange(
-                                crawler.GetFileNames(currStore.LocalPath));
-                        }
-                        
+                        crawler = new LocalFileSystemCrawler(
+                            currStore.LocalPath);
                         break;
                     case DataStoreTypes.AzureBlobStorage:
                         Console.WriteLine("Crawling blobs");
+                        crawler = new AzureDataLakeCrawler();
+                        break;
+                    default:
                         break;
                 }
-                    
+                var files = crawler?.GetFileNames();
+                //var files = crawler != null ? crawler.GetFileNames() : new List<string>();
+                middenFiles.AddRange(files);
+
             }
 
             // TODO: Create unit tests instead of junk code
