@@ -1,4 +1,5 @@
-﻿using Caf.Midden.Cli.Common;
+﻿using Caf.Midden.Cli.Actions;
+using Caf.Midden.Cli.Common;
 using Caf.Midden.Cli.Models;
 using Caf.Midden.Cli.Services;
 using System;
@@ -22,11 +23,11 @@ namespace Caf.Midden.Cli
             //    new Option(new[] {"--verbose", "-v" }, "Show the deets.")
             //};
 
-            var collate = new Command("collate", "Create a Midden catalog file from one or more data stores.")
-            {
-                new Argument<List<string>>("datastores", "List of names of data stores to crawl"),
-                new Option<string?>(new[] {"--outdir", "-o" }, "Directory to write the catalog.json file.")
-            };
+            //var collate = new Command("collate", "Create a Midden catalog file from one or more data stores.")
+            //{
+            //    new Argument<List<string>>("datastores", "List of names of data stores to crawl"),
+            //    new Option<string?>(new[] {"--outdir", "-o" }, "Directory to write the catalog.json file.")
+            //};
 
             //var col = new Command("col", "Create a Midden catalog file from one or more data stores.")
             //{
@@ -37,97 +38,85 @@ namespace Caf.Midden.Cli
 
             //greeting.Handler = CommandHandler.Create<string, string?, bool, IConsole>(HandleGreeting);
             //col.Handler = CommandHandler.Create<string, string?, IConsole>(HandleCol);
-            collate.Handler = CommandHandler.Create<List<string>, string?, IConsole>(HandleCollate);
+            //collate.Handler = CommandHandler.Create<List<string>, string?, IConsole>(HandleCollate);
 
             var cmd = new RootCommand
             {
-                //greeting,
-                collate
-                //col
+                new Collate(
+                    "collate",
+                    "Create a Midden catalog file from one or more data stores.",
+                    new Configuration())
             };
 
             return cmd.Invoke(args);
         }
 
-        static void HandleCollate(
-            List<string> datastores,
-            string? outdir,
-            IConsole console)
-        {
-            // Read+parse the config file
-            // foreach dataStore in dataStores
-            // Create a ICrawler (or something) to collage Midden files in store based on type
-            // Foreach .midden file; parse (use MetadataParser?) and add to global List<Metadata>
-            // Write "catalog.json" to writeDirectory
+        //static void HandleCollate(
+        //    List<string> datastores,
+        //    string? outdir,
+        //    IConsole console)
+        //{
+        //    // Read+parse the config file
+        //    // foreach dataStore in dataStores
+        //    // Create a ICrawler (or something) to collage Midden files in store based on type
+        //    // Foreach .midden file; parse (use MetadataParser?) and add to global List<Metadata>
+        //    // Write "catalog.json" to writeDirectory
 
-            //var storesList = Regex.Replace(datastores, @"\s+", "").Split(",");
+        //    //var storesList = Regex.Replace(datastores, @"\s+", "").Split(",");
 
-            foreach (string store in datastores)
-            {
-                Console.WriteLine(store);
-            }
+        //    foreach (string store in datastores)
+        //    {
+        //        Console.WriteLine(store);
+        //    }
 
-            outdir ??= ".";
+        //    outdir ??= ".";
 
-            Console.WriteLine($"Will write 'catalog.json' to {outdir}");
+        //    Console.WriteLine($"Will write 'catalog.json' to {outdir}");
 
-            // TODO: Create unit tests instead of junk code
-            Configuration config = new Configuration()
-            {
-                DataStores = new List<DataStore>()
-                {
-                    new DataStore()
-                    {
-                        Name = "TestFolder",
-                        Type = DataStoreTypes.LocalFileSystem,
-                        LocalPath = @"C:\Users\brcarlson\Desktop\TestFiles"
-                    }
-                }
-            };
 
-            List<string> middenFiles = new List<string>();
+        //    List<string> middenFiles = new List<string>();
 
-            foreach(string store in datastores)
-            {
-                var currStore = config
-                    .DataStores
-                    .FirstOrDefault(s => s.Name == store);
+        //    foreach(string store in datastores)
+        //    {
+        //        var currStore = config?
+        //            .DataStores
+        //            .FirstOrDefault(s => s.Name == store);
 
-                if (currStore == null)
-                {
-                    Console.WriteLine($"No data store with name {store} in config file");
-                    continue;
-                }
+        //        if (currStore == null)
+        //        {
+        //            Console.WriteLine($"No data store with name {store} in config file");
+        //            continue;
+        //        }
 
-                ICrawl crawler = null;
-                switch(currStore.Type)
-                {
-                    // TODO: Create an ICrawler and use builder pattern
-                    // TODO: Clean this up, move to private funcs
-                    case DataStoreTypes.LocalFileSystem:
-                        Console.WriteLine("Crawling files");
-                        crawler = new LocalFileSystemCrawler(
-                            currStore.LocalPath);
-                        break;
-                    case DataStoreTypes.AzureBlobStorage:
-                        Console.WriteLine("Crawling blobs");
-                        crawler = new AzureDataLakeCrawler();
-                        break;
-                    default:
-                        break;
-                }
-                var files = crawler?.GetFileNames();
-                //var files = crawler != null ? crawler.GetFileNames() : new List<string>();
-                if(files != null) middenFiles.AddRange(files);
+        //        ICrawl crawler = null;
+        //        switch(currStore.Type)
+        //        {
+        //            // TODO: Create an ICrawler and use builder pattern
+        //            // TODO: Clean this up, move to private funcs
+        //            case DataStoreTypes.LocalFileSystem:
+        //                Console.WriteLine("Crawling files");
+        //                crawler = new LocalFileSystemCrawler(
+        //                    currStore.LocalPath);
+        //                break;
+        //            case DataStoreTypes.AzureBlobStorage:
+        //                Console.WriteLine("Crawling blobs");
+        //                crawler = new AzureDataLakeCrawler();
+        //                break;
+        //            default:
+        //                break;
+        //        }
+        //        var files = crawler?.GetFileNames();
+        //        //var files = crawler != null ? crawler.GetFileNames() : new List<string>();
+        //        if(files != null) middenFiles.AddRange(files);
 
-            }
+        //    }
 
-            // TODO: Create unit tests instead of junk code
-            foreach(var middenFile in middenFiles)
-            {
-                Console.WriteLine(middenFile);
-            }
-        }
+        //    // TODO: Create unit tests instead of junk code
+        //    foreach(var middenFile in middenFiles)
+        //    {
+        //        Console.WriteLine(middenFile);
+        //    }
+        //}
 
         static void HandleGreeting(
             string name,
