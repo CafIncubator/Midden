@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Caf.Midden.Cli.Actions
 {
-    public class Collate : System.CommandLine.Command
+    public class Collate : Command
     {
         private readonly Configuration config;
 
@@ -78,9 +78,12 @@ namespace Caf.Midden.Cli.Actions
                         crawler = new LocalFileSystemCrawler(
                             currStore.LocalPath);
                         break;
-                    case DataStoreTypes.AzureBlobStorage:
-                        Console.WriteLine("Crawling blobs");
-                        crawler = new AzureDataLakeCrawler();
+                    case DataStoreTypes.AzureDataLakeGen2:
+                        Console.WriteLine("Crawling data lake");
+                        crawler = new AzureDataLakeCrawler(
+                            currStore.TenantId,
+                            currStore.ClientId,
+                            currStore.ClientSecret);
                         break;
                     default:
                         break;

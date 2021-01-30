@@ -11,5 +11,8 @@ namespace Caf.Midden.Cli.Models
         public string Name { get; set; }
         public DataStoreTypes Type { get; set; }
         public string? LocalPath { get; set; }
+        public string? TenantId { get; set; }
+        public string? ClientId { get; set; }
+        public string? ClientSecret { get; set; }
     }
 }

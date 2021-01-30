@@ -10,6 +10,7 @@ namespace Caf.Midden.Cli.Models
     {
         LocalFileSystem,
         AzureBlobStorage,
+        AzureDataLakeGen2,
         GithubOrganization
     }
 }

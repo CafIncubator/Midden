@@ -16,12 +16,23 @@ namespace Caf.Midden.Cli
     {
         static int Main(string[] args)
         {
+            ConfigurationService configReader = new ConfigurationService();
+            Configuration? config = configReader.GetConfiguration();
+
+            if(config == null)
+            {
+                Console.WriteLine("Unable to read 'configuration.json' file. To create a configuration file, use the 'setup' action");
+            }
+
             var cmd = new RootCommand
             {
                 new Collate(
                     "collate",
                     "Create a Midden catalog file from one or more data stores.",
-                    new Configuration())
+                    config),
+                new Setup(
+                    "setup",
+                    "Creates a blank 'configuration.json' file")
             };
 
             return cmd.Invoke(args);
