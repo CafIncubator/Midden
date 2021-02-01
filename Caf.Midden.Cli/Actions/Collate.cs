@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Invocation;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
@@ -26,7 +27,7 @@ namespace Caf.Midden.Cli.Actions
             this.config = configuration;
 
             Add(new Option<List<string>>(
-                new[] { "--datastors", "-d" },
+                new[] { "--datastores", "-d" },
                 "List of names of data stores to crawl"));
             Add(new Option<string?>(
                 new[] { "--outdir", "-o" },
@@ -36,31 +37,48 @@ namespace Caf.Midden.Cli.Actions
                 .Create<List<string>, string?, IConsole>(HandleCollate);
         }
 
+        private void Add(Option<string?> option, object getDefaultValue)
+        {
+            throw new NotImplementedException();
+        }
+
         public void HandleCollate(
             List<string> datastores,
             string? outdir,
             IConsole console)
         {
-            // Read+parse the config file
-            // foreach dataStore in dataStores
-            // Create a ICrawler (or something) to collage Midden files in store based on type
-            // Foreach .midden file; parse (use MetadataParser?) and add to global List<Metadata>
-            // Write "catalog.json" to writeDirectory
+            // TODO: Add this as an Option
 
-            foreach (string store in datastores)
-            {
-                Console.WriteLine(store);
-            }
+            bool silentMode = false;
+            // Set output directory if none specified
+            outdir ??= Path.Combine(
+                Directory.GetCurrentDirectory(), "catalog.json");
+            Console.WriteLine($"Will write output to {outdir}");
 
-            outdir ??= ".";
-
-            Console.WriteLine($"Will write 'catalog.json' to {outdir}");
-
-
-            List<Metadata> middenMetadatas = new List<Metadata>();
-
+            // If no store specified then crawl them all
             if (datastores.Count == 0)
                 datastores = config.DataStores.Select(ds => ds.Name).ToList();
+
+            Console.Write($"Will crawl: ");
+            foreach (var datastore in datastores) Console.Write($"{datastore} ");
+
+            char shouldCont = 'Y';
+            
+            if(!silentMode)
+            {
+                Console.WriteLine();
+                Console.WriteLine("Continue? (Y|N)");
+                shouldCont = Convert.ToChar(Console.Read());
+            }
+
+            if (shouldCont != 'Y')
+            {
+                Console.WriteLine("Aborting...");
+                return;
+            }
+               
+
+            List<Metadata> middenMetadatas = new List<Metadata>();
 
             foreach (string store in datastores)
             {
@@ -122,7 +140,7 @@ namespace Caf.Midden.Cli.Actions
 
             }
 
-            Console.WriteLine(JsonSerializer.Serialize(middenMetadatas));
+            File.WriteAllText(outdir, JsonSerializer.Serialize(middenMetadatas));
         }
     }
 }

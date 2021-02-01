@@ -2,7 +2,7 @@
   "profiles": {
     "Caf.Midden.Cli": {
       "commandName": "Project",
-      "commandLineArgs": "collate"
+      "commandLineArgs": "collate -d \"production\" \"raw\" -o \"C:\\Files\\foo.json\""
     }
   }
 }
