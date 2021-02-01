@@ -17,15 +17,20 @@ namespace Caf.Midden.Cli.Services
         private readonly string tenantId;
         private readonly string clientId;
         private readonly string clientSecret;
+        private readonly string fileSystemName;
+
+        private const string FILE_EXTENSION = ".midden";
 
         public AzureDataLakeCrawler(
             string tenantId,
             string clientId,
-            string clientSecret)
+            string clientSecret,
+            string fileSystemName)
         {
             this.tenantId = tenantId;
             this.clientId = clientId;
             this.clientSecret = clientSecret;
+            this.fileSystemName = fileSystemName;
         }
 
         public List<string> GetFileNames()
@@ -38,18 +43,18 @@ namespace Caf.Midden.Cli.Services
             var serviceClient = new DataLakeServiceClient(new Uri(dfsUri), credential);
 
             DataLakeFileSystemClient fileSystemClient =
-                serviceClient.GetFileSystemClient("production");
+                serviceClient.GetFileSystemClient(fileSystemName);
 
             var names = new List<string>();
 
-            foreach (PathItem projectItem in fileSystemClient.GetPaths())
+            foreach (PathItem pathItem in fileSystemClient.GetPaths())
             {
-                if ((bool)projectItem.IsDirectory)
+                if (pathItem.IsDirectory ?? false)
                 {
-                    foreach(PathItem datasetItem in fileSystemClient.GetPaths(projectItem.Name))
+                    foreach (PathItem subPathItem in fileSystemClient.GetPaths(pathItem.Name))
                     {
-                        if (datasetItem.Name.Contains(".midden"))
-                            names.Add(datasetItem.Name);
+                        if (subPathItem.Name.Contains(FILE_EXTENSION))
+                            names.Add(subPathItem.Name);
                     }
                 }
             }

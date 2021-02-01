@@ -23,8 +23,9 @@ namespace Caf.Midden.Cli.Actions
         {
             this.config = configuration;
 
-            Add(new Argument<List<string>>(
-                "datastores", "List of names of data stores to crawl"));
+            Add(new Option<List<string>>(
+                new[] { "--datastors", "-d" },
+                "List of names of data stores to crawl"));
             Add(new Option<string?>(
                 new[] { "--outdir", "-o" },
                 "Directory to write the catalog.json file."));
@@ -56,6 +57,9 @@ namespace Caf.Midden.Cli.Actions
 
             List<string> middenFiles = new List<string>();
 
+            if (datastores.Count == 0)
+                datastores = config.DataStores.Select(ds => ds.Name).ToList();
+
             foreach (string store in datastores)
             {
                 var currStore = config
@@ -67,6 +71,8 @@ namespace Caf.Midden.Cli.Actions
                     Console.WriteLine($"No data store with name {store} in config file");
                     continue;
                 }
+
+                Console.WriteLine($"Crawling Data Store: {currStore.Name}");
 
                 ICrawl crawler = null;
                 switch (currStore.Type)
@@ -80,10 +86,18 @@ namespace Caf.Midden.Cli.Actions
                         break;
                     case DataStoreTypes.AzureDataLakeGen2:
                         Console.WriteLine("Crawling data lake");
-                        crawler = new AzureDataLakeCrawler(
-                            currStore.TenantId,
-                            currStore.ClientId,
-                            currStore.ClientSecret);
+                        if(currStore.TenantId is not null &&
+                            currStore.ClientId is not null &&
+                            currStore.ClientSecret is not null &&
+                            currStore.AzureFileSystemName is not null)
+                        {
+                            crawler = new AzureDataLakeCrawler(
+                                currStore.TenantId,
+                                currStore.ClientId,
+                                currStore.ClientSecret,
+                                currStore.AzureFileSystemName);
+                        }
+
                         break;
                     default:
                         break;
