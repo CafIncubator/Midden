@@ -17,7 +17,7 @@ namespace Caf.Midden.Cli
         static int Main(string[] args)
         {
             ConfigurationService configReader = new ConfigurationService();
-            Configuration? config = configReader.GetConfiguration();
+            CliConfiguration? config = configReader.GetConfiguration();
 
             if(config == null)
             {

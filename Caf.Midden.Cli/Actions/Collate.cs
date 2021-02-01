@@ -1,24 +1,26 @@
 ﻿using Caf.Midden.Cli.Common;
 using Caf.Midden.Cli.Models;
 using Caf.Midden.Cli.Services;
+using Caf.Midden.Core.Models.v0_1_0alpha4;
 using System;
 using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Caf.Midden.Cli.Actions
 {
     public class Collate : Command
     {
-        private readonly Configuration config;
+        private readonly CliConfiguration config;
 
         public Collate(
             string name, 
             string description,
-            Configuration configuration) 
+            CliConfiguration configuration) 
             : base(name, description)
         {
             this.config = configuration;
@@ -55,7 +57,7 @@ namespace Caf.Midden.Cli.Actions
             Console.WriteLine($"Will write 'catalog.json' to {outdir}");
 
 
-            List<string> middenFiles = new List<string>();
+            List<Metadata> middenMetadatas = new List<Metadata>();
 
             if (datastores.Count == 0)
                 datastores = config.DataStores.Select(ds => ds.Name).ToList();
@@ -77,42 +79,50 @@ namespace Caf.Midden.Cli.Actions
                 ICrawl crawler = null;
                 switch (currStore.Type)
                 {
-                    // TODO: Create an ICrawler and use builder pattern
-                    // TODO: Clean this up, move to private funcs
                     case DataStoreTypes.LocalFileSystem:
                         Console.WriteLine("Crawling files");
-                        crawler = new LocalFileSystemCrawler(
-                            currStore.LocalPath);
+                        if(currStore.LocalPath is not null)
+                        {
+                            crawler = new LocalFileSystemCrawler(
+                                currStore.LocalPath);
+                        }
+                        
                         break;
                     case DataStoreTypes.AzureDataLakeGen2:
                         Console.WriteLine("Crawling data lake");
-                        if(currStore.TenantId is not null &&
+                        if(
+                            currStore.AccountName is not null &&
+                            currStore.TenantId is not null &&
                             currStore.ClientId is not null &&
                             currStore.ClientSecret is not null &&
                             currStore.AzureFileSystemName is not null)
                         {
+
                             crawler = new AzureDataLakeCrawler(
+                                currStore.AccountName,
                                 currStore.TenantId,
                                 currStore.ClientId,
                                 currStore.ClientSecret,
                                 currStore.AzureFileSystemName);
+                        }
+                        else
+                        {
+                            Console.WriteLine(
+                                $"Not enough information provided for {currStore.Name}");
                         }
 
                         break;
                     default:
                         break;
                 }
-                var files = crawler?.GetFileNames();
+                var metadatas = crawler?.GetMetadatas();
 
-                if (files != null) middenFiles.AddRange(files);
+                if(metadatas != null)
+                    if (middenMetadatas != null) middenMetadatas.AddRange(metadatas);
 
             }
 
-            // TODO: Create unit tests instead of junk code
-            foreach (var middenFile in middenFiles)
-            {
-                Console.WriteLine(middenFile);
-            }
+            Console.WriteLine(JsonSerializer.Serialize(middenMetadatas));
         }
     }
 }

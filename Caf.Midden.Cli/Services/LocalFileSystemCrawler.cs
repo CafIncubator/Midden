@@ -1,4 +1,5 @@
 ﻿using Caf.Midden.Cli.Common;
+using Caf.Midden.Core.Models.v0_1_0alpha4;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -29,6 +30,11 @@ namespace Caf.Midden.Cli.Services
                 SearchOption.AllDirectories);
 
             return files.ToList();
+        }
+
+        public List<Metadata> GetMetadatas()
+        {
+            throw new NotImplementedException();
         }
     }
 }

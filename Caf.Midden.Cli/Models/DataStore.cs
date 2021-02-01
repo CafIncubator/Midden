@@ -12,6 +12,7 @@ namespace Caf.Midden.Cli.Models
         public DataStoreTypes Type { get; set; }
         public string? LocalPath { get; set; }
         public string? TenantId { get; set; }
+        public string? AccountName { get; set; }
         public string? ClientId { get; set; }
         public string? ClientSecret { get; set; }
         public string? AzureFileSystemName { get; set; }

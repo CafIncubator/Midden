@@ -1,11 +1,15 @@
-﻿using Azure.Core;
+﻿using Azure;
+using Azure.Core;
 using Azure.Identity;
 using Azure.Storage.Files.DataLake;
 using Azure.Storage.Files.DataLake.Models;
 using Caf.Midden.Cli.Common;
 using Caf.Midden.Cli.Models;
+using Caf.Midden.Core.Models.v0_1_0alpha4;
+using Caf.Midden.Core.Services.Metadata;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,34 +18,44 @@ namespace Caf.Midden.Cli.Services
 {
     public class AzureDataLakeCrawler : ICrawl
     {
+        private readonly string accountName;
         private readonly string tenantId;
         private readonly string clientId;
         private readonly string clientSecret;
         private readonly string fileSystemName;
 
+        private readonly DataLakeServiceClient serviceClient;
+
+        
         private const string FILE_EXTENSION = ".midden";
 
         public AzureDataLakeCrawler(
+            string accountName,
             string tenantId,
             string clientId,
             string clientSecret,
             string fileSystemName)
         {
+            this.accountName = accountName;
             this.tenantId = tenantId;
             this.clientId = clientId;
             this.clientSecret = clientSecret;
             this.fileSystemName = fileSystemName;
+
+            this.serviceClient = InitializeClient();
         }
 
-        public List<string> GetFileNames()
+        private DataLakeServiceClient InitializeClient()
         {
             TokenCredential credential = new ClientSecretCredential(
                 tenantId, clientId, clientSecret, new TokenCredentialOptions());
 
-            string dfsUri = "https://cafltardatalake.dfs.core.windows.net";
+            string dfsUri = $"https://{accountName}.dfs.core.windows.net";
 
-            var serviceClient = new DataLakeServiceClient(new Uri(dfsUri), credential);
-
+            return new DataLakeServiceClient(new Uri(dfsUri), credential);
+        }
+        public List<string> GetFileNames()
+        {
             DataLakeFileSystemClient fileSystemClient =
                 serviceClient.GetFileSystemClient(fileSystemName);
 
@@ -60,6 +74,41 @@ namespace Caf.Midden.Cli.Services
             }
 
             return names;
+        }
+
+        public List<Metadata> GetMetadatas()
+        {
+            List<string> files = GetFileNames();
+
+            List<Metadata> metadatas = new List<Metadata>();
+
+            DataLakeFileSystemClient fileSystemClient =
+                    serviceClient.GetFileSystemClient(fileSystemName);
+
+            MetadataParser parser = 
+                new MetadataParser(
+                    new MetadataConverter());
+            
+            foreach (var file in files)
+            {
+                // Get file contents as json string
+                DataLakeFileClient fileClient = 
+                    fileSystemClient.GetFileClient(file);
+
+                Response<FileDownloadInfo> fileContents = fileClient.Read();
+
+                string json;
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    fileContents.Value.Content.CopyTo(ms);
+                    json = Encoding.UTF8.GetString(ms.ToArray());
+                }
+
+                // Parse json string
+                metadatas.Add(parser.Parse(json));
+            }
+
+            return metadatas;
         }
     }
 }

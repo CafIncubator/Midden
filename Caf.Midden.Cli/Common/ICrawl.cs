@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Caf.Midden.Core.Models.v0_1_0alpha4;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,5 +10,6 @@ namespace Caf.Midden.Cli.Common
     public interface ICrawl
     {
         List<string> GetFileNames();
+        List<Metadata> GetMetadatas();
     }
 }

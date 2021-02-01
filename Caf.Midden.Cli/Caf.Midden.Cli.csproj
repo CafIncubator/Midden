@@ -19,4 +19,10 @@
     <ProjectReference Include="..\Caf.Midden.Core\Caf.Midden.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="configuration.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

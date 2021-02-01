@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Caf.Midden.Cli.Models
 {
-    public class Configuration
+    public class CliConfiguration
     {
         public List<DataStore> DataStores { get; set; } = new List<DataStore>();
     }

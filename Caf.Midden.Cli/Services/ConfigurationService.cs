@@ -18,21 +18,21 @@ namespace Caf.Midden.Cli.Services
             WriteIndented = true
         };
         
-        public Configuration? GetConfiguration()
+        public CliConfiguration? GetConfiguration()
         {
             if (!File.Exists(CONFIG_FILE))
                 return null;
 
             string json = File.ReadAllText(CONFIG_FILE);
-            Configuration? config = 
-                JsonSerializer.Deserialize<Configuration>(json, jsonOptions);
+            CliConfiguration? config = 
+                JsonSerializer.Deserialize<CliConfiguration>(json, jsonOptions);
 
             return config;
         }
 
         public void CreateConfiguration()
         {
-            Configuration config = new Configuration()
+            CliConfiguration config = new CliConfiguration()
             {
                 DataStores = new List<DataStore>()
                 {

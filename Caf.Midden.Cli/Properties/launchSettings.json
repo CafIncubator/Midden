@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Caf.Midden.Cli": {
+      "commandName": "Project",
+      "commandLineArgs": "collate"
+    }
+  }
+}
