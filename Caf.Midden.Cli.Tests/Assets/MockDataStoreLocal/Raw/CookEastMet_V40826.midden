@@ -1,0 +1,363 @@
+{
+	"file": {
+		"schema-version": "v0.1.0-alpha2",
+		"creation-date": "2020-07-29"
+	},
+	"dataset": {
+  "zone": "Raw",
+  "project": "CafMeteorologyECTower",
+  "name": "CookEastMet_V40826",
+  "description": "Meteorology datatable from eddy covariant flux tower located on Cook East field.",
+  "format": ".dat",
+  "filePathTemplate": "{YYYY}/{MM}/CookEastEcTower_Met_Raw_{YYYY}_{MM}_{DD}_{HHMM}.dat",
+  "filePathDescriptor": "YYYY is four digit year of data collection, MM is two digit month of data collection, DD is two digit day of data collection, HHMM is two digit hour and minute of data collection. Time in pacific standard time, not adjusted for daylight savings.",
+  "structure": "Multiple",
+  "tags": [
+    "meteorology"
+  ],
+  "contacts": [
+    {
+      "name": "Bryan Carlson",
+      "email": "bryan.carlson@usda.gov",
+      "role": "Manager"
+    },
+    {
+      "name": "Eric Russell",
+      "email": "eric.e.russell@wsu.edu",
+      "role": "Owner"
+    }
+  ],
+  "areaOfInterest": "CookEast",
+  "geometry": "{\"type\":\"Point\",\"coordinates\":[-117.08205,46.78152]}",
+  "methods": [],
+  "temporalResolution": "15 minute",
+  "endDate": "current",
+  "spatialRepeats": 1,
+  "variables": [
+    {
+      "name": "TIMESTAMP",
+      "description": "mm/dd/yyyy HH:MM, Timestamp of data record in Pacific Standard Time",
+      "units": "Unitless",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "RECORD",
+      "description": "Record number",
+      "units": "unitless",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "amb_tmpr_Avg",
+      "description": "Ambient temperature, original value ",
+      "units": "degC",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "rslt_wnd_spd",
+      "description": "Resultant wind speed from 3-D wind speed",
+      "units": "m s-1",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "wnd_dir_compass",
+      "description": "Wind direction based on compass direction",
+      "units": "Degrees from north",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "RH_Avg",
+      "description": "Average relative humidity",
+      "units": "%",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "Precipitation_Tot",
+      "description": "Total precipitation for each 30-minute block",
+      "units": "mm",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "amb_press_Avg",
+      "description": "Ambient air pressure at station",
+      "units": "kPa",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "PAR_density_Avg",
+      "description": "PAR values. Needed for gap-filling and general data",
+      "units": "μmol s-1 m-2",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "batt_volt_Avg",
+      "description": "Average battery voltage for the previous half-hour",
+      "units": "Volts",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "panel_tmpr_Avg",
+      "description": "Temperature of the logger panel",
+      "units": "Celsius",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "std_wnd_dir",
+      "description": "Standard deviation of the wind direction",
+      "units": "Degrees",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "VPD_air",
+      "description": "Vapor pressure deficit",
+      "units": "kPa",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "Rn_meas_Avg",
+      "description": "Net radiation, uncorrected",
+      "units": "W m-2",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "e_sat",
+      "description": "Saturation vapor pressure",
+      "units": "kPa",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "e",
+      "description": "vapor pressure",
+      "units": "kPa",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "tdr31X_wc_Avg",
+      "description": "Volumetric water content of top TDR",
+      "units": "%",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "tdr31X_tmpr_Avg",
+      "description": "Temperature of top TDR",
+      "units": "Celsius",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "tdr31X_E_Avg",
+      "description": "Soil permittivity",
+      "units": "unitless",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "tdr31X_bulkEC_Avg",
+      "description": "",
+      "units": "μS cm-1",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "tdr31X_poreEC_Avg",
+      "description": "Pore electric conductivity",
+      "units": "μS cm-1",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "Tsoil_Avg",
+      "description": "Average temperature from averaging thermocouple",
+      "units": "Celsius",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "profile_tdr31X_wc_Avg(1)",
+      "description": "Volumetric water content",
+      "units": "%",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "profile_tdr31X_wc_Avg(2)",
+      "description": "Volumetric water content",
+      "units": "%",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "profile_tdr31X_wc_Avg(3)",
+      "description": "Volumetric water content",
+      "units": "%",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "profile_tdr31X_wc_Avg(4)",
+      "description": "Volumetric water content",
+      "units": "%",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "profile_tdr31X_wc_Avg(5)",
+      "description": "Volumetric water content",
+      "units": "%",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "profile_tdr31X_wc_Avg(6)",
+      "description": "Volumetric water content",
+      "units": "%",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "profile_tdr31X_tmpr_Avg(1)",
+      "description": "Temperature",
+      "units": "Celsius",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "profile_tdr31X_tmpr_Avg(2)",
+      "description": "Temperature",
+      "units": "Celsius",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "profile_tdr31X_tmpr_Avg(3)",
+      "description": "Temperature",
+      "units": "Celsius",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "profile_tdr31X_tmpr_Avg(4)",
+      "description": "Temperature",
+      "units": "Celsius",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "profile_tdr31X_tmpr_Avg(5)",
+      "description": "Temperature",
+      "units": "Celsius",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "profile_tdr31X_tmpr_Avg(6)",
+      "description": "Temperature",
+      "units": "Celsius",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "profile_tdr31X_E_Avg(1)",
+      "description": "Permittivity",
+      "units": "",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "profile_tdr31X_E_Avg(2)",
+      "description": "Permittivity",
+      "units": "",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "profile_tdr31X_E_Avg(3)",
+      "description": "Permittivity",
+      "units": "",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "profile_tdr31X_E_Avg(4)",
+      "description": "Permittivity",
+      "units": "",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "profile_tdr31X_E_Avg(5)",
+      "description": "Permittivity",
+      "units": "",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "profile_tdr31X_E_Avg(6)",
+      "description": "Permittivity",
+      "units": "",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "profile_tdr31X_bulkEC_Avg(1)",
+      "description": "Bulk Electric Conductivity",
+      "units": "",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "profile_tdr31X_bulkEC_Avg(2)",
+      "description": "Bulk Electric Conductivity",
+      "units": "",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "profile_tdr31X_bulkEC_Avg(3)",
+      "description": "Bulk Electric Conductivity",
+      "units": "",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "profile_tdr31X_bulkEC_Avg(4)",
+      "description": "Bulk Electric Conductivity",
+      "units": "",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "profile_tdr31X_bulkEC_Avg(5)",
+      "description": "Bulk Electric Conductivity",
+      "units": "",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "profile_tdr31X_bulkEC_Avg(6)",
+      "description": "Bulk Electric Conductivity",
+      "units": "",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "profile_tdr31X_poreEC_Avg(1)",
+      "description": "Pore Water Electric Conductivity",
+      "units": "",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "profile_tdr31X_poreEC_Avg(2)",
+      "description": "Pore Water Electric Conductivity",
+      "units": "",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "profile_tdr31X_poreEC_Avg(3)",
+      "description": "Pore Water Electric Conductivity",
+      "units": "",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "profile_tdr31X_poreEC_Avg(4)",
+      "description": "Pore Water Electric Conductivity",
+      "units": "",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "profile_tdr31X_poreEC_Avg(5)",
+      "description": "Pore Water Electric Conductivity",
+      "units": "",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "profile_tdr31X_poreEC_Avg(6)",
+      "description": "Pore Water Electric Conductivity",
+      "units": "",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "shf_plate_avg",
+      "description": "Average soil heat flux",
+      "units": "W m-2",
+	  "isQCSpecified": false
+    },
+    {
+      "name": "SHFP_1_SENS",
+      "description": "",
+      "units": "",
+	  "isQCSpecified": false
+    }
+  ]
+}
+}
