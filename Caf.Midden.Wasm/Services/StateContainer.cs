@@ -22,7 +22,7 @@ namespace Caf.Midden.Wasm.Services
             NotifyStateChanged(source, "LastUpdated");
         }
 
-        public Metadata Metadata { get; set; }
+        public Metadata Metadata { get; set; } = new Metadata();
         public Metadata MetadataTwoWayBining { get; set; } = new Metadata();
         public Metadata MetadataEdit { get; set; } = new Metadata();
 

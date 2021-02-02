@@ -20,7 +20,7 @@ namespace Caf.Midden.Core.Models.v0_1_0alpha4
 
         [JsonPropertyName("dataset")]
         [Required]
-        public Dataset Dataset { get; set; }
+        public Dataset Dataset { get; set; } = new Dataset();
 
         public Metadata()
         {

@@ -13,7 +13,7 @@ namespace Caf.Midden.Core.Models.v0_1_0alpha4
         public string SchemaVersion { get; set; }
 
         [JsonPropertyName("isConfigured")]
-        public bool IsConfigured { get; set; }
+        public bool IsConfigured { get; set; } = false;
 
         [JsonPropertyName("organizationName")]
         public string OrganizationName { get; set; }
@@ -22,15 +22,15 @@ namespace Caf.Midden.Core.Models.v0_1_0alpha4
         public string ToolName { get; set; }
 
         [JsonPropertyName("zones")]
-        public List<string> Zones { get; set; }
+        public List<string> Zones { get; set; } = new List<string>();
 
         [JsonPropertyName("roles")]
-        public List<string> Roles { get; set; }
+        public List<string> Roles { get; set; } = new List<string>();
 
         [JsonPropertyName("processingLevels")]
-        public List<string> ProcessingLevels { get; set; }
+        public List<string> ProcessingLevels { get; set; } = new List<string>();
 
         [JsonPropertyName("geometries")]
-        public List<Geometry> Geometries { get; set; }
+        public List<Geometry> Geometries { get; set; } = new List<Geometry>();
     }
 }
