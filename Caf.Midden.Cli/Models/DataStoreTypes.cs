@@ -9,8 +9,10 @@ namespace Caf.Midden.Cli.Models
     public enum DataStoreTypes
     {
         LocalFileSystem,
-        AzureBlobStorage,
         AzureDataLakeGen2,
-        GithubOrganization
+        GithubOrganization,
+        GoogleWorkspaceDrive,
+        FileTransferProtocol,
+        Office365OneDrive
     }
 }

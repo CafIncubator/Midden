@@ -21,10 +21,18 @@ namespace Caf.Midden.Cli.Actions
         public Collate(
             string name, 
             string description,
-            CliConfiguration configuration) 
+            CliConfiguration? configuration) 
             : base(name, description)
         {
+            // Abort if not configuration found
+            if (configuration == null)
+            {
+                Console.WriteLine("Unable to read 'configuration.json' file. To create a configuration file, use the 'setup' action");
+                return;
+            }
+
             this.config = configuration;
+
 
             Add(new Option<List<string>>(
                 new[] { "--datastores", "-d" },
@@ -47,9 +55,9 @@ namespace Caf.Midden.Cli.Actions
             string? outdir,
             IConsole console)
         {
-            // TODO: Add this as an Option
-
+            // TODO: Add a silent mode as an Option
             bool silentMode = false;
+
             // Set output directory if none specified
             outdir ??= Path.Combine(
                 Directory.GetCurrentDirectory(), "catalog.json");
@@ -59,9 +67,10 @@ namespace Caf.Midden.Cli.Actions
             if (datastores.Count == 0)
                 datastores = config.DataStores.Select(ds => ds.Name).ToList();
 
-            Console.Write($"Will crawl: ");
+            Console.Write($"Plannig to crawl: ");
             foreach (var datastore in datastores) Console.Write($"{datastore} ");
 
+            // Confirm crawl should continue
             char shouldCont = 'Y';
             
             if(!silentMode)
@@ -77,7 +86,7 @@ namespace Caf.Midden.Cli.Actions
                 return;
             }
                
-
+            // Start crawling all specified data stores
             List<Metadata> middenMetadatas = new List<Metadata>();
 
             foreach (string store in datastores)
@@ -98,16 +107,20 @@ namespace Caf.Midden.Cli.Actions
                 switch (currStore.Type)
                 {
                     case DataStoreTypes.LocalFileSystem:
-                        Console.WriteLine("Crawling files");
                         if(currStore.LocalPath is not null)
                         {
                             crawler = new LocalFileSystemCrawler(
                                 currStore.LocalPath);
                         }
-                        
+                        else
+                        {
+                            Console.WriteLine(
+                                $"Not enough information provided to crawl {currStore.Name}");
+                        }
+
                         break;
+
                     case DataStoreTypes.AzureDataLakeGen2:
-                        Console.WriteLine("Crawling data lake");
                         if(
                             currStore.AccountName is not null &&
                             currStore.TenantId is not null &&
@@ -126,13 +139,15 @@ namespace Caf.Midden.Cli.Actions
                         else
                         {
                             Console.WriteLine(
-                                $"Not enough information provided for {currStore.Name}");
+                                $"Not enough information provided to crawl {currStore.Name}");
                         }
 
                         break;
+
                     default:
                         break;
                 }
+
                 var metadatas = crawler?.GetMetadatas();
 
                 if(metadatas != null)
@@ -140,6 +155,7 @@ namespace Caf.Midden.Cli.Actions
 
             }
 
+            Console.WriteLine($"Writing output to {outdir}");
             File.WriteAllText(outdir, JsonSerializer.Serialize(middenMetadatas));
         }
     }
