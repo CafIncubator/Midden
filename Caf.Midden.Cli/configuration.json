@@ -1,0 +1,22 @@
+{
+  "DataStores": [
+    {
+      "Name": "Production",
+      "Type": "AzureDataLakeGen2",
+      "AccountName":  "cafltardatalake",
+      "TenantId": "582f38ab-df2b-4b2e-9e39-de5e1c1e386d",
+      "ClientId": "374a9e93-34a9-4256-8433-3ce3678b4638",
+      "ClientSecret": "Z~5GRMPPh6~7Xz0yN5o89vC6r2-7Ba_5q-",
+      "AzureFileSystemName": "production"
+    },
+    {
+      "Name": "Raw",
+      "Type": "AzureDataLakeGen2",
+      "AccountName": "cafltardatalake",
+      "TenantId": "582f38ab-df2b-4b2e-9e39-de5e1c1e386d",
+      "ClientId": "374a9e93-34a9-4256-8433-3ce3678b4638",
+      "ClientSecret": "Z~5GRMPPh6~7Xz0yN5o89vC6r2-7Ba_5q-",
+      "AzureFileSystemName": "raw"
+    }
+  ]
+}
