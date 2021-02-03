@@ -1,6 +1,8 @@
 ﻿@using Microsoft.AspNetCore.Components.Forms
 @using AntDesign
 @inject Common.IUpdateLastUpdated State
+@inject ModalService ModalService
+@using Caf.Midden.Components.Modals 
 
 <Space>
     <SpaceItem>
@@ -49,39 +51,30 @@
     </FormItem>
     <FormItem Label="Contacts">
         <Button OnClick="AddContactHandler">Add</Button>
-        <AntList Id="contacts"
-                 DataSource="@context.Dataset.Contacts"
-                 Split="false"
-                 Size="small">
+        <AntDesign.Table
+               TItem="Caf.Midden.Core.Models.v0_1_0alpha4.Person"
+               DataSource="@context.Dataset.Contacts">
             <ChildContent Context="contact">
-                <ListItem>
-                    <InputGroup Compact>
-                        <FormItem Class="thirty-percent">
-                            <AntDesign.Input @bind-Value="contact.Name"
-                                             Placeholder="Name of contact" />
-                        </FormItem>
-                        <FormItem Class="thirty-percent">
-                            <AntDesign.Input @bind-Value="contact.Email"
-                                             Placeholder="Email of contact" />
-                        </FormItem>
-                        <FormItem Class="thirty-percent">
-                            <SimpleSelect @bind-Value="contact.Role"
-                                          Placeholder="Role of contact">
-                                <SelectOptions>
-                                    @foreach (var role in AppConfig.Roles)
-                                    {
-                                        <SimpleSelectOption Value=@role Label=@role />
-                                    }
-                                </SelectOptions>
-                            </SimpleSelect>
-                        </FormItem>
-                        <Button Danger OnClick="@(() => { DeleteContactHandler(contact); })">
-                            <Icon Type="delete" />
-                        </Button>
-                    </InputGroup>
-                </ListItem>
+                <Column @bind-Field="contact.Name" />
+                <Column @bind-Field="contact.Email" />
+                <Column @bind-Field="contact.Role" />
+                <ActionColumn Title="Action">
+                    <Space Size="middle">
+                        <SpaceItem>
+                            <Button Danger OnClick="() => DeleteContactHandler(contact)">
+                                <Icon Type="delete" />
+                            </Button>
+                        </SpaceItem>
+                        <SpaceItem>
+                            <Button OnClick="() => OpenPersonModalTemplate(contact)">
+                                <Icon Type="edit" />
+                            </Button>
+                        </SpaceItem>
+                    </Space>
+                </ActionColumn>
             </ChildContent>
-        </AntList>
+            
+        </AntDesign.Table>
     </FormItem>
     <FormItem Label="Spatial Repeats">
         <AntDesign.InputNumber id="spatial-repeats"
@@ -131,6 +124,41 @@ else
 }
 
 @code {
-    string GeometryTemplate { get; set; }
+    private string GeometryTemplate { get; set; }
+    private ModalRef personModalRef;
 
+    private async Task OpenPersonModalTemplate(Caf.Midden.Core.Models.v0_1_0alpha4.Person contact)
+    {
+        var templateOptions = new Caf.Midden.Components.ViewModels.PersonModalViewModel
+        {
+            Person = new Caf.Midden.Core.Models.v0_1_0alpha4.Person(){
+                Name = contact.Name,
+                Email = contact.Email,
+                Role = contact.Role
+            },
+            Roles = AppConfig.Roles
+        };
+
+        var modalConfig = new ModalOptions();
+        modalConfig.Title = "Contact";
+        modalConfig.OnCancel = async (e) =>
+        {
+            await personModalRef.CloseAsync();
+        };
+
+        modalConfig.AfterClose = () =>
+        {
+            contact.Name = templateOptions.Person.Name;
+            contact.Email = templateOptions.Person.Email;
+            contact.Role = templateOptions.Person.Role;
+
+            InvokeAsync(StateHasChanged);
+
+            return Task.CompletedTask;
+        };
+
+        personModalRef = await ModalService
+        .CreateModalAsync<PersonModal, Caf.Midden.Components.ViewModels.PersonModalViewModel>(modalConfig, templateOptions);
+
+    }
 }

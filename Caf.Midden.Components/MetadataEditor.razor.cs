@@ -17,6 +17,7 @@ namespace Caf.Midden.Components
         public Configuration AppConfig { get; set; }
 
         private Metadata metadata { set; get; }
+        
         [Parameter]
         //public Metadata Metadata { get; set; }
         public Metadata Metadata
