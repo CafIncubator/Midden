@@ -55,11 +55,14 @@
                TItem="Caf.Midden.Core.Models.v0_1_0alpha4.Person"
                DataSource="@context.Dataset.Contacts">
             <ChildContent Context="contact">
-                <Column @bind-Field="contact.Name" />
-                <Column @bind-Field="contact.Email" />
-                <Column @bind-Field="contact.Role" />
+                <Column @bind-Field="contact.Name"
+                        Width="30%"/>
+                <Column @bind-Field="contact.Email"
+                        Width="30%"/>
+                <Column @bind-Field="contact.Role"
+                        Width="30%"/>
                 <ActionColumn Title="Action">
-                    <Space Size="middle">
+                    <Space Size="small">
                         <SpaceItem>
                             <Button Danger OnClick="() => DeleteContactHandler(contact)">
                                 <Icon Type="delete" />
@@ -125,40 +128,5 @@ else
 
 @code {
     private string GeometryTemplate { get; set; }
-    private ModalRef personModalRef;
-
-    private async Task OpenPersonModalTemplate(Caf.Midden.Core.Models.v0_1_0alpha4.Person contact)
-    {
-        var templateOptions = new Caf.Midden.Components.ViewModels.PersonModalViewModel
-        {
-            Person = new Caf.Midden.Core.Models.v0_1_0alpha4.Person(){
-                Name = contact.Name,
-                Email = contact.Email,
-                Role = contact.Role
-            },
-            Roles = AppConfig.Roles
-        };
-
-        var modalConfig = new ModalOptions();
-        modalConfig.Title = "Contact";
-        modalConfig.OnCancel = async (e) =>
-        {
-            await personModalRef.CloseAsync();
-        };
-
-        modalConfig.AfterClose = () =>
-        {
-            contact.Name = templateOptions.Person.Name;
-            contact.Email = templateOptions.Person.Email;
-            contact.Role = templateOptions.Person.Role;
-
-            InvokeAsync(StateHasChanged);
-
-            return Task.CompletedTask;
-        };
-
-        personModalRef = await ModalService
-        .CreateModalAsync<PersonModal, Caf.Midden.Components.ViewModels.PersonModalViewModel>(modalConfig, templateOptions);
-
-    }
+    
 }
