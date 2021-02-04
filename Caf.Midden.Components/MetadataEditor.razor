@@ -121,14 +121,13 @@
         {
             // See: https://stackoverflow.com/questions/60416018/how-to-bind-to-element-from-collection-list-in-blazor
             var iCopy = i;
-            <Space Size="small">
-                <SpaceItem>
-                    @Metadata.Dataset.Tags[i] 
-                    <Button Size="small"
-                            OnClick="() => DeleteTagHandlerIndex(iCopy)">x
-                    </Button>
-                </SpaceItem>
-            </Space>            
+        <span>
+            @Metadata.Dataset.Tags[i]
+            <Button Size="small"
+                    OnClick="() => DeleteTagHandlerIndex(iCopy)">
+                x
+            </Button>
+        </span>
         }
     </FormItem>
         <FormItem Label="Spatial Repeats">
