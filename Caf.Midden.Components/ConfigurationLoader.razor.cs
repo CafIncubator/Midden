@@ -27,10 +27,9 @@ namespace Caf.Midden.Components
         [Parameter]
         public EventCallback<Configuration> ConfigurationChanged { get; set; }*/
 
-        string DebugMsg { get; set; } = "";
         protected override async Task OnInitializedAsync()
         {
-            var config = await ConfigReader.Read();
+            Configuration config = await ConfigReader.Read();
             State.UpdateAppConfig(this, config);
         }
     }

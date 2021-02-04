@@ -63,6 +63,11 @@ namespace Caf.Midden.Components
                             Email = "Test@test.com",
                             Role = "User"
                         }
+                    },
+                    Tags = new List<string>()
+                    {
+                        "Foo",
+                        "[ISO]someThing"
                     }
                 }
             };
@@ -98,6 +103,7 @@ namespace Caf.Midden.Components
             };
         }
 
+        #region Contact Functions
         private ModalRef personModalRef;
         private async Task OpenPersonModalTemplate(Person contact)
         {
@@ -158,11 +164,6 @@ namespace Caf.Midden.Components
                 this.Metadata.Dataset.Contacts.Remove(remove);
             }
         }
-        public void Dispose()
-        {
-            this.EditContext.OnFieldChanged -=
-                EditContext_OnFieldChange;
-        }
 
         private async Task AddContactHandler()
         {
@@ -180,10 +181,82 @@ namespace Caf.Midden.Components
         {
             this.Metadata.Dataset.Contacts.Remove(person);
         }
+        #endregion
+
+        #region Tag Functions
+        private ModalRef tagModalRef;
+        private async Task OpenTagModalTemplate(List<string> tags)
+        {
+            var templateOptions = new ViewModels.TagModalViewModel
+            {
+                Tag = "",
+                Tags = AppConfig.Tags
+            };
+
+            var modalConfig = new ModalOptions();
+            modalConfig.Title = "Tag";
+            modalConfig.OnCancel = async (e) =>
+            {
+                await tagModalRef.CloseAsync();
+            };
+            modalConfig.OnOk = async (e) =>
+            {
+                if(!string.IsNullOrWhiteSpace(templateOptions.Tag) &&
+                    !IsDuplicateTag(templateOptions.Tag))
+                {
+                    tags.Add(templateOptions.Tag);
+                }
+                
+
+                await tagModalRef.CloseAsync();
+            };
+
+            modalConfig.AfterClose = () =>
+            {
+                InvokeAsync(StateHasChanged);
+
+                return Task.CompletedTask;
+            };
+
+            tagModalRef = await ModalService
+                .CreateModalAsync<TagModal, ViewModels.TagModalViewModel>(
+                    modalConfig, templateOptions);
+        }
+
+        private bool IsDuplicateTag(string tag)
+        {
+            var dup = this.Metadata.Dataset.Tags.Find(s => s == tag);
+            if (string.IsNullOrEmpty(dup))
+                return false;
+            else { return true; }
+        }
+
+        private async Task AddTagHandler()
+        {
+            await OpenTagModalTemplate(this.Metadata.Dataset.Tags);
+        }
+
+        private void DeleteTagHandler(string tag)
+        {
+            this.Metadata.Dataset.Tags.Remove(tag);
+            InvokeAsync(StateHasChanged);
+        }
+
+        private void DeleteTagHandlerIndex(int index)
+        {
+            this.Metadata.Dataset.Tags.RemoveAt(index);
+        }
+        #endregion
 
         private void OnGeometryItemChangedHandler(string value)
         {
             this.Metadata.Dataset.Geometry = value;
+        }
+
+        public void Dispose()
+        {
+            this.EditContext.OnFieldChanged -=
+                EditContext_OnFieldChange;
         }
     }
 }

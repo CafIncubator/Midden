@@ -1,7 +1,7 @@
 ﻿@using Caf.Midden.Core.Models.v0_1_0alpha4
 @using Microsoft.AspNetCore.Components
 @using AntDesign
-@inherits ModalTemplate<Caf.Midden.Components.ViewModels.PersonModalViewModel>
+@inherits ModalTemplate<Caf.Midden.Components.ViewModels.TagModalViewModel>
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Components.Forms
 @using Caf.Midden.Components.ViewModels
@@ -11,33 +11,31 @@
       WrapperCol="new ColLayoutParam { Span = 16 }"
       OnFinish="OnFinish"
       OnFinishFailed="OnFinishFailed">
-    <FormItem Label="Name">
-        <Input @bind-Value="@context.Person.Name"
-               Placeholder="Name of contact"/>
-    </FormItem>
-    <FormItem Label="Email">
-        <Input @bind-Value="@context.Person.Email"
-               Placeholder="Email of contact"/>
-    </FormItem>
-    <FormItem Label="Email">
-        <SimpleSelect @bind-Value="@context.Person.Role"
-                      Placeholder="Role of contact">
+    <FormItem Label="From Saved">
+        <SimpleSelect @bind-Value="@selectedSavedTag"
+                      OnSelectedItemChanged="SelectedItemChangedHandler"
+                      Placeholder="Saved tags">
             <SelectOptions>
-                @foreach (var role in context.Roles)
+                @foreach (var role in context.Tags)
                 {
                     <SimpleSelectOption Value=@role Label=@role />
                 }
             </SelectOptions>
         </SimpleSelect>
     </FormItem>
+    <FormItem Label="Tag">
+        <Input @bind-Value="context.Tag"
+               Placeholder="Type tag or choose from saved" />
+    </FormItem>
 </Form>
 
 @code {
-    private PersonModalViewModel _model;
+    private TagModalViewModel _model;
+    private string selectedSavedTag { get; set; }
 
     protected override void OnInitialized()
     {
-        _model = base.Options ?? new PersonModalViewModel();
+        _model = base.Options ?? new TagModalViewModel();
         base.OnInitialized();
     }
 
@@ -48,6 +46,17 @@
 
     private void OnFinishFailed(EditContext editContext)
     {
-        
+
+    }
+    private void SelectedItemChangedHandler(string value)
+    {
+        this._model.Tag = selectedSavedTag;
+
+        //selectedSavedTag = "";
+        //InvokeAsync(StateHasChanged);
+    }
+    void handleChange(string value)
+    {
+        Console.WriteLine(value);
     }
 }
