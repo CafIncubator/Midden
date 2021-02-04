@@ -32,5 +32,8 @@ namespace Caf.Midden.Core.Models.v0_1_0alpha4
 
         [JsonPropertyName("geometries")]
         public List<Geometry> Geometries { get; set; } = new List<Geometry>();
+
+        [JsonPropertyName("tags")]
+        public List<string> Tags { get; set; } = new List<string>();
     }
 }
