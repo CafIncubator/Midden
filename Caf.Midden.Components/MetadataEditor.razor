@@ -85,86 +85,82 @@
     <FormItem Label="Tags">
         <Button OnClick="AddTagHandler">Add</Button>
         <br />
-        <!-- <AntDesign.Table
-                     TItem="string"
-                     DataSource="@context.Dataset.Tags">
-        <ChildContent Context="tag">
-            <Column @bind-Field="tag"
-                    Width="80%">
-            </Column>
-            <ActionColumn Title="Action">
-                <Space Size="small">
-                    <SpaceItem>
-                        <Button Danger OnClick="() => DeleteTagHandler(tag)">
-                            <Icon Type="delete" />
-                        </Button>
-                    </SpaceItem>
-                    <SpaceItem>
-                        <Button OnClick="() => OpenTagModalTemplate(tag)">
-                            <Icon Type="edit" />
-                        </Button>
-                    </SpaceItem>
-                </Space>
-            </ActionColumn>
-        </ChildContent>
-    </AntDesign.Table>-->
-        <!--
-    @foreach(string tag in context.Dataset.Tags)
-    {
-        <Tag Mode="closeable" OnClose="() => DeleteTagHandler(tag)">
-            @tag
-        </Tag>
-    }-->
         <!-- Using for loop here because deleting using List.Remove, or even by finding index then using RemoveAt, caused multiple to be deleted -->
-
         @for (int i = 0; i < Metadata.Dataset.Tags.Count; i++)
         {
             // See: https://stackoverflow.com/questions/60416018/how-to-bind-to-element-from-collection-list-in-blazor
             var iCopy = i;
-        <span>
-            @Metadata.Dataset.Tags[i]
-            <Button Size="small"
-                    OnClick="() => DeleteTagHandlerIndex(iCopy)">
-                x
-            </Button>
-        </span>
+            <span>
+                @Metadata.Dataset.Tags[i]
+                <Button Size="small"
+                        OnClick="() => DeleteTagHandlerIndex(iCopy)">
+                    x
+                </Button>
+            </span>
         }
     </FormItem>
-        <FormItem Label="Spatial Repeats">
-            <AntDesign.InputNumber id="spatial-repeats"
-                                   @bind-Value="context.Dataset.SpatialRepeats" />
-        </FormItem>
-        <FormItem Label="Spatial Extent">
-            <FormItem>
-                <SimpleSelect @bind-Value="this.GeometryTemplate"
-                              Placeholder="Saved values"
-                              AllowClear="true"
-                              OnSelectedItemChanged="OnGeometryItemChangedHandler">
-                    <SelectOptions>
-                        @if (AppConfig.Geometries != null)
+    <FormItem Label="Spatial Repeats">
+        <AntDesign.InputNumber id="spatial-repeats"
+                               @bind-Value="context.Dataset.SpatialRepeats" />
+    </FormItem>
+    <FormItem Label="Spatial Extent">
+        <FormItem>
+            <SimpleSelect @bind-Value="this.GeometryTemplate"
+                          Placeholder="Saved values"
+                          AllowClear="true"
+                          OnSelectedItemChanged="OnGeometryItemChangedHandler">
+                <SelectOptions>
+                    @if (AppConfig.Geometries != null)
+                    {
+                        @foreach (var geom in AppConfig.Geometries)
                         {
-                            @foreach (var geom in AppConfig.Geometries)
-                            {
-                                <SimpleSelectOption Value="@geom.GeoJson"
-                                                    Label="@geom.Name" />
-                            }
+                            <SimpleSelectOption Value="@geom.GeoJson"
+                                                Label="@geom.Name" />
                         }
-                    </SelectOptions>
-                </SimpleSelect>
-            </FormItem>
-            <FormItem>
-                <AntDesign.TextArea @bind-Value="context.Dataset.Geometry"
-                                    Placeholder="Valid geojson" />
-            </FormItem>
+                    }
+                </SelectOptions>
+            </SimpleSelect>
         </FormItem>
-        <FormItem Label="Temporal Resolution">
-            <AntDesign.Input @bind-Value="context.Dataset.TemporalResolution"
-                             Placeholder="e.g. '15 min'" />
+        <FormItem>
+            <AntDesign.TextArea @bind-Value="context.Dataset.Geometry"
+                                Placeholder="Valid geojson" />
         </FormItem>
-        <FormItem Label="Temporal Extent">
-            <AntDesign.Input @bind-Value="context.Dataset.TemporalExtent"
-                             Placeholder="YYYY-MM-DD/YYYY-MM-DD" />
-        </FormItem>
+    </FormItem>
+    <FormItem Label="Temporal Resolution">
+        <AntDesign.Input @bind-Value="context.Dataset.TemporalResolution"
+                         Placeholder="e.g. '15 min'" />
+    </FormItem>
+    <FormItem Label="Temporal Extent">
+        <AntDesign.Input @bind-Value="context.Dataset.TemporalExtent"
+                         Placeholder="YYYY-MM-DD/YYYY-MM-DD" />
+    </FormItem>
+    <FormItem Label="File Format">
+        <AntDesign.Input @bind-Value="context.Dataset.Format"
+                         Placeholder="Format, usually file extension" />
+    </FormItem>
+    <FormItem Label="File Path Template">
+        <AntDesign.Input @bind-Value="context.Dataset.FilePathTemplate"
+                         Placeholder="e.g. '{YYYY}/Filename_{YYYYMMDD}.csv'" />
+    </FormItem>
+    <FormItem Label="File Path Description">
+        <AntDesign.TextArea @bind-Value="context.Dataset.FilePathDescriptor"
+                         Placeholder="Describe template values; e.g. {YYYY}" />
+    </FormItem>
+    <FormItem Label="Dataset Structure">
+        <SimpleSelect @bind-Value="context.Dataset.Structure"
+                      Placeholder="Select">
+            <SelectOptions>
+                @if (AppConfig.DatasetStructures != null)
+                {
+                    @foreach (var structure in AppConfig.DatasetStructures)
+                    {
+                        <AntDesign.SimpleSelectOption Value="@structure"
+                                                      Label="@structure" />
+                    }
+                }
+            </SelectOptions>
+        </SimpleSelect>
+    </FormItem>
 
 </AntDesign.Form>
 

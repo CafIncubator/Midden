@@ -45,5 +45,9 @@
     "[ISO]imageryBaseMapsEarthCover",
     "Meteorology",
     "Temperature"
+  ],
+  "datasetStructures": [
+    "Single",
+    "Multiple"
   ]
 }
