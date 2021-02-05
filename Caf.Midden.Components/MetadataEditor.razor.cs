@@ -236,15 +236,105 @@ namespace Caf.Midden.Components
             await OpenTagModalTemplate(this.Metadata.Dataset.Tags);
         }
 
-        private void DeleteTagHandler(string tag)
-        {
-            this.Metadata.Dataset.Tags.Remove(tag);
-            InvokeAsync(StateHasChanged);
-        }
-
         private void DeleteTagHandlerIndex(int index)
         {
             this.Metadata.Dataset.Tags.RemoveAt(index);
+        }
+        #endregion
+
+        #region Method Functions
+        private ModalRef methodModalRef;
+        private async Task OpenMethodModalTemplate(List<string> methods)
+        {
+            var templateOptions = new ViewModels.MethodModalViewModel
+            {
+                Method = ""
+            };
+
+            var modalConfig = new ModalOptions();
+            modalConfig.Title = "Method";
+            modalConfig.OnCancel = async (e) =>
+            {
+                await tagModalRef.CloseAsync();
+            };
+            modalConfig.OnOk = async (e) =>
+            {
+                if (!string.IsNullOrWhiteSpace(templateOptions.Method))
+                {
+                    methods.Add(templateOptions.Method);
+                }
+
+                await methodModalRef.CloseAsync();
+            };
+
+            modalConfig.AfterClose = () =>
+            {
+                InvokeAsync(StateHasChanged);
+
+                return Task.CompletedTask;
+            };
+
+            methodModalRef = await ModalService
+                .CreateModalAsync<MethodModal, ViewModels.MethodModalViewModel>(
+                    modalConfig, templateOptions);
+        }
+
+        private async Task AddMethodHandler()
+        {
+            await OpenMethodModalTemplate(this.Metadata.Dataset.Methods);
+        }
+
+        private void DeleteMethodHandlerIndex(int index)
+        {
+            this.Metadata.Dataset.Methods.RemoveAt(index);
+        }
+        #endregion
+
+        #region Derived Works Functions
+        private ModalRef derivedWorkModalRef;
+        private async Task OpenDerivedWorkModalTemplate(List<string> derivedWorks)
+        {
+            var templateOptions = new ViewModels.DerivedWorkModalViewModel
+            {
+                DerivedWork = ""
+            };
+
+            var modalConfig = new ModalOptions();
+            modalConfig.Title = "Derived Work";
+            modalConfig.OnCancel = async (e) =>
+            {
+                await tagModalRef.CloseAsync();
+            };
+            modalConfig.OnOk = async (e) =>
+            {
+                if (!string.IsNullOrWhiteSpace(templateOptions.DerivedWork))
+                {
+                    derivedWorks.Add(templateOptions.DerivedWork);
+                }
+
+                await methodModalRef.CloseAsync();
+            };
+
+            modalConfig.AfterClose = () =>
+            {
+                InvokeAsync(StateHasChanged);
+
+                return Task.CompletedTask;
+            };
+
+            methodModalRef = await ModalService
+                .CreateModalAsync<DerivedWorkModal, ViewModels.DerivedWorkModalViewModel>(
+                    modalConfig, templateOptions);
+        }
+
+        private async Task AddDerivedWorkHandler()
+        {
+            await OpenDerivedWorkModalTemplate(this.Metadata.Dataset.DerivedWorks);
+        }
+
+        private void DeleteDerivedWorkHandlerIndex(int index)
+        {
+            this.Metadata.Dataset.DerivedWorks.RemoveAt(index);
         }
         #endregion
 
