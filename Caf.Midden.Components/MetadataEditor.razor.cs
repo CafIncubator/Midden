@@ -255,7 +255,7 @@ namespace Caf.Midden.Components
             modalConfig.Title = "Method";
             modalConfig.OnCancel = async (e) =>
             {
-                await tagModalRef.CloseAsync();
+                await methodModalRef.CloseAsync();
             };
             modalConfig.OnOk = async (e) =>
             {
@@ -303,7 +303,7 @@ namespace Caf.Midden.Components
             modalConfig.Title = "Derived Work";
             modalConfig.OnCancel = async (e) =>
             {
-                await tagModalRef.CloseAsync();
+                await derivedWorkModalRef.CloseAsync();
             };
             modalConfig.OnOk = async (e) =>
             {
@@ -312,7 +312,7 @@ namespace Caf.Midden.Components
                     derivedWorks.Add(templateOptions.DerivedWork);
                 }
 
-                await methodModalRef.CloseAsync();
+                await derivedWorkModalRef.CloseAsync();
             };
 
             modalConfig.AfterClose = () =>
@@ -322,7 +322,7 @@ namespace Caf.Midden.Components
                 return Task.CompletedTask;
             };
 
-            methodModalRef = await ModalService
+            derivedWorkModalRef = await ModalService
                 .CreateModalAsync<DerivedWorkModal, ViewModels.DerivedWorkModalViewModel>(
                     modalConfig, templateOptions);
         }
