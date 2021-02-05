@@ -11,9 +11,14 @@
       WrapperCol="new ColLayoutParam { Span = 16 }"
       OnFinish="OnFinish"
       OnFinishFailed="OnFinishFailed">
-    <FormItem Label="Method">
+    <FormItem Label="Derived Work">
         <Input @bind-Value="@context.DerivedWork"
-               Placeholder="Link to method document"/>
+               Placeholder="Link to document that references dataset, or short description"/>
+    </FormItem>
+    <FormItem>
+        <Button Type="@ButtonType.Primary" HtmlType="submit">
+            Submit
+        </Button>
     </FormItem>
 </Form>
 
