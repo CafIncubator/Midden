@@ -15,43 +15,23 @@
         <Input @bind-Value="@context.Variable.Name"
                Placeholder="Variable Name" />
     </FormItem>
+
     <FormItem Label="Description">
         <TextArea @bind-Value="@context.Variable.Description"
                   Placeholder="Variable description" />
     </FormItem>
+
     <FormItem Label="Units">
         <Input @bind-Value="@context.Variable.Units"
                Placeholder="Variable units" />
     </FormItem>
-    <FormItem Label="Height">
-        <Input @bind-Value="@context.Variable.Height"
-               Placeholder="Variable height" />
-    </FormItem>
 
-    <!-- Not using "FormItem" tag here because it throws an error; something about using a bind-Value with string -->
-    <Row Gutter="2">
-        <AntDesign.Col Span="8">Tags:</AntDesign.Col>
-        <AntDesign.Col Span="16">
-            <Select Mode="tags"
-                    Placeholder="Select tags"
-                    @bind-Values="@context.SelectedTags"
-                    TItemValue="string"
-                    TItem="string"
-                    OnSelectedItemsChanged="OnSelectedItemsChangedHandler"
-                    EnableSearch>
-                <SelectOptions>
-                    @foreach (var item in context.Tags)
-                    {
-                        <SelectOption TItemValue="string" TItem="string" Value=@item Label=@item />
-                    }
-                </SelectOptions>
-            </Select>
-        </AntDesign.Col>
-    </Row>
     <FormItem Label="Method">
         <Input @bind-Value="@context.Variable.Method"
                Placeholder="Instrument name, link to SOP, et." />
     </FormItem>
+
+    <!-- Not using "FormItem" tag here because it throws an error; something about using a bind-Value with string -->
     <Row Gutter="2">
         <AntDesign.Col Span="8">QC Applied:</AntDesign.Col>
         <AntDesign.Col Span="16">
@@ -82,7 +62,31 @@
         </SimpleSelect>
     </FormItem>
 
+    <!-- Not using "FormItem" tag here because it throws an error; something about using a bind-Value with string -->
+    <Row Gutter="2">
+        <AntDesign.Col Span="8">Tags:</AntDesign.Col>
+        <AntDesign.Col Span="16">
+            <Select Mode="tags"
+                    Placeholder="Select tags"
+                    @bind-Values="@context.SelectedTags"
+                    TItemValue="string"
+                    TItem="string"
+                    OnSelectedItemsChanged="OnSelectedItemsChangedHandler"
+                    EnableSearch>
+                <SelectOptions>
+                    @foreach (var item in context.Tags)
+                    {
+                        <SelectOption TItemValue="string" TItem="string" Value=@item Label=@item />
+                    }
+                </SelectOptions>
+            </Select>
+        </AntDesign.Col>
+    </Row>
 
+    <FormItem Label="Height">
+        <Input @bind-Value="@context.Variable.Height"
+               Placeholder="Variable height" />
+    </FormItem>
 </Form>
 
 @code {
