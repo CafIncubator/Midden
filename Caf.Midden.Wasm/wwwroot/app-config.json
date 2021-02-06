@@ -49,5 +49,13 @@
   "datasetStructures": [
     "Single",
     "Multiple"
+  ],
+  "qualityControlTags": [
+    "Assurance",
+    "Point",
+    "Observation",
+    "Dataset",
+    "External",
+    "Review"
   ]
 }

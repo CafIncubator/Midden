@@ -22,8 +22,8 @@
 @if (Metadata != null && AppConfig != null)
 {
 <AntDesign.Form Model="@this.Metadata"
-                LabelColSpan="8"
-                WrapperColSpan="16">
+                LabelColSpan="6"
+                WrapperColSpan="8">
     <FormItem Label="Zone">
         <SimpleSelect @bind-Value="@context.Dataset.Zone"
                       Placeholder="Zone that holds dataset">
@@ -198,6 +198,57 @@
         }
     </FormItem>
 
+    <FormItem Label="Variables">
+        <Button OnClick="AddVariableHandler">Add</Button>
+        <br />
+        @if (context.Dataset.Variables.Count > 0)
+        {
+            <AntDesign.Table TItem="Caf.Midden.Core.Models.v0_1_0alpha4.Variable"
+                             DataSource="@context.Dataset.Variables"
+                             Size="@TableSize.Small"
+                             ScrollX="1400">
+                <ChildContent Context="variable">
+                    <Column @bind-Field="variable.Name" 
+                            Fixed="left"/>
+                    <Column @bind-Field="variable.Description"
+                            Ellipsis />
+                    <Column @bind-Field="variable.Units" />
+                    <Column @bind-Field="variable.Height" />
+                    <Column @bind-Field="variable.QCApplied">
+                        @foreach(var qc in variable.QCApplied)
+                        {
+                            <Tag>@qc</Tag>
+                        }
+                    </Column>
+                    <Column @bind-Field="variable.ProcessingLevel" />
+                    <Column @bind-Field="variable.Method"
+                            Ellipsis />
+                    <Column @bind-Field="variable.Tags">
+                        @foreach(var tag in variable.Tags)
+                        {
+                            <Tag>@tag</Tag>
+                        }
+                    </Column>
+                    <ActionColumn Title="Action"
+                                  Fixed="right">
+                        <Space Size="small">
+                            <SpaceItem>
+                                <Button OnClick="() => OpenVariableModalTemplate(variable)">
+                                    <Icon Type="edit" />
+                                </Button>
+                            </SpaceItem>
+                            <SpaceItem>
+                                <Button Danger OnClick="() => DeleteVariableHandler(variable)">
+                                    <Icon Type="delete" />
+                                </Button>
+                            </SpaceItem>
+                        </Space>
+                    </ActionColumn>
+                </ChildContent>
+
+            </AntDesign.Table>
+        }
+    </FormItem>
 </AntDesign.Form>
 
     <!-- <EditForm EditContext="@EditContext">

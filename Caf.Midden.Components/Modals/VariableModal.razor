@@ -1,0 +1,112 @@
+﻿@using Caf.Midden.Core.Models.v0_1_0alpha4
+@using Microsoft.AspNetCore.Components
+@using AntDesign
+@inherits ModalTemplate<Caf.Midden.Components.ViewModels.VariableModalViewModel>
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms
+@using Caf.Midden.Components.ViewModels
+
+<Form Model="@_model"
+      LabelCol="new ColLayoutParam { Span = 8 }"
+      WrapperCol="new ColLayoutParam { Span = 16 }"
+      OnFinish="OnFinish"
+      OnFinishFailed="OnFinishFailed">
+    <FormItem Label="Name">
+        <Input @bind-Value="@context.Variable.Name"
+               Placeholder="Variable Name" />
+    </FormItem>
+    <FormItem Label="Description">
+        <TextArea @bind-Value="@context.Variable.Description"
+                  Placeholder="Variable description" />
+    </FormItem>
+    <FormItem Label="Units">
+        <Input @bind-Value="@context.Variable.Units"
+               Placeholder="Variable units" />
+    </FormItem>
+    <FormItem Label="Height">
+        <Input @bind-Value="@context.Variable.Height"
+               Placeholder="Variable height" />
+    </FormItem>
+
+    <!-- Not using "FormItem" tag here because it throws an error; something about using a bind-Value with string -->
+    <Row Gutter="2">
+        <AntDesign.Col Span="8">Tags:</AntDesign.Col>
+        <AntDesign.Col Span="16">
+            <Select Mode="tags"
+                    Placeholder="Select tags"
+                    @bind-Values="@context.SelectedTags"
+                    TItemValue="string"
+                    TItem="string"
+                    OnSelectedItemsChanged="OnSelectedItemsChangedHandler"
+                    EnableSearch>
+                <SelectOptions>
+                    @foreach (var item in context.Tags)
+                    {
+                        <SelectOption TItemValue="string" TItem="string" Value=@item Label=@item />
+                    }
+                </SelectOptions>
+            </Select>
+        </AntDesign.Col>
+    </Row>
+    <FormItem Label="Method">
+        <Input @bind-Value="@context.Variable.Method"
+               Placeholder="Instrument name, link to SOP, et." />
+    </FormItem>
+    <Row Gutter="2">
+        <AntDesign.Col Span="8">QC Applied:</AntDesign.Col>
+        <AntDesign.Col Span="16">
+            <Select Mode="multiple"
+                    Placeholder="Select QC"
+                    @bind-Values="@context.SelectedQCApplied"
+                    TItemValue="string"
+                    TItem="string">
+                <SelectOptions>
+                    @foreach (var item in context.QCFlags)
+                    {
+                        <SelectOption TItemValue="string" TItem="string" Value=@item Label=@item />
+                    }
+                </SelectOptions>
+            </Select>
+        </AntDesign.Col>
+    </Row>
+
+    <FormItem Label="Processing">
+        <SimpleSelect @bind-Value="@context.Variable.ProcessingLevel"
+                      Placeholder="Processing Level">
+            <SelectOptions>
+                @foreach (var item in context.ProcessingLevels)
+                {
+                    <SimpleSelectOption Value=@item Label=@item />
+                }
+            </SelectOptions>
+        </SimpleSelect>
+    </FormItem>
+
+
+</Form>
+
+@code {
+    private VariableModalViewModel _model;
+
+    protected override void OnInitialized()
+    {
+        _model = base.Options ?? new VariableModalViewModel();
+        base.OnInitialized();
+    }
+
+    private void OnFinish(EditContext editContext)
+    {
+        _ = base.ModalRef.CloseAsync();
+    }
+
+    private void OnFinishFailed(EditContext editContext)
+    {
+
+    }
+
+    private void OnSelectedItemsChangedHandler(IEnumerable<string> values)
+    {
+        if (values != null)
+            Console.WriteLine($"selected: ${string.Join(",", values)}");
+    }
+}
