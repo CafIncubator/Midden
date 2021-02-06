@@ -38,5 +38,8 @@ namespace Caf.Midden.Core.Models.v0_1_0alpha4
 
         [JsonPropertyName("datasetStructures")]
         public List<string> DatasetStructures { get; set; } = new List<string>();
+
+        [JsonPropertyName("qualityControlTags")]
+        public List<string> QCTags { get; set; } = new List<string>();
     }
 }

@@ -68,6 +68,55 @@ namespace Caf.Midden.Components
                     {
                         "Foo",
                         "[ISO]someThing"
+                    },
+                    Variables = new List<Variable>()
+                    {
+                        new Variable()
+                        {
+                            Name = "Var1",
+                            Description = "Varvar",
+                            Units = "unitless",
+                            QCApplied = new List<string>()
+                            {
+                                "Assurance", "Review"
+                            },
+                            ProcessingLevel = "Calculated",
+                            Method = "Tiagatron 3000",
+                            Tags = new List<string>()
+                            {
+                                "Met", "CAF", "Test"
+                            }
+                        },
+                        new Variable()
+                        {
+                            Name = "Var3",
+                            Description = "Varvarbst",
+                            Units = "unitless",
+                            QCApplied = new List<string>()
+                            {
+                                "Assurance"
+                            },
+                            ProcessingLevel = "Unknown",
+                            Tags = new List<string>()
+                            {
+                                "Met"
+                            }
+                        },
+                        new Variable()
+                        {
+                            Name = "Var4",
+                            Description = "Calculation of the slope and specific catchment area based Topographic Wetness Index. It shows water accumulation. This can be useful for soil or flood mapping",
+                            Units = "unitless",
+                            QCApplied = new List<string>()
+                            {
+                                "Assurance"
+                            },
+                            ProcessingLevel = "Unknown",
+                            Tags = new List<string>()
+                            {
+                                "Met"
+                            }
+                        }
                     }
                 }
             };
@@ -335,6 +384,99 @@ namespace Caf.Midden.Components
         private void DeleteDerivedWorkHandlerIndex(int index)
         {
             this.Metadata.Dataset.DerivedWorks.RemoveAt(index);
+        }
+        #endregion
+
+        #region Variable Functions
+        private ModalRef variableModalRef;
+        private async Task OpenVariableModalTemplate(Variable variable)
+        {
+            var templateOptions = new ViewModels.VariableModalViewModel
+            {
+                Variable = new Variable()
+                {
+                    Name = variable.Name,
+                    Description = variable.Description,
+                    Units = variable.Units,
+                    Height = variable.Height,
+                    Tags = variable.Tags,
+                    Methods = variable.Methods,
+                    QCApplied = variable.QCApplied,
+                    ProcessingLevel = variable.ProcessingLevel,
+                    Method = variable.Method
+                },
+                ProcessingLevels = AppConfig.ProcessingLevels,
+                QCFlags = AppConfig.QCTags,
+                Tags = AppConfig.Tags,
+                SelectedTags = variable.Tags ??= new List<string>(),
+                SelectedQCApplied = variable.QCApplied ??= new List<string>()
+            };
+
+            var modalConfig = new ModalOptions();
+            modalConfig.Title = "Variable";
+            modalConfig.OnCancel = async (e) =>
+            {
+                await variableModalRef.CloseAsync();
+            };
+            modalConfig.OnOk = async (e) =>
+            {
+                variable.Name = templateOptions.Variable.Name;
+                variable.Description = templateOptions.Variable.Description;
+                variable.Units = templateOptions.Variable.Units;
+                variable.Height = templateOptions.Variable.Height;
+                variable.Tags = templateOptions.SelectedTags.ToList();
+                variable.Methods = templateOptions.Variable.Methods;
+                variable.QCApplied = templateOptions.SelectedQCApplied.ToList();
+                variable.ProcessingLevel = templateOptions.Variable.ProcessingLevel;
+                variable.Method = templateOptions.Variable.Method;
+
+                await variableModalRef.CloseAsync();
+            };
+
+            modalConfig.AfterClose = () =>
+            {
+                RemoveBlankVariables();
+
+                InvokeAsync(StateHasChanged);
+
+                return Task.CompletedTask;
+            };
+
+            variableModalRef = await ModalService
+                .CreateModalAsync<VariableModal, ViewModels.VariableModalViewModel>(
+                    modalConfig, templateOptions);
+        }
+
+        private void RemoveBlankVariables()
+        {
+            List<Variable> variablesToRemove = new List<Variable>();
+            foreach (Variable variable in this.Metadata.Dataset.Variables)
+            {
+                if (string.IsNullOrWhiteSpace(variable.Name) &&
+                    string.IsNullOrWhiteSpace(variable.Description) &&
+                    string.IsNullOrWhiteSpace(variable.Units))
+                {
+                    variablesToRemove.Add(variable);
+                }
+            }
+            foreach (Variable remove in variablesToRemove)
+            {
+                this.Metadata.Dataset.Variables.Remove(remove);
+            }
+        }
+
+        private async Task AddVariableHandler()
+        {
+            var variable = new Variable();
+
+            await OpenVariableModalTemplate(variable);
+
+            this.Metadata.Dataset.Variables.Add(variable);
+        }
+
+        private void DeleteVariableHandler(Variable variable)
+        {
+            this.Metadata.Dataset.Variables.Remove(variable);
         }
         #endregion
 
