@@ -109,12 +109,12 @@
                     <Button OnClick="AddDatasetTagHandler">Add</Button>
                 </SpaceItem>
                 <SpaceItem><Divider Type="vertical" /></SpaceItem>
-                <SpaceItem >
+                <SpaceItem>
                     <SimpleSelect Placeholder="Add saved tag"
                                   OnSelectedItemChanged="DatasetTagSelectedItemChangedHandler"
                                   EnableSearch
                                   @bind-Value="SavedDatasetTag"
-                                  Style="width:300px;">
+                                  AutoClearSearchValue>
                         <SelectOptions>
                             @foreach (var tag in AppConfig.Tags)
                             {
@@ -204,20 +204,28 @@
         </FormItem>
 
         <FormItem Label="Methods">
-            <Button OnClick="AddMethodHandler">Add</Button>
+            <Space Style="width:100%">
+                <SpaceItem>
+                    <Input @bind-Value="NewDatasetMethod"
+                           Style="width:70%;"/>
+                </SpaceItem>
+                <SpaceItem>
+                    <Button OnClick="AddDatasetMethodHandler">Add</Button>
+                </SpaceItem>
+            </Space>
             <br />
-            <!-- Using for loop here because deleting using List.Remove, or even by finding index then using RemoveAt, caused multiple to be deleted -->
-            @for (int i = 0; i < Metadata.Dataset.Methods.Count; i++)
+            @if (context.Dataset.Methods.Count > 0)
             {
-                // See: https://stackoverflow.com/questions/60416018/how-to-bind-to-element-from-collection-list-in-blazor
-                var iCopy = i;
-                <div>
-                    @Metadata.Dataset.Methods[i]
-                    <Button Size="small"
-                            OnClick="() => DeleteMethodHandlerIndex(iCopy)">
-                        x
-                    </Button>
-                </div>
+                <AntList DataSource="@context.Dataset.Methods">
+                    <ChildContent Context="method">
+                        <ListItem>
+                            <span><Text>@method</Text></span>
+                            <Button Danger OnClick="() => DeleteDatasetMethodHandler(method)">
+                                <Icon Type="delete" />
+                            </Button>
+                        </ListItem>
+                    </ChildContent>
+                </AntList>
             }
         </FormItem>
 
