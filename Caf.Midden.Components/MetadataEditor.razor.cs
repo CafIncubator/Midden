@@ -241,14 +241,13 @@ namespace Caf.Midden.Components
             if (!string.IsNullOrWhiteSpace(tag) &&
                 !IsDuplicateDatasetTag(tag))
             {
-
                 this.Metadata.Dataset.Tags.Add(tag);
-                NewDatasetTag = "";
             }
         }
         private void AddDatasetTagHandler()
         {
             AddDatasetTag(NewDatasetTag);
+            NewDatasetTag = "";
         }
 
         private void DatasetTagSelectedItemChangedHandler(string value)
@@ -270,51 +269,35 @@ namespace Caf.Midden.Components
             else { return true; }
         }
         #endregion
-        #region Method Functions
-        private ModalRef methodModalRef;
-        private async Task OpenMethodModalTemplate(List<string> methods)
+
+        #region DatasetMethods
+        private string NewDatasetMethod { get; set; }
+
+        
+        private void AddDatasetMethod(string method)
         {
-            var templateOptions = new ViewModels.MethodModalViewModel
+            if(!string.IsNullOrWhiteSpace(method) &&
+                !IsDuplicateDatasetMethod(method))
             {
-                Method = ""
-            };
-
-            var modalConfig = new ModalOptions();
-            modalConfig.Title = "Method";
-            modalConfig.OnCancel = async (e) =>
-            {
-                await methodModalRef.CloseAsync();
-            };
-            modalConfig.OnOk = async (e) =>
-            {
-                if (!string.IsNullOrWhiteSpace(templateOptions.Method))
-                {
-                    methods.Add(templateOptions.Method);
-                }
-
-                await methodModalRef.CloseAsync();
-            };
-
-            modalConfig.AfterClose = () =>
-            {
-                InvokeAsync(StateHasChanged);
-
-                return Task.CompletedTask;
-            };
-
-            methodModalRef = await ModalService
-                .CreateModalAsync<MethodModal, ViewModels.MethodModalViewModel>(
-                    modalConfig, templateOptions);
+                this.Metadata.Dataset.Methods.Add(method);
+                NewDatasetMethod = "";
+            }
+        }
+        private bool IsDuplicateDatasetMethod(string method)
+        {
+            var dup = this.Metadata.Dataset.Methods.Find(s => s == method);
+            if (string.IsNullOrEmpty(dup))
+                return false;
+            else { return true; }
         }
 
-        private async Task AddMethodHandler()
+        private void AddDatasetMethodHandler()
         {
-            await OpenMethodModalTemplate(this.Metadata.Dataset.Methods);
+            AddDatasetMethod(NewDatasetMethod);
         }
-
-        private void DeleteMethodHandlerIndex(int index)
+        private void DeleteDatasetMethodHandler(string method)
         {
-            this.Metadata.Dataset.Methods.RemoveAt(index);
+            this.Metadata.Dataset.Methods.Remove(method);
         }
         #endregion
 
