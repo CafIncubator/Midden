@@ -2,7 +2,7 @@
 @using AntDesign
 @inject Common.IUpdateLastUpdated State
 @inject ModalService ModalService
-@using Caf.Midden.Components.Modals 
+@using Caf.Midden.Components.Modals
 
 <Space>
     <SpaceItem>
@@ -21,238 +21,278 @@
 
 @if (Metadata != null && AppConfig != null)
 {
-<AntDesign.Form Model="@this.Metadata"
-                LabelColSpan="6"
-                WrapperColSpan="8">
-    <FormItem Label="Zone">
-        <SimpleSelect @bind-Value="@context.Dataset.Zone"
-                      Placeholder="Zone that holds dataset">
-            <SelectOptions>
-                @foreach (var zone in AppConfig.Zones)
-                {
-                    <SimpleSelectOption Value=@zone Label=@zone />
-                }
-            </SelectOptions>
-        </SimpleSelect>
-    </FormItem>
-    <FormItem Label="Name">
-        <AntDesign.Input @bind-Value="context.Dataset.Name"
-                         Placeholder="Name of dataset" />
-    </FormItem>
-    <FormItem Label="Project">
-        <AntDesign.Input @bind-Value="context.Dataset.Project"
-                         Placeholder="Name of project that produced the dataset" />
-    </FormItem>
-    <FormItem Label="Description">
-        <AntDesign.TextArea @bind-Value="context.Dataset.Description"
-                            Placeholder="Description of dataset"
-                            MinRows="5"
-                            AutoSize="true" />
-    </FormItem>
-    <FormItem Label="Contacts">
-        <Button OnClick="AddContactHandler">Add</Button>
-        <br />
-        @if (context.Dataset.Contacts.Count > 0)
-        {
-            <AntDesign.Table TItem="Caf.Midden.Core.Models.v0_1_0alpha4.Person"
-                             DataSource="@context.Dataset.Contacts"
-                             HidePagination="@true">
-                <ChildContent Context="contact">
-                    <Column @bind-Field="contact.Name"
-                            Width="30%" />
-                    <Column @bind-Field="contact.Email"
-                            Width="30%" />
-                    <Column @bind-Field="contact.Role"
-                            Width="30%" />
-                    <ActionColumn Title="Action">
-                        <Space Size="small">
-                            <SpaceItem>
-                                <Button OnClick="() => OpenPersonModalTemplate(contact)">
-                                    <Icon Type="edit" />
-                                </Button>
-                            </SpaceItem>
-                            <SpaceItem>
-                                <Button Danger OnClick="() => DeleteContactHandler(contact)">
-                                    <Icon Type="delete" />
-                                </Button>
-                            </SpaceItem>
-                        </Space>
-                    </ActionColumn>
-                </ChildContent>
-
-            </AntDesign.Table>
-        }
-    </FormItem>
-    <FormItem Label="Tags">
-        <Button OnClick="AddTagHandler">Add</Button>
-        <br />
-        <!-- Using for loop here because deleting using List.Remove, or even by finding index then using RemoveAt, caused multiple to be deleted -->
-        @for (int i = 0; i < Metadata.Dataset.Tags.Count; i++)
-        {
-            // See: https://stackoverflow.com/questions/60416018/how-to-bind-to-element-from-collection-list-in-blazor
-            var iCopy = i;
-            <span>
-                @Metadata.Dataset.Tags[i]
-                <Button Size="small"
-                        OnClick="() => DeleteTagHandlerIndex(iCopy)">
-                    x
-                </Button>
-            </span>
-        }
-    </FormItem>
-    <FormItem Label="Spatial Repeats">
-        <AntDesign.InputNumber id="spatial-repeats"
-                               @bind-Value="context.Dataset.SpatialRepeats" />
-    </FormItem>
-    <FormItem Label="Spatial Extent">
-        <FormItem>
-            <SimpleSelect @bind-Value="this.GeometryTemplate"
-                          Placeholder="Saved values"
-                          AllowClear="true"
-                          OnSelectedItemChanged="OnGeometryItemChangedHandler">
+    <AntDesign.Form Model="@this.Metadata"
+                    LabelColSpan="6"
+                    WrapperColSpan="8">
+        <FormItem Label="Zone">
+            <SimpleSelect @bind-Value="@context.Dataset.Zone"
+                          Placeholder="Zone that holds dataset">
                 <SelectOptions>
-                    @if (AppConfig.Geometries != null)
+                    @foreach (var zone in AppConfig.Zones)
                     {
-                        @foreach (var geom in AppConfig.Geometries)
+                        <SimpleSelectOption Value=@zone Label=@zone />
+                    }
+                </SelectOptions>
+            </SimpleSelect>
+        </FormItem>
+        <FormItem Label="Name">
+            <AntDesign.Input @bind-Value="context.Dataset.Name"
+                             Placeholder="Name of dataset" />
+        </FormItem>
+        <FormItem Label="Project">
+            <AntDesign.Input @bind-Value="context.Dataset.Project"
+                             Placeholder="Name of project that produced the dataset" />
+        </FormItem>
+        <FormItem Label="Description">
+            <AntDesign.TextArea @bind-Value="context.Dataset.Description"
+                                Placeholder="Description of dataset"
+                                MinRows="5"
+                                AutoSize="true" />
+        </FormItem>
+        <FormItem Label="Contacts">
+            <Button OnClick="AddContactHandler">Add</Button>
+            <br />
+            @if (context.Dataset.Contacts.Count > 0)
+            {
+                <AntDesign.Table TItem="Caf.Midden.Core.Models.v0_1_0alpha4.Person"
+                                 DataSource="@context.Dataset.Contacts"
+                                 HidePagination="@true">
+                    <ChildContent Context="contact">
+                        <Column @bind-Field="contact.Name"
+                                Width="30%" />
+                        <Column @bind-Field="contact.Email"
+                                Width="30%" />
+                        <Column @bind-Field="contact.Role"
+                                Width="30%" />
+                        <ActionColumn Title="Action">
+                            <Space Size="small">
+                                <SpaceItem>
+                                    <Button OnClick="() => OpenPersonModalTemplate(contact)">
+                                        <Icon Type="edit" />
+                                    </Button>
+                                </SpaceItem>
+                                <SpaceItem>
+                                    <Button Danger OnClick="() => DeleteContactHandler(contact)">
+                                        <Icon Type="delete" />
+                                    </Button>
+                                </SpaceItem>
+                            </Space>
+                        </ActionColumn>
+                    </ChildContent>
+
+                </AntDesign.Table>
+            }
+        </FormItem>
+        <!-- <FormItem Label="Tags">
+            <Button OnClick="AddTagHandler">Add</Button>
+            <br />
+            Using for loop here because deleting using List.Remove, or even by finding index then using RemoveAt, caused multiple to be deleted
+            @for (int i = 0; i < Metadata.Dataset.Tags.Count; i++)
+            {
+                // See: https://stackoverflow.com/questions/60416018/how-to-bind-to-element-from-collection-list-in-blazor
+                var iCopy = i;
+                <span>
+                    @Metadata.Dataset.Tags[i]
+                    <Button Size="small"
+                            OnClick="() => DeleteTagHandlerIndex(iCopy)">
+                        x
+                    </Button>
+                </span>
+            }
+        </FormItem>-->
+        <FormItem Label="Tags">
+            <Space>
+                <SpaceItem>
+                    <Input @bind-Value="NewDatasetTag" />
+                </SpaceItem>
+                <SpaceItem>
+                    <Button OnClick="AddDatasetTagHandler">Add</Button>
+                </SpaceItem>
+                <SpaceItem><Divider Type="vertical" /></SpaceItem>
+                <SpaceItem >
+                    <SimpleSelect Placeholder="Add saved tag"
+                                  OnSelectedItemChanged="DatasetTagSelectedItemChangedHandler"
+                                  EnableSearch
+                                  @bind-Value="SavedDatasetTag"
+                                  Style="width:300px;">
+                        <SelectOptions>
+                            @foreach (var tag in AppConfig.Tags)
+                            {
+                                <SimpleSelectOption Value=@tag Label=@tag />
+                            }
+                        </SelectOptions>
+                    </SimpleSelect>
+                </SpaceItem>
+
+            </Space>
+            <br />
+            @if (context.Dataset.Tags.Count > 0)
+            {
+                <AntList DataSource="@context.Dataset.Tags">
+                    <ChildContent Context="tag">
+                        <ListItem>
+                            <span><Text>@tag</Text></span>
+                            <Button Danger OnClick="() => DeleteDatasetTagHandler(tag)">
+                                <Icon Type="delete"/>
+                            </Button>
+                        </ListItem>
+                    </ChildContent>
+                </AntList>
+            }
+        </FormItem>
+        <FormItem Label="Spatial Repeats">
+            <AntDesign.InputNumber id="spatial-repeats"
+                                   @bind-Value="context.Dataset.SpatialRepeats" />
+        </FormItem>
+        <FormItem Label="Spatial Extent">
+            <FormItem>
+                <SimpleSelect @bind-Value="this.GeometryTemplate"
+                              Placeholder="Saved values"
+                              AllowClear="true"
+                              OnSelectedItemChanged="OnGeometryItemChangedHandler">
+                    <SelectOptions>
+                        @if (AppConfig.Geometries != null)
                         {
-                            <SimpleSelectOption Value="@geom.GeoJson"
-                                                Label="@geom.Name" />
+                            @foreach (var geom in AppConfig.Geometries)
+                            {
+                                <SimpleSelectOption Value="@geom.GeoJson"
+                                                    Label="@geom.Name" />
+                            }
+                        }
+                    </SelectOptions>
+                </SimpleSelect>
+            </FormItem>
+            <FormItem>
+                <AntDesign.TextArea @bind-Value="context.Dataset.Geometry"
+                                    Placeholder="Valid geojson" />
+            </FormItem>
+        </FormItem>
+        <FormItem Label="Temporal Resolution">
+            <AntDesign.Input @bind-Value="context.Dataset.TemporalResolution"
+                             Placeholder="e.g. '15 min'" />
+        </FormItem>
+        <FormItem Label="Temporal Extent">
+            <AntDesign.Input @bind-Value="context.Dataset.TemporalExtent"
+                             Placeholder="YYYY-MM-DD/YYYY-MM-DD" />
+        </FormItem>
+        <FormItem Label="File Format">
+            <AntDesign.Input @bind-Value="context.Dataset.Format"
+                             Placeholder="Format, usually file extension" />
+        </FormItem>
+        <FormItem Label="File Path Template">
+            <AntDesign.Input @bind-Value="context.Dataset.FilePathTemplate"
+                             Placeholder="e.g. '{YYYY}/Filename_{YYYYMMDD}.csv'" />
+        </FormItem>
+        <FormItem Label="File Path Description">
+            <AntDesign.TextArea @bind-Value="context.Dataset.FilePathDescriptor"
+                                Placeholder="Describe template values; e.g. {YYYY}" />
+        </FormItem>
+        <FormItem Label="Dataset Structure">
+            <SimpleSelect @bind-Value="context.Dataset.Structure"
+                          Placeholder="Select">
+                <SelectOptions>
+                    @if (AppConfig.DatasetStructures != null)
+                    {
+                        @foreach (var structure in AppConfig.DatasetStructures)
+                        {
+                            <AntDesign.SimpleSelectOption Value="@structure"
+                                                          Label="@structure" />
                         }
                     }
                 </SelectOptions>
             </SimpleSelect>
         </FormItem>
-        <FormItem>
-            <AntDesign.TextArea @bind-Value="context.Dataset.Geometry"
-                                Placeholder="Valid geojson" />
+
+        <FormItem Label="Methods">
+            <Button OnClick="AddMethodHandler">Add</Button>
+            <br />
+            <!-- Using for loop here because deleting using List.Remove, or even by finding index then using RemoveAt, caused multiple to be deleted -->
+            @for (int i = 0; i < Metadata.Dataset.Methods.Count; i++)
+            {
+                // See: https://stackoverflow.com/questions/60416018/how-to-bind-to-element-from-collection-list-in-blazor
+                var iCopy = i;
+                <div>
+                    @Metadata.Dataset.Methods[i]
+                    <Button Size="small"
+                            OnClick="() => DeleteMethodHandlerIndex(iCopy)">
+                        x
+                    </Button>
+                </div>
+            }
         </FormItem>
-    </FormItem>
-    <FormItem Label="Temporal Resolution">
-        <AntDesign.Input @bind-Value="context.Dataset.TemporalResolution"
-                         Placeholder="e.g. '15 min'" />
-    </FormItem>
-    <FormItem Label="Temporal Extent">
-        <AntDesign.Input @bind-Value="context.Dataset.TemporalExtent"
-                         Placeholder="YYYY-MM-DD/YYYY-MM-DD" />
-    </FormItem>
-    <FormItem Label="File Format">
-        <AntDesign.Input @bind-Value="context.Dataset.Format"
-                         Placeholder="Format, usually file extension" />
-    </FormItem>
-    <FormItem Label="File Path Template">
-        <AntDesign.Input @bind-Value="context.Dataset.FilePathTemplate"
-                         Placeholder="e.g. '{YYYY}/Filename_{YYYYMMDD}.csv'" />
-    </FormItem>
-    <FormItem Label="File Path Description">
-        <AntDesign.TextArea @bind-Value="context.Dataset.FilePathDescriptor"
-                            Placeholder="Describe template values; e.g. {YYYY}" />
-    </FormItem>
-    <FormItem Label="Dataset Structure">
-        <SimpleSelect @bind-Value="context.Dataset.Structure"
-                      Placeholder="Select">
-            <SelectOptions>
-                @if (AppConfig.DatasetStructures != null)
-                {
-                    @foreach (var structure in AppConfig.DatasetStructures)
-                    {
-                        <AntDesign.SimpleSelectOption Value="@structure"
-                                                      Label="@structure" />
-                    }
-                }
-            </SelectOptions>
-        </SimpleSelect>
-    </FormItem>
 
-    <FormItem Label="Methods">
-        <Button OnClick="AddMethodHandler">Add</Button>
-        <br />
-        <!-- Using for loop here because deleting using List.Remove, or even by finding index then using RemoveAt, caused multiple to be deleted -->
-        @for (int i = 0; i < Metadata.Dataset.Methods.Count; i++)
-        {
-            // See: https://stackoverflow.com/questions/60416018/how-to-bind-to-element-from-collection-list-in-blazor
-            var iCopy = i;
-            <div>
-                @Metadata.Dataset.Methods[i]
-                <Button Size="small"
-                        OnClick="() => DeleteMethodHandlerIndex(iCopy)">
-                    x
-                </Button>
-            </div>
-        }
-    </FormItem>
+        <FormItem Label="Derived Works">
+            <Button OnClick="AddDerivedWorkHandler">Add</Button>
+            <br />
+            <!-- Using for loop here because deleting using List.Remove, or even by finding index then using RemoveAt, caused multiple to be deleted -->
+            @for (int i = 0; i < Metadata.Dataset.DerivedWorks.Count; i++)
+            {
+                // See: https://stackoverflow.com/questions/60416018/how-to-bind-to-element-from-collection-list-in-blazor
+                var iCopy = i;
+                <div>
+                    @Metadata.Dataset.DerivedWorks[i]
+                    <Button Size="small"
+                            OnClick="() => DeleteDerivedWorkHandlerIndex(iCopy)">
+                        x
+                    </Button>
+                </div>
+            }
+        </FormItem>
 
-    <FormItem Label="Derived Works">
-        <Button OnClick="AddDerivedWorkHandler">Add</Button>
-        <br />
-        <!-- Using for loop here because deleting using List.Remove, or even by finding index then using RemoveAt, caused multiple to be deleted -->
-        @for (int i = 0; i < Metadata.Dataset.DerivedWorks.Count; i++)
-        {
-            // See: https://stackoverflow.com/questions/60416018/how-to-bind-to-element-from-collection-list-in-blazor
-            var iCopy = i;
-            <div>
-                @Metadata.Dataset.DerivedWorks[i]
-                <Button Size="small"
-                        OnClick="() => DeleteDerivedWorkHandlerIndex(iCopy)">
-                    x
-                </Button>
-            </div>
-        }
-    </FormItem>
+        <FormItem Label="Variables">
+            <Button OnClick="AddVariableHandler">Add</Button>
+            <br />
+            @if (context.Dataset.Variables.Count > 0)
+            {
+                <AntDesign.Table TItem="Caf.Midden.Core.Models.v0_1_0alpha4.Variable"
+                                 DataSource="@context.Dataset.Variables"
+                                 Size="@TableSize.Small"
+                                 ScrollX="1400"
+                                 HidePagination="@true">
+                    <ChildContent Context="variable">
+                        <Column @bind-Field="variable.Name"
+                                Fixed="left" />
+                        <Column @bind-Field="variable.Description"
+                                Ellipsis />
+                        <Column @bind-Field="variable.Units" />
+                        <Column @bind-Field="variable.Method"
+                                Ellipsis />
 
-    <FormItem Label="Variables">
-        <Button OnClick="AddVariableHandler">Add</Button>
-        <br />
-        @if (context.Dataset.Variables.Count > 0)
-        {
-            <AntDesign.Table TItem="Caf.Midden.Core.Models.v0_1_0alpha4.Variable"
-                             DataSource="@context.Dataset.Variables"
-                             Size="@TableSize.Small"
-                             ScrollX="1400"
-                             HidePagination="@true">
-                <ChildContent Context="variable">
-                    <Column @bind-Field="variable.Name"
-                            Fixed="left" />
-                    <Column @bind-Field="variable.Description"
-                            Ellipsis />
-                    <Column @bind-Field="variable.Units" />
-                    <Column @bind-Field="variable.Method"
-                            Ellipsis />
+                        <Column @bind-Field="variable.QCApplied">
+                            @foreach (var qc in variable.QCApplied)
+                                {
+                                <Tag>@qc</Tag>
+                                }
+                        </Column>
+                        <Column @bind-Field="variable.ProcessingLevel" />
 
-                    <Column @bind-Field="variable.QCApplied">
-                        @foreach (var qc in variable.QCApplied)
-                            {
-                            <Tag>@qc</Tag>
-                            }
-                    </Column>
-                    <Column @bind-Field="variable.ProcessingLevel" />
-
-                    <Column @bind-Field="variable.Tags">
-                        @foreach (var tag in variable.Tags)
-                            {
-                            <Tag>@tag</Tag>
-                            }
-                    </Column>
-                    <Column @bind-Field="variable.Height" />
-                    <ActionColumn Title="Action"
-                                  Fixed="right">
-                        <Space Size="small">
-                            <SpaceItem>
-                                <Button OnClick="() => OpenVariableModalTemplate(variable)">
-                                    <Icon Type="edit" />
-                                </Button>
-                            </SpaceItem>
-                            <SpaceItem>
-                                <Button Danger OnClick="() => DeleteVariableHandler(variable)">
-                                    <Icon Type="delete" />
-                                </Button>
-                            </SpaceItem>
-                        </Space>
-                    </ActionColumn>
-                </ChildContent>
-            </AntDesign.Table>
-        }
-    </FormItem>
-</AntDesign.Form>
+                        <Column @bind-Field="variable.Tags">
+                            @foreach (var tag in variable.Tags)
+                                {
+                                <Tag>@tag</Tag>
+                                }
+                        </Column>
+                        <Column @bind-Field="variable.Height" />
+                        <ActionColumn Title="Action"
+                                      Fixed="right">
+                            <Space Size="small">
+                                <SpaceItem>
+                                    <Button OnClick="() => OpenVariableModalTemplate(variable)">
+                                        <Icon Type="edit" />
+                                    </Button>
+                                </SpaceItem>
+                                <SpaceItem>
+                                    <Button Danger OnClick="() => DeleteVariableHandler(variable)">
+                                        <Icon Type="delete" />
+                                    </Button>
+                                </SpaceItem>
+                            </Space>
+                        </ActionColumn>
+                    </ChildContent>
+                </AntDesign.Table>
+            }
+        </FormItem>
+    </AntDesign.Form>
 
     <!-- <EditForm EditContext="@EditContext">
 
@@ -261,9 +301,4 @@
 else
 {
     <p>No Metadata loaded</p>
-}
-
-@code {
-    private string GeometryTemplate { get; set; }
-    
 }

@@ -232,65 +232,44 @@ namespace Caf.Midden.Components
         }
         #endregion
 
-        #region Tag Functions
-        private ModalRef tagModalRef;
-        private async Task OpenTagModalTemplate(List<string> tags)
+        #region DatasetTag
+        private string NewDatasetTag { get; set; }
+        private string SavedDatasetTag { get; set; }
+
+        private void AddDatasetTag(string tag)
         {
-            var templateOptions = new ViewModels.TagModalViewModel
+            if (!string.IsNullOrWhiteSpace(tag) &&
+                !IsDuplicateDatasetTag(tag))
             {
-                Tag = "",
-                Tags = AppConfig.Tags
-            };
 
-            var modalConfig = new ModalOptions();
-            modalConfig.Title = "Tag";
-            modalConfig.OnCancel = async (e) =>
-            {
-                await tagModalRef.CloseAsync();
-            };
-            modalConfig.OnOk = async (e) =>
-            {
-                if(!string.IsNullOrWhiteSpace(templateOptions.Tag) &&
-                    !IsDuplicateTag(templateOptions.Tag))
-                {
-                    tags.Add(templateOptions.Tag);
-                }
-                
-
-                await tagModalRef.CloseAsync();
-            };
-
-            modalConfig.AfterClose = () =>
-            {
-                InvokeAsync(StateHasChanged);
-
-                return Task.CompletedTask;
-            };
-
-            tagModalRef = await ModalService
-                .CreateModalAsync<TagModal, ViewModels.TagModalViewModel>(
-                    modalConfig, templateOptions);
+                this.Metadata.Dataset.Tags.Add(tag);
+                NewDatasetTag = "";
+            }
+        }
+        private void AddDatasetTagHandler()
+        {
+            AddDatasetTag(NewDatasetTag);
         }
 
-        private bool IsDuplicateTag(string tag)
+        private void DatasetTagSelectedItemChangedHandler(string value)
+        {
+            AddDatasetTag(value);
+            SavedDatasetTag = "";
+        }
+
+        private void DeleteDatasetTagHandler(string tag)
+        {
+            this.Metadata.Dataset.Tags.Remove(tag);
+        }
+
+        private bool IsDuplicateDatasetTag(string tag)
         {
             var dup = this.Metadata.Dataset.Tags.Find(s => s == tag);
             if (string.IsNullOrEmpty(dup))
                 return false;
             else { return true; }
         }
-
-        private async Task AddTagHandler()
-        {
-            await OpenTagModalTemplate(this.Metadata.Dataset.Tags);
-        }
-
-        private void DeleteTagHandlerIndex(int index)
-        {
-            this.Metadata.Dataset.Tags.RemoveAt(index);
-        }
         #endregion
-
         #region Method Functions
         private ModalRef methodModalRef;
         private async Task OpenMethodModalTemplate(List<string> methods)
@@ -480,6 +459,8 @@ namespace Caf.Midden.Components
         }
         #endregion
 
+        #region Geometry
+        private string GeometryTemplate { get; set; }
         private void OnGeometryItemChangedHandler(string value)
         {
             this.Metadata.Dataset.Geometry = value;
@@ -490,5 +471,7 @@ namespace Caf.Midden.Components
             this.EditContext.OnFieldChanged -=
                 EditContext_OnFieldChange;
         }
+        #endregion
+
     }
 }
