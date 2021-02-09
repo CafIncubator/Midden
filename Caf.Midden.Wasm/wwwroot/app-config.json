@@ -27,7 +27,8 @@
   "processingLevels": [
     "Measured",
     "Calculated",
-    "Modeled"
+    "Modeled",
+    "Unknown"
   ],
   "geometries": [
     {
@@ -56,6 +57,8 @@
     "Observation",
     "Dataset",
     "External",
-    "Review"
+    "Review",
+    "Unknown",
+    "None"
   ]
 }

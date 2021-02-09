@@ -37,7 +37,7 @@ namespace Caf.Midden.Core.Services.Metadata
                     TemporalExtent =
                     $"{metadata.Dataset.StartDate}/{metadata.Dataset.EndDate}",
                     SpatialRepeats = metadata.Dataset.SpatialRepeats,
-
+                    Variables = ConvertVariables(metadata.Dataset.Variables)
                 };
             }
             else { d = new Models.v0_1_0alpha4.Dataset(); }
@@ -82,38 +82,55 @@ namespace Caf.Midden.Core.Services.Metadata
 
             foreach(var variable in variables)
             {
-                result.Add(new Models.v0_1_0alpha4.Variable()
+                var newVariable = new Models.v0_1_0alpha4.Variable()
                 {
                     Name = variable.Name,
                     Description = variable.Description,
                     Units = variable.Units,
                     Height = variable.Height,
-                    Tags = variable.Tags,
-                    Methods = variable.Methods,
+                    Tags = variable.Tags ??= new List<string>(),
+                    Methods = variable.Methods ??= new List<string>(),
                     TemporalResolution = variable.TemporalResolution,
-                    TemporalExtent =
-                        $"{variable.StartDate}/{variable.EndDate}",
                     SpatialRepeats = variable.SpatialRepeats,
                     IsQCSpecified = variable.IsQCSpecified,
-                    QCApplied = CopyQCApplied(variable.QCApplied),
+                    QCApplied = CopyQCApplied(
+                        variable.QCApplied, 
+                        variable.IsQCSpecified),
                     ProcessingLevel = variable.ProcessingLevel.ToString()
-                });
+                };
+
+                // Get temporal extent
+                string temporalStart = string.IsNullOrEmpty(variable.StartDate) ? "" : variable.StartDate;
+                string temporalEnd = string.IsNullOrEmpty(variable.EndDate) ? "" : variable.StartDate;
+
+                newVariable.TemporalExtent = $"{temporalStart}/{temporalEnd}";
+
+                result.Add(newVariable);
             }
 
             return result;
         }
 
         private List<string> CopyQCApplied(
-            Models.v0_1_0alpha3.QCApplied qc)
+            Models.v0_1_0alpha3.QCApplied qc, bool qcSpecified)
         {
             var result = new List<string>();
 
-            if (qc.Assurance) result.Add("Assurance");
-            if (qc.Point) result.Add("Point");
-            if (qc.Observation) result.Add("Observation");
-            if (qc.Dataset) result.Add("Dataset");
-            if (qc.External) result.Add("External");
-            if (qc.Review) result.Add("Review");
+            if (qc == null)
+            {
+                if (qcSpecified)
+                    result.Add("None");
+                else { result.Add("Unknown"); }
+            }
+            else
+            {
+                if (qc.Assurance) result.Add("Assurance");
+                if (qc.Point) result.Add("Point");
+                if (qc.Observation) result.Add("Observation");
+                if (qc.Dataset) result.Add("Dataset");
+                if (qc.External) result.Add("External");
+                if (qc.Review) result.Add("Review");
+            }
 
             return result;
         }

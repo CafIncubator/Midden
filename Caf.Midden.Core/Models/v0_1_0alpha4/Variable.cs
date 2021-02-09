@@ -41,7 +41,7 @@ namespace Caf.Midden.Core.Models.v0_1_0alpha4
         public int? SpatialRepeats { get; set; }
 
         [JsonPropertyName("isQCSpecified")]
-        public bool IsQCSpecified { get; set; }
+        public bool? IsQCSpecified { get; set; }
 
         [JsonPropertyName("qcApplied")]
         public List<string>? QCApplied { get; set; } = new List<string>();
