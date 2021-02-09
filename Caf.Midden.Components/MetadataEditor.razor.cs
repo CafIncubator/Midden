@@ -301,51 +301,34 @@ namespace Caf.Midden.Components
         }
         #endregion
 
-        #region Derived Works Functions
-        private ModalRef derivedWorkModalRef;
-        private async Task OpenDerivedWorkModalTemplate(List<string> derivedWorks)
+        #region Derived Works
+        private string NewDerivedWork { get; set; }
+
+
+        private void AddDerivedWork(string derived)
         {
-            var templateOptions = new ViewModels.DerivedWorkModalViewModel
+            if (!string.IsNullOrWhiteSpace(derived) &&
+                !IsDuplicateDerivedWork(derived))
             {
-                DerivedWork = ""
-            };
-
-            var modalConfig = new ModalOptions();
-            modalConfig.Title = "Derived Work";
-            modalConfig.OnCancel = async (e) =>
-            {
-                await derivedWorkModalRef.CloseAsync();
-            };
-            modalConfig.OnOk = async (e) =>
-            {
-                if (!string.IsNullOrWhiteSpace(templateOptions.DerivedWork))
-                {
-                    derivedWorks.Add(templateOptions.DerivedWork);
-                }
-
-                await derivedWorkModalRef.CloseAsync();
-            };
-
-            modalConfig.AfterClose = () =>
-            {
-                InvokeAsync(StateHasChanged);
-
-                return Task.CompletedTask;
-            };
-
-            derivedWorkModalRef = await ModalService
-                .CreateModalAsync<DerivedWorkModal, ViewModels.DerivedWorkModalViewModel>(
-                    modalConfig, templateOptions);
+                this.Metadata.Dataset.DerivedWorks.Add(derived);
+                NewDerivedWork = "";
+            }
+        }
+        private bool IsDuplicateDerivedWork(string derived)
+        {
+            var dup = this.Metadata.Dataset.DerivedWorks.Find(s => s == derived);
+            if (string.IsNullOrEmpty(dup))
+                return false;
+            else { return true; }
         }
 
-        private async Task AddDerivedWorkHandler()
+        private void AddDerivedWorkHandler()
         {
-            await OpenDerivedWorkModalTemplate(this.Metadata.Dataset.DerivedWorks);
+            AddDerivedWork(NewDerivedWork);
         }
-
-        private void DeleteDerivedWorkHandlerIndex(int index)
+        private void DeleteDerivedWorkHandler(string derived)
         {
-            this.Metadata.Dataset.DerivedWorks.RemoveAt(index);
+            this.Metadata.Dataset.DerivedWorks.Remove(derived);
         }
         #endregion
 
