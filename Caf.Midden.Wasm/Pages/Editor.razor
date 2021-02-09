@@ -1,18 +1,34 @@
 ﻿@page "/editor"
 @inject Services.StateContainer State
 
-<PageHeader Title="Editor" Subtitle="@State.SchemaVersion" />
+
+<Breadcrumb Style="margin:16px 0;">
+    <BreadcrumbItem>
+        <a href="/">
+            <Icon Type="home" Theme="fill" />
+        </a>
+    </BreadcrumbItem>
+    <BreadcrumbItem>
+        <a href="/editor">
+            <Icon Type="edit" /> Editor
+        </a>
+    </BreadcrumbItem>
+</Breadcrumb>
+
+<div class="site-layout-background">
+    <PageHeader Title="Editor" Subtitle="@State.SchemaVersion" />
 
 
-<AntDesign.Row Justify="start">
-    <AntDesign.Col Span="6">
-        <MetadataLoaderFileSystem @bind-Metadata="State.MetadataEdit" />
-    </AntDesign.Col>
-</AntDesign.Row>
-<AntDesign.Divider />
-<AntDesign.Row Justify="center">
-    <AntDesign.Col Span="18">
-        <MetadataEditor @bind-Metadata="State.MetadataEdit"
-                        AppConfig="State.AppConfig" />
-    </AntDesign.Col>
-</AntDesign.Row>
+    <AntDesign.Row Justify="start">
+        <AntDesign.Col Span="6">
+            <MetadataLoaderFileSystem @bind-Metadata="State.MetadataEdit" />
+        </AntDesign.Col>
+    </AntDesign.Row>
+    <AntDesign.Divider />
+    <AntDesign.Row Justify="center">
+        <AntDesign.Col Span="18">
+            <MetadataEditor @bind-Metadata="State.MetadataEdit"
+                            AppConfig="State.AppConfig" />
+        </AntDesign.Col>
+    </AntDesign.Row>
+</div>
