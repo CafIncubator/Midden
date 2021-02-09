@@ -31,9 +31,6 @@ namespace Caf.Midden.Core.Models.v0_1_0alpha4
         [JsonPropertyName("methods")]
         public List<string>? Methods { get; set; } = new List<string>();
 
-        [JsonPropertyName("method")]
-        public string Method { get; set; }
-
         [JsonPropertyName("temporalResolution")]
         public string? TemporalResolution { get; set; }
 

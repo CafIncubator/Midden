@@ -81,7 +81,7 @@ namespace Caf.Midden.Components
                                 "Assurance", "Review"
                             },
                             ProcessingLevel = "Calculated",
-                            Method = "Tiagatron 3000",
+                            Methods = new List<string>(){"Tiagatron 3000" },
                             Tags = new List<string>()
                             {
                                 "Met", "CAF", "Test"
@@ -347,8 +347,7 @@ namespace Caf.Midden.Components
                     Tags = variable.Tags,
                     Methods = variable.Methods,
                     QCApplied = variable.QCApplied,
-                    ProcessingLevel = variable.ProcessingLevel,
-                    Method = variable.Method
+                    ProcessingLevel = variable.ProcessingLevel
                 },
                 ProcessingLevels = AppConfig.ProcessingLevels,
                 QCFlags = AppConfig.QCTags,
@@ -374,7 +373,6 @@ namespace Caf.Midden.Components
                 variable.Methods = templateOptions.Variable.Methods;
                 variable.QCApplied = templateOptions.SelectedQCApplied.ToList();
                 variable.ProcessingLevel = templateOptions.Variable.ProcessingLevel;
-                variable.Method = templateOptions.Variable.Method;
 
                 await variableModalRef.CloseAsync();
             };

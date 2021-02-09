@@ -83,23 +83,7 @@
                 </AntDesign.Table>
             }
         </FormItem>
-        <!-- <FormItem Label="Tags">
-            <Button OnClick="AddTagHandler">Add</Button>
-            <br />
-            Using for loop here because deleting using List.Remove, or even by finding index then using RemoveAt, caused multiple to be deleted
-            @for (int i = 0; i < Metadata.Dataset.Tags.Count; i++)
-            {
-                // See: https://stackoverflow.com/questions/60416018/how-to-bind-to-element-from-collection-list-in-blazor
-                var iCopy = i;
-                <span>
-                    @Metadata.Dataset.Tags[i]
-                    <Button Size="small"
-                            OnClick="() => DeleteTagHandlerIndex(iCopy)">
-                        x
-                    </Button>
-                </span>
-            }
-        </FormItem>-->
+
         <FormItem Label="Tags">
             <Space>
                 <SpaceItem>
