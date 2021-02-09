@@ -274,8 +274,13 @@
                         <Column @bind-Field="variable.Description"
                                 Ellipsis />
                         <Column @bind-Field="variable.Units" />
-                        <Column @bind-Field="variable.Method"
-                                Ellipsis />
+                        <Column @bind-Field="variable.Methods"
+                                Ellipsis>
+                            @foreach(var method in variable.Methods)
+                            {
+                                <p>@method</p>
+                            }
+                        </Column>
 
                         <Column @bind-Field="variable.QCApplied">
                             @foreach (var qc in variable.QCApplied)
