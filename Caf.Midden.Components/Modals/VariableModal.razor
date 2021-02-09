@@ -30,6 +30,33 @@
         <Input @bind-Value="@context.Variable.Method"
                Placeholder="Instrument name, link to SOP, et." />
     </FormItem>
+    <FormItem Label="Methods">
+        <InputGroup>
+            <Row Justify="space-between">
+                <AntDesign.Col Span="20">
+                    <Input @bind-Value="NewVariableMethod" />
+                </AntDesign.Col>
+                <AntDesign.Col Span="4">
+                    <Button OnClick="AddVariableMethodHandler">Add</Button>
+                </AntDesign.Col>
+            </Row>
+        </InputGroup>
+        <br />
+        @if (context.Variable.Methods.Count > 0)
+        {
+            <AntList DataSource="@context.Variable.Methods"
+                     Size="small">
+                <ChildContent Context="method">
+                    <ListItem>
+                        <span><Text>@method</Text></span>
+                        <Button Danger OnClick="() => DeleteVariableMethodHandler(method)">
+                            <Icon Type="delete" />
+                        </Button>
+                    </ListItem>
+                </ChildContent>
+            </AntList>
+        }
+    </FormItem>
 
     <!-- Not using "FormItem" tag here because it throws an error; something about using a bind-Value with string -->
     <Row Gutter="2">
@@ -62,26 +89,46 @@
         </SimpleSelect>
     </FormItem>
 
-    <!-- Not using "FormItem" tag here because it throws an error; something about using a bind-Value with string -->
-    <Row Gutter="2">
-        <AntDesign.Col Span="8">Tags:</AntDesign.Col>
-        <AntDesign.Col Span="16">
-            <Select Mode="multiple"
-                    Placeholder="Select tags"
-                    @bind-Values="@context.SelectedTags"
-                    TItemValue="string"
-                    TItem="string"
-                    OnSelectedItemsChanged="OnSelectedItemsChangedHandler"
-                    EnableSearch>
-                <SelectOptions>
-                    @foreach (var item in context.Tags)
-                    {
-                        <SelectOption TItemValue="string" TItem="string" Value=@item Label=@item />
-                    }
-                </SelectOptions>
-            </Select>
-        </AntDesign.Col>
-    </Row>
+    <FormItem Label="Tags">
+        <Space>
+            <SpaceItem>
+                <Input @bind-Value="NewVariableTag" />
+            </SpaceItem>
+            <SpaceItem>
+                <Button OnClick="AddVariableTagHandler">Add</Button>
+            </SpaceItem>
+            <SpaceItem><Divider Type="vertical" /></SpaceItem>
+            <SpaceItem>
+                <SimpleSelect Placeholder="Add saved tag"
+                              OnSelectedItemChanged="VariableTagSelectedItemChangedHandler"
+                              EnableSearch
+                              @bind-Value="SavedVariableTag"
+                              AutoClearSearchValue>
+                    <SelectOptions>
+                        @foreach (var tag in _model.Tags)
+                        {
+                            <SimpleSelectOption Value=@tag Label=@tag />
+                        }
+                    </SelectOptions>
+                </SimpleSelect>
+            </SpaceItem>
+
+        </Space>
+        <br />
+        @if (_model.Variable.Tags.Count > 0)
+        {
+            <AntList DataSource="@_model.Variable.Tags">
+                <ChildContent Context="tag">
+                    <ListItem>
+                        <span><Tag>@tag</Tag></span>
+                        <Button Danger OnClick="() => DeleteVariableTagHandler(tag)">
+                            <Icon Type="delete" />
+                        </Button>
+                    </ListItem>
+                </ChildContent>
+            </AntList>
+        }
+    </FormItem>
 
     <FormItem Label="Height">
         <Input @bind-Value="@context.Variable.Height"
@@ -113,4 +160,73 @@
         if (values != null)
             Console.WriteLine($"selected: ${string.Join(",", values)}");
     }
+
+    #region VariableMethods
+    private string NewVariableMethod { get; set; }
+
+
+    private void AddVariableMethod(string method)
+    {
+        if (!string.IsNullOrWhiteSpace(method) &&
+            !IsDuplicateVariableMethod(method))
+        {
+            _model.Variable.Methods.Add(method);
+            NewVariableMethod = "";
+        }
+    }
+    private bool IsDuplicateVariableMethod(string method)
+    {
+        var dup = _model.Variable.Methods.Find(s => s == method);
+        if (string.IsNullOrEmpty(dup))
+            return false;
+        else { return true; }
+    }
+
+    private void AddVariableMethodHandler()
+    {
+        AddVariableMethod(NewVariableMethod);
+    }
+    private void DeleteVariableMethodHandler(string method)
+    {
+        _model.Variable.Methods.Remove(method);
+    }
+    #endregion
+
+    #region VariableTag
+    private string NewVariableTag { get; set; }
+    private string SavedVariableTag { get; set; }
+
+    private void AddVariableTag(string tag)
+    {
+        if (!string.IsNullOrWhiteSpace(tag) &&
+            !IsDuplicateVariableTag(tag))
+        {
+            _model.Variable.Tags.Add(tag);
+        }
+    }
+    private void AddVariableTagHandler()
+    {
+        AddVariableTag(NewVariableTag);
+        NewVariableTag = "";
+    }
+
+    private void VariableTagSelectedItemChangedHandler(string value)
+    {
+        AddVariableTag(value);
+        SavedVariableTag = "";
+    }
+
+    private void DeleteVariableTagHandler(string tag)
+    {
+        _model.Variable.Tags.Remove(tag);
+    }
+
+    private bool IsDuplicateVariableTag(string tag)
+    {
+        var dup = _model.Variable.Tags.Find(s => s == tag);
+        if (string.IsNullOrEmpty(dup))
+            return false;
+        else { return true; }
+    }
+    #endregion
 }

@@ -359,6 +359,7 @@ namespace Caf.Midden.Components
 
             var modalConfig = new ModalOptions();
             modalConfig.Title = "Variable";
+            modalConfig.Width = "70%";
             modalConfig.OnCancel = async (e) =>
             {
                 await variableModalRef.CloseAsync();
