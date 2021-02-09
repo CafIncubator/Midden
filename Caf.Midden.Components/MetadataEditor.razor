@@ -272,7 +272,9 @@
                                 <Tag>@qc</Tag>
                                 }
                         </Column>
-                        <Column @bind-Field="variable.ProcessingLevel" />
+                        <Column @bind-Field="variable.ProcessingLevel">
+                            <Tag>@variable.ProcessingLevel</Tag>
+                        </Column>
 
                         <Column @bind-Field="variable.Tags">
                             @foreach (var tag in variable.Tags)
