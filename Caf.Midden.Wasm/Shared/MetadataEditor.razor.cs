@@ -183,7 +183,7 @@ namespace Caf.Midden.Wasm.Shared
                     Email = contact.Email,
                     Role = contact.Role
                 },
-                Roles = AppConfig.Roles
+                Roles = State.AppConfig.Roles
             };
 
             var modalConfig = new ModalOptions();
@@ -368,9 +368,9 @@ namespace Caf.Midden.Wasm.Shared
                     QCApplied = variable.QCApplied,
                     ProcessingLevel = variable.ProcessingLevel
                 },
-                ProcessingLevels = AppConfig.ProcessingLevels,
-                QCFlags = AppConfig.QCTags,
-                Tags = AppConfig.Tags,
+                ProcessingLevels = State.AppConfig.ProcessingLevels,
+                QCFlags = State.AppConfig.QCTags,
+                Tags = State.AppConfig.Tags,
                 SelectedTags = variable.Tags ??= new List<string>(),
                 SelectedQCApplied = variable.QCApplied ??= new List<string>()
             };
