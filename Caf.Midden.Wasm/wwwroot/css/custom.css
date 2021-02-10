@@ -88,3 +88,41 @@
 #spatial-repeats {
     width: 100%;
 }
+
+.file-input-zone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(0,0,0,.85);
+    cursor: pointer;
+    position: relative;
+    width: 120px;
+    height: 30px;
+    border: 1px solid transparent;
+    box-shadow: 0 2px 0 rgb(0 0 0 / 2%);
+    cursor: pointer;
+    border-radius: 2px;
+    border-color: #d9d9d9;
+    transition: all .3s cubic-bezier(.645,.045,.355,1);
+    line-height: 1.5715px;
+    height: 32px;
+    touch-action: manipulation;
+    background: #fff;
+}
+
+    .file-input-zone input[type=file] {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+        .file-input-zone input[type=file]:hover {
+        }
+
+    .file-input-zone:hover {
+        color: #40a9ff;
+        background: #fff;
+        border-color: #40a9ff
+    }
