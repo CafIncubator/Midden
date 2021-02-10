@@ -1,8 +1,7 @@
-﻿@using Microsoft.AspNetCore.Components.Forms
-@using AntDesign
+﻿@using AntDesign
 @inject Caf.Midden.Wasm.Services.StateContainer State
 @inject ModalService ModalService
-@using Caf.Midden.Components.Modals
+@inject IJSRuntime JS
 
 <Space>
     <SpaceItem>
@@ -303,12 +302,14 @@
             }
         </FormItem>
     </AntDesign.Form>
-    <Alert Type="@AlertType.Success">
+    <Divider />
+    <Row Justify="end">
         <Button Type="primary" OnClick="SaveDataset">
             <Icon Type="download" />
             Download
         </Button>
-    </Alert>
+    </Row>
+    
     <!-- <EditForm EditContext="@EditContext">
 
     </EditForm>-->
@@ -316,8 +317,4 @@
 else
 {
     <p>No Metadata loaded</p>
-}
-
-@code {
-
 }
