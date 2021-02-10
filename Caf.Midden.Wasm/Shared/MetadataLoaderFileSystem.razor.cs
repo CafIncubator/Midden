@@ -10,7 +10,7 @@ using Caf.Midden.Core.Models.v0_1_0alpha4;
 using Microsoft.AspNetCore.Components;
 using AntDesign;
 
-namespace Caf.Midden.Components
+namespace Caf.Midden.Wasm.Shared
 {
     public partial class MetadataLoaderFileSystem : ComponentBase
     {
