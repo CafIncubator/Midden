@@ -56,10 +56,12 @@
 
 @code{
     private RenderFragment coverTemplate =@<img alt="example" src="https://phenocam.sr.unh.edu/data/latest/cafcookeastltar01.jpg" />;
+    
     private string DebugMsg { get; set; }
+
     private async Task AppConfig_StateChanged(
-    ComponentBase source,
-    string appConfig)
+        ComponentBase source,
+        string appConfig)
     {
         if (source != this)
         {
