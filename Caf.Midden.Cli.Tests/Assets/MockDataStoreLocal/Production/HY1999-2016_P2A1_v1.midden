@@ -1,0 +1,321 @@
+{
+	"file": {
+		"schema-version": "v0.1.0-alpha1",
+		"creation-date": "2020-07-29"
+	},
+	"dataset": {
+		"zone": "Production",
+		"project": "CafPlantGridPointSurvey",
+		"name": "HY1999-2016_P2A1_v1",
+		"description": "Legacy harvest data aggregated from harvest year 1999 to harvest year 2016",
+		"format": ".csv",
+		"filePathTemplate": "HY1999-2016_{YYYMMDD}_P2A1.csv",
+		"filePathDescriptor": "{YYYYMMDD} is date file was generated where YYYY is four digit year, MM is two digit month, DD is two digit day",
+		"structure": "Single",
+		"tags": [
+			"Productivity",
+			"Yield",
+			"Crop",
+			"crop production",
+			"crop quality",
+			"plant analysis"
+		],
+		"contacts": [
+			{
+				"name": "David Huggins",
+				"email": "david.huggins@usda.gov",
+				"role": "Owner"
+			},
+			{
+				"name": "Bryan Carlson",
+				"email": "bryan.carlson@usda.gov",
+				"role": "Manager"
+			}
+		],
+		"areaOfInterest": "CookEast",
+		"methods": [
+			"https://github.com/cafltar/CafPlantGridPointSurvey_R_AggregateYieldAndBiomass/tree/17092f5da12c7707992c04bd679c8260faaa0cfc",
+			"https://drive.google.com/a/cafltar.org/file/d/1SDjyR868fHs5NXjXA27hGB3frjKmrvH-/view?usp=sharing",
+			"https://docs.google.com/document/d/1JWSeVUyiTJt60Y5dHD0PO1OYk4jAxFcuyEi4ftcmix8/edit?usp=sharing"
+		],
+		"temporalResolution": "1 year",
+		"startDate": "1999",
+		"endDate": "2016",
+		"spatialRepeats": 369,
+		"variables": [
+			{
+				"name": "HarvestYear",
+				"description": "Year sample was collected",
+				"units": "unitless",
+				"isQCSpecified": false
+			},
+			{
+				"name": "ID2",
+				"description": "Number ID of georeference point near sample collection",
+				"units": "unitless",
+				"isQCSpecified": false
+			},
+			{
+				"name": "Longitude",
+				"description": "Longitude of georeference point near where sample was collected",
+				"units": "dd",
+				"isQCSpecified": false
+			},
+			{
+				"name": "Latitude",
+				"description": "Latitude of georeference point near where sample was collected",
+				"units": "dd",
+				"isQCSpecified": false
+			},
+			{
+				"name": "SampleID",
+				"description": "ID of sample",
+				"units": "unitless",
+				"isQCSpecified": false
+			},
+			{
+				"name": "Crop",
+				"description": "Crop abbreviation where: Spring wheat = SW, Winter wheat = WW, Spring canola = SC, Winter canola = WC, Spring barley = SB, Spring pea = SP, Winter barley = WB, Winter pea = WP, Winter triticale = WT, Winter lentil = WL, Garbonzo Beans = GB, Alfalfa = AL",
+				"units": "unitless",
+				"isQCSpecified": true,
+				"qcApplied": {
+					"assurance": true,
+					"point": false,
+					"observation": false,
+					"dataset": false,
+					"external": false,
+					"review": true
+				},
+				"processingLevel": "Measured"
+			},
+			{
+				"name": "GrainYieldDryPerArea",
+				"description": "Dry grain yield on a per area basis. Sample dried in greenhouse or oven, threshed, then weighed. Some moisture likely still present",
+				"units": "g/m2",
+				"isQCSpecified": true,
+				"qcApplied": {
+					"assurance": true,
+					"point": true,
+					"observation": false,
+					"dataset": true,
+					"external": false,
+					"review": true
+				},
+				"processingLevel": "Calculated"
+			},
+			{
+				"name": "GrainCarbon",
+				"description": "Percent carbon of dry grain mass",
+				"units": "%",
+				"methods": [
+					"Finnigan DELTAplus Advantage by Thermo Fisher Scientific"
+				],
+				"isQCSpecified": true,
+				"qcApplied": {
+					"assurance": true,
+					"point": true,
+					"observation": false,
+					"dataset": false,
+					"external": false,
+					"review": false
+				},
+				"processingLevel": "Measured"
+			},
+			{
+				"name": "GrainNitrogen",
+				"description": "Percent nitrogen of dry gain mass",
+				"units": "%",
+				"methods": [
+					"Finnigan DELTAplus Advantage by Thermo Fisher Scientific"
+				],
+				"isQCSpecified": true,
+				"qcApplied": {
+					"assurance": true,
+					"point": true,
+					"observation": false,
+					"dataset": false,
+					"external": false,
+					"review": false
+				},
+				"processingLevel": "Measured"
+			},
+			{
+				"name": "GrainProtein",
+				"description": "Percent of protein in grain",
+				"units": "%",
+				"methods": [
+					"FOSS Infratec 1241 Grain Analyzer"
+				],
+				"isQCSpecified": true,
+				"qcApplied": {
+					"assurance": true,
+					"point": false,
+					"observation": false,
+					"dataset": false,
+					"external": false,
+					"review": false
+				},
+				"processingLevel": "Measured"
+			},
+			{
+				"name": "GrainMoisture",
+				"description": "Percent of moisture in dried grain",
+				"units": "%",
+				"methods": [
+					"FOSS Infratec 1241 Grain Analyzer"
+				],
+				"isQCSpecified": true,
+				"qcApplied": {
+					"assurance": true,
+					"point": false,
+					"observation": false,
+					"dataset": false,
+					"external": false,
+					"review": false
+				},
+				"processingLevel": "Measured"
+			},
+			{
+				"name": "GrainStarch",
+				"description": "Percent of starch in dried grain",
+				"units": "%",
+				"methods": [
+					"FOSS Infratec 1241 Grain Analyzer"
+				],
+				"isQCSpecified": true,
+				"qcApplied": {
+					"assurance": true,
+					"point": false,
+					"observation": false,
+					"dataset": false,
+					"external": false,
+					"review": false
+				},
+				"processingLevel": "Measured"
+			},
+			{
+				"name": "GrainWGlutDM",
+				"description": "Percent of gluten in dried grain",
+				"units": "%",
+				"methods": [
+					"FOSS Infratec 1241 Grain Analyzer"
+				],
+				"isQCSpecified": true,
+				"qcApplied": {
+					"assurance": true,
+					"point": false,
+					"observation": false,
+					"dataset": false,
+					"external": false,
+					"review": false
+				},
+				"processingLevel": "Measured"
+			},
+			{
+				"name": "GrainOilDM",
+				"description": "Percent of oil in dried grain",
+				"units": "%",
+				"methods": [
+					"FOSS Infratec 1241 Grain Analyzer"
+				],
+				"isQCSpecified": true,
+				"qcApplied": {
+					"assurance": true,
+					"point": false,
+					"observation": false,
+					"dataset": false,
+					"external": false,
+					"review": false
+				},
+				"processingLevel": "Measured"
+			},
+			{
+				"name": "GrainTestWeight",
+				"description": "Test weight of grain, as an indicator of grain quality",
+				"units": "lb/bushel",
+				"isQCSpecified": true,
+				"qcApplied": {
+					"assurance": true,
+					"point": false,
+					"observation": false,
+					"dataset": false,
+					"external": false,
+					"review": false
+				},
+				"processingLevel": "Measured"
+			},
+			{
+				"name": "ResidueMassDryPerArea",
+				"description": "Residue mass on a per area basis. Sample dried in greenhouse or oven. Residue = (biomass - grain mass) / area",
+				"units": "g/m2",
+				"isQCSpecified": true,
+				"qcApplied": {
+					"assurance": true,
+					"point": true,
+					"observation": false,
+					"dataset": true,
+					"external": false,
+					"review": true
+				},
+				"processingLevel": "Calculated"
+			},
+			{
+				"name": "ResidueCarbon",
+				"description": "Percent carbon of dry residue mass",
+				"units": "%",
+				"methods": [
+					"Finnigan DELTAplus Advantage by Thermo Fisher Scientific"
+				],
+				"isQCSpecified": true,
+				"qcApplied": {
+					"assurance": true,
+					"point": true,
+					"observation": false,
+					"dataset": false,
+					"external": false,
+					"review": false
+				},
+				"processingLevel": "Measured"
+			},
+			{
+				"name": "ResidueNitrogen",
+				"description": "Percent nitrogen of dry residue mass",
+				"units": "%",
+				"methods": [
+					"Finnigan DELTAplus Advantage by Thermo Fisher Scientific"
+				],
+				"isQCSpecified": true,
+				"qcApplied": {
+					"assurance": true,
+					"point": true,
+					"observation": false,
+					"dataset": false,
+					"external": false,
+					"review": false
+				},
+				"processingLevel": "Measured"
+			},
+			{
+				"name": "CropExists",
+				"description": "Indication whether or not a crop was present at location: 1 = crop present, 0 = not present. Crop not present due to planting error, failed germination, weeds, etc. A value of 1 without data indicates missing sample",
+				"units": "unitless",
+				"isQCSpecified": true,
+				"qcApplied": {
+					"assurance": true,
+					"point": false,
+					"observation": false,
+					"dataset": false,
+					"external": false,
+					"review": true
+				},
+				"processingLevel": "Measured"
+			},
+			{
+				"name": "Comments",
+				"description": "Comments, aggregated from various columns. '|' or ',' separates source",
+				"units": "unitless",
+				"isQCSpecified": false
+			}
+		]
+	}
+}
