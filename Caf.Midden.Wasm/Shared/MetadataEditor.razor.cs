@@ -36,8 +36,8 @@ namespace Caf.Midden.Wasm.Shared
         //    }
         //}
 
-        [Parameter]
-        public EventCallback<Metadata> MetadataChanged { get; set; }
+        //[Parameter]
+        //public EventCallback<Metadata> MetadataChanged { get; set; }
 
         //private string LastUpdated { get; set; } =
         //    DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
@@ -166,8 +166,9 @@ namespace Caf.Midden.Wasm.Shared
                 CreationDate = dt,
                 ModifiedDate = dt
             });
-
+            
             State.UpdateLastUpdated(this, DateTime.UtcNow);
+
         }
 
         #region Contact Functions
