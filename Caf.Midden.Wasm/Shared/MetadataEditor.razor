@@ -9,14 +9,17 @@
                     OkText="Reset"
                     CancelText="Cancel"
                     OnConfirm="NewMetadata">
-            <Button>Reset</Button>
+            <Button><Icon Type="plus" Theme="outline" /> New</Button>
         </Popconfirm>
     </SpaceItem>
-    <SpaceItem>
+    <!--<SpaceItem>
         <Button OnClick="LoadMetadataTest">Test</Button>
+    </SpaceItem>-->
+    <SpaceItem>
+        <MetadataLoaderFileSystem @bind-Metadata="State.MetadataEdit" />
     </SpaceItem>
 </Space>
-
+<AntDesign.Divider />
 
 @if (State.MetadataEdit != null && AppConfig != null)
 {

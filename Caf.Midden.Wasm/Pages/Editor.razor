@@ -17,17 +17,10 @@
 
 <div class="site-layout-background">
     <PageHeader Title="Editor" Subtitle="@State.SchemaVersion" />
-
-
-    <AntDesign.Row Justify="start">
-        <AntDesign.Col Span="6">
-            <MetadataLoaderFileSystem @bind-Metadata="State.MetadataEdit" />
-        </AntDesign.Col>
-    </AntDesign.Row>
-    <AntDesign.Divider />
     <AntDesign.Row Justify="center">
         <AntDesign.Col Span="18">
             <MetadataEditor AppConfig="State.AppConfig" />
         </AntDesign.Col>
     </AntDesign.Row>
+    <BackTop></BackTop>
 </div>
