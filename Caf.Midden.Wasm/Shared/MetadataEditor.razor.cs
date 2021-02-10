@@ -17,8 +17,8 @@ namespace Caf.Midden.Wasm.Shared
 {
     public partial class MetadataEditor : ComponentBase//, IDisposable
     {
-        [Parameter]
-        public Configuration AppConfig { get; set; }
+        //[Parameter]
+        //public Configuration AppConfig { get; set; }
 
         //private Metadata metadata { set; get; }
         
