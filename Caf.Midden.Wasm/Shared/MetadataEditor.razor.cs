@@ -15,26 +15,26 @@ using Microsoft.JSInterop;
 
 namespace Caf.Midden.Wasm.Shared
 {
-    public partial class MetadataEditor : ComponentBase, IDisposable
+    public partial class MetadataEditor : ComponentBase//, IDisposable
     {
         [Parameter]
         public Configuration AppConfig { get; set; }
 
-        private Metadata metadata { set; get; }
+        //private Metadata metadata { set; get; }
         
-        [Parameter]
-        //public Metadata Metadata { get; set; }
-        public Metadata Metadata
-        {
-            get => metadata;
-            set
-            {
-                if (metadata == value) return;
-                metadata = value;
-                State.UpdateLastUpdated(this, DateTime.UtcNow);
-                MetadataChanged.InvokeAsync(value);
-            }
-        }
+        //[Parameter]
+        ////public Metadata Metadata { get; set; }
+        //public Metadata Metadata
+        //{
+        //    get => metadata;
+        //    set
+        //    {
+        //        if (metadata == value) return;
+        //        metadata = value;
+        //        State.UpdateLastUpdated(this, DateTime.UtcNow);
+        //        MetadataChanged.InvokeAsync(value);
+        //    }
+        //}
 
         [Parameter]
         public EventCallback<Metadata> MetadataChanged { get; set; }
@@ -42,8 +42,7 @@ namespace Caf.Midden.Wasm.Shared
         //private string LastUpdated { get; set; } =
         //    DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
 
-        private EditContext EditContext { get; set; }
-        Form<Metadata> _form;
+        //private EditContext EditContext { get; set; }
         
         public void LoadMetadataTest()
         {
@@ -123,22 +122,36 @@ namespace Caf.Midden.Wasm.Shared
                     }
                 }
             };
-            
-            this.Metadata = metadata;
+
+            State.UpdateMetadataEdit(this, metadata);
+        }
+
+        private async Task LastUpdated_StateChanged(
+            ComponentBase source,
+            string lastUpdated)
+        {
+            if(source != this)
+            {
+                await InvokeAsync(StateHasChanged);
+                Console.WriteLine("LastUpdate_StateChanged");
+            }
         }
 
         protected override void OnInitialized()
         {
-            this.EditContext = new EditContext(this.Metadata);
-            this.EditContext.OnFieldChanged +=
-                EditContext_OnFieldChange;
+            //this.EditContext = new EditContext(State.MetadataEdit);
+            //this.EditContext.OnFieldChanged +=
+            //    EditContext_OnFieldChange;
+            State.StateChanged += async (source, property) =>
+                await LastUpdated_StateChanged(source, property);
         }
 
         private void EditContext_OnFieldChange(
             object sender, 
             FieldChangedEventArgs e)
         {
-            MetadataChanged.InvokeAsync(this.Metadata);
+            //MetadataChanged.InvokeAsync(this.Metadata);
+
             //LastUpdated = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
             State.UpdateLastUpdated(this, DateTime.UtcNow);
         }
@@ -147,12 +160,14 @@ namespace Caf.Midden.Wasm.Shared
         {
             DateTime dt = DateTime.UtcNow;
 
-            this.Metadata = new Metadata()
+            State.UpdateMetadataEdit(this,new Metadata()
             {
                 Dataset = new Dataset(),
                 CreationDate = dt,
                 ModifiedDate = dt
-            };
+            });
+
+            State.UpdateLastUpdated(this, DateTime.UtcNow);
         }
 
         #region Contact Functions
@@ -202,7 +217,7 @@ namespace Caf.Midden.Wasm.Shared
         private void RemoveBlankContacts()
         {
             List<Person> contactsToRemove = new List<Person>();
-            foreach(Person contact in this.Metadata.Dataset.Contacts)
+            foreach(Person contact in State.MetadataEdit.Dataset.Contacts)
             {
                 if(string.IsNullOrWhiteSpace(contact.Name) &&
                     string.IsNullOrWhiteSpace(contact.Email) &&
@@ -213,25 +228,25 @@ namespace Caf.Midden.Wasm.Shared
             }
             foreach(Person remove in contactsToRemove)
             {
-                this.Metadata.Dataset.Contacts.Remove(remove);
+                State.MetadataEdit.Dataset.Contacts.Remove(remove);
             }
         }
 
         private async Task AddContactHandler()
         {
-            if (this.Metadata.Dataset.Contacts == null)
-                this.Metadata.Dataset.Contacts = new List<Person>();
+            if (State.MetadataEdit.Dataset.Contacts == null)
+                State.MetadataEdit.Dataset.Contacts = new List<Person>();
 
             var contact = new Person();
 
             await OpenPersonModalTemplate(contact);
 
-            this.Metadata.Dataset.Contacts.Add(contact);
+            State.MetadataEdit.Dataset.Contacts.Add(contact);
         }
 
         private void DeleteContactHandler(Person person)
         {
-            this.Metadata.Dataset.Contacts.Remove(person);
+            State.MetadataEdit.Dataset.Contacts.Remove(person);
         }
         #endregion
 
@@ -244,7 +259,7 @@ namespace Caf.Midden.Wasm.Shared
             if (!string.IsNullOrWhiteSpace(tag) &&
                 !IsDuplicateDatasetTag(tag))
             {
-                this.Metadata.Dataset.Tags.Add(tag);
+                State.MetadataEdit.Dataset.Tags.Add(tag);
             }
         }
         private void AddDatasetTagHandler()
@@ -261,12 +276,12 @@ namespace Caf.Midden.Wasm.Shared
 
         private void DeleteDatasetTagHandler(string tag)
         {
-            this.Metadata.Dataset.Tags.Remove(tag);
+            State.MetadataEdit.Dataset.Tags.Remove(tag);
         }
 
         private bool IsDuplicateDatasetTag(string tag)
         {
-            var dup = this.Metadata.Dataset.Tags.Find(s => s == tag);
+            var dup = State.MetadataEdit.Dataset.Tags.Find(s => s == tag);
             if (string.IsNullOrEmpty(dup))
                 return false;
             else { return true; }
@@ -282,13 +297,13 @@ namespace Caf.Midden.Wasm.Shared
             if(!string.IsNullOrWhiteSpace(method) &&
                 !IsDuplicateDatasetMethod(method))
             {
-                this.Metadata.Dataset.Methods.Add(method);
+                State.MetadataEdit.Dataset.Methods.Add(method);
                 NewDatasetMethod = "";
             }
         }
         private bool IsDuplicateDatasetMethod(string method)
         {
-            var dup = this.Metadata.Dataset.Methods.Find(s => s == method);
+            var dup = State.MetadataEdit.Dataset.Methods.Find(s => s == method);
             if (string.IsNullOrEmpty(dup))
                 return false;
             else { return true; }
@@ -300,7 +315,7 @@ namespace Caf.Midden.Wasm.Shared
         }
         private void DeleteDatasetMethodHandler(string method)
         {
-            this.Metadata.Dataset.Methods.Remove(method);
+            State.MetadataEdit.Dataset.Methods.Remove(method);
         }
         #endregion
 
@@ -313,13 +328,13 @@ namespace Caf.Midden.Wasm.Shared
             if (!string.IsNullOrWhiteSpace(derived) &&
                 !IsDuplicateDerivedWork(derived))
             {
-                this.Metadata.Dataset.DerivedWorks.Add(derived);
+                State.MetadataEdit.Dataset.DerivedWorks.Add(derived);
                 NewDerivedWork = "";
             }
         }
         private bool IsDuplicateDerivedWork(string derived)
         {
-            var dup = this.Metadata.Dataset.DerivedWorks.Find(s => s == derived);
+            var dup = State.MetadataEdit.Dataset.DerivedWorks.Find(s => s == derived);
             if (string.IsNullOrEmpty(dup))
                 return false;
             else { return true; }
@@ -331,7 +346,7 @@ namespace Caf.Midden.Wasm.Shared
         }
         private void DeleteDerivedWorkHandler(string derived)
         {
-            this.Metadata.Dataset.DerivedWorks.Remove(derived);
+            State.MetadataEdit.Dataset.DerivedWorks.Remove(derived);
         }
         #endregion
 
@@ -397,7 +412,7 @@ namespace Caf.Midden.Wasm.Shared
         private void RemoveBlankVariables()
         {
             List<Variable> variablesToRemove = new List<Variable>();
-            foreach (Variable variable in this.Metadata.Dataset.Variables)
+            foreach (Variable variable in State.MetadataEdit.Dataset.Variables)
             {
                 if (string.IsNullOrWhiteSpace(variable.Name) &&
                     string.IsNullOrWhiteSpace(variable.Description) &&
@@ -408,7 +423,7 @@ namespace Caf.Midden.Wasm.Shared
             }
             foreach (Variable remove in variablesToRemove)
             {
-                this.Metadata.Dataset.Variables.Remove(remove);
+                State.MetadataEdit.Dataset.Variables.Remove(remove);
             }
         }
 
@@ -418,12 +433,12 @@ namespace Caf.Midden.Wasm.Shared
 
             await OpenVariableModalTemplate(variable);
 
-            this.Metadata.Dataset.Variables.Add(variable);
+            State.MetadataEdit.Dataset.Variables.Add(variable);
         }
 
         private void DeleteVariableHandler(Variable variable)
         {
-            this.Metadata.Dataset.Variables.Remove(variable);
+            State.MetadataEdit.Dataset.Variables.Remove(variable);
         }
         #endregion
 
@@ -431,13 +446,15 @@ namespace Caf.Midden.Wasm.Shared
         private string GeometryTemplate { get; set; }
         private void OnGeometryItemChangedHandler(string value)
         {
-            this.Metadata.Dataset.Geometry = value;
+            State.MetadataEdit.Dataset.Geometry = value;
         }
 
         public void Dispose()
         {
-            this.EditContext.OnFieldChanged -=
-                EditContext_OnFieldChange;
+            //this.EditContext.OnFieldChanged -=
+            //     EditContext_OnFieldChange;
+            State.StateChanged -= async (source, property) =>
+                 await LastUpdated_StateChanged(source, property);
         }
         #endregion
 
@@ -454,7 +471,7 @@ namespace Caf.Midden.Wasm.Shared
 
             DateTime now = DateTime.UtcNow;
 
-            jsonString = JsonSerializer.Serialize(this.Metadata, options);
+            jsonString = JsonSerializer.Serialize(State.MetadataEdit, options);
 
             var buffer = Encoding.UTF8.GetBytes(jsonString);
             var stream = new MemoryStream(buffer);
@@ -462,7 +479,7 @@ namespace Caf.Midden.Wasm.Shared
             
             await JS.InvokeAsync<string>(
                 "saveAsFile", 
-                $"{this.Metadata.Dataset.Name}.midden", 
+                $"{State.MetadataEdit.Dataset.Name}.midden", 
                 fileBytes);
 
             return jsonString;

@@ -18,9 +18,9 @@
 </Space>
 
 
-@if (Metadata != null && AppConfig != null)
+@if (State.MetadataEdit != null && AppConfig != null)
 {
-    <AntDesign.Form Model="@this.Metadata"
+    <AntDesign.Form Model="State.MetadataEdit"
                     LabelColSpan="6"
                     WrapperColSpan="8">
         <FormItem Label="Zone">
