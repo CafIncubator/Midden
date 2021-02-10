@@ -21,7 +21,7 @@
 </Space>
 <AntDesign.Divider />
 
-@if (State.MetadataEdit != null && AppConfig != null)
+@if (State?.MetadataEdit != null && State?.AppConfig != null)
 {
     <AntDesign.Form Model="State.MetadataEdit"
                     LabelColSpan="6"
@@ -30,7 +30,7 @@
             <SimpleSelect @bind-Value="@context.Dataset.Zone"
                           Placeholder="Zone that holds dataset">
                 <SelectOptions>
-                    @foreach (var zone in AppConfig.Zones)
+                    @foreach (var zone in State.AppConfig.Zones)
                     {
                         <SimpleSelectOption Value=@zone Label=@zone />
                     }
@@ -102,7 +102,7 @@
                                   @bind-Value="SavedDatasetTag"
                                   AutoClearSearchValue>
                         <SelectOptions>
-                            @foreach (var tag in AppConfig.Tags)
+                            @foreach (var tag in State.AppConfig.Tags)
                             {
                                 <SimpleSelectOption Value=@tag Label=@tag />
                             }
@@ -137,9 +137,9 @@
                               AllowClear="true"
                               OnSelectedItemChanged="OnGeometryItemChangedHandler">
                     <SelectOptions>
-                        @if (AppConfig.Geometries != null)
+                        @if (State.AppConfig.Geometries != null)
                         {
-                            @foreach (var geom in AppConfig.Geometries)
+                            @foreach (var geom in State.AppConfig.Geometries)
                             {
                                 <SimpleSelectOption Value="@geom.GeoJson"
                                                     Label="@geom.Name" />
@@ -177,9 +177,9 @@
             <SimpleSelect @bind-Value="context.Dataset.Structure"
                           Placeholder="Select">
                 <SelectOptions>
-                    @if (AppConfig.DatasetStructures != null)
+                    @if (State.AppConfig.DatasetStructures != null)
                     {
-                        @foreach (var structure in AppConfig.DatasetStructures)
+                        @foreach (var structure in State.AppConfig.DatasetStructures)
                         {
                             <AntDesign.SimpleSelectOption Value="@structure"
                                                           Label="@structure" />
