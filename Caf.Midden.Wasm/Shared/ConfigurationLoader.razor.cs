@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Caf.Midden.Components
+namespace Caf.Midden.Wasm.Shared
 {
     public partial class ConfigurationLoader
     {

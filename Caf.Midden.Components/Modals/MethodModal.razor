@@ -1,0 +1,38 @@
+﻿@using Caf.Midden.Core.Models.v0_1_0alpha4
+@using Microsoft.AspNetCore.Components
+@using AntDesign
+@inherits ModalTemplate<Caf.Midden.Components.ViewModels.MethodModalViewModel>
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms
+@using Caf.Midden.Components.ViewModels
+
+<Form Model="@_model"
+      LabelCol="new ColLayoutParam { Span = 8 }"
+      WrapperCol="new ColLayoutParam { Span = 16 }"
+      OnFinish="OnFinish"
+      OnFinishFailed="OnFinishFailed">
+    <FormItem Label="Method">
+        <Input @bind-Value="@context.Method"
+               Placeholder="Link to method document, or short description"/>
+    </FormItem>
+</Form>
+
+@code {
+    private MethodModalViewModel _model;
+
+    protected override void OnInitialized()
+    {
+        _model = base.Options ?? new MethodModalViewModel();
+        base.OnInitialized();
+    }
+
+    private void OnFinish(EditContext editContext)
+    {
+        _ = base.ModalRef.CloseAsync();
+    }
+
+    private void OnFinishFailed(EditContext editContext)
+    {
+        
+    }
+}

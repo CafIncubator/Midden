@@ -22,9 +22,16 @@ namespace Caf.Midden.Wasm.Services
             NotifyStateChanged(source, "LastUpdated");
         }
 
-        public Metadata Metadata { get; set; }
-        public Metadata MetadataTwoWayBining { get; set; } = new Metadata();
+        //public Metadata Metadata { get; set; } = new Metadata();
+        //public Metadata MetadataTwoWayBining { get; set; } = new Metadata();
         public Metadata MetadataEdit { get; set; } = new Metadata();
+        public void UpdateMetadataEdit(
+            ComponentBase source,
+            Metadata value)
+        {
+            this.MetadataEdit = value;
+            NotifyStateChanged(source, "UpdateMetadataEdit");
+        }
 
         public Configuration AppConfig { get; private set; }
         public void UpdateAppConfig(

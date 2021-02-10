@@ -1,8 +1,19 @@
 ﻿@page "/catalog"
 @inject Services.StateContainer State
 
-<PageHeader Class="site-page-header" Title="Catalog" />
 
-@code {
+    <Breadcrumb Style="margin:16px 0;">
+        <BreadcrumbItem>
+            <a href="/">
+                <Icon Type="home" Theme="fill" />
+            </a>
+        </BreadcrumbItem>
+        <BreadcrumbItem>
+            <a href="/catalog">
+                <Icon Type="read" /> Catalog
+            </a></BreadcrumbItem>
+    </Breadcrumb>
 
-}
+<div class="site-layout-background">
+    <PageHeader Class="site-page-header" Title="Catalog" />
+</div>

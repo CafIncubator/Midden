@@ -1,0 +1,53 @@
+﻿@using Caf.Midden.Core.Models.v0_1_0alpha4
+@using Microsoft.AspNetCore.Components
+@using AntDesign
+@inherits ModalTemplate<Caf.Midden.Components.ViewModels.PersonModalViewModel>
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms
+@using Caf.Midden.Components.ViewModels
+
+<Form Model="@_model"
+      LabelCol="new ColLayoutParam { Span = 8 }"
+      WrapperCol="new ColLayoutParam { Span = 16 }"
+      OnFinish="OnFinish"
+      OnFinishFailed="OnFinishFailed">
+    <FormItem Label="Name">
+        <Input @bind-Value="@context.Person.Name"
+               Placeholder="Name of contact"/>
+    </FormItem>
+    <FormItem Label="Email">
+        <Input @bind-Value="@context.Person.Email"
+               Placeholder="Email of contact"/>
+    </FormItem>
+    <FormItem Label="Role">
+        <SimpleSelect @bind-Value="@context.Person.Role"
+                      Placeholder="Role of contact">
+            <SelectOptions>
+                @foreach (var role in context.Roles)
+                {
+                    <SimpleSelectOption Value=@role Label=@role />
+                }
+            </SelectOptions>
+        </SimpleSelect>
+    </FormItem>
+</Form>
+
+@code {
+    private PersonModalViewModel _model;
+
+    protected override void OnInitialized()
+    {
+        _model = base.Options ?? new PersonModalViewModel();
+        base.OnInitialized();
+    }
+
+    private void OnFinish(EditContext editContext)
+    {
+        _ = base.ModalRef.CloseAsync();
+    }
+
+    private void OnFinishFailed(EditContext editContext)
+    {
+        
+    }
+}

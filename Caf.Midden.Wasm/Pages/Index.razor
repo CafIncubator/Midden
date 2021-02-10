@@ -2,54 +2,66 @@
 @inject Services.StateContainer State
 
 
+<Breadcrumb Style="margin:16px 0;">
+    <BreadcrumbItem>
+        <a href="/">
+            <Icon Type="home" Theme="fill" />
+        </a>
+    </BreadcrumbItem>
+</Breadcrumb>
 
-@if (State?.AppConfig != null)
-{
-    <PageHeader Class="site-page-header"
-                Title="@State.AppConfig.OrganizationName"
-                Subtitle="Metadata Tool" />
-}
+<div class="site-layout-background">
+    @if (State?.AppConfig != null)
+    {
+        <PageHeader Class="site-page-header"
+                    Title="@State.AppConfig.OrganizationName"
+                    Subtitle="Metadata Tool" />
+    }
+
+    @if (State != null)
+    {
+        <p>LastUpdated: @State.LastUpdated</p>
+    }
+    else
+    {
+        <p>None loaded</p>
+    }
 
 
-@if (State != null)
-{
-    <p>LastUpdated: @State.LastUpdated</p>
-}
-else
-{
-    <p>None loaded</p>
-}
-
-<p>@DebugMsg</p>
-<div>
     <Row Gutter="16">
         <AntDesign.Col Span="8">
-            <Card Hoverable Cover="coverTemplate">
-                <CardMeta Title="Dashboard" Description="Stats for nerds" />
-            </Card>
+            <a href="/dashboard">
+                <Card Hoverable Cover="coverTemplate">
+                    <CardMeta Title="Dashboard" Description="Stats for nerds" />
+                </Card>
+            </a>
         </AntDesign.Col>
         <AntDesign.Col Span="8">
-            <Card Hoverable Cover="coverTemplate">
-                <CardMeta Title="Catalog" Description="Find and view datasets" />
-            </Card>
+            <a href="/catalog">
+                <Card Hoverable Cover="coverTemplate">
+                    <CardMeta Title="Catalog" Description="Find and view datasets" />
+                </Card>
+            </a>
         </AntDesign.Col>
         <AntDesign.Col Span="8">
-            <Card Hoverable Cover="coverTemplate">
-                <CardMeta Title="Editor" Description="Add dataset" />
-            </Card>
+            <a href="/editor">
+                <Card Hoverable Cover="coverTemplate">
+                    <CardMeta Title="Editor" Description="Add dataset" />
+                </Card>
+            </a>
         </AntDesign.Col>
     </Row>
-
 </div>
 
 
 @code{
-    public string DebugMsg { get; set; } = "";
     private RenderFragment coverTemplate =@<img alt="example" src="https://phenocam.sr.unh.edu/data/latest/cafcookeastltar01.jpg" />;
+    
+    private string DebugMsg { get; set; }
 
     private async Task AppConfig_StateChanged(
-            ComponentBase source,
-            string appConfig)
+        ComponentBase source,
+        string appConfig)
     {
         if (source != this)
         {
@@ -61,11 +73,11 @@ else
     protected override void OnInitialized()
     {
         State.StateChanged += async (source, property)
-            => await AppConfig_StateChanged(source, property);
+        => await AppConfig_StateChanged(source, property);
     }
     public void Dispose()
     {
         State.StateChanged -= async (source, property)
-            => await AppConfig_StateChanged(source, property);
+        => await AppConfig_StateChanged(source, property);
     }
 }

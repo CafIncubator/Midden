@@ -26,10 +26,10 @@ namespace Caf.Midden.Core.Models.v0_1_0alpha4
         public double? Height { get; set; }
 
         [JsonPropertyName("tags")]
-        public List<string>? Tags { get; set; }
+        public List<string>? Tags { get; set; } = new List<string>();
 
         [JsonPropertyName("methods")]
-        public List<string>? Methods { get; set; }
+        public List<string>? Methods { get; set; } = new List<string>();
 
         [JsonPropertyName("temporalResolution")]
         public string? TemporalResolution { get; set; }
@@ -41,10 +41,10 @@ namespace Caf.Midden.Core.Models.v0_1_0alpha4
         public int? SpatialRepeats { get; set; }
 
         [JsonPropertyName("isQCSpecified")]
-        public bool IsQCSpecified { get; set; }
+        public bool? IsQCSpecified { get; set; }
 
         [JsonPropertyName("qcApplied")]
-        public List<string>? QCApplied { get; set; }
+        public List<string>? QCApplied { get; set; } = new List<string>();
 
         [JsonPropertyName("processingLevel")]
         public string? ProcessingLevel { get; set; }

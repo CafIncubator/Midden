@@ -42,10 +42,10 @@ namespace Caf.Midden.Core.Models.v0_1_0alpha4
         public DateTime? LastUpdate { get; set; }
 
         [JsonPropertyName("tags")]
-        public List<string> Tags { get; set; }
+        public List<string> Tags { get; set; } = new List<string>();
 
         [JsonPropertyName("contacts")]
-        public List<Person> Contacts { get; set; }
+        public List<Person> Contacts { get; set; } = new List<Person>();
 
         /// <summary>
         /// "geometry" value of a geojson document; should include "type" and "coordinates"
@@ -54,7 +54,7 @@ namespace Caf.Midden.Core.Models.v0_1_0alpha4
         public string? Geometry { get; set; }
 
         [JsonPropertyName("methods")]
-        public List<string> Methods { get; set; }
+        public List<string> Methods { get; set; } = new List<string>();
 
         [JsonPropertyName("temporalResolution")]
         public string? TemporalResolution { get; set; }
@@ -70,9 +70,9 @@ namespace Caf.Midden.Core.Models.v0_1_0alpha4
         public int? SpatialRepeats { get; set; }
 
         [JsonPropertyName("variables")]
-        public List<Variable> Variables { get; set; }
+        public List<Variable> Variables { get; set; } = new List<Variable>();
 
         [JsonPropertyName("derivedWorks")]
-        public List<string>? DerivedWorks { get; set; }
+        public List<string>? DerivedWorks { get; set; } = new List<string>();
     }
 }

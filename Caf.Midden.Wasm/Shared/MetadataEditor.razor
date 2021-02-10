@@ -1,8 +1,7 @@
-﻿@using Microsoft.AspNetCore.Components.Forms
-@using AntDesign
-@inject Common.IUpdateLastUpdated State
+﻿@using AntDesign
+@inject Caf.Midden.Wasm.Services.StateContainer State
 @inject ModalService ModalService
-@using Caf.Midden.Components.Modals
+@inject IJSRuntime JS
 
 <Space>
     <SpaceItem>
@@ -10,25 +9,25 @@
                     OkText="Reset"
                     CancelText="Cancel"
                     OnConfirm="NewMetadata">
-            <Button>Reset</Button>
+            <Button><Icon Type="plus" Theme="outline" /> New</Button>
         </Popconfirm>
     </SpaceItem>
     <SpaceItem>
-        <Button OnClick="LoadMetadataTest">Test</Button>
+        <MetadataLoaderFileSystem @bind-Metadata="State.MetadataEdit" />
     </SpaceItem>
 </Space>
+<AntDesign.Divider />
 
-
-@if (Metadata != null && AppConfig != null)
+@if (State?.MetadataEdit != null && State?.AppConfig != null)
 {
-    <AntDesign.Form Model="@this.Metadata"
+    <AntDesign.Form Model="State.MetadataEdit"
                     LabelColSpan="6"
                     WrapperColSpan="8">
         <FormItem Label="Zone">
             <SimpleSelect @bind-Value="@context.Dataset.Zone"
                           Placeholder="Zone that holds dataset">
                 <SelectOptions>
-                    @foreach (var zone in AppConfig.Zones)
+                    @foreach (var zone in State.AppConfig.Zones)
                     {
                         <SimpleSelectOption Value=@zone Label=@zone />
                     }
@@ -100,7 +99,7 @@
                                   @bind-Value="SavedDatasetTag"
                                   AutoClearSearchValue>
                         <SelectOptions>
-                            @foreach (var tag in AppConfig.Tags)
+                            @foreach (var tag in State.AppConfig.Tags)
                             {
                                 <SimpleSelectOption Value=@tag Label=@tag />
                             }
@@ -135,9 +134,9 @@
                               AllowClear="true"
                               OnSelectedItemChanged="OnGeometryItemChangedHandler">
                     <SelectOptions>
-                        @if (AppConfig.Geometries != null)
+                        @if (State.AppConfig.Geometries != null)
                         {
-                            @foreach (var geom in AppConfig.Geometries)
+                            @foreach (var geom in State.AppConfig.Geometries)
                             {
                                 <SimpleSelectOption Value="@geom.GeoJson"
                                                     Label="@geom.Name" />
@@ -175,9 +174,9 @@
             <SimpleSelect @bind-Value="context.Dataset.Structure"
                           Placeholder="Select">
                 <SelectOptions>
-                    @if (AppConfig.DatasetStructures != null)
+                    @if (State.AppConfig.DatasetStructures != null)
                     {
-                        @foreach (var structure in AppConfig.DatasetStructures)
+                        @foreach (var structure in State.AppConfig.DatasetStructures)
                         {
                             <AntDesign.SimpleSelectOption Value="@structure"
                                                           Label="@structure" />
@@ -303,12 +302,14 @@
             }
         </FormItem>
     </AntDesign.Form>
-    <Alert Type="@AlertType.Success">
+    <Divider />
+    <Row Justify="end">
         <Button Type="primary" OnClick="SaveDataset">
             <Icon Type="download" />
             Download
         </Button>
-    </Alert>
+    </Row>
+    
     <!-- <EditForm EditContext="@EditContext">
 
     </EditForm>-->
@@ -316,8 +317,4 @@
 else
 {
     <p>No Metadata loaded</p>
-}
-
-@code {
-
 }
