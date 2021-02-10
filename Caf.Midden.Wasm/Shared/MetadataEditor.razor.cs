@@ -7,11 +7,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.Forms;
 using AntDesign;
-using Microsoft.AspNetCore.Components.Web;
 using Caf.Midden.Wasm.Shared.Modals;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.IO;
+using Microsoft.JSInterop;
 
 namespace Caf.Midden.Wasm.Shared
 {
@@ -460,10 +460,10 @@ namespace Caf.Midden.Wasm.Shared
             var stream = new MemoryStream(buffer);
             var fileBytes = stream.ToArray();
             
-            //await JS.InvokeAsync<string>(
-            //    "saveAsFile", 
-            //    $"{this.Metadata.Dataset.Name}.midden", 
-            //    fileBytes);
+            await JS.InvokeAsync<string>(
+                "saveAsFile", 
+                $"{this.Metadata.Dataset.Name}.midden", 
+                fileBytes);
 
             return jsonString;
         }
