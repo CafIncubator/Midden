@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.Forms;
 using AntDesign;
 using Microsoft.AspNetCore.Components.Web;
-using Caf.Midden.Components.Modals;
+using Caf.Midden.Wasm.Shared.Modals;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.IO;
 
-namespace Caf.Midden.Components
+namespace Caf.Midden.Wasm.Shared
 {
     public partial class MetadataEditor : ComponentBase, IDisposable
     {
