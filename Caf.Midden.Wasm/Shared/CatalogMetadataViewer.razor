@@ -1,0 +1,6 @@
+﻿@inject Caf.Midden.Wasm.Services.StateContainer State
+
+@if(State.Catalog != null)
+{
+    <p>@State.Catalog.CreationDate</p>
+}

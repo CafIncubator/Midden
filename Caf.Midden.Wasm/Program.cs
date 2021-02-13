@@ -11,6 +11,7 @@ using Caf.Midden.Wasm.Services;
 using Caf.Midden.Core.Services.Configuration;
 using Caf.Midden.Components.Common;
 using Microsoft.JSInterop;
+using Caf.Midden.Core.Services;
 
 namespace Caf.Midden.Wasm
 {
@@ -32,6 +33,10 @@ namespace Caf.Midden.Wasm
                 sp => new ConfigurationReaderHttp(
                     sp.GetRequiredService<HttpClient>(),
                     "app-config.json"));
+
+            builder.Services.AddScoped<IReadCatalog>(
+                sp => new CatalogReaderHttp(
+                    sp.GetRequiredService<HttpClient>()));
 
             //builder.Services.AddScoped<StateContainer>();
             //builder.Services.AddScoped<IUpdateAppConfig>(x =>

@@ -1,0 +1,8 @@
+﻿@inject Caf.Midden.Core.Services.IReadCatalog CatalogReader
+@inject Caf.Midden.Wasm.Services.StateContainer State
+<div id="CatalogLoader">
+    @if(State == null)
+    {
+        <p>Loading...</p>
+    }
+</div>

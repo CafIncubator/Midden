@@ -1,0 +1,124 @@
+﻿@inject Caf.Midden.Wasm.Services.StateContainer State
+
+@if (this.Metadata != null)
+{
+    <h3>@Metadata.Dataset.Zone / @Metadata.Dataset.Project /</h3>
+    <PageHeader Class="site-page-header" Title="@Metadata.Dataset.Name" Subtitle="Dataset details" />
+
+    <h3><Icon Type="read" Theme="outline" />Description</h3>
+<textarea readonly style="width:100%;">@Metadata.Dataset.Description</textarea>
+    <br />
+    <Row Justify="space-around" Align="top">
+        <AntDesign.Col Span="11">
+            <Card>
+                <TitleTemplate>
+                    <Icon Type="clock-circle" Theme="outline" /> Temporal Information
+                </TitleTemplate>
+                <Body>
+                    <p><strong>Start/End</strong>: @Metadata.Dataset.TemporalExtent</p>
+                    <p><strong>Resolution</strong>: @Metadata.Dataset.TemporalResolution</p>
+                </Body>
+            </Card>
+        </AntDesign.Col>
+        <AntDesign.Col Span="11">
+            <Card>
+                <TitleTemplate>
+                    <Icon Type="environment" Theme="outline" /> Spatial Information
+                </TitleTemplate>
+                <Body>
+                    <p>TODO: Add map of geojson here</p>
+                    <p><strong>Repeats</strong>: @Metadata.Dataset.SpatialRepeats</p>
+                </Body>
+            </Card>
+        </AntDesign.Col>
+    </Row>
+    <br />
+    <Row Justify="space-around" Align="top">
+        <AntDesign.Col Span="11">
+            <AntList Bordered DataSource="@Metadata.Dataset.Methods">
+                <Header>
+                    <Icon Type="experiment" Theme="outline" /> Methods
+                </Header>
+                <ChildContent Context="method">
+                    <ListItem Style="overflow:auto;"><Text>@method</Text></ListItem>
+                </ChildContent>
+            </AntList>
+        </AntDesign.Col>
+        <AntDesign.Col Span="11">
+            <AntList Bordered DataSource="@Metadata.Dataset.DerivedWorks">
+                <Header>
+                    <Icon Type="comment" Theme="outline" /> Derived Works
+                </Header>
+                <ChildContent Context="derived">
+                    <ListItem Style="overflow:auto;"><Text>@derived</Text></ListItem>
+                </ChildContent>
+            </AntList>
+        </AntDesign.Col>
+    </Row>
+    <!--<Row Justify="space-around" Align="top">
+        <AntDesign.Col Span="11">
+            <Card>
+                <TitleTemplate>
+                    <Icon Type="experiment" Theme="outline" /> Methods
+                </TitleTemplate>
+                <Body>
+                    <AntList DataSource="@Metadata.Dataset.Methods">
+                        <ChildContent Context="method">
+                            <ListItem><Text>@method</Text></ListItem>
+                        </ChildContent>
+                    </AntList>
+                </Body>
+            </Card>
+        </AntDesign.Col>
+        <AntDesign.Col Span="11">
+            <Card>
+                <TitleTemplate>
+                    <Icon Type="comment" Theme="outline" /> Derived Works
+                </TitleTemplate>
+                <Body>
+                    <AntList DataSource="@Metadata.Dataset.DerivedWorks">
+                        <ChildContent Context="derived">
+                            <ListItem><Text>@derived</Text></ListItem>
+                        </ChildContent>
+                    </AntList>
+                </Body>
+            </Card>
+        </AntDesign.Col>
+    </Row>-->
+    <br />
+    <Row Justify="space-around" Align="top">
+        <AntDesign.Col Span="11">
+            <Card>
+                <TitleTemplate>
+                    <Icon Type="user" Theme="outline" /> Contacts
+                </TitleTemplate>
+                <Body>
+                    <AntDesign.Table TItem="Caf.Midden.Core.Models.v0_1_0alpha4.Person"
+                                     DataSource="@Metadata.Dataset.Contacts"
+                                     HidePagination="@true">
+                        <ChildContent Context="contact">
+                            <Column @bind-Field="contact.Name">
+                                <a href="mailto:@contact.Email">@contact.Name</a>
+                            </Column>
+                            <Column @bind-Field="contact.Role" />
+                        </ChildContent>
+                    </AntDesign.Table>
+                </Body>
+            </Card>
+        </AntDesign.Col>
+        <AntDesign.Col Span="11">
+            <Card Title="Tags">
+                <TitleTemplate>
+                    <Icon Type="tags" Theme="outline" /> Tags
+                </TitleTemplate>
+                <Body>
+                    @foreach (var tag in Metadata.Dataset.Tags)
+                    {
+                        <Tag>@tag</Tag>
+                    }
+                </Body>
+            </Card>
+        </AntDesign.Col>
+    </Row>
+
+}
