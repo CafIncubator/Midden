@@ -486,6 +486,7 @@ namespace Caf.Midden.Wasm.Shared
             return jsonString;
         }
 
+        private ModalRef metadataDetailsModalRef;
         private async Task OpenMetadataDetailsModalTemplate(Metadata metadata)
         {
             var templateOptions = new ViewModels.MetadataDetailsViewModel
@@ -498,11 +499,11 @@ namespace Caf.Midden.Wasm.Shared
             modalConfig.Width = "90%";
             modalConfig.OnCancel = async (e) =>
             {
-                await variableModalRef.CloseAsync();
+                await metadataDetailsModalRef.CloseAsync();
             };
             modalConfig.OnOk = async (e) =>
             {
-                await variableModalRef.CloseAsync();
+                await metadataDetailsModalRef.CloseAsync();
             };
 
             modalConfig.AfterClose = () =>
@@ -512,7 +513,7 @@ namespace Caf.Midden.Wasm.Shared
                 return Task.CompletedTask;
             };
 
-            variableModalRef = await ModalService
+            metadataDetailsModalRef = await ModalService
                 .CreateModalAsync<MetadataDetailsModal, ViewModels.MetadataDetailsViewModel>(
                     modalConfig, templateOptions);
         }

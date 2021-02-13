@@ -1,6 +1,32 @@
 ﻿@inject Caf.Midden.Wasm.Services.StateContainer State
+@inject ModalService ModalService
 
-@if(State.Catalog != null)
+@if (State.Catalog != null)
 {
-    <p>@State.Catalog.CreationDate</p>
+    <h3>@State.Catalog.CreationDate</h3>
+    <Input @bind-Value="SearchTerm" />
+    <Button OnClick="SearchHandler">Search</Button>
+}
+
+@if (FilteredMetadata != null)
+{
+    <Row Gutter="16">
+        @foreach (var metadata in FilteredMetadata)
+        {
+            <AntDesign.Col Span="12">
+                <Card Title="@metadata.Dataset.Name">
+                    <Extra>
+                        <Button OnClick="() => OpenMetadataDetailsModalTemplate(metadata)">
+                            <Icon Type="expand" Theme="outline" /> View
+                        </Button>
+                    </Extra>
+                    <Body>
+                        @metadata.Dataset.Description
+                    </Body>
+                </Card>
+            </AntDesign.Col>
+
+        }
+    </Row>
+
 }
