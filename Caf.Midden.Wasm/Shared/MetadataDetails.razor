@@ -18,8 +18,8 @@
                 </Body>
             </Card>
         </AntDesign.Col>
-        
     </Row>
+
     <Row Justify="space-around" Align="top">
         <AntDesign.Col Span="12" Style="padding:5px">
             <Card>
@@ -44,6 +44,7 @@
             </Card>
         </AntDesign.Col>
     </Row>
+
     <Row Justify="space-around" Align="top">
         <AntDesign.Col Span="12" Style="padding:5px">
             <AntList Bordered DataSource="@Metadata.Dataset.Methods">
@@ -66,36 +67,7 @@
             </AntList>
         </AntDesign.Col>
     </Row>
-    <!--<Row Justify="space-around" Align="top">
-        <AntDesign.Col Span="11">
-            <Card>
-                <TitleTemplate>
-                    <Icon Type="experiment" Theme="outline" /> Methods
-                </TitleTemplate>
-                <Body>
-                    <AntList DataSource="@Metadata.Dataset.Methods">
-                        <ChildContent Context="method">
-                            <ListItem><Text>@method</Text></ListItem>
-                        </ChildContent>
-                    </AntList>
-                </Body>
-            </Card>
-        </AntDesign.Col>
-        <AntDesign.Col Span="11">
-            <Card>
-                <TitleTemplate>
-                    <Icon Type="comment" Theme="outline" /> Derived Works
-                </TitleTemplate>
-                <Body>
-                    <AntList DataSource="@Metadata.Dataset.DerivedWorks">
-                        <ChildContent Context="derived">
-                            <ListItem><Text>@derived</Text></ListItem>
-                        </ChildContent>
-                    </AntList>
-                </Body>
-            </Card>
-        </AntDesign.Col>
-    </Row>-->
+
     <Row Justify="space-around" Align="top">
         <AntDesign.Col Span="12" Style="padding:5px">
             <Card>
@@ -131,4 +103,62 @@
         </AntDesign.Col>
     </Row>
 
+    <Row Justify="space-around" Align="top">
+        <AntDesign.Col Span="24" Style="padding:5px">
+            <Card>
+                <TitleTemplate>
+                    <Icon Type="read" Theme="outline" /> Variables
+                </TitleTemplate>
+                <Body>
+                    @if (Metadata.Dataset.Variables?.Count > 0)
+                    {
+                        <AntDesign.Table TItem="Caf.Midden.Core.Models.v0_1_0alpha4.Variable"
+                                         DataSource="@Metadata.Dataset.Variables"
+                                         Size="@TableSize.Small"
+                                         ScrollX="1600"
+                                         HidePagination="@true"
+                                         Bordered>
+                            <ChildContent Context="variable">
+                                <Column @bind-Field="variable.Name"
+                                        Fixed="left" />
+                                <Column @bind-Field="variable.Description"
+                                        Width="600">
+                                    <textarea readonly
+                                              rows="@(string.IsNullOrEmpty(variable.Description) ? 1 : variable.Description.Split('\n').Length + 1)"
+                                              style="width:100%; border:none;">@variable.Description</textarea>
+                                </Column>
+                                <Column @bind-Field="variable.Units" />
+                                <Column @bind-Field="variable.Methods"
+                                        Ellipsis>
+                                    @foreach (var method in variable.Methods)
+                                            {
+                                        <p>@method</p>
+                                            }
+                                </Column>
+
+                                <Column @bind-Field="variable.QCApplied">
+                                    @foreach (var qc in variable.QCApplied)
+                                            {
+                                        <Tag>@qc</Tag>
+                                            }
+                                </Column>
+                                <Column @bind-Field="variable.ProcessingLevel">
+                                    <Tag>@variable.ProcessingLevel</Tag>
+                                </Column>
+
+                                <Column @bind-Field="variable.Tags">
+                                    @foreach (var tag in variable.Tags)
+                                            {
+                                        <Tag>@tag</Tag>
+                                            }
+                                </Column>
+                                <Column @bind-Field="variable.Height" />
+                            </ChildContent>
+                        </AntDesign.Table>
+                    }
+                </Body>
+            </Card>
+        </AntDesign.Col>
+
+    </Row>
 }
