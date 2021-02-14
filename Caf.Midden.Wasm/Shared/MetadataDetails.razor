@@ -5,11 +5,23 @@
     <h3>@Metadata.Dataset.Zone / @Metadata.Dataset.Project /</h3>
     <PageHeader Class="site-page-header" Title="@Metadata.Dataset.Name" Subtitle="Dataset details" />
 
-    <h3><Icon Type="read" Theme="outline" />Description</h3>
-<textarea readonly style="width:100%;">@Metadata.Dataset.Description</textarea>
-    <br />
     <Row Justify="space-around" Align="top">
-        <AntDesign.Col Span="11">
+        <AntDesign.Col Span="24" Style="padding:5px">
+            <Card>
+                <TitleTemplate>
+                    <Icon Type="read" Theme="outline" /> Description
+                </TitleTemplate>
+                <Body>
+                    <textarea readonly
+                              rows="@(string.IsNullOrEmpty(Metadata.Dataset.Description) ? 1 : Metadata.Dataset.Description.Split('\n').Length + 1)"
+                              style="width:100%; border:none;">@Metadata.Dataset.Description</textarea>
+                </Body>
+            </Card>
+        </AntDesign.Col>
+        
+    </Row>
+    <Row Justify="space-around" Align="top">
+        <AntDesign.Col Span="12" Style="padding:5px">
             <Card>
                 <TitleTemplate>
                     <Icon Type="clock-circle" Theme="outline" /> Temporal Information
@@ -20,7 +32,7 @@
                 </Body>
             </Card>
         </AntDesign.Col>
-        <AntDesign.Col Span="11">
+        <AntDesign.Col Span="12" Style="padding:5px">
             <Card>
                 <TitleTemplate>
                     <Icon Type="environment" Theme="outline" /> Spatial Information
@@ -32,9 +44,8 @@
             </Card>
         </AntDesign.Col>
     </Row>
-    <br />
     <Row Justify="space-around" Align="top">
-        <AntDesign.Col Span="11">
+        <AntDesign.Col Span="12" Style="padding:5px">
             <AntList Bordered DataSource="@Metadata.Dataset.Methods">
                 <Header>
                     <Icon Type="experiment" Theme="outline" /> Methods
@@ -44,7 +55,7 @@
                 </ChildContent>
             </AntList>
         </AntDesign.Col>
-        <AntDesign.Col Span="11">
+        <AntDesign.Col Span="12" Style="padding:5px">
             <AntList Bordered DataSource="@Metadata.Dataset.DerivedWorks">
                 <Header>
                     <Icon Type="comment" Theme="outline" /> Derived Works
@@ -85,9 +96,8 @@
             </Card>
         </AntDesign.Col>
     </Row>-->
-    <br />
     <Row Justify="space-around" Align="top">
-        <AntDesign.Col Span="11">
+        <AntDesign.Col Span="12" Style="padding:5px">
             <Card>
                 <TitleTemplate>
                     <Icon Type="user" Theme="outline" /> Contacts
@@ -106,7 +116,7 @@
                 </Body>
             </Card>
         </AntDesign.Col>
-        <AntDesign.Col Span="11">
+        <AntDesign.Col Span="12" Style="padding:5px">
             <Card Title="Tags">
                 <TitleTemplate>
                     <Icon Type="tags" Theme="outline" /> Tags
