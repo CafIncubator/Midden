@@ -44,10 +44,21 @@ namespace Caf.Midden.Wasm.Shared
         private void SearchHandler()
         {
             if (string.IsNullOrWhiteSpace(SearchTerm))
+            {
                 FilteredMetadata = State.Catalog.Metadatas;
-
-            FilteredMetadata = State.Catalog.Metadatas
-                .Where(m => m.Dataset.Name.ToLower().Contains(SearchTerm.ToLower())).ToList();
+            }
+            else
+            {
+                FilteredMetadata = State.Catalog.Metadatas
+                    .Where(m => 
+                        (m.Dataset.Name.ToLower().Contains(
+                            SearchTerm.ToLower()) ||
+                        (m.Dataset.Description.ToLower().Contains(
+                            SearchTerm.ToLower()) ||
+                        (m.Dataset.Tags.Any(t => t.ToLower().Contains(
+                            SearchTerm.ToLower()))))))
+                    .ToList();
+            }
         }
 
         private ModalRef metadataDetailsModalRef;

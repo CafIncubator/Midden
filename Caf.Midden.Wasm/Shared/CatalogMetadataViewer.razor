@@ -3,18 +3,27 @@
 
 @if (State.Catalog != null)
 {
-    <h3>@State.Catalog.CreationDate</h3>
-    <Input @bind-Value="SearchTerm" />
-    <Button OnClick="SearchHandler">Search</Button>
+<AntDesign.Row>
+    <AntDesign.Col Offset="8" Span="8">
+        <Search Placeholder="Search all things"
+                OnChange="SearchHandler"
+                EnterButton="true" @bind-Value="SearchTerm" />
+    </AntDesign.Col>
+</AntDesign.Row>
+
+
 }
+
+<Divider Orientation="center">Datasets</Divider>
 
 @if (FilteredMetadata != null)
 {
     <Row Gutter="16">
         @foreach (var metadata in FilteredMetadata)
         {
-            <AntDesign.Col Span="12">
-                <Card Title="@metadata.Dataset.Name">
+            <AntDesign.Col Span="12" Style="padding:10px">
+                <Card Title="@metadata.Dataset.Name" 
+                      Style="overflow:hidden">
                     <Extra>
                         <Button OnClick="() => OpenMetadataDetailsModalTemplate(metadata)">
                             <Icon Type="expand" Theme="outline" /> View
@@ -22,11 +31,14 @@
                     </Extra>
                     <Body>
                         @metadata.Dataset.Description
+                        <Divider />
+                        @foreach(var tag in metadata.Dataset.Tags)
+                        {
+                            <Tag>@tag</Tag>
+                        }
                     </Body>
                 </Card>
             </AntDesign.Col>
-
         }
     </Row>
-
 }
