@@ -39,7 +39,7 @@
                 </TitleTemplate>
                 <Body>
                     <p>TODO: Add map of geojson here</p>
-                    <p><strong>Repeats</strong>: @Metadata.Dataset.SpatialRepeats</p>
+                    <p><strong>Resolution</strong>: @Metadata.Dataset.SpatialRepeats</p>
                 </Body>
             </Card>
         </AntDesign.Col>
@@ -65,6 +65,21 @@
                     <ListItem Style="overflow:auto;"><Text>@derived</Text></ListItem>
                 </ChildContent>
             </AntList>
+        </AntDesign.Col>
+    </Row>
+
+    <Row Justify="space-around" Align="top">
+        <AntDesign.Col Span="24" Style="padding:5px">
+            <Card>
+                <TitleTemplate>
+                    <Icon Type="file-text" Theme="outline" /> File Information
+                </TitleTemplate>
+                <Body>
+                    <p><strong>Format</strong>: @Metadata.Dataset.Format</p>
+                    <p><strong>Path Template</strong>: @Metadata.Dataset.FilePathTemplate</p>
+                    <p><strong>Path Description</strong>: @Metadata.Dataset.FilePathDescriptor</p>
+                </Body>
+            </Card>
         </AntDesign.Col>
     </Row>
 
