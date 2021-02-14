@@ -17,5 +17,19 @@
 <div class="site-layout-background">
     <CatalogLoader />
     <PageHeader Class="site-page-header" Title="Catalog" />
-    <CatalogMetadataViewer />
+    <Tabs Type="@TabType.Card">
+        <TabPane Key="1">
+            <Tab>Datasets</Tab>
+            <ChildContent>
+                <CatalogMetadataViewer />
+            </ChildContent>
+        </TabPane>
+        <TabPane Key="2">
+            <Tab>Variables</Tab>
+            <ChildContent>
+                <CatalogVariableViewer />
+            </ChildContent>
+        </TabPane>
+    </Tabs>
+    
 </div>
