@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Caf.Midden.Components.Common;
 using Caf.Midden.Core.Models.v0_1_0alpha4;
 using Microsoft.AspNetCore.Components;
 
 namespace Caf.Midden.Wasm.Services
 {
-    public class StateContainer : IUpdateAppConfig, IUpdateLastUpdated
+    public class StateContainer
     {
         public string SchemaVersion { get; } = "v0.1.0-alpha4";
         

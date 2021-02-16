@@ -9,7 +9,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Caf.Midden.Wasm.Services;
 using Caf.Midden.Core.Services.Configuration;
-using Caf.Midden.Components.Common;
 using Microsoft.JSInterop;
 using Caf.Midden.Core.Services;
 
