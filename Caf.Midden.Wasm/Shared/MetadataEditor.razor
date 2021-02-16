@@ -304,15 +304,15 @@
     </AntDesign.Form>
     <Divider />
     <Row Justify="end">
+        <Button Type="default" OnClick="() => OpenMetadataDetailsModalTemplate(State.MetadataEdit)">
+            <Icon Type="eye" />
+            Preview
+        </Button>
         <Button Type="primary" OnClick="SaveDataset">
             <Icon Type="download" />
             Download
         </Button>
     </Row>
-    
-    <!-- <EditForm EditContext="@EditContext">
-
-    </EditForm>-->
 }
 else
 {

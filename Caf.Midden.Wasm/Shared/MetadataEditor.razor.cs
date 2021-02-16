@@ -485,5 +485,37 @@ namespace Caf.Midden.Wasm.Shared
 
             return jsonString;
         }
+
+        private ModalRef metadataDetailsModalRef;
+        private async Task OpenMetadataDetailsModalTemplate(Metadata metadata)
+        {
+            var templateOptions = new ViewModels.MetadataDetailsViewModel
+            {
+                Metadata = metadata
+            };
+
+            var modalConfig = new ModalOptions();
+            modalConfig.Title = "Metadata Preview";
+            modalConfig.Width = "90%";
+            modalConfig.OnCancel = async (e) =>
+            {
+                await metadataDetailsModalRef.CloseAsync();
+            };
+            modalConfig.OnOk = async (e) =>
+            {
+                await metadataDetailsModalRef.CloseAsync();
+            };
+
+            modalConfig.AfterClose = () =>
+            {
+                InvokeAsync(StateHasChanged);
+
+                return Task.CompletedTask;
+            };
+
+            metadataDetailsModalRef = await ModalService
+                .CreateModalAsync<MetadataDetailsModal, ViewModels.MetadataDetailsViewModel>(
+                    modalConfig, templateOptions);
+        }
     }
 }

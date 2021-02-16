@@ -21,6 +21,9 @@ namespace Caf.Midden.Core.Models.v0_1_0alpha4
         [JsonPropertyName("toolName")]
         public string ToolName { get; set; }
 
+        [JsonPropertyName("catalogPath")]
+        public string CatalogPath { get; set; }
+
         [JsonPropertyName("zones")]
         public List<string> Zones { get; set; } = new List<string>();
 

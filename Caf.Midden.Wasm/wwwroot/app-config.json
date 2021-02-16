@@ -25,10 +25,10 @@
     "User"
   ],
   "processingLevels": [
+    "Unknown",
     "Measured",
     "Calculated",
-    "Modeled",
-    "Unknown"
+    "Modeled"
   ],
   "geometries": [
     {
@@ -52,13 +52,14 @@
     "Multiple"
   ],
   "qualityControlTags": [
+    "Unknown",
+    "None",
     "Assurance",
     "Point",
     "Observation",
     "Dataset",
     "External",
-    "Review",
-    "Unknown",
-    "None"
-  ]
+    "Review"
+  ],
+  "catalogPath": "https://cafpublic.blob.core.windows.net/data/midden/catalog-test.json"
 }

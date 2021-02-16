@@ -10,22 +10,8 @@ namespace Caf.Midden.Wasm.Shared
 {
     public partial class ConfigurationLoader
     {
-        /*private Configuration configuration { set; get; }
-        
         [Parameter]
-        public Configuration Configuration
-        {
-            get => configuration;
-            set
-            {
-                if (configuration == value) return;
-                configuration = value;
-                ConfigurationChanged.InvokeAsync(value);
-            }
-        }
-
-        [Parameter]
-        public EventCallback<Configuration> ConfigurationChanged { get; set; }*/
+        public RenderFragment ChildContent { get; set; }
 
         protected override async Task OnInitializedAsync()
         {

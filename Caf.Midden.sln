@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Caf.Midden.Wasm", "Caf.Midd
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Caf.Midden.Cli", "Caf.Midden.Cli\Caf.Midden.Cli.csproj", "{F2B9716B-1DCE-43B8-84A3-38029B693E90}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Caf.Midden.Cli.Tests", "Caf.Midden.Cli.Tests\Caf.Midden.Cli.Tests.csproj", "{92D543A8-BF96-47F9-A278-70C0E1054BAD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Caf.Midden.Cli.Tests", "Caf.Midden.Cli.Tests\Caf.Midden.Cli.Tests.csproj", "{92D543A8-BF96-47F9-A278-70C0E1054BAD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

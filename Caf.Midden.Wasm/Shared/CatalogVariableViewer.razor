@@ -1,0 +1,80 @@
+﻿@inject Caf.Midden.Wasm.Services.StateContainer State
+@inject ModalService ModalService
+
+@if (State.Catalog != null)
+{
+    <AntDesign.Row>
+        <AntDesign.Col Offset="8" Span="8">
+            <Search Placeholder="Search all things"
+                    OnChange="SearchHandler"
+                    EnterButton="true" @bind-Value="ViewModel.SearchTerm"
+                    AllowClear="true"/>
+        </AntDesign.Col>
+    </AntDesign.Row>
+}
+
+<Divider Orientation="center">Variables</Divider>
+
+@if(ViewModel?.FilteredCatalogVariables != null)
+{
+<Row Gutter="16">
+    <AntDesign.Col Span="24">
+        <AntDesign.Table TItem="Caf.Midden.Wasm.Shared.ViewModels.CatalogVariable"
+                         DataSource="@ViewModel.FilteredCatalogVariables"
+                         Size="@TableSize.Small"
+                         ScrollX="2800"
+                         Bordered>
+            <ChildContent Context="cv">
+                <Column @bind-Field="cv.Name"
+                        Fixed="left" />
+                <Column @bind-Field="cv.Description"
+                        Width="600">
+                    <textarea readonly
+                              rows="@(string.IsNullOrEmpty(cv.Description) ? 1 : cv.Description.Split('\n').Length + 1)"
+                              style="width:100%; border:none;">@cv.Description</textarea>
+                </Column>
+                <Column @bind-Field="cv.Units" />
+                <Column @bind-Field="cv.Methods"
+                        Width="500">
+                    @foreach (var method in cv.Methods)
+                        {
+                    <textarea readonly
+                              rows="@(string.IsNullOrEmpty(method) ? 1 :method.Split('\n').Length + 1)"
+                              style="width:100%; border:none;">@method</textarea>
+                        }
+                </Column>
+
+                <Column @bind-Field="cv.QCApplied">
+                    @foreach (var qc in cv.QCApplied)
+                        {
+                        <Tag>@qc</Tag>
+                        }
+                </Column>
+                <Column @bind-Field="cv.ProcessingLevel">
+                    <Tag>@cv.ProcessingLevel</Tag>
+                </Column>
+
+                <Column @bind-Field="cv.Tags">
+                    @foreach (var tag in cv.Tags)
+                        {
+                        <Tag>@tag</Tag>
+                        }
+                </Column>
+                <Column @bind-Field="cv.Zone" />
+                <Column @bind-Field="cv.ProjectName" />
+                <Column @bind-Field="cv.DatasetName" />
+                <ActionColumn Title="Action"
+                              Fixed="right">
+                    <Space Size="small">
+                        <SpaceItem>
+                            <Button OnClick="() => OpenMetadataDetailsModalTemplate(cv)">
+                                <Icon Type="fullscreen" Theme="outline" /> View
+                            </Button>
+                        </SpaceItem>
+                    </Space>
+                </ActionColumn>
+            </ChildContent>
+        </AntDesign.Table>
+    </AntDesign.Col>
+</Row>
+}

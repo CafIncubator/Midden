@@ -12,6 +12,7 @@ namespace Caf.Midden.Wasm.Services
     public class StateContainer : IUpdateAppConfig, IUpdateLastUpdated
     {
         public string SchemaVersion { get; } = "v0.1.0-alpha4";
+        
         public DateTime LastUpdated { get; private set; } = 
             DateTime.UtcNow;
         public void UpdateLastUpdated(
@@ -19,11 +20,10 @@ namespace Caf.Midden.Wasm.Services
             DateTime value)
         {
             this.LastUpdated = value;
-            NotifyStateChanged(source, "LastUpdated");
+            NotifyStateChanged(source, "UpdateLastUpdated");
         }
 
-        //public Metadata Metadata { get; set; } = new Metadata();
-        //public Metadata MetadataTwoWayBining { get; set; } = new Metadata();
+
         public Metadata MetadataEdit { get; set; } = new Metadata();
         public void UpdateMetadataEdit(
             ComponentBase source,
@@ -39,7 +39,16 @@ namespace Caf.Midden.Wasm.Services
             Configuration value)
         {
             this.AppConfig = value;
-            NotifyStateChanged(source, "AppConfig");
+            NotifyStateChanged(source, "UpdateAppConfig");
+        }
+
+        public Catalog Catalog { get; private set; } = new Catalog();
+        public void UpdateCatalog(
+            ComponentBase source,
+            Catalog value)
+        {
+            this.Catalog = value;
+            NotifyStateChanged(source, "UpdateCatalog");
         }
 
         public event Action<ComponentBase, string> StateChanged;

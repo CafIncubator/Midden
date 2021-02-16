@@ -48,5 +48,26 @@ namespace Caf.Midden.Core.Models.v0_1_0alpha4
 
         [JsonPropertyName("processingLevel")]
         public string? ProcessingLevel { get; set; }
+
+        public Variable ShallowCopy()
+        {
+            return (Variable)this.MemberwiseClone();
+        }
+
+        public Variable DeepCopy()
+        {
+            Variable other = (Variable)this.MemberwiseClone();
+
+            if(this.Tags != null)
+                other.Tags = new List<string>(this.Tags);
+
+            if (this.Methods != null)
+                other.Methods = new List<string>(this.Methods);
+
+            if (this.QCApplied != null)
+                other.QCApplied = new List<string>(this.QCApplied);
+
+            return other;
+        }
     }
 }

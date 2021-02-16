@@ -1,0 +1,180 @@
+﻿@inject Caf.Midden.Wasm.Services.StateContainer State
+
+@if (this.Metadata != null)
+{
+    <h3>@Metadata.Dataset.Zone / @Metadata.Dataset.Project /</h3>
+    <PageHeader Class="site-page-header" Title="@Metadata.Dataset.Name" Subtitle="Dataset details" />
+
+    <Row Justify="space-around" Align="top">
+        <AntDesign.Col Span="24" Style="padding:5px">
+            <Card>
+                <TitleTemplate>
+                    <Icon Type="read" Theme="outline" /> Description
+                </TitleTemplate>
+                <Body>
+                    <textarea readonly
+                              rows="@(string.IsNullOrEmpty(Metadata.Dataset.Description) ? 1 : Metadata.Dataset.Description.Split('\n').Length + 1)"
+                              style="width:100%; border:none;">@Metadata.Dataset.Description</textarea>
+                </Body>
+            </Card>
+        </AntDesign.Col>
+    </Row>
+
+    <Row Justify="space-around" Align="top">
+        <AntDesign.Col Span="12" Style="padding:5px">
+            <Card>
+                <TitleTemplate>
+                    <Icon Type="clock-circle" Theme="outline" /> Temporal Information
+                </TitleTemplate>
+                <Body>
+                    <p><strong>Start/End</strong>: @Metadata.Dataset.TemporalExtent</p>
+                    <p><strong>Resolution</strong>: @Metadata.Dataset.TemporalResolution</p>
+                </Body>
+            </Card>
+        </AntDesign.Col>
+        <AntDesign.Col Span="12" Style="padding:5px">
+            <Card>
+                <TitleTemplate>
+                    <Icon Type="environment" Theme="outline" /> Spatial Information
+                </TitleTemplate>
+                <Body>
+                    <p>TODO: Add map of geojson here</p>
+                    <p><strong>Resolution</strong>: @Metadata.Dataset.SpatialRepeats</p>
+                </Body>
+            </Card>
+        </AntDesign.Col>
+    </Row>
+
+    <Row Justify="space-around" Align="top">
+        <AntDesign.Col Span="12" Style="padding:5px">
+            <AntList Bordered DataSource="@Metadata.Dataset.Methods">
+                <Header>
+                    <Icon Type="experiment" Theme="outline" /> Methods
+                </Header>
+                <ChildContent Context="method">
+                    <ListItem Style="overflow:auto;"><Text>@method</Text></ListItem>
+                </ChildContent>
+            </AntList>
+        </AntDesign.Col>
+        <AntDesign.Col Span="12" Style="padding:5px">
+            <AntList Bordered DataSource="@Metadata.Dataset.DerivedWorks">
+                <Header>
+                    <Icon Type="comment" Theme="outline" /> Derived Works
+                </Header>
+                <ChildContent Context="derived">
+                    <ListItem Style="overflow:auto;"><Text>@derived</Text></ListItem>
+                </ChildContent>
+            </AntList>
+        </AntDesign.Col>
+    </Row>
+
+    <Row Justify="space-around" Align="top">
+        <AntDesign.Col Span="24" Style="padding:5px">
+            <Card>
+                <TitleTemplate>
+                    <Icon Type="file-text" Theme="outline" /> File Information
+                </TitleTemplate>
+                <Body>
+                    <p><strong>Format</strong>: @Metadata.Dataset.Format</p>
+                    <p><strong>Path Template</strong>: @Metadata.Dataset.FilePathTemplate</p>
+                    <p><strong>Path Description</strong>: @Metadata.Dataset.FilePathDescriptor</p>
+                </Body>
+            </Card>
+        </AntDesign.Col>
+    </Row>
+
+    <Row Justify="space-around" Align="top">
+        <AntDesign.Col Span="12" Style="padding:5px">
+            <Card>
+                <TitleTemplate>
+                    <Icon Type="user" Theme="outline" /> Contacts
+                </TitleTemplate>
+                <Body>
+                    <AntDesign.Table TItem="Caf.Midden.Core.Models.v0_1_0alpha4.Person"
+                                     DataSource="@Metadata.Dataset.Contacts"
+                                     HidePagination="@true">
+                        <ChildContent Context="contact">
+                            <Column @bind-Field="contact.Name">
+                                <a href="mailto:@contact.Email">@contact.Name</a>
+                            </Column>
+                            <Column @bind-Field="contact.Role" />
+                        </ChildContent>
+                    </AntDesign.Table>
+                </Body>
+            </Card>
+        </AntDesign.Col>
+        <AntDesign.Col Span="12" Style="padding:5px">
+            <Card Title="Tags">
+                <TitleTemplate>
+                    <Icon Type="tags" Theme="outline" /> Tags
+                </TitleTemplate>
+                <Body>
+                    @foreach (var tag in Metadata.Dataset.Tags)
+                    {
+                        <Tag>@tag</Tag>
+                    }
+                </Body>
+            </Card>
+        </AntDesign.Col>
+    </Row>
+
+    <Row Justify="space-around" Align="top">
+        <AntDesign.Col Span="24" Style="padding:5px">
+            <Card>
+                <TitleTemplate>
+                    <Icon Type="read" Theme="outline" /> Variables
+                </TitleTemplate>
+                <Body>
+                    @if (Metadata.Dataset.Variables?.Count > 0)
+                    {
+                        <AntDesign.Table TItem="Caf.Midden.Core.Models.v0_1_0alpha4.Variable"
+                                         DataSource="@Metadata.Dataset.Variables"
+                                         Size="@TableSize.Small"
+                                         ScrollX="1900"
+                                         Bordered>
+                            <ChildContent Context="variable">
+                                <Column @bind-Field="variable.Name"
+                                        Fixed="left" />
+                                <Column @bind-Field="variable.Description"
+                                        Width="600">
+                                    <textarea readonly
+                                              rows="@(string.IsNullOrEmpty(variable.Description) ? 1 : variable.Description.Split('\n').Length + 1)"
+                                              style="width:100%; border:none;">@variable.Description</textarea>
+                                </Column>
+                                <Column @bind-Field="variable.Units" />
+                                <Column @bind-Field="variable.Methods"
+                                        Width="500">
+                                    @foreach (var method in variable.Methods)
+                                            {
+                                    <textarea readonly
+                                              rows="@(string.IsNullOrEmpty(method) ? 1 :method.Split('\n').Length + 1)"
+                                              style="width:100%; border:none;">@method</textarea>
+                                            }
+                                </Column>
+
+                                <Column @bind-Field="variable.QCApplied">
+                                    @foreach (var qc in variable.QCApplied)
+                                            {
+                                        <Tag>@qc</Tag>
+                                            }
+                                </Column>
+                                <Column @bind-Field="variable.ProcessingLevel">
+                                    <Tag>@variable.ProcessingLevel</Tag>
+                                </Column>
+
+                                <Column @bind-Field="variable.Tags">
+                                    @foreach (var tag in variable.Tags)
+                                            {
+                                        <Tag>@tag</Tag>
+                                            }
+                                </Column>
+                                <Column @bind-Field="variable.Height" />
+                            </ChildContent>
+                        </AntDesign.Table>
+                    }
+                </Body>
+            </Card>
+        </AntDesign.Col>
+
+    </Row>
+}
