@@ -126,3 +126,30 @@
         background: #fff;
         border-color: #40a9ff
     }
+
+.ant-card-head {
+    border-bottom: 1px solid #9e9e9e;
+    background-color: #f6f6f6;
+}
+
+.ant-card-bordered {
+    border: 1px solid #9e9e9e;
+}
+
+.ant-list-split .ant-list-header {
+    border-bottom: 1px solid #9e9e9e;
+}
+
+.ant-list-bordered {
+    border: 1px solid #9e9e9e;
+}
+
+.ant-list-header {
+    background-color: #f6f6f6;
+    font-weight: 500;
+}
+
+.ant-list-bordered .ant-list-header {
+    padding: 16px;
+    font-size: 16px;
+}

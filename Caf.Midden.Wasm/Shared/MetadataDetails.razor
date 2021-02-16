@@ -130,8 +130,7 @@
                         <AntDesign.Table TItem="Caf.Midden.Core.Models.v0_1_0alpha4.Variable"
                                          DataSource="@Metadata.Dataset.Variables"
                                          Size="@TableSize.Small"
-                                         ScrollX="1600"
-                                         HidePagination="@true"
+                                         ScrollX="1900"
                                          Bordered>
                             <ChildContent Context="variable">
                                 <Column @bind-Field="variable.Name"
@@ -144,10 +143,12 @@
                                 </Column>
                                 <Column @bind-Field="variable.Units" />
                                 <Column @bind-Field="variable.Methods"
-                                        Ellipsis>
+                                        Width="500">
                                     @foreach (var method in variable.Methods)
                                             {
-                                        <p>@method</p>
+                                    <textarea readonly
+                                              rows="@(string.IsNullOrEmpty(method) ? 1 :method.Split('\n').Length + 1)"
+                                              style="width:100%; border:none;">@method</textarea>
                                             }
                                 </Column>
 

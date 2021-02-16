@@ -31,21 +31,22 @@
     <Row Gutter="16">
         <AntDesign.Col Span="8">
             <a href="/dashboard">
-                <Card Hoverable Cover="coverTemplate">
+                <!--<Card Hoverable Cover="coverTemplate">-->
+                <Card Hoverable>
                     <CardMeta Title="Dashboard" Description="Stats for nerds" />
                 </Card>
             </a>
         </AntDesign.Col>
         <AntDesign.Col Span="8">
             <a href="/catalog">
-                <Card Hoverable Cover="coverTemplate">
+                <Card Hoverable>
                     <CardMeta Title="Catalog" Description="Find and view datasets" />
                 </Card>
             </a>
         </AntDesign.Col>
         <AntDesign.Col Span="8">
             <a href="/editor">
-                <Card Hoverable Cover="coverTemplate">
+                <Card Hoverable>
                     <CardMeta Title="Editor" Description="Add dataset" />
                 </Card>
             </a>
@@ -55,7 +56,7 @@
 
 
 @code{
-    private RenderFragment coverTemplate =@<img alt="example" src="https://phenocam.sr.unh.edu/data/latest/cafcookeastltar01.jpg" />;
+    //private RenderFragment coverTemplate =@<img alt="example" src="https://phenocam.sr.unh.edu/data/latest/cafcookeastltar01.jpg" />;
     
     private string DebugMsg { get; set; }
 
