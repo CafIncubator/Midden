@@ -26,6 +26,9 @@ namespace Caf.Midden.Core.Models.v0_1_0alpha4
         [Required]
         public string? Description { get; set; }
 
+        [JsonPropertyName("datasetPath")]
+        public string? DatasetPath { get; set; }
+
         [JsonPropertyName("format")]
         public string? Format { get; set; }
 
