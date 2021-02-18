@@ -155,8 +155,14 @@ namespace Caf.Midden.Cli.Actions
 
             }
 
+            Catalog catalog = new Catalog()
+            {
+                CreationDate = DateTime.UtcNow,
+                Metadatas = middenMetadatas
+            };
+
             Console.WriteLine($"Writing output to {outdir}");
-            File.WriteAllText(outdir, JsonSerializer.Serialize(middenMetadatas));
+            File.WriteAllText(outdir, JsonSerializer.Serialize(catalog));
         }
     }
 }
