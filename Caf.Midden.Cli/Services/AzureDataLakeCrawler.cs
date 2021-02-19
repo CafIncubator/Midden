@@ -50,13 +50,11 @@ namespace Caf.Midden.Cli.Services
             TokenCredential credential = new ClientSecretCredential(
                 tenantId, clientId, clientSecret, new TokenCredentialOptions());
 
-            //DefaultAzureCredential cred = new DefaultAzureCredential(true);
-
             string dfsUri = $"https://{accountName}.dfs.core.windows.net";
 
             return new DataLakeServiceClient(new Uri(dfsUri), credential);
-            //return new DataLakeServiceClient(new Uri(dfsUri), cred);
         }
+
         public List<string> GetFileNames()
         {
             DataLakeFileSystemClient fileSystemClient =
@@ -107,11 +105,10 @@ namespace Caf.Midden.Cli.Services
                     json = Encoding.UTF8.GetString(ms.ToArray());
                 }
 
-                // Parse json string
+                // Parse json string and add relative path to Dataset
                 Metadata metadata = parser.Parse(json);
 
                 string filePath = fileClient.Path.Replace(".midden", "");
-
                 metadata.Dataset.DatasetPath = filePath;
 
                 metadatas.Add(metadata);

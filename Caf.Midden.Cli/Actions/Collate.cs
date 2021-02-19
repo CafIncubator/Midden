@@ -37,12 +37,16 @@ namespace Caf.Midden.Cli.Actions
             Add(new Option<List<string>>(
                 new[] { "--datastores", "-d" },
                 "List of names of data stores to crawl"));
+            Add(new Option<bool?>(
+                new[] { "--silent", "-s" },
+                "Runs in silent mode without user prompt."));
             Add(new Option<string?>(
                 new[] { "--outdir", "-o" },
                 "Directory to write the catalog.json file."));
+            
 
             Handler = CommandHandler
-                .Create<List<string>, string?, IConsole>(HandleCollate);
+                .Create<List<string>, bool?, string?, IConsole>(HandleCollate);
         }
 
         private void Add(Option<string?> option, object getDefaultValue)
@@ -52,11 +56,11 @@ namespace Caf.Midden.Cli.Actions
 
         public void HandleCollate(
             List<string> datastores,
+            bool? silent,
             string? outdir,
             IConsole console)
         {
-            // TODO: Add a silent mode as an Option
-            bool silentMode = false;
+            bool silentMode = silent ??= false;
 
             // Set output directory if none specified
             outdir ??= Path.Combine(
