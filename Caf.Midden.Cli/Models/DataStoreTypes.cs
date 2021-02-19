@@ -11,7 +11,7 @@ namespace Caf.Midden.Cli.Models
         LocalFileSystem,
         AzureDataLakeGen2,
         GithubOrganization,
-        GoogleWorkspaceDrive,
+        GoogleWorkspaceSharedDrive,
         FileTransferProtocol,
         Office365OneDrive
     }
