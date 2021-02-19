@@ -12,6 +12,8 @@ namespace Caf.Midden.Cli.Services
 {
     public class LocalFileSystemCrawler: ICrawl
     {
+        private const string FILE_EXTENSION = ".midden";
+
         private readonly string rootDirectory;
         public LocalFileSystemCrawler(string rootDirectory)
         {
@@ -27,7 +29,7 @@ namespace Caf.Midden.Cli.Services
         {
             string[] files = Directory.GetFiles(
                 rootDirectory, 
-                "*.midden", 
+                $"*{FILE_EXTENSION}", 
                 SearchOption.AllDirectories);
 
             return files.ToList();
@@ -52,7 +54,7 @@ namespace Caf.Midden.Cli.Services
 
                 string relativePath = Path.GetRelativePath(this.rootDirectory, file);
 
-                metadata.Dataset.DatasetPath = relativePath.Replace(".midden", "");
+                metadata.Dataset.DatasetPath = relativePath.Replace(FILE_EXTENSION, "");
 
                 metadatas.Add(metadata);
             }

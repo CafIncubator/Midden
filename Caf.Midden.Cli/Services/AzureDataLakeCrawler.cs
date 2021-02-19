@@ -18,6 +18,8 @@ namespace Caf.Midden.Cli.Services
 {
     public class AzureDataLakeCrawler : ICrawl
     {
+        private const string FILE_EXTENSION = ".midden";
+
         private readonly string accountName;
         private readonly string tenantId;
         private readonly string clientId;
@@ -25,9 +27,6 @@ namespace Caf.Midden.Cli.Services
         private readonly string fileSystemName;
 
         private readonly DataLakeServiceClient serviceClient;
-
-        
-        private const string FILE_EXTENSION = ".midden";
 
         public AzureDataLakeCrawler(
             string accountName,
@@ -108,7 +107,7 @@ namespace Caf.Midden.Cli.Services
                 // Parse json string and add relative path to Dataset
                 Metadata metadata = parser.Parse(json);
 
-                string filePath = fileClient.Path.Replace(".midden", "");
+                string filePath = fileClient.Path.Replace(FILE_EXTENSION, "");
                 metadata.Dataset.DatasetPath = filePath;
 
                 metadatas.Add(metadata);
