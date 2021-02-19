@@ -109,6 +109,8 @@ namespace Caf.Midden.Cli.Services
         //    return parent;
         //}
 
+        // Gets a list of Google File Ids for files in Shared Drives with the extension ".midden"
+        // Limited to searching 100 shared drives and returning 100 midden files within each shared drive (TODO: Update paging to support more)
         public List<string> GetFileNames()
         {
             List<string> names = new List<string>();

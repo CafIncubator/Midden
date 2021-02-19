@@ -54,6 +54,8 @@ namespace Caf.Midden.Cli.Services
             return new DataLakeServiceClient(new Uri(dfsUri), credential);
         }
 
+        // Gets a list of midden file names that are two levels deep from the root. 
+        // Assumes directory structure is something like "root/{projectName}/{datasetName}.midden"
         public List<string> GetFileNames()
         {
             DataLakeFileSystemClient fileSystemClient =
