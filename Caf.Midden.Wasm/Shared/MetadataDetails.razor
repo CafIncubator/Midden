@@ -75,6 +75,10 @@
                     <Icon Type="file-text" Theme="outline" /> File Information
                 </TitleTemplate>
                 <Body>
+                    @if (!string.IsNullOrEmpty(Metadata.Dataset.DatasetPath))
+                    {
+                        <p><strong>Dataset Path</strong>: @Metadata.Dataset.DatasetPath</p>
+                    }
                     <p><strong>Format</strong>: @Metadata.Dataset.Format</p>
                     <p><strong>Path Template</strong>: @Metadata.Dataset.FilePathTemplate</p>
                     <p><strong>Path Description</strong>: @Metadata.Dataset.FilePathDescriptor</p>

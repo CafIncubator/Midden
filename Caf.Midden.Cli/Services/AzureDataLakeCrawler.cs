@@ -18,6 +18,8 @@ namespace Caf.Midden.Cli.Services
 {
     public class AzureDataLakeCrawler : ICrawl
     {
+        private const string FILE_EXTENSION = ".midden";
+
         private readonly string accountName;
         private readonly string tenantId;
         private readonly string clientId;
@@ -25,9 +27,6 @@ namespace Caf.Midden.Cli.Services
         private readonly string fileSystemName;
 
         private readonly DataLakeServiceClient serviceClient;
-
-        
-        private const string FILE_EXTENSION = ".midden";
 
         public AzureDataLakeCrawler(
             string accountName,
@@ -54,6 +53,9 @@ namespace Caf.Midden.Cli.Services
 
             return new DataLakeServiceClient(new Uri(dfsUri), credential);
         }
+
+        // Gets a list of midden file names that are two levels deep from the root. 
+        // Assumes directory structure is something like "root/{projectName}/{datasetName}.midden"
         public List<string> GetFileNames()
         {
             DataLakeFileSystemClient fileSystemClient =
@@ -104,8 +106,13 @@ namespace Caf.Midden.Cli.Services
                     json = Encoding.UTF8.GetString(ms.ToArray());
                 }
 
-                // Parse json string
-                metadatas.Add(parser.Parse(json));
+                // Parse json string and add relative path to Dataset
+                Metadata metadata = parser.Parse(json);
+
+                string filePath = fileClient.Path.Replace(FILE_EXTENSION, "");
+                metadata.Dataset.DatasetPath = filePath;
+
+                metadatas.Add(metadata);
             }
 
             return metadatas;

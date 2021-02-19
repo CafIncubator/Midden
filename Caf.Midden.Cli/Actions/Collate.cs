@@ -37,12 +37,16 @@ namespace Caf.Midden.Cli.Actions
             Add(new Option<List<string>>(
                 new[] { "--datastores", "-d" },
                 "List of names of data stores to crawl"));
+            Add(new Option<bool?>(
+                new[] { "--silent", "-s" },
+                "Runs in silent mode without user prompt."));
             Add(new Option<string?>(
                 new[] { "--outdir", "-o" },
                 "Directory to write the catalog.json file."));
+            
 
             Handler = CommandHandler
-                .Create<List<string>, string?, IConsole>(HandleCollate);
+                .Create<List<string>, bool?, string?, IConsole>(HandleCollate);
         }
 
         private void Add(Option<string?> option, object getDefaultValue)
@@ -52,11 +56,11 @@ namespace Caf.Midden.Cli.Actions
 
         public void HandleCollate(
             List<string> datastores,
+            bool? silent,
             string? outdir,
             IConsole console)
         {
-            // TODO: Add a silent mode as an Option
-            bool silentMode = false;
+            bool silentMode = silent ??= false;
 
             // Set output directory if none specified
             outdir ??= Path.Combine(
@@ -144,6 +148,25 @@ namespace Caf.Midden.Cli.Actions
 
                         break;
 
+                    case DataStoreTypes.GoogleWorkspaceSharedDrive:
+                        if(
+                            currStore.ClientId is not null &&
+                            currStore.ClientSecret is not null &&
+                            currStore.ApplicationName is not null)
+                        {
+                            crawler = new GoogleWorkspaceSharedDriveCrawler(
+                                currStore.ClientId,
+                                currStore.ClientSecret,
+                                currStore.ApplicationName);
+                        }
+                        else
+                        {
+                            Console.WriteLine(
+                                $"Not enough information provided to crawl {currStore.Name}");
+                        }
+
+                        break;
+
                     default:
                         break;
                 }
@@ -155,8 +178,14 @@ namespace Caf.Midden.Cli.Actions
 
             }
 
+            Catalog catalog = new Catalog()
+            {
+                CreationDate = DateTime.UtcNow,
+                Metadatas = middenMetadatas
+            };
+
             Console.WriteLine($"Writing output to {outdir}");
-            File.WriteAllText(outdir, JsonSerializer.Serialize(middenMetadatas));
+            File.WriteAllText(outdir, JsonSerializer.Serialize(catalog));
         }
     }
 }
