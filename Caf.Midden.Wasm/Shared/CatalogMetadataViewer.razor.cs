@@ -50,13 +50,15 @@ namespace Caf.Midden.Wasm.Shared
             else
             {
                 FilteredMetadata = State.Catalog.Metadatas
-                    .Where(m => 
+                    .Where(m =>
+                        (m.Dataset.Project.ToLower().Contains(
+                            SearchTerm.ToLower())) ||
                         (m.Dataset.Name.ToLower().Contains(
-                            SearchTerm.ToLower()) ||
+                            SearchTerm.ToLower())) ||
                         (m.Dataset.Description.ToLower().Contains(
-                            SearchTerm.ToLower()) ||
+                            SearchTerm.ToLower())) ||
                         (m.Dataset.Tags.Any(t => t.ToLower().Contains(
-                            SearchTerm.ToLower()))))))
+                            SearchTerm.ToLower()))))
                     .ToList();
             }
         }

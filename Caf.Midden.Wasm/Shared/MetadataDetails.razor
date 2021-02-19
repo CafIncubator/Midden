@@ -52,7 +52,11 @@
                     <Icon Type="experiment" Theme="outline" /> Methods
                 </Header>
                 <ChildContent Context="method">
-                    <ListItem Style="overflow:auto;"><Text>@method</Text></ListItem>
+                    <ListItem Style="overflow:auto;">
+                        <textarea readonly
+                                  rows="@(string.IsNullOrEmpty(method) ? 1 : method.Split('\n').Length + 1)"
+                                  style="width:100%; border:none;">@method</textarea>
+                    </ListItem>
                 </ChildContent>
             </AntList>
         </AntDesign.Col>
@@ -62,7 +66,11 @@
                     <Icon Type="comment" Theme="outline" /> Derived Works
                 </Header>
                 <ChildContent Context="derived">
-                    <ListItem Style="overflow:auto;"><Text>@derived</Text></ListItem>
+                    <ListItem Style="overflow:auto;">
+                        <textarea readonly
+                                  rows="@(string.IsNullOrEmpty(derived) ? 1 : derived.Split('\n').Length + 1)"
+                                  style="width:100%; border:none;">@derived</textarea>
+                    </ListItem>
                 </ChildContent>
             </AntList>
         </AntDesign.Col>
