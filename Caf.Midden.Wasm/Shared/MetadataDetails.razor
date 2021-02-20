@@ -2,7 +2,7 @@
 
 @if (this.Metadata != null)
 {
-    <PageHeader Class="site-page-header" Title="@Metadata.Dataset.Name" Subtitle="Dataset details">
+    <PageHeader Class="site-page-header" Title="@Metadata.Dataset.Name" Subtitle="@($"Last updated: {Metadata.ModifiedDate}")">
     </PageHeader>
 
     <Row Justify="space-around" Align="top">

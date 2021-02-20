@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Caf.Midden.Wasm.Pages
 {
-    public partial class Dataset : IDisposable
+    public partial class MetadataView : IDisposable
     {
         [Parameter]
         public string ZoneName { get; set; }
@@ -63,6 +63,12 @@ namespace Caf.Midden.Wasm.Pages
         {
             State.StateChanged -= async (source, property)
                 => await StateChanged(source, property);
+        }
+
+        public void EditMetadata()
+        {
+            State.MetadataEdit = this.Metadata;
+            NavManager.NavigateTo("/editor");
         }
     }
 }

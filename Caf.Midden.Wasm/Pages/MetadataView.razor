@@ -1,6 +1,7 @@
 ﻿@page "/catalog/{ZoneName}/{ProjectName}/{DatasetName}"
 
 @inject Services.StateContainer State
+@inject NavigationManager NavManager
 
 <Breadcrumb Style="margin:16px 0;">
     <BreadcrumbItem>
@@ -30,12 +31,22 @@
 
 <div class="site-layout-background">
     <CatalogLoader />
-    <AntDesign.Row Justify="center">
-        <AntDesign.Col Span="24">
-            @if (this.Metadata != null)
-            {
+    @if (this.Metadata != null)
+    {
+        <AntDesign.Row Justify="end">
+            <AntDesign.Col Span="2">
+                <Button OnClick="EditMetadata">
+                    <Icon Type="edit" /> Edit
+                </Button>
+            </AntDesign.Col>
+        </AntDesign.Row>
+        <AntDesign.Row Justify="center">
+            <AntDesign.Col Span="24">
                 <MetadataDetails Metadata="this.Metadata" />
-            }
-        </AntDesign.Col>
-    </AntDesign.Row>
-</div>
+            </AntDesign.Col>
+        </AntDesign.Row>
+    } else
+    {
+        <span>Loading...</span>
+    }
+    </div>
