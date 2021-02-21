@@ -470,7 +470,7 @@ namespace Caf.Midden.Wasm.Shared
             };
             string jsonString;
 
-            DateTime now = DateTime.UtcNow;
+            State.MetadataEdit.ModifiedDate = DateTime.UtcNow;
 
             jsonString = JsonSerializer.Serialize(State.MetadataEdit, options);
 

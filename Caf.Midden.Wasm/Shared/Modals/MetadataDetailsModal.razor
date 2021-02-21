@@ -8,13 +8,20 @@
 @inject NavigationManager NavManager
 
 <AntDesign.Row Justify="space-between">
-    
+
     <AntDesign.Col Span="22">
         <strong>@_model.Metadata.Dataset.Zone / @_model.Metadata.Dataset.Project / </strong>
     </AntDesign.Col>
-    <AntDesign.Col Span="2">
-        <Button Type="primary" OnClick="ViewFull">View Full</Button>
-    </AntDesign.Col>
+    <!-- Don't show the link to full screen if editing -->
+    @if (NavManager.ToBaseRelativePath(NavManager.Uri).ToString() != "editor")
+    {
+        <AntDesign.Col Span="2">
+            <Button Type="primary" OnClick="ViewFull">
+                <Icon Type="fullscreen" Theme="outline" /> View Page
+            </Button>
+        </AntDesign.Col>
+    }
+
 </AntDesign.Row>
 
 
