@@ -2,8 +2,8 @@
 
 @if (this.Metadata != null)
 {
-    <h3>@Metadata.Dataset.Zone / @Metadata.Dataset.Project /</h3>
-    <PageHeader Class="site-page-header" Title="@Metadata.Dataset.Name" Subtitle="Dataset details" />
+    <PageHeader Class="site-page-header" Title="@Metadata.Dataset.Name" Subtitle="@($"Last updated: {Metadata.ModifiedDate}")">
+    </PageHeader>
 
     <Row Justify="space-around" Align="top">
         <AntDesign.Col Span="24" Style="padding:5px">

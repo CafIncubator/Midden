@@ -1,0 +1,52 @@
+﻿@page "/catalog/{ZoneName}/{ProjectName}/{DatasetName}"
+
+@inject Services.StateContainer State
+@inject NavigationManager NavManager
+
+<Breadcrumb Style="margin:16px 0;">
+    <BreadcrumbItem>
+        <a href="/">
+            <Icon Type="home" Theme="fill" />
+        </a>
+    </BreadcrumbItem>
+    <BreadcrumbItem>
+        <a href="/catalog">
+            <Icon Type="read" /> Catalog
+        </a>
+    </BreadcrumbItem>
+    <BreadcrumbItem>
+        <a href="/catalog/@ZoneName">
+            @ZoneName
+        </a>
+    </BreadcrumbItem>
+    <BreadcrumbItem>
+        <a href="/catalog/@ZoneName/@ProjectName">
+            @ProjectName
+        </a>
+    </BreadcrumbItem>
+    <BreadcrumbItem>
+        @DatasetName
+    </BreadcrumbItem>
+</Breadcrumb>
+
+<div class="site-layout-background">
+    <CatalogLoader />
+    @if (this.Metadata != null)
+    {
+        <AntDesign.Row Justify="end">
+            <AntDesign.Col Span="2">
+                <Button OnClick="EditMetadata">
+                    <Icon Type="edit" /> Edit
+                </Button>
+            </AntDesign.Col>
+        </AntDesign.Row>
+        <AntDesign.Row Justify="center">
+            <AntDesign.Col Span="24">
+                <MetadataDetails Metadata="this.Metadata" />
+            </AntDesign.Col>
+        </AntDesign.Row>
+    } else
+    {
+        <span>Loading...</span>
+    }
+    </div>

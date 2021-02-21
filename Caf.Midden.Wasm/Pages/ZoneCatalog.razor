@@ -1,0 +1,31 @@
+﻿@page "/catalog/{ZoneName}"
+@inject Services.StateContainer State
+
+<Breadcrumb Style="margin:16px 0;">
+    <BreadcrumbItem>
+        <a href="/">
+            <Icon Type="home" Theme="fill" />
+        </a>
+    </BreadcrumbItem>
+    <BreadcrumbItem>
+        <a href="/catalog">
+            <Icon Type="read" /> Catalog
+        </a>
+    </BreadcrumbItem>
+    <BreadcrumbItem>
+            @ZoneName
+    </BreadcrumbItem>
+</Breadcrumb>
+
+<div class="site-layout-background">
+    <CatalogLoader />
+    <PageHeader Class="site-page-header"
+                Title="@($"{ZoneName} Zone Catalog")" />
+    <ZoneCatalogMetadataViewer Zone="@ZoneName" />
+</div>
+
+
+@code {
+    [Parameter]
+    public string ZoneName { get; set; }
+} 

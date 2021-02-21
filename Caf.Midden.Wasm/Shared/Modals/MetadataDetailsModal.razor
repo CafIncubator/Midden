@@ -5,6 +5,25 @@
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Components.Forms
 @using Caf.Midden.Wasm.Shared.ViewModels
+@inject NavigationManager NavManager
+
+<AntDesign.Row Justify="space-between">
+
+    <AntDesign.Col Span="22">
+        <strong>@_model.Metadata.Dataset.Zone / @_model.Metadata.Dataset.Project / </strong>
+    </AntDesign.Col>
+    <!-- Don't show the link to full screen if editing -->
+    @if (NavManager.ToBaseRelativePath(NavManager.Uri).ToString() != "editor")
+    {
+        <AntDesign.Col Span="2">
+            <Button Type="primary" OnClick="ViewFull">
+                <Icon Type="fullscreen" Theme="outline" /> View Page
+            </Button>
+        </AntDesign.Col>
+    }
+
+</AntDesign.Row>
+
 
 <MetadataDetails Metadata="@_model.Metadata" />
 
@@ -17,6 +36,12 @@
         base.OnInitialized();
     }
 
+    private void ViewFull()
+    {
+        _ = base.ModalRef.CloseAsync();
+        NavManager.NavigateTo($"/catalog/{_model.Metadata.Dataset.Zone}/{_model.Metadata.Dataset.Project}/{_model.Metadata.Dataset.Name}");
+    }
+
     private void OnFinish(EditContext editContext)
     {
         //_ = base.ModalRef.CloseAsync();
@@ -24,6 +49,6 @@
 
     private void OnFinishFailed(EditContext editContext)
     {
-        
+
     }
 }
