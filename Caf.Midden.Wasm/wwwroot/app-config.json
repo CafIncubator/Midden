@@ -1,12 +1,12 @@
 {
   "schemaVersion": "v0.1",
   "isConfigured": true,
-  "organizationName": "Your Organization",
+  "organizationName": "My Organization",
   "toolName": "Metadata Tool",
   "zones": [
-    "Raw",
-    "Work",
-    "Production"
+    "Bronze",
+	"Silver",
+	"Gold"
   ],
   "roles": [
     "Author",
