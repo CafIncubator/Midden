@@ -1,15 +1,12 @@
 {
   "schemaVersion": "v0.1.0-alpha4",
   "isConfigured": true,
-  "organizationName": "R.J. Cook Agronomy Farm",
-  "toolName": "CAF Metadata",
+  "organizationName": "My Organization",
+  "toolName": "Metadata Tool",
   "zones": [
-    "Raw",
-    "Work",
-    "Production",
-    "Scratch",
-    "Sensitive",
-    "Intermediate"
+    "Bronze",
+	"Silver",
+	"Gold"
   ],
   "roles": [
     "Author",
