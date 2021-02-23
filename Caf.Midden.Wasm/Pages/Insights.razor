@@ -1,4 +1,4 @@
-﻿@page "/dashboard"
+﻿@page "/insights"
 @inject Services.StateContainer State
 
 <Breadcrumb Style="margin:16px 0;">
@@ -8,12 +8,10 @@
         </a>
     </BreadcrumbItem>
     <BreadcrumbItem>
-        <a href="/dashboard">
-            <Icon Type="dashboard" /> Dashboard
-        </a>
+        <Icon Type="line-chart" Theme="outline" /> Insights
     </BreadcrumbItem>
 </Breadcrumb>
 
 <div class="site-layout-background">
-    <PageHeader Class="site-page-header" Title="Dashboard" />
+    <PageHeader Class="site-page-header" Title="Insights" />
 </div>
