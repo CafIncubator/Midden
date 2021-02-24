@@ -61,5 +61,5 @@
     "External",
     "Review"
   ],
-  "catalogPath": "https://cafpublic.blob.core.windows.net/data/midden/catalog-test.json"
+  "catalogPath": "/catalog-test.json"
 }
