@@ -106,10 +106,10 @@
                                      DataSource="@Metadata.Dataset.Contacts"
                                      HidePagination="@true">
                         <ChildContent Context="contact">
-                            <Column @bind-Field="contact.Name">
+                            <AntDesign.Column @bind-Field="contact.Name">
                                 <a href="mailto:@contact.Email">@contact.Name</a>
-                            </Column>
-                            <Column @bind-Field="contact.Role" />
+                            </AntDesign.Column>
+                            <AntDesign.Column @bind-Field="contact.Role" />
                         </ChildContent>
                     </AntDesign.Table>
                 </Body>
@@ -145,16 +145,16 @@
                                          ScrollX="1900"
                                          Bordered>
                             <ChildContent Context="variable">
-                                <Column @bind-Field="variable.Name"
+                                <AntDesign.Column @bind-Field="variable.Name"
                                         Fixed="left" />
-                                <Column @bind-Field="variable.Description"
+                                <AntDesign.Column @bind-Field="variable.Description"
                                         Width="600">
                                     <textarea readonly
                                               rows="@(string.IsNullOrEmpty(variable.Description) ? 1 : variable.Description.Split('\n').Length + 1)"
                                               style="width:100%; border:none;">@variable.Description</textarea>
-                                </Column>
-                                <Column @bind-Field="variable.Units" />
-                                <Column @bind-Field="variable.Methods"
+                                </AntDesign.Column>
+                                <AntDesign.Column @bind-Field="variable.Units" />
+                                <AntDesign.Column @bind-Field="variable.Methods"
                                         Width="500">
                                     @foreach (var method in variable.Methods)
                                             {
@@ -162,25 +162,25 @@
                                               rows="@(string.IsNullOrEmpty(method) ? 1 :method.Split('\n').Length + 1)"
                                               style="width:100%; border:none;">@method</textarea>
                                             }
-                                </Column>
+                                </AntDesign.Column>
 
-                                <Column @bind-Field="variable.QCApplied">
+                                <AntDesign.Column @bind-Field="variable.QCApplied">
                                     @foreach (var qc in variable.QCApplied)
                                             {
                                         <Tag>@qc</Tag>
                                             }
-                                </Column>
-                                <Column @bind-Field="variable.ProcessingLevel">
+                                </AntDesign.Column>
+                                <AntDesign.Column @bind-Field="variable.ProcessingLevel">
                                     <Tag>@variable.ProcessingLevel</Tag>
-                                </Column>
+                                </AntDesign.Column>
 
-                                <Column @bind-Field="variable.Tags">
+                                <AntDesign.Column @bind-Field="variable.Tags">
                                     @foreach (var tag in variable.Tags)
                                             {
                                         <Tag>@tag</Tag>
                                             }
-                                </Column>
-                                <Column @bind-Field="variable.Height" />
+                                </AntDesign.Column>
+                                <AntDesign.Column @bind-Field="variable.Height" />
                             </ChildContent>
                         </AntDesign.Table>
                     }

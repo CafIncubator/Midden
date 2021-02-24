@@ -57,11 +57,11 @@
                                  DataSource="@context.Dataset.Contacts"
                                  HidePagination="@true">
                     <ChildContent Context="contact">
-                        <Column @bind-Field="contact.Name"
+                        <AntDesign.Column @bind-Field="contact.Name"
                                 Width="30%" />
-                        <Column @bind-Field="contact.Email"
+                        <AntDesign.Column @bind-Field="contact.Email"
                                 Width="30%" />
-                        <Column @bind-Field="contact.Role"
+                        <AntDesign.Column @bind-Field="contact.Role"
                                 Width="30%" />
                         <ActionColumn Title="Action">
                             <Space Size="small">
@@ -251,36 +251,36 @@
                                  Size="@TableSize.Small"
                                  ScrollX="1400">
                     <ChildContent Context="variable">
-                        <Column @bind-Field="variable.Name"
+                        <AntDesign.Column @bind-Field="variable.Name"
                                 Fixed="left" />
-                        <Column @bind-Field="variable.Description"
+                        <AntDesign.Column @bind-Field="variable.Description"
                                 Ellipsis />
-                        <Column @bind-Field="variable.Units" />
-                        <Column @bind-Field="variable.Methods"
+                        <AntDesign.Column @bind-Field="variable.Units" />
+                        <AntDesign.Column @bind-Field="variable.Methods"
                                 Ellipsis>
                             @foreach (var method in variable.Methods)
                                 {
                                 <p>@method</p>
                                 }
-                        </Column>
+                        </AntDesign.Column>
 
-                        <Column @bind-Field="variable.QCApplied">
+                        <AntDesign.Column @bind-Field="variable.QCApplied">
                             @foreach (var qc in variable.QCApplied)
                                 {
                                 <Tag>@qc</Tag>
                                 }
-                        </Column>
-                        <Column @bind-Field="variable.ProcessingLevel">
+                        </AntDesign.Column>
+                        <AntDesign.Column @bind-Field="variable.ProcessingLevel">
                             <Tag>@variable.ProcessingLevel</Tag>
-                        </Column>
+                        </AntDesign.Column>
 
-                        <Column @bind-Field="variable.Tags">
+                        <AntDesign.Column @bind-Field="variable.Tags">
                             @foreach (var tag in variable.Tags)
                                 {
                                 <Tag>@tag</Tag>
                                 }
-                        </Column>
-                        <Column @bind-Field="variable.Height" />
+                        </AntDesign.Column>
+                        <AntDesign.Column @bind-Field="variable.Height" />
                         <ActionColumn Title="Action"
                                       Fixed="right">
                             <Space Size="small">

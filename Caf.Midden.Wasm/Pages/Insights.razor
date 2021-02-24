@@ -13,5 +13,62 @@
 </Breadcrumb>
 
 <div class="site-layout-background">
+    <CatalogLoader />
     <PageHeader Class="site-page-header" Title="Insights" />
+    <AntDesign.Row Justify="start">
+        <AntDesign.Col>
+            <span>Last Updated</span>
+            <span><Icon Type="calendar" /> @CatalogLastUpdate</span>
+        </AntDesign.Col>
+    </AntDesign.Row>
+    <AntDesign.Row Justify="center">
+        <AntDesign.Col Span="4">
+            <Statistic Title="Total Datasets" Value="@TotalDatasets">
+                <PrefixTemplate>
+                    <span><Icon Type="database" /></span>
+                </PrefixTemplate>
+            </Statistic>
+        </AntDesign.Col>
+        <AntDesign.Col Span="4">
+            <Statistic Title="Total Projects" Value="@TotalProjects">
+                <PrefixTemplate>
+                    <span><Icon Type="experiment" /></span>
+                </PrefixTemplate>
+            </Statistic>
+        </AntDesign.Col>
+        <AntDesign.Col Span="4">
+            <Statistic Title="Total Variables" Value="@TotalVariables">
+                <PrefixTemplate>
+                    <span><Icon Type="calculator" /></span>
+                </PrefixTemplate>
+            </Statistic>
+        </AntDesign.Col>
+        <AntDesign.Col Span="4">
+            <Statistic Title="Unique Tags" Value="@TotalTags">
+                <PrefixTemplate>
+                    <span><Icon Type="tags" /></span>
+                </PrefixTemplate>
+            </Statistic>
+        </AntDesign.Col>
+        <AntDesign.Col Span="4">
+            <Statistic Title="Contributors" Value="@TotalContacts">
+                <PrefixTemplate>
+                    <span><Icon Type="user" /></span>
+                </PrefixTemplate>
+            </Statistic>
+        </AntDesign.Col>
+    </AntDesign.Row>
+
+    <AntDesign.Row Justify="center">
+        <AntDesign.Col Span="12">
+            @if (MetadataPerZoneData != null)
+            {
+                <AntDesign.Charts.Column @ref="MetadataPerZone"
+                                         Data="MetadataPerZoneData"
+                                         Config="MetadataPerZoneConfig" />
+            }
+        </AntDesign.Col>
+    </AntDesign.Row>
+   
+
 </div>

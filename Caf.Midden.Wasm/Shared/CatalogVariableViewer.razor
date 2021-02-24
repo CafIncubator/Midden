@@ -25,16 +25,16 @@
                          ScrollX="2800"
                          Bordered>
             <ChildContent Context="cv">
-                <Column @bind-Field="cv.Name"
+                <AntDesign.Column @bind-Field="cv.Name"
                         Fixed="left" />
-                <Column @bind-Field="cv.Description"
+                <AntDesign.Column @bind-Field="cv.Description"
                         Width="600">
                     <textarea readonly
                               rows="@(string.IsNullOrEmpty(cv.Description) ? 1 : cv.Description.Split('\n').Length + 1)"
                               style="width:100%; border:none;">@cv.Description</textarea>
-                </Column>
-                <Column @bind-Field="cv.Units" />
-                <Column @bind-Field="cv.Methods"
+                </AntDesign.Column>
+                <AntDesign.Column @bind-Field="cv.Units" />
+                <AntDesign.Column @bind-Field="cv.Methods"
                         Width="500">
                     @foreach (var method in cv.Methods)
                         {
@@ -42,27 +42,27 @@
                               rows="@(string.IsNullOrEmpty(method) ? 1 :method.Split('\n').Length + 1)"
                               style="width:100%; border:none;">@method</textarea>
                         }
-                </Column>
+                </AntDesign.Column>
 
-                <Column @bind-Field="cv.QCApplied">
+                <AntDesign.Column @bind-Field="cv.QCApplied">
                     @foreach (var qc in cv.QCApplied)
                         {
                         <Tag>@qc</Tag>
                         }
-                </Column>
-                <Column @bind-Field="cv.ProcessingLevel">
+                </AntDesign.Column>
+                <AntDesign.Column @bind-Field="cv.ProcessingLevel">
                     <Tag>@cv.ProcessingLevel</Tag>
-                </Column>
+                </AntDesign.Column>
 
-                <Column @bind-Field="cv.Tags">
+                <AntDesign.Column @bind-Field="cv.Tags">
                     @foreach (var tag in cv.Tags)
                         {
                         <Tag>@tag</Tag>
                         }
-                </Column>
-                <Column @bind-Field="cv.Zone" />
-                <Column @bind-Field="cv.ProjectName" />
-                <Column @bind-Field="cv.DatasetName" />
+                </AntDesign.Column>
+                <AntDesign.Column @bind-Field="cv.Zone" />
+                <AntDesign.Column @bind-Field="cv.ProjectName" />
+                <AntDesign.Column @bind-Field="cv.DatasetName" />
                 <ActionColumn Title="Action"
                               Fixed="right">
                     <Space Size="small">
