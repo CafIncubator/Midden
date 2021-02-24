@@ -25,7 +25,7 @@
     <Content Update="wwwroot\app-config.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\catalog-test.json">
+    <Content Update="wwwroot\catalog.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
