@@ -1,0 +1,119 @@
+﻿@page "/insights"
+@inject Services.StateContainer State
+
+<Breadcrumb Style="margin:16px 0;">
+    <BreadcrumbItem>
+        <a href="/">
+            <Icon Type="home" Theme="fill" />
+        </a>
+    </BreadcrumbItem>
+    <BreadcrumbItem>
+        <Icon Type="line-chart" Theme="outline" /> Insights
+    </BreadcrumbItem>
+</Breadcrumb>
+
+<div class="site-layout-background">
+    <CatalogLoader />
+    <PageHeader Class="site-page-header" Title="Insights" />
+
+    <Divider />
+
+    <AntDesign.Row Gutter="16">
+        <AntDesign.Col Span="4">
+            <Statistic Title="Catalog Last Updated" Value="@CatalogLastUpdate.Month">
+                <PrefixTemplate>
+                    <span><Icon Type="calendar" /></span>
+                </PrefixTemplate>
+                <SuffixTemplate>
+                    /@CatalogLastUpdate.Day/@CatalogLastUpdate.Year
+                </SuffixTemplate>
+            </Statistic>
+        </AntDesign.Col>
+        <AntDesign.Col Span="4">
+            <Statistic Title="Total Datasets" Value="@TotalDatasets">
+                <PrefixTemplate>
+                    <span><Icon Type="database" /></span>
+                </PrefixTemplate>
+            </Statistic>
+        </AntDesign.Col>
+        <AntDesign.Col Span="4">
+            <Statistic Title="Total Projects" Value="@TotalProjects">
+                <PrefixTemplate>
+                    <span><Icon Type="experiment" /></span>
+                </PrefixTemplate>
+            </Statistic>
+        </AntDesign.Col>
+        <AntDesign.Col Span="4">
+            <Statistic Title="Total Variables" Value="@TotalVariables">
+                <PrefixTemplate>
+                    <span><Icon Type="calculator" /></span>
+                </PrefixTemplate>
+            </Statistic>
+        </AntDesign.Col>
+        <AntDesign.Col Span="4">
+            <Statistic Title="Unique Tags" Value="@TotalTags">
+                <PrefixTemplate>
+                    <span><Icon Type="tags" /></span>
+                </PrefixTemplate>
+            </Statistic>
+        </AntDesign.Col>
+        <AntDesign.Col Span="4">
+            <Statistic Title="Contributors" Value="@TotalContacts">
+                <PrefixTemplate>
+                    <span><Icon Type="user" /></span>
+                </PrefixTemplate>
+            </Statistic>
+        </AntDesign.Col>
+    </AntDesign.Row>
+
+    <Divider />
+
+    <AntDesign.Row Gutter="16">
+        <AntDesign.Col Span="12" Style="padding: 5px;">
+            @if (MetadataPerZoneData != null)
+            {
+                <AntDesign.Charts.Column @ref="MetadataPerZone"
+                                         Data="MetadataPerZoneData"
+                                         Config="MetadataPerZoneConfig" />
+            }
+        </AntDesign.Col>
+        <AntDesign.Col Span="12" Style="padding: 5px;">
+            @if (DatasetsOverTimeData != null)
+            {
+                <AntDesign.Charts.Area @ref="DatasetsOverTime"
+                                       Data="DatasetsOverTimeData"
+                                       Config="DatasetsOverTimeConfig" />
+            }
+        </AntDesign.Col>
+    </AntDesign.Row>
+
+    <Divider />
+
+    <AntDesign.Row Gutter="16">
+        <AntDesign.Col Span="12" Style="padding: 5px;">
+            <AntDesign.AntList DataSource="@TopTags"
+                               Bordered>
+                <Header>Top Tags</Header>
+                <ChildContent Context="item">
+                    <ListItem>
+                        <span><Text>@item.Key</Text></span> @item.Value
+                    </ListItem>
+                </ChildContent>
+            </AntDesign.AntList>
+        </AntDesign.Col>
+        <AntDesign.Col Span="12" Style="padding: 5px;">
+            <AntDesign.AntList DataSource="@TopContacts"
+                               Bordered>
+                <Header>Top Contributors</Header>
+                <ChildContent Context="item">
+                    <ListItem>
+                        <span><Text>@item.Key</Text></span> @item.Value
+                    </ListItem>
+                </ChildContent>
+            </AntDesign.AntList>
+        </AntDesign.Col>
+
+    </AntDesign.Row>
+
+
+</div>
