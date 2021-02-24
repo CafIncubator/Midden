@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AntDesign.Charts;
 using Caf.Midden.Core.Models.v0_1_0alpha4;
+using System.Globalization;
 
 namespace Caf.Midden.Wasm.Pages
 {
@@ -16,6 +17,10 @@ namespace Caf.Midden.Wasm.Pages
         int TotalTags { get; set; }
         int TotalContacts { get; set; }
         int TotalProjects { get; set; }
+
+        Dictionary<string, int> TopTags { get; set; }
+        Dictionary<string, int> TopContacts { get; set; }
+
         DateTime CatalogLastUpdate { get; set; }
 
 
@@ -32,6 +37,31 @@ namespace Caf.Midden.Wasm.Pages
             Padding = "auto",
             XField = "zone",
             YField = "count"
+        };
+
+        IChartComponent DatasetsOverTime = new Area<object>();
+        public object[] DatasetsOverTimeData { get; set; }
+        AreaConfig DatasetsOverTimeConfig = new AreaConfig
+        {
+            Title = new Title
+            {
+                Visible = true,
+                Text = "Dataset growth"
+            },
+            ForceFit = true,
+            Padding = "auto",
+            XField = "date",
+            YField = "count",
+            XAxis = new ValueCatTimeAxis
+            {
+                Visible = true,
+                Type = "dateTime"
+            },
+            YAxis = new ValueAxis
+            {
+                Visible = true,
+                Min = 0
+            }
         };
 
         protected override void OnInitialized()
@@ -68,7 +98,8 @@ namespace Caf.Midden.Wasm.Pages
 
             SetSimpleStats();
             CreateDatasetsPerZone();
-            
+            CreateDatasetsOverTime();
+            SetTopStats();
         }
 
         private void SetSimpleStats()
@@ -87,17 +118,11 @@ namespace Caf.Midden.Wasm.Pages
                 .Distinct()
                 .Count();
 
-            //List<string> UniqueProjects = new List<string>();
             List<string> UniqueTags = new List<string>();
             List<string> UniqueContacts = new List<string>();
 
             foreach(Metadata meta in State.Catalog.Metadatas)
             {
-                
-                //UniqueTags = UniqueTags.Union(meta.Dataset.Tags).ToList();
-                //List<string> varTags = meta.Dataset.Variables.SelectMany(v => v.Tags).ToList();
-                //UniqueTags = UniqueTags.Union(varTags).ToList();
-
                 // Get unique tags from all datasets and variables
                 UniqueTags = UniqueTags
                     .Union(meta.Dataset.Tags)
@@ -105,10 +130,6 @@ namespace Caf.Midden.Wasm.Pages
                     .Union(meta.Dataset.Variables
                         .SelectMany(v => v.Tags))
                     .ToList();
-
-                //List<string> contacts = meta.Dataset.Contacts.Select(p => p.Name).Where(n => n != null).ToList<string>();
-
-                //UniqueContacts = UniqueContacts.Union<string>(contacts).ToList();
 
                 // Get unique contacts from all datasets
                 UniqueContacts = UniqueContacts
@@ -144,6 +165,97 @@ namespace Caf.Midden.Wasm.Pages
             this.MetadataPerZoneData = objs.ToArray();
 
             MetadataPerZone.ChangeData(MetadataPerZoneData);
+        }
+
+        private void CreateDatasetsOverTime()
+        {
+            List<object> objs = new List<object>();
+
+            // Groups datasets by creation date to get counts of those added the same month
+            var grouped = State.Catalog.Metadatas.GroupBy(m => m.CreationDate.ToString("yyyyMM"))
+                .Select(i => new
+                {
+                    date = DateTime.ParseExact(i.Key, "yyyyMM", CultureInfo.InvariantCulture),
+                    count = i.Count()
+                })
+                .OrderBy(g => g.date)
+                .ToList();
+
+            int total = 0;
+
+            if (grouped.Count == 0)
+                return;
+
+            DateTime min = grouped.Min(g => g.date);
+            DateTime now = DateTime.UtcNow;
+            DateTime curr = min;
+
+            // Set threshold of year diff to displaying 10 years of data
+            if((curr.Year - min.Year) > 10)
+            {
+                min = new DateTime(curr.Year - 10, 1, 1);
+            }
+
+            while(curr < now)
+            {
+                object obj;
+                // Moving in accending order, so curr should only match first index
+                if(grouped[0].date.Month == curr.Month && grouped[0].date.Year == curr.Year)
+                {
+                    total += grouped[0].count;
+
+                    grouped.RemoveAt(0);
+                    
+                }
+
+                obj = new
+                {
+                    date = curr,
+                    count = total
+                };
+
+                objs.Add(obj);
+
+                curr = curr.AddMonths(1);
+
+            }
+
+            this.DatasetsOverTimeData = objs.ToArray();
+
+            DatasetsOverTime.ChangeData(DatasetsOverTimeData);
+        }
+        
+        private void SetTopStats()
+        {
+            List<string> Tags = new List<string>();
+            List<string> Contacts = new List<string>();
+
+            foreach (Metadata meta in State.Catalog.Metadatas)
+            {
+                // Get tags from all datasets and variables
+                Tags = Tags.Concat(meta.Dataset.Tags).ToList();
+                Tags = Tags.Concat(meta.Dataset.Variables
+                        .SelectMany(v => v.Tags)).ToList();
+
+                // Get contacts from all datasets
+                Contacts = Contacts.Concat(meta.Dataset.Contacts
+                        .Select(p => p.Name)
+                        .Where(n => n != null)
+                        .ToList<string>()).ToList();
+            }
+
+
+            this.TopTags = Tags.GroupBy(s => s)
+                .ToDictionary(g => g.Key, g => g.Count())
+                .OrderByDescending(d => d.Value)
+                .Take(5)
+                .ToDictionary(d => d.Key, d => d.Value);
+
+            this.TopContacts = Contacts.GroupBy(s => s)
+                .ToDictionary(g => g.Key, g => g.Count())
+                .OrderByDescending(d => d.Value)
+                .Take(5)
+                .ToDictionary(d => d.Key, d => d.Value);
         }
 
         public void Dispose()

@@ -15,13 +15,20 @@
 <div class="site-layout-background">
     <CatalogLoader />
     <PageHeader Class="site-page-header" Title="Insights" />
-    <AntDesign.Row Justify="start">
-        <AntDesign.Col>
-            <span>Last Updated</span>
-            <span><Icon Type="calendar" /> @CatalogLastUpdate</span>
+
+    <Divider />
+
+    <AntDesign.Row Gutter="16">
+        <AntDesign.Col Span="4">
+            <Statistic Title="Catalog Last Updated" Value="@CatalogLastUpdate.Month">
+                <PrefixTemplate>
+                    <span><Icon Type="calendar" /></span>
+                </PrefixTemplate>
+                <SuffixTemplate>
+                    /@CatalogLastUpdate.Day/@CatalogLastUpdate.Year
+                </SuffixTemplate>
+            </Statistic>
         </AntDesign.Col>
-    </AntDesign.Row>
-    <AntDesign.Row Justify="center">
         <AntDesign.Col Span="4">
             <Statistic Title="Total Datasets" Value="@TotalDatasets">
                 <PrefixTemplate>
@@ -59,8 +66,10 @@
         </AntDesign.Col>
     </AntDesign.Row>
 
-    <AntDesign.Row Justify="center">
-        <AntDesign.Col Span="12">
+    <Divider />
+
+    <AntDesign.Row Gutter="16">
+        <AntDesign.Col Span="12" Style="padding: 5px;">
             @if (MetadataPerZoneData != null)
             {
                 <AntDesign.Charts.Column @ref="MetadataPerZone"
@@ -68,7 +77,43 @@
                                          Config="MetadataPerZoneConfig" />
             }
         </AntDesign.Col>
+        <AntDesign.Col Span="12" Style="padding: 5px;">
+            @if (DatasetsOverTimeData != null)
+            {
+                <AntDesign.Charts.Area @ref="DatasetsOverTime"
+                                       Data="DatasetsOverTimeData"
+                                       Config="DatasetsOverTimeConfig" />
+            }
+        </AntDesign.Col>
     </AntDesign.Row>
-   
+
+    <Divider />
+
+    <AntDesign.Row Gutter="16">
+        <AntDesign.Col Span="12" Style="padding: 5px;">
+            <AntDesign.AntList DataSource="@TopTags"
+                               Bordered>
+                <Header>Top Tags</Header>
+                <ChildContent Context="item">
+                    <ListItem>
+                        <span><Text>@item.Key</Text></span> @item.Value
+                    </ListItem>
+                </ChildContent>
+            </AntDesign.AntList>
+        </AntDesign.Col>
+        <AntDesign.Col Span="12" Style="padding: 5px;">
+            <AntDesign.AntList DataSource="@TopContacts"
+                               Bordered>
+                <Header>Top Contributors</Header>
+                <ChildContent Context="item">
+                    <ListItem>
+                        <span><Text>@item.Key</Text></span> @item.Value
+                    </ListItem>
+                </ChildContent>
+            </AntDesign.AntList>
+        </AntDesign.Col>
+
+    </AntDesign.Row>
+
 
 </div>
