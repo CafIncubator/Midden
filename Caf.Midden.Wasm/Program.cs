@@ -37,12 +37,6 @@ namespace Caf.Midden.Wasm
                 sp => new CatalogReaderHttp(
                     sp.GetRequiredService<HttpClient>()));
 
-            //builder.Services.AddScoped<StateContainer>();
-            //builder.Services.AddScoped<IUpdateAppConfig>(x =>
-            //    x.GetRequiredService<StateContainer>());
-            //builder.Services.AddScoped<IUpdateLastUpdated>(x =>
-            //    x.GetRequiredService<StateContainer>());
-
             builder.Services.AddAntDesign();
 
             await builder.Build().RunAsync();

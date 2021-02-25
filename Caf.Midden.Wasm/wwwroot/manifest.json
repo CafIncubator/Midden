@@ -1,6 +1,6 @@
 {
-  "name": "Caf.Midden.Wasm",
-  "short_name": "Caf.Midden.Wasm",
+  "name": "Midden: Research Data Catalog",
+  "short_name": "Midden",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#ffffff",
