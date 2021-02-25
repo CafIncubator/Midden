@@ -44,13 +44,15 @@
                         }
                 </AntDesign.Column>
 
-                <AntDesign.Column @bind-Field="cv.QCApplied">
+                <AntDesign.Column @bind-Field="cv.QCApplied"
+                                  Title="Quality Control">
                     @foreach (var qc in cv.QCApplied)
                         {
                         <Tag>@qc</Tag>
                         }
                 </AntDesign.Column>
-                <AntDesign.Column @bind-Field="cv.ProcessingLevel">
+                <AntDesign.Column @bind-Field="cv.ProcessingLevel"
+                                  Title="Processing">
                     <Tag>@cv.ProcessingLevel</Tag>
                 </AntDesign.Column>
 
@@ -61,8 +63,10 @@
                         }
                 </AntDesign.Column>
                 <AntDesign.Column @bind-Field="cv.Zone" />
-                <AntDesign.Column @bind-Field="cv.ProjectName" />
-                <AntDesign.Column @bind-Field="cv.DatasetName" />
+                <AntDesign.Column @bind-Field="cv.ProjectName"
+                                  Title="Project"/>
+                <AntDesign.Column @bind-Field="cv.DatasetName"
+                                  Title="Dataset"/>
                 <ActionColumn Title="Action"
                               Fixed="right">
                     <Space Size="small">

@@ -264,13 +264,15 @@
                                 }
                         </AntDesign.Column>
 
-                        <AntDesign.Column @bind-Field="variable.QCApplied">
+                        <AntDesign.Column @bind-Field="variable.QCApplied"
+                                          Title="Quality Control">
                             @foreach (var qc in variable.QCApplied)
                                 {
                                 <Tag>@qc</Tag>
                                 }
                         </AntDesign.Column>
-                        <AntDesign.Column @bind-Field="variable.ProcessingLevel">
+                        <AntDesign.Column @bind-Field="variable.ProcessingLevel"
+                                          Title="Processing">
                             <Tag>@variable.ProcessingLevel</Tag>
                         </AntDesign.Column>
 

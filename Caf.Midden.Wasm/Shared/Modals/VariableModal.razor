@@ -56,10 +56,10 @@
 
     <!-- Not using "FormItem" tag here because it throws an error; something about using a bind-Value with string -->
     <Row Gutter="2">
-        <AntDesign.Col Span="8">QC Applied:</AntDesign.Col>
+        <AntDesign.Col Span="8"><div style="text-align: right;">Quality Control: </div></AntDesign.Col>
         <AntDesign.Col Span="16">
             <Select Mode="multiple"
-                    Placeholder="Select QC"
+                    Placeholder="Select Quality Control"
                     @bind-Values="@context.SelectedQCApplied"
                     TItemValue="string"
                     TItem="string">
