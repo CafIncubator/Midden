@@ -18,20 +18,9 @@
                     Subtitle="Metadata Tool" />
     }
 
-    @if (State != null)
-    {
-        <p>LastUpdated: @State.LastUpdated</p>
-    }
-    else
-    {
-        <p>None loaded</p>
-    }
-
-
     <Row Gutter="16">
         <AntDesign.Col Span="8">
             <a href="/insights">
-                <!--<Card Hoverable Cover="coverTemplate">-->
                 <Card Hoverable>
                     <CardMeta Title="Insights" Description="Stats for nerds" />
                 </Card>
@@ -52,33 +41,32 @@
             </a>
         </AntDesign.Col>
     </Row>
+
 </div>
 
 
 @code{
-    //private RenderFragment coverTemplate =@<img alt="example" src="https://phenocam.sr.unh.edu/data/latest/cafcookeastltar01.jpg" />;
-    
-    private string DebugMsg { get; set; }
+private string DebugMsg { get; set; }
 
-    private async Task AppConfig_StateChanged(
-        ComponentBase source,
-        string appConfig)
-    {
-        if (source != this)
-        {
-            await InvokeAsync(StateHasChanged);
-            DebugMsg = "StateHasChanged";
-        }
-    }
+private async Task AppConfig_StateChanged(
+ComponentBase source,
+string appConfig)
+{
+if (source != this)
+{
+await InvokeAsync(StateHasChanged);
+DebugMsg = "StateHasChanged";
+}
+}
 
-    protected override void OnInitialized()
-    {
-        State.StateChanged += async (source, property)
-        => await AppConfig_StateChanged(source, property);
-    }
-    public void Dispose()
-    {
-        State.StateChanged -= async (source, property)
-        => await AppConfig_StateChanged(source, property);
-    }
+protected override void OnInitialized()
+{
+State.StateChanged += async (source, property)
+=> await AppConfig_StateChanged(source, property);
+}
+public void Dispose()
+{
+State.StateChanged -= async (source, property)
+=> await AppConfig_StateChanged(source, property);
+}
 }
