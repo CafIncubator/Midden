@@ -10,6 +10,7 @@
     <PackageId>MiddenCli</PackageId>
     <Version>0.1.0</Version>
     <RepositoryUrl>https://github.com/cafltar/Midden</RepositoryUrl>
+    <AssemblyName>MiddenCli</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -28,5 +29,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+
 
 </Project>
