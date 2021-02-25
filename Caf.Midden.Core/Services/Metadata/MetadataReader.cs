@@ -17,7 +17,7 @@ namespace Caf.Midden.Core.Services.Metadata
             this.parser = parser;
         }
 
-        public Models.v0_1_0alpha4.Metadata Read(
+        public Models.v0_1.Metadata Read(
             string fileString)
         {
             if (fileString.Length == 0)
@@ -28,7 +28,7 @@ namespace Caf.Midden.Core.Services.Metadata
             return result;
         }
 
-        public async Task<Models.v0_1_0alpha4.Metadata> ReadAsync(
+        public async Task<Models.v0_1.Metadata> ReadAsync(
             System.IO.Stream stream)
         {
             using (var reader = new StreamReader(stream, Encoding.UTF8))

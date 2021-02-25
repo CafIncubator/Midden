@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Caf.Midden.Core.Models.v0_1_0alpha4;
+using Caf.Midden.Core.Models.v0_1;
 using Microsoft.AspNetCore.Components;
 
 namespace Caf.Midden.Wasm.Services
 {
     public class StateContainer
     {
-        public string SchemaVersion { get; } = "v0.1.0-alpha4";
+        public string SchemaVersion { get; } = "v0.1";
         
         public DateTime LastUpdated { get; private set; } = 
             DateTime.UtcNow;
