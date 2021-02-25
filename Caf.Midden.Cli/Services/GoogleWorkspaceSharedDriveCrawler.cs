@@ -62,52 +62,46 @@ namespace Caf.Midden.Cli.Services
         }
 
         // Stolen from: https://stackoverflow.com/a/38750409/1621156
-        //private string AbsPath(Google.Apis.Drive.v3.Data.File file)
-        //{
-        //    var name = file.Name;
-        //
-        //    if (file.Parents.Count() == 0)
-        //    {
-        //        return name;
-        //    }
-        //
-        //    var path = new List<string>();
-        //
-        //    while (true)
-        //    {
-        //        var parent = GetFile(file.Parents[0]);
-        //
-        //        // Stop when we find the root dir
-        //        if (parent.Parents == null || parent.Parents.Count() == 0)
-        //        {
-        //            break;
-        //        }
-        //
-        //        path.Insert(0, parent.Name);
-        //        file = parent;
-        //    }
-        //    path.Add(name);
-        //    return path.Aggregate((current, next) => Path.Combine(current, next));
-        //}
+        private string AbsPath(Google.Apis.Drive.v3.Data.File file)
+        {
+            var name = file.Name;
+        
+            if (file.Parents.Count() == 0)
+            {
+                return name;
+            }
+        
+            var path = new List<string>();
+        
+            while (true)
+            {
+                var parent = GetFile(file.Parents[0]);
+        
+                // Stop when we find the root dir
+                if (parent.Parents == null || parent.Parents.Count() == 0)
+                {
+                    break;
+                }
+        
+                path.Insert(0, parent.Name);
+                file = parent;
+            }
+            path.Add(name);
+            return path.Aggregate((current, next) => Path.Combine(current, next));
+        }
 
-        //private Google.Apis.Drive.v3.Data.File GetFile(string id)
-        //{
-        //    // Check cache
-        //    //if (files.ContainsKey(id))
-        //    //{
-        //    //    return files[id];
-        //    //}
-        //
-        //    // Fetch file from drive
-        //    var request = service.Files.Get(id);
-        //    request.Fields = "files(id, name, parents)";
-        //    var parent = request.Execute();
-        //
-        //    // Save in cache
-        //    //files[id] = parent;
-        //
-        //    return parent;
-        //}
+        // Stolen from: https://stackoverflow.com/a/38750409/1621156
+        private Google.Apis.Drive.v3.Data.File GetFile(string id)
+        {        
+            // Fetch file from drive
+            FilesResource.GetRequest request = service.Files.Get(id);
+            request.Fields = "id, name, parents";
+            request.SupportsAllDrives = true;
+            request.SupportsTeamDrives = true;
+            var parent = request.Execute();
+        
+            return parent;
+        }
 
         // Gets a list of Google File Ids for files in Shared Drives with the extension ".midden"
         // Limited to searching 100 shared drives and returning 100 midden files within each shared drive (TODO: Update paging to support more)
@@ -156,9 +150,50 @@ namespace Caf.Midden.Cli.Services
             return names;
         }
 
+        public List<Google.Apis.Drive.v3.Data.File> GetFiles()
+        {
+            List<Google.Apis.Drive.v3.Data.File> files = new List<Google.Apis.Drive.v3.Data.File>();
+
+            var teamDriveList = service.Teamdrives.List();
+
+            teamDriveList.Fields = "teamDrives(kind, id, name)";
+            teamDriveList.PageSize = 100;
+
+            var teamDrives = teamDriveList.Execute().TeamDrives;
+
+            if (teamDrives != null && teamDrives.Count > 0)
+            {
+                foreach (var drive in teamDrives)
+                {
+                    FilesResource.ListRequest listRequest = service.Files.List();
+                    listRequest.DriveId = drive.Id;
+                    listRequest.PageSize = 100;
+                    listRequest.Fields = "nextPageToken, files(id, name, parents)";
+                    listRequest.IncludeItemsFromAllDrives = true;
+                    listRequest.SupportsAllDrives = true;
+                    listRequest.Corpora = "drive";
+                    listRequest.Q = $"name contains '{FILE_EXTENSION}'";
+
+                    List<Google.Apis.Drive.v3.Data.File> dirFiles = listRequest.Execute().Files.ToList();
+
+                    if (dirFiles != null && dirFiles.Count > 0)
+                    {
+                        foreach (var file in dirFiles)
+                        {
+                            Console.WriteLine($"  In {drive.Name} found {file.Name}");
+
+                            files.Add(file);
+                        }
+                    }
+                }
+            }
+
+            return files;
+        }
+
         public List<Metadata> GetMetadatas()
         {
-            List<string> files = GetFileNames();
+            List<Google.Apis.Drive.v3.Data.File> files = GetFiles();
 
             List<Metadata> metadatas = new List<Metadata>();
 
@@ -172,7 +207,7 @@ namespace Caf.Midden.Cli.Services
                 
                 using (MemoryStream ms = new MemoryStream())
                 {
-                    var fileRequest = service.Files.Get(file);
+                    var fileRequest = service.Files.Get(file.Id);
                     fileRequest.Download(ms);
                     json = Encoding.UTF8.GetString(ms.ToArray());
                 }
@@ -187,15 +222,15 @@ namespace Caf.Midden.Cli.Services
                     continue;
                 }
 
-                // This isn't working at the moment
-                //try
-                //{
-                //    var gFile = GetFile(file);
-                //
-                //    var filePath = AbsPath(gFile);
-                //    metadata.Dataset.DatasetPath = filePath;
-                //}
-                //catch { }
+                // Try to set the path
+                try
+                {
+                     var filePath = AbsPath(file);
+
+                    metadata.Dataset.DatasetPath = 
+                        filePath.Replace(FILE_EXTENSION, "");
+                }
+                catch { } // Silent fail -- code smell
 
                 metadatas.Add(metadata);
             }
