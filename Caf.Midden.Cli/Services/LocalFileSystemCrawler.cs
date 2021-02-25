@@ -1,5 +1,5 @@
 ﻿using Caf.Midden.Cli.Common;
-using Caf.Midden.Core.Models.v0_1_0alpha4;
+using Caf.Midden.Core.Models.v0_1;
 using Caf.Midden.Core.Services.Metadata;
 using System;
 using System.Collections.Generic;

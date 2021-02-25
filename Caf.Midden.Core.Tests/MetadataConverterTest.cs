@@ -21,7 +21,7 @@ namespace Caf.Midden.Core.Tests
 
             var actual = sut.Convert(input);
 
-            Assert.IsType<Models.v0_1_0alpha4.Metadata>(actual);
+            Assert.IsType<Models.v0_1.Metadata>(actual);
         }
 
         public void Convert_v0_1_0alpha3WithVals_ConvertsProperly()
@@ -89,7 +89,7 @@ namespace Caf.Midden.Core.Tests
 
             var sut = new MetadataConverter();
 
-            Models.v0_1_0alpha4.Metadata actual = sut.Convert(input);
+            Models.v0_1.Metadata actual = sut.Convert(input);
 
             Assert.Equal(creationDate, actual.CreationDate.ToString());
             Assert.Equal(contactName, actual.Dataset.Contacts[0].Name);
@@ -103,14 +103,14 @@ namespace Caf.Midden.Core.Tests
         [Fact]
         public void Convert_v0_1_0alpha4_ConvertsProperly()
         {
-            Models.v0_1_0alpha4.Metadata input =
-                new Models.v0_1_0alpha4.Metadata();
+            Models.v0_1.Metadata input =
+                new Models.v0_1.Metadata();
 
             var sut = new MetadataConverter();
 
             var actual = sut.Convert(input);
 
-            Assert.IsType<Models.v0_1_0alpha4.Metadata>(actual);
+            Assert.IsType<Models.v0_1.Metadata>(actual);
         }
     }
 }

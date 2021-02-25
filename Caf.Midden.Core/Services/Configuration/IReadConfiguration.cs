@@ -8,6 +8,6 @@ namespace Caf.Midden.Core.Services.Configuration
 {
     public interface IReadConfiguration
     {
-        Task<Models.v0_1_0alpha4.Configuration> Read();
+        Task<Models.v0_1.Configuration> Read();
     }
 }

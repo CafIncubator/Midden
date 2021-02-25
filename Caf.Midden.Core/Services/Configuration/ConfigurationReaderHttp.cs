@@ -22,11 +22,11 @@ namespace Caf.Midden.Core.Services.Configuration
             this.jsonPath = jsonPath;
         }
 
-        public async Task<Models.v0_1_0alpha4.Configuration> Read()
+        public async Task<Models.v0_1.Configuration> Read()
         {
-            Models.v0_1_0alpha4.Configuration result = 
+            Models.v0_1.Configuration result = 
                 await client
-                    .GetFromJsonAsync<Models.v0_1_0alpha4.Configuration>(
+                    .GetFromJsonAsync<Models.v0_1.Configuration>(
                         jsonPath);
 
             return result;

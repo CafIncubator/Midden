@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AntDesign.Charts;
-using Caf.Midden.Core.Models.v0_1_0alpha4;
+using Caf.Midden.Core.Models.v0_1;
 using System.Globalization;
 
 namespace Caf.Midden.Wasm.Pages
