@@ -8,7 +8,17 @@
 	{
 	  "route": "/datasets/*",
 	  "serve": "/catalog/*",
-	  "statusCode": 200
+	  "statusCode": 301
+	},
+	{
+	  "route": "/variable-catalog",
+	  "serve": "/catalog",
+	  "statusCode": 301
+	},
+	{
+	  "route": "/dataset-catalog",
+	  "serve": "/catalog",
+	  "statusCode": 301
 	}
   ]
 }
