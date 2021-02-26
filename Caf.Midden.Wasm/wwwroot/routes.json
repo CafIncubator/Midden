@@ -1,16 +1,6 @@
 {
   "routes": [
     {
-      "route": "/*",
-      "serve": "/index.html",
-      "statusCode": 200
-    },
-	{
-	  "route": "/datasets/*",
-	  "serve": "/catalog/*",
-	  "statusCode": 301
-	},
-	{
 	  "route": "/variable-catalog",
 	  "serve": "/catalog",
 	  "statusCode": 301
@@ -19,6 +9,16 @@
 	  "route": "/dataset-catalog",
 	  "serve": "/catalog",
 	  "statusCode": 301
-	}
+	},
+	{
+	  "route": "/datasets/*",
+	  "serve": "/catalog/*",
+	  "statusCode": 301
+	},
+	{
+      "route": "/*",
+      "serve": "/index.html",
+      "statusCode": 200
+    }
   ]
 }
