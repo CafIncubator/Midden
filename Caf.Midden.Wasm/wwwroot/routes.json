@@ -4,6 +4,11 @@
       "route": "/*",
       "serve": "/index.html",
       "statusCode": 200
-    }
+    },
+	{
+	  "route": "/datasets/*",
+	  "serve": "/catalog/*",
+	  "statusCode": 200
+	}
   ]
 }
