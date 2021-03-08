@@ -196,9 +196,10 @@ namespace Caf.Midden.Wasm.Pages
                 min = new DateTime(curr.Year - 10, 1, 1);
             }
 
-            while(curr < now)
+            while(grouped.Count > 0)
             {
                 object obj;
+
                 // Moving in accending order, so curr should only match first index
                 if(grouped[0].date.Month == curr.Month && grouped[0].date.Year == curr.Year)
                 {
