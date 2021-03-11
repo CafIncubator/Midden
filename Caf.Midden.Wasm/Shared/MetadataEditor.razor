@@ -84,7 +84,7 @@
         </FormItem>
 
         <FormItem Label="Tags">
-            <Space>
+            <Space Style="width:100%;">
                 <SpaceItem>
                     <Input @bind-Value="NewDatasetTag" />
                 </SpaceItem>
@@ -92,20 +92,23 @@
                     <Button OnClick="AddDatasetTagHandler">Add</Button>
                 </SpaceItem>
                 <SpaceItem><Divider Type="vertical" /></SpaceItem>
-                <SpaceItem>
-                    <SimpleSelect Placeholder="Add saved tag"
-                                  OnSelectedItemChanged="DatasetTagSelectedItemChangedHandler"
-                                  EnableSearch
-                                  @bind-Value="SavedDatasetTag"
-                                  AutoClearSearchValue>
-                        <SelectOptions>
-                            @foreach (var tag in State.AppConfig.Tags)
-                            {
-                                <SimpleSelectOption Value=@tag Label=@tag />
-                            }
-                        </SelectOptions>
-                    </SimpleSelect>
-                </SpaceItem>
+                <div style="width: 100%;">
+                    <SpaceItem>
+                        <SimpleSelect Placeholder="Add saved tag"
+                                      OnSelectedItemChanged="DatasetTagSelectedItemChangedHandler"
+                                      EnableSearch
+                                      @bind-Value="SavedDatasetTag"
+                                      AutoClearSearchValue>
+                            <SelectOptions>
+                                @foreach (var tag in State.AppConfig.Tags)
+                                {
+                                    <SimpleSelectOption Value=@tag Label=@tag />
+                                }
+                            </SelectOptions>
+                        </SimpleSelect>
+                    </SpaceItem>
+                </div>
+                
 
             </Space>
             <br />
