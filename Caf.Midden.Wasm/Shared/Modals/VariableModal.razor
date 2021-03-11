@@ -86,7 +86,7 @@
     </FormItem>
 
     <FormItem Label="Tags">
-        <Space>
+        <Space Style="width:100%;">
             <SpaceItem>
                 <Input @bind-Value="NewVariableTag" />
             </SpaceItem>
@@ -94,21 +94,22 @@
                 <Button OnClick="AddVariableTagHandler">Add</Button>
             </SpaceItem>
             <SpaceItem><Divider Type="vertical" /></SpaceItem>
-            <SpaceItem>
-                <SimpleSelect Placeholder="Add saved tag"
-                              OnSelectedItemChanged="VariableTagSelectedItemChangedHandler"
-                              EnableSearch
-                              @bind-Value="SavedVariableTag"
-                              AutoClearSearchValue>
-                    <SelectOptions>
-                        @foreach (var tag in _model.Tags)
-                        {
-                            <SimpleSelectOption Value=@tag Label=@tag />
-                        }
-                    </SelectOptions>
-                </SimpleSelect>
-            </SpaceItem>
-
+            <div style="width:100%;">
+                <SpaceItem>
+                    <SimpleSelect Placeholder="Add saved tag"
+                                  OnSelectedItemChanged="VariableTagSelectedItemChangedHandler"
+                                  EnableSearch
+                                  @bind-Value="SavedVariableTag"
+                                  AutoClearSearchValue>
+                        <SelectOptions>
+                            @foreach (var tag in _model.Tags)
+                            {
+                                <SimpleSelectOption Value=@tag Label=@tag />
+                            }
+                        </SelectOptions>
+                    </SimpleSelect>
+                </SpaceItem>
+            </div>
         </Space>
         <br />
         @if (_model.Variable.Tags.Count > 0)

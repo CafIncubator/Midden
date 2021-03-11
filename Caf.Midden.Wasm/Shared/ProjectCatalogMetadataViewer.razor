@@ -20,29 +20,39 @@
     <Row Gutter="16">
         @foreach (var metadata in FilteredMetadata)
         {
-            <AntDesign.Col Span="12" Style="padding:10px">
-                <Card Title="@($"{metadata.Dataset.Project} / {metadata.Dataset.Name}")"
-                      Style="overflow:hidden">
-                    <Extra>
-                        <Button OnClick="() => OpenMetadataDetailsModalTemplate(metadata)">
-                            <Icon Type="zoom-in" Theme="outline" /> View
-                        </Button>
-                        <Button>
-                            <a href="/catalog/@metadata.Dataset.Zone/@metadata.Dataset.Project/@metadata.Dataset.Name">
-                                <Icon Type="fullscreen" Theme="outline" /> View
-                            </a>
-                        </Button>
-                    </Extra>
-                    <Body>
-                        @metadata.Dataset.Description
-                        <Divider />
-                        @foreach (var tag in metadata.Dataset.Tags)
-                        {
-                            <Tag>@tag</Tag>
-                        }
-                    </Body>
-                </Card>
-            </AntDesign.Col>
+        <AntDesign.Col Span="12" Style="padding:10px">
+            <Card Style="overflow:hidden">
+                <TitleTemplate>
+                    <a href="/catalog/@metadata.Dataset.Zone/@metadata.Dataset.Project/@metadata.Dataset.Name">
+                        @metadata.Dataset.Name
+                    </a>
+                </TitleTemplate>
+                <Extra>
+                    <Button OnClick="() => OpenMetadataDetailsModalTemplate(metadata)">
+                        <Icon Type="zoom-in" Theme="outline" />
+                    </Button>
+                </Extra>
+                <Body>
+                    <a href="/catalog/@metadata.Dataset.Zone">
+                        @metadata.Dataset.Zone
+                    </a> /
+                    <a href="/catalog/@metadata.Dataset.Zone/@metadata.Dataset.Project">
+                        @metadata.Dataset.Project
+                    </a>
+
+                    <Divider />
+
+                    @metadata.Dataset.Description
+
+                    <Divider />
+
+                    @foreach (var tag in metadata.Dataset.Tags)
+                    {
+                        <Tag>@tag</Tag>
+                    }
+                </Body>
+            </Card>
+        </AntDesign.Col>
         }
     </Row>
 }
