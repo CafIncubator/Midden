@@ -20,7 +20,7 @@ Midden has a metadata editor that supports fields common in many standard metada
 
 ![screenshot of editor](media/editor.jpg)
 
-### The Crawer
+### The Crawler
 
 Midden has a cross-platform command-line interface with commands to crawl various data stores (local file system, Google Workspace Shared drive, Azure Data Lake Gen 2, more coming soon...) and collates all metadata into a single file.
 
@@ -76,6 +76,10 @@ Midden supports viewing all metadata through a rich interactive interface that s
 ## Contributing
 
 Please help us make this tool better. We welcome Issues and Pull Requests. Contribution guidelines coming soon...
+
+## Attribution
+
+Original work was supported by the R.J. Cook Agronomy Farm, a member of the USDA Long-Term Agroecological Research network.
 
 ## License
 
