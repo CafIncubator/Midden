@@ -4,8 +4,6 @@
 
 Midden is a data catalog that is easily adaptable to fit within a typical researcher's workflow. Midden solves the problem of "who is collecting X data, and where can I access it?" that is the bane of many large academic research projects.
 
-![screenshot of insight dashboard](media/insights.jpg)
-
 ## Motivation
 
 There are numerous solutions for cataloging data to make it discoverable. Many of these solutions, however, require technical knowledge that is uncommon among academic researchers. Many researchers feel at ease with managing their data workflow through their native filesystem (see [here](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1005510), [here](https://data.research.cornell.edu/content/file-management), [here](https://data.library.arizona.edu/data-management/best-practices/data-project-organization)). Despite that, many data catalogs require complex solutions that is more typical in teams of data scientists and data engineers.
@@ -41,6 +39,26 @@ Midden supports viewing all metadata through a rich interactive interface that s
 3. Researcher (or data manager, or an automated script) runs the Crawler
 4. The data catalog is updated with the new metadata
 5. Collaborators find data using the Catalog, rejoice
+
+## Screenshots
+
+**Insights Dashboard** shows interesting statistics of your data holdings.
+
+![screenshot of the Insights dashboard](media/ss-insights.jpg)
+
+---
+
+**Variable Data Catalog** allows searching for specific variables across all datasets.
+
+![screenshot of the variable catalog](media/ss-variable-catalog.jpg)
+
+---
+
+**Dataset Details** shows all metadata of a given dataset.
+
+![screenshot of the dataset](media/ss-dataset-view.jpg)
+
+---
 
 ## Installing
 
