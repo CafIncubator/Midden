@@ -2,7 +2,7 @@
 
 **See it in action**: https://meta.cafltar.org
 
-Midden is a data catalog that is easily adaptable to fit within a typical researcher's workflow. Midden solves the problem of "who is collecting X data, and where can I access it?" that is the bane of many large academic research projects.
+Midden is a data catalog that is easily adaptable to fit within a typical researcher's workflow. Midden solves the problem of "who is collecting what data, and where can I access it?" that is the bane of many large academic research projects.
 
 ## Motivation
 
