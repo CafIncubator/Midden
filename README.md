@@ -73,6 +73,10 @@ Midden supports viewing all metadata through a rich interactive interface that s
 
 5. Create metadata, crawl metadata, update catalog.json, push changes to Github, enjoy the envy of your peers.
 
+## Why "Midden"?
+
+A midden is a refuse heap created by various entities such as packrats, earthworms, and human societies. It is also a rich source of information for scientists trying to study a system. The Midden Data Catalog takes datasets without any context (i.e. refuge) and helps apply metadata so it becomes information; a digital midden, if you will.
+
 ## Contributing
 
 Please help us make this tool better. We welcome Issues and Pull Requests. Contribution guidelines coming soon...
