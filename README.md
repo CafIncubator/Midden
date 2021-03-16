@@ -67,7 +67,7 @@ Midden supports viewing all metadata through a rich interactive interface that s
 
     `git clone https://github.com/your-account/midden.git`
 
-3. Make it yours by editing Midden/Caf.Midden.Wam/wwwroot/app-config.json
+3. Make it yours by editing Midden/Caf.Midden.Wasm/wwwroot/app-config.json
 
 4. Publish to a free static website host ([Github Pages](https://www.meziantou.net/publishing-a-blazor-webassembly-application-to-github-pages.htm), [netlify](https://swimburger.net/blog/dotnet/how-to-deploy-blazor-webassembly-to-netlify), [Azure Static Web Apps](https://code-maze.com/deploying-blazor-webassembly-into-azure-static-web-apps/))
 
