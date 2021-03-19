@@ -2,7 +2,7 @@
 
 **See it in action**: https://meta.cafltar.org
 
-Midden is a data catalog that is easily adaptable to fit within a typical researcher's workflow. Midden solves the problem of "who is collecting X data, and where can I access it?" that is the bane of many large academic research projects.
+Midden is a data catalog that is easily adaptable to fit within a typical researcher's workflow. Midden solves the problem of "who is collecting what data, and where can I access it?" that is the bane of many large academic research projects.
 
 ## Motivation
 
@@ -12,7 +12,7 @@ Midden meets researchers where they are comfortable.
 
 ## Overview
 
-Midden is a suite of three tools; an editor, a crawler, and a data catalog. The editor and crawler are static web apps that can be hosted for free from various providers ([Github](https://pages.github.com/), [Azure](https://azure.microsoft.com/en-us/services/app-service/static/), [netlify](https://www.netlify.com/)) and the crawler is a cross-platform command line interface.
+Midden is a suite of three tools; an editor, a crawler, and a data catalog. The editor and catalog are static web apps that can be hosted for free from various providers ([Github](https://pages.github.com/), [Azure](https://azure.microsoft.com/en-us/services/app-service/static/), [netlify](https://www.netlify.com/)) and the crawler is a cross-platform command line interface.
 
 ### The Editor
 
@@ -67,11 +67,15 @@ Midden supports viewing all metadata through a rich interactive interface that s
 
     `git clone https://github.com/your-account/midden.git`
 
-3. Make it yours by editing Midden/Caf.Midden.Wam/wwwroot/app-config.json
+3. Make it yours by editing Midden/Caf.Midden.Wasm/wwwroot/app-config.json
 
 4. Publish to a free static website host ([Github Pages](https://www.meziantou.net/publishing-a-blazor-webassembly-application-to-github-pages.htm), [netlify](https://swimburger.net/blog/dotnet/how-to-deploy-blazor-webassembly-to-netlify), [Azure Static Web Apps](https://code-maze.com/deploying-blazor-webassembly-into-azure-static-web-apps/))
 
 5. Create metadata, crawl metadata, update catalog.json, push changes to Github, enjoy the envy of your peers.
+
+## Why "Midden"?
+
+A midden is a refuse heap created by various entities such as packrats, earthworms, and human societies. It is also a rich source of information for scientists trying to study a system. The Midden Data Catalog takes datasets without any context (i.e. refuge) and helps apply metadata so it becomes information; a digital midden, if you will.
 
 ## Contributing
 
