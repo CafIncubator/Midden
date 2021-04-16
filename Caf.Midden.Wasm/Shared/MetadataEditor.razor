@@ -245,7 +245,21 @@
         </FormItem>
 
         <FormItem Label="Variables">
-            <Button OnClick="AddVariableHandler">Add</Button>
+            <Space>
+                <SpaceItem>
+                    <Button OnClick="AddVariableHandler">Add</Button>
+                </SpaceItem>
+                <SpaceItem>
+                    <DataDictionaryLoaderCafCsv />
+                </SpaceItem>
+                <SpaceItem>
+                    <Tooltip Title="@("WARNING: Uploading will replace all current variables. The uploaded file must be a CSV with the following column headers: FieldName, Units, Description")">
+                        <Icon Type="info-circle" Theme="fill" />
+                    </Tooltip>
+                </SpaceItem>
+            </Space>
+            
+            
             <br />
             @if (context.Dataset.Variables.Count > 0)
             {
