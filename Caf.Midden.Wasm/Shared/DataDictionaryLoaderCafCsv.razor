@@ -1,0 +1,16 @@
+﻿@inject Caf.Midden.Wasm.Services.StateContainer State
+
+<div class="file-input-zone">
+    <InputFile id="inputFileDataDictionaryCafCsv"
+               OnChange="OnInputFileDataDictionaryCafCsvChange"
+               accept=".csv" />
+    @if (isLoading)
+    {
+        <span><Icon Type="loading" /> Uploading..</span>
+    }
+    else
+    {
+        <span><Icon Type="upload" /> Upload</span>
+    }
+</div>
+

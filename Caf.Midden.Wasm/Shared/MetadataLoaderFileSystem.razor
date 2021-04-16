@@ -2,6 +2,13 @@
     <InputFile id="inputFileMetadata"
                OnChange="OnInputFileMetadataChange"
                accept="application/json,.midden" />
-    <Icon Type="upload" /> Upload
+    @if (isLoading)
+    {
+        <span><Icon Type="loading" /> Uploading..</span>
+    }
+    else
+    {
+        <span><Icon Type="upload" /> Upload</span>
+    }
 </div>
 
