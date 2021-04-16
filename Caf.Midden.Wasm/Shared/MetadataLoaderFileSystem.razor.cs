@@ -20,24 +20,40 @@ namespace Caf.Midden.Wasm.Shared
         [Parameter]
         public EventCallback<Metadata> MetadataChanged { get; set; }
 
+        [Parameter]
+        public bool isLoading { get; set; } = false;
+
         private async Task OnInputFileMetadataChange(
             InputFileChangeEventArgs e)
         {
+            isLoading = true;
+
             if (e.FileCount != 1)
             {
                 return;
             }
 
-            // TODO IoC?
-            MetadataReader metadataReader =
-                    new MetadataReader(
-                        new MetadataParser(
-                            new MetadataConverter()));
+            try
+            {
+                // TODO IoC?
+                MetadataReader metadataReader =
+                        new MetadataReader(
+                            new MetadataParser(
+                                new MetadataConverter()));
 
-            this.Metadata =
-                await metadataReader.ReadAsync(e.File.OpenReadStream());
+                this.Metadata =
+                    await metadataReader.ReadAsync(e.File.OpenReadStream());
 
-            await MetadataChanged.InvokeAsync(this.Metadata);
+                await MetadataChanged.InvokeAsync(this.Metadata);
+            }
+            catch
+            {
+                // TODO: Indicate error state
+            }
+            finally
+            {
+                isLoading = false;
+            }
         }
     }
 }
