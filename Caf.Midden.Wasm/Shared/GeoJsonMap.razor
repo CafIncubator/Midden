@@ -1,0 +1,31 @@
+﻿@inject IJSRuntime JS
+@implements IAsyncDisposable
+
+<div @ref="map" id="map" style="height: 300px; width: 300px;"></div>
+
+@code {
+    ElementReference map;
+    IJSObjectReference mapModule;
+    IJSObjectReference mapInstance;
+
+    [Parameter]
+    public string Geometry { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // Creates the map DOM element if it's not alreay created
+        if(mapModule == null && Geometry != null)
+        {
+            mapModule = await JS.InvokeAsync<IJSObjectReference>(
+                "import", "./geojsonMap.js");
+            mapInstance = await mapModule.InvokeAsync<IJSObjectReference>(
+                "create", map, this.Geometry);
+        }
+    }
+
+    async ValueTask IAsyncDisposable.DisposeAsync()
+    {
+        await mapInstance.DisposeAsync();
+        await mapModule.DisposeAsync();
+    }
+}
