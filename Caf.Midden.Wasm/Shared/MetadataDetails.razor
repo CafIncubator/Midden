@@ -38,7 +38,10 @@
                     <Icon Type="environment" Theme="outline" /> Spatial Information
                 </TitleTemplate>
                 <Body>
-                    <p>TODO: Add map of geojson here</p>
+                    @if (Metadata.Dataset.Geometry != null)
+                    {
+                        <GeoJsonMap Geometry="@Metadata.Dataset.Geometry" />
+                    }
                     <p><strong>Resolution</strong>: @Metadata.Dataset.SpatialRepeats</p>
                 </Body>
             </Card>
