@@ -32,6 +32,8 @@ namespace Caf.Midden.Cli.Services
                 $"*{FILE_EXTENSION}", 
                 SearchOption.AllDirectories);
 
+            Console.WriteLine($"Found a total of {files.Length} files");
+
             return files.ToList();
         }
 

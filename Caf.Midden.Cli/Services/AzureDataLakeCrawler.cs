@@ -70,10 +70,17 @@ namespace Caf.Midden.Cli.Services
                     foreach (PathItem subPathItem in fileSystemClient.GetPaths(pathItem.Name))
                     {
                         if (subPathItem.Name.Contains(FILE_EXTENSION))
+                        {
+                            Console.WriteLine($"  In {pathItem.Name} found {subPathItem.Name}");
+
                             names.Add(subPathItem.Name);
+                        }
+                            
                     }
                 }
             }
+
+            Console.WriteLine($"Found a total of {names.Count} files");
 
             return names;
         }

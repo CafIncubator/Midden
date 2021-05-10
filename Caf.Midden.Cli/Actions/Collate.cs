@@ -174,8 +174,11 @@ namespace Caf.Midden.Cli.Actions
                 var metadatas = crawler?.GetMetadatas();
 
                 if(metadatas != null)
-                    if (middenMetadatas != null) middenMetadatas.AddRange(metadatas);
+                {
+                    AppendDataStoreNameToPath(metadatas, currStore.Name);
 
+                    if (middenMetadatas != null) middenMetadatas.AddRange(metadatas);
+                }
             }
 
             Catalog catalog = new Catalog()
@@ -186,6 +189,19 @@ namespace Caf.Midden.Cli.Actions
 
             Console.WriteLine($"Writing output to {outdir}");
             File.WriteAllText(outdir, JsonSerializer.Serialize(catalog));
+        }
+    
+        private void AppendDataStoreNameToPath(
+            List<Metadata> metadatas,
+            string dataStoreName)
+        {
+            string prependString = $"[{dataStoreName}]";
+
+            foreach(Metadata metadata in metadatas)
+            {
+                string newPath = $"{prependString}{metadata.Dataset.DatasetPath}";
+                metadata.Dataset.DatasetPath = newPath;
+            }
         }
     }
 }
