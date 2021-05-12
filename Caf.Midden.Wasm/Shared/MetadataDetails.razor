@@ -20,8 +20,8 @@
         </AntDesign.Col>
     </Row>
 
-    <Row Justify="space-around" Align="top">
-        <AntDesign.Col Span="12" Style="padding:5px">
+    <Row Align="top">
+        <AntDesign.Col Span="@((string.IsNullOrEmpty(Metadata.Dataset.TemporalExtent) && string.IsNullOrEmpty(Metadata.Dataset.TemporalResolution)) ? 0 : 12)" Style="padding:5px;">
             <Card>
                 <TitleTemplate>
                     <Icon Type="clock-circle" Theme="outline" /> Temporal Information
@@ -32,7 +32,7 @@
                 </Body>
             </Card>
         </AntDesign.Col>
-        <AntDesign.Col Span="12" Style="padding:5px">
+        <AntDesign.Col Span="@(string.IsNullOrEmpty(Metadata.Dataset.Geometry) ? 0 : 12)" Style="padding:5px">
             <Card>
                 <TitleTemplate>
                     <Icon Type="environment" Theme="outline" /> Spatial Information
@@ -46,10 +46,7 @@
                 </Body>
             </Card>
         </AntDesign.Col>
-    </Row>
-
-    <Row Justify="space-around" Align="top">
-        <AntDesign.Col Span="12" Style="padding:5px">
+        <AntDesign.Col Span="@((Metadata.Dataset.Methods == null) || (!Metadata.Dataset.Methods.Any()) ? 0 : 12)" Style="padding:5px">
             <AntList Bordered DataSource="@Metadata.Dataset.Methods">
                 <Header>
                     <Icon Type="experiment" Theme="outline" /> Methods
@@ -63,7 +60,7 @@
                 </ChildContent>
             </AntList>
         </AntDesign.Col>
-        <AntDesign.Col Span="12" Style="padding:5px">
+        <AntDesign.Col Span="@((Metadata.Dataset.DerivedWorks == null) || (!Metadata.Dataset.DerivedWorks.Any()) ? 0 : 12)" Style="padding:5px">
             <AntList Bordered DataSource="@Metadata.Dataset.DerivedWorks">
                 <Header>
                     <Icon Type="comment" Theme="outline" /> Derived Works
@@ -77,10 +74,8 @@
                 </ChildContent>
             </AntList>
         </AntDesign.Col>
-    </Row>
 
-    <Row Justify="space-around" Align="top">
-        <AntDesign.Col Span="24" Style="padding:5px">
+        <AntDesign.Col Span="@((string.IsNullOrEmpty(Metadata.Dataset.DatasetPath) && string.IsNullOrEmpty(Metadata.Dataset.Format) && string.IsNullOrEmpty(Metadata.Dataset.FilePathTemplate) && string.IsNullOrEmpty(Metadata.Dataset.FilePathDescriptor))  ? 0 : 24)" Style="padding:5px">
             <Card>
                 <TitleTemplate>
                     <Icon Type="file-text" Theme="outline" /> File Information
@@ -96,9 +91,7 @@
                 </Body>
             </Card>
         </AntDesign.Col>
-    </Row>
 
-    <Row Justify="space-around" Align="top">
         <AntDesign.Col Span="12" Style="padding:5px">
             <Card>
                 <TitleTemplate>
@@ -118,7 +111,7 @@
                 </Body>
             </Card>
         </AntDesign.Col>
-        <AntDesign.Col Span="12" Style="padding:5px">
+        <AntDesign.Col Span="@((Metadata.Dataset.Tags == null) || (!Metadata.Dataset.Tags.Any()) ? 0 : 12)" Style="padding:5px">
             <Card Title="Tags">
                 <TitleTemplate>
                     <Icon Type="tags" Theme="outline" /> Tags
@@ -134,7 +127,7 @@
     </Row>
 
     <Row Justify="space-around" Align="top">
-        <AntDesign.Col Span="24" Style="padding:5px">
+        <AntDesign.Col Span="@((Metadata.Dataset.Variables == null) || (!Metadata.Dataset.Variables.Any()) ? 0 : 24)" Style="padding:5px">
             <Card>
                 <TitleTemplate>
                     <Icon Type="read" Theme="outline" /> Variables
