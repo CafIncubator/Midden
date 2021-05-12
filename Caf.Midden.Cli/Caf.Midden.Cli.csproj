@@ -24,7 +24,7 @@
     <ProjectReference Include="..\Caf.Midden.Core\Caf.Midden.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition=" '$(Configuration)' == 'Debug' ">
     <None Update="configuration.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
