@@ -5,7 +5,7 @@
     <PageHeader Class="site-page-header" Title="@Metadata.Dataset.Name" Subtitle="@($"Last updated: {Metadata.ModifiedDate}")">
     </PageHeader>
     <Row>
-        <AntDesign.Col Span="16">
+        <AntDesign.Col Span="17">
             <Row>
                 <AntDesign.Col Span="24" Style="padding:5px">
                     <Card>
@@ -13,12 +13,9 @@
                             <Icon Type="read" Theme="outline" /> Description
                         </TitleTemplate>
                         <Body>
-                            <!--<textarea readonly
-              rows="@(string.IsNullOrEmpty(Metadata.Dataset.Description) ? 1 : Metadata.Dataset.Description.Split('\n').Length + 1)"
-              style="width:100%; border:none;">@Metadata.Dataset.Description</textarea>-->
-                            <AntDesign.TextArea AutoSize
-                                                Value="@Metadata.Dataset.Description"
-                                                Style="width: 100%; border: none;" />
+                            <textarea readonly
+                                      rows="@(string.IsNullOrEmpty(Metadata.Dataset.Description) ? 1 : Metadata.Dataset.Description.Split('\n').Length + 2)"
+                                      style="width:100%; border:none;">@Metadata.Dataset.Description</textarea>
                         </Body>
                     </Card>
                 </AntDesign.Col>
@@ -97,35 +94,54 @@
                                                       style="width:100%; border:none;">@variable.Description</textarea>
                                         </AntDesign.Column>
                                         <AntDesign.Column @bind-Field="variable.Units" />
-                                        <AntDesign.Column @bind-Field="variable.Methods"
-                                                          Width="500">
-                                            @foreach (var method in variable.Methods)
-                                                    {
-                                                <textarea readonly
-                                                          rows="@(string.IsNullOrEmpty(method) ? 1 :method.Split('\n').Length + 1)"
-                                                          style="width:100%; border:none;">@method</textarea>
-                                                    }
-                                        </AntDesign.Column>
 
-                                        <AntDesign.Column @bind-Field="variable.QCApplied"
-                                                          Title="Quality Control">
-                                            @foreach (var qc in variable.QCApplied)
-                                                    {
-                                                <Tag>@qc</Tag>
-                                                    }
-                                        </AntDesign.Column>
-                                        <AntDesign.Column @bind-Field="variable.ProcessingLevel"
-                                                          Title="Processing">
-                                            <Tag>@variable.ProcessingLevel</Tag>
-                                        </AntDesign.Column>
+                                        @if (VarsHaveMethods)
+                                        {
+                                            <AntDesign.Column @bind-Field="variable.Methods"
+                                                              Width="500">
+                                                @foreach (var method in variable.Methods)
+                                                            {
+                                                    <textarea readonly
+                                                              rows="@(string.IsNullOrEmpty(method) ? 1 :method.Split('\n').Length + 1)"
+                                                              style="width:100%; border:none;">@method</textarea>
+                                                            }
+                                            </AntDesign.Column>
+                                        }
 
+                                        @if (VarsHaveQCApplied)
+                                        {
+                                            <AntDesign.Column @bind-Field="variable.QCApplied"
+                                                              Title="Quality Control">
+                                                @foreach (var qc in variable.QCApplied)
+                                                            {
+                                                    <Tag>@qc</Tag>
+                                                            }
+                                            </AntDesign.Column>
+                                        }
+
+                                        @if (VarsHaveProcessingLevel)
+                                        {
+                                            <AntDesign.Column @bind-Field="variable.ProcessingLevel"
+                                                              Title="Processing">
+                                                <Tag>@variable.ProcessingLevel</Tag>
+                                            </AntDesign.Column>
+                                        }
+
+                                        @if(VarsHaveTags)
+                                        {
                                         <AntDesign.Column @bind-Field="variable.Tags">
                                             @foreach (var tag in variable.Tags)
-                                                    {
+                                                        {
                                                 <Tag>@tag</Tag>
-                                                    }
+                                                        }
                                         </AntDesign.Column>
+                                        }
+                                        @if(VarsHaveHeight)
+                                        {
                                         <AntDesign.Column @bind-Field="variable.Height" />
+                                        }
+
+                                        
                                     </ChildContent>
                                 </AntDesign.Table>
                             }
@@ -134,7 +150,7 @@
                 </AntDesign.Col>
             </Row>
         </AntDesign.Col>
-        <AntDesign.Col Span="8">
+        <AntDesign.Col Span="7">
             <Row>
                 <AntDesign.Col Span="@(string.IsNullOrEmpty(Metadata.Dataset.Geometry) ? 0 : 24)" Style="padding:5px">
                     <Card>
@@ -202,20 +218,4 @@
             </Row>
         </AntDesign.Col>
     </Row>
-    <!--
-        <Row Align="top">
-
-            
-            
-
-            
-
-            
-            
-        </Row>
-
-        <Row Justify="space-around" Align="top">
-            
-
-        </Row>-->
 }
