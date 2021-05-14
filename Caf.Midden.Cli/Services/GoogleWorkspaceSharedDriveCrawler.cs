@@ -31,6 +31,8 @@ namespace Caf.Midden.Cli.Services
         private readonly string applicationName;
         private readonly DriveService service;
 
+        private List<Google.Apis.Drive.v3.Data.TeamDrive> cachedDriveList;
+
         public GoogleWorkspaceSharedDriveCrawler(
             string clientId,
             string clientSecret,
@@ -76,13 +78,26 @@ namespace Caf.Midden.Cli.Services
             while (true)
             {
                 var parent = GetFile(file.Parents[0]);
-        
+
                 // Stop when we find the root dir
                 if (parent.Parents == null || parent.Parents.Count() == 0)
                 {
+                    if(this.cachedDriveList == null)
+                    {
+                        this.cachedDriveList = GetSharedDrives();
+                    }
+
+                    string driveName = cachedDriveList
+                        .Where(d => d.Id == parent.DriveId)
+                        .ToList()[0]
+                        .Name;
+
+                    if(!string.IsNullOrEmpty(driveName))
+                        path.Insert(0, driveName);
+
                     break;
                 }
-        
+
                 path.Insert(0, parent.Name);
                 file = parent;
             }
@@ -95,12 +110,25 @@ namespace Caf.Midden.Cli.Services
         {        
             // Fetch file from drive
             FilesResource.GetRequest request = service.Files.Get(id);
-            request.Fields = "id, name, parents";
+            request.Fields = "id, name, parents, driveId";
             request.SupportsAllDrives = true;
             request.SupportsTeamDrives = true;
             var parent = request.Execute();
         
             return parent;
+        }
+
+        
+        private List<Google.Apis.Drive.v3.Data.TeamDrive> GetSharedDrives()
+        {
+            var teamDriveList = service.Teamdrives.List();
+
+            teamDriveList.Fields = "teamDrives(kind, id, name)";
+            teamDriveList.PageSize = 100;
+
+            var teamDrives = teamDriveList.Execute().TeamDrives.ToList();
+
+            return teamDrives;
         }
 
         // Gets a list of Google File Ids for files in Shared Drives with the extension ".midden"
@@ -109,16 +137,14 @@ namespace Caf.Midden.Cli.Services
         {
             List<string> names = new List<string>();
 
-            var teamDriveList = service.Teamdrives.List();
-
-            teamDriveList.Fields = "teamDrives(kind, id, name)";
-            teamDriveList.PageSize = 100;
-
-            var teamDrives = teamDriveList.Execute().TeamDrives;
-
-            if (teamDrives != null && teamDrives.Count > 0)
+            if(this.cachedDriveList == null)
             {
-                foreach (var drive in teamDrives)
+                this.cachedDriveList = GetSharedDrives();
+            }
+
+            if (cachedDriveList != null && cachedDriveList.Count > 0)
+            {
+                foreach (var drive in cachedDriveList)
                 {
                     FilesResource.ListRequest listRequest = service.Files.List();
                     listRequest.DriveId = drive.Id;
@@ -135,7 +161,7 @@ namespace Caf.Midden.Cli.Services
                     {
                         foreach (var file in files)
                         {
-                            if(file.Name.Contains(FILE_EXTENSION))
+                            if(file.Name.EndsWith(FILE_EXTENSION))
                             {
                                 Console.WriteLine($"  In {drive.Name} found {file.Name}");
                                 names.Add(file.Id);
@@ -150,20 +176,19 @@ namespace Caf.Midden.Cli.Services
             return names;
         }
 
+        
         public List<Google.Apis.Drive.v3.Data.File> GetFiles()
         {
             List<Google.Apis.Drive.v3.Data.File> files = new List<Google.Apis.Drive.v3.Data.File>();
 
-            var teamDriveList = service.Teamdrives.List();
-
-            teamDriveList.Fields = "teamDrives(kind, id, name)";
-            teamDriveList.PageSize = 100;
-
-            var teamDrives = teamDriveList.Execute().TeamDrives;
-
-            if (teamDrives != null && teamDrives.Count > 0)
+            if (this.cachedDriveList == null)
             {
-                foreach (var drive in teamDrives)
+                this.cachedDriveList = GetSharedDrives();
+            }
+
+            if (cachedDriveList != null && cachedDriveList.Count > 0)
+            {
+                foreach (var drive in cachedDriveList)
                 {
                     FilesResource.ListRequest listRequest = service.Files.List();
                     listRequest.DriveId = drive.Id;
@@ -225,7 +250,7 @@ namespace Caf.Midden.Cli.Services
                 // Try to set the path
                 try
                 {
-                     var filePath = AbsPath(file);
+                    var filePath = this.AbsPath(file);
 
                     metadata.Dataset.DatasetPath = 
                         filePath.Replace(FILE_EXTENSION, "");
