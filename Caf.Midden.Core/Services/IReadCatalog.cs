@@ -9,6 +9,6 @@ namespace Caf.Midden.Core.Services
 {
     public interface IReadCatalog
     {
-        Task<Catalog> Read(string path);
+        Task<Catalog> Read(string path, bool noCache);
     }
 }

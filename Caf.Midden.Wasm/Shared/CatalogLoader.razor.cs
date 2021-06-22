@@ -39,7 +39,8 @@ namespace Caf.Midden.Wasm.Shared
                 return;
 
             Catalog catalog = await CatalogReader.Read(
-                State.AppConfig.CatalogPath);
+                State.AppConfig.CatalogPath,
+                true);
 
             catalog.Metadatas = catalog.Metadatas
                 .OrderByDescending(m => m.ModifiedDate).ToList();
