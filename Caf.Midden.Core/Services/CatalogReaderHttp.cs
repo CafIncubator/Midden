@@ -19,12 +19,20 @@ namespace Caf.Midden.Core.Services
             this.client = client;
         }
 
-        public async Task<Catalog> Read(string path)
+        public async Task<Catalog> Read(string path, bool noCache)
         {
+            var realPath = path;
+
+            if(noCache)
+            {
+                string randomid = Guid.NewGuid().ToString();
+                realPath = $"{path}?{randomid}";
+            }
+
             Catalog result = 
                 await client
                     .GetFromJsonAsync<Catalog>(
-                        path);
+                        realPath);
 
             return result;
         }
