@@ -85,6 +85,8 @@ Please help us make this tool better. We welcome Issues and Pull Requests. Contr
 
 Original work was supported by the R.J. Cook Agronomy Farm, a member of the USDA Long-Term Agroecological Research network.
 
+The Midden web tools rely heavily on the UI component library [Ant Design Blazor](https://github.com/ant-design-blazor/ant-design-blazor).
+
 ## License
 
 As a work of the United States government, this project is in the public domain within the United States.
