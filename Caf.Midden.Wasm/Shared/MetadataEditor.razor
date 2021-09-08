@@ -21,304 +21,327 @@
 @if (State?.MetadataEdit != null && State?.AppConfig != null)
 {
     <AntDesign.Form Model="State.MetadataEdit"
-                    LabelColSpan="6"
-                    WrapperColSpan="8">
-        <FormItem Label="Zone">
-            <SimpleSelect @bind-Value="@context.Dataset.Zone"
-                          Placeholder="Zone that holds dataset">
-                <SelectOptions>
-                    @foreach (var zone in State.AppConfig.Zones)
-                    {
-                        <SimpleSelectOption Value=@zone Label=@zone />
-                    }
-                </SelectOptions>
-            </SimpleSelect>
-        </FormItem>
-        <FormItem Label="Name">
-            <AntDesign.Input @bind-Value="context.Dataset.Name"
-                             Placeholder="Name of dataset" />
-        </FormItem>
-        <FormItem Label="Project">
-            <AntDesign.Input @bind-Value="context.Dataset.Project"
-                             Placeholder="Name of project that produced the dataset" />
-        </FormItem>
-        <FormItem Label="Description">
-            <AntDesign.TextArea @bind-Value="context.Dataset.Description"
-                                Placeholder="Description of dataset"
-                                MinRows="5"
-                                AutoSize="true" />
-        </FormItem>
-        <FormItem Label="Contacts">
-            <Button OnClick="AddContactHandler">Add</Button>
-            <br />
-            @if (context.Dataset.Contacts.Count > 0)
-            {
-                <AntDesign.Table TItem="Caf.Midden.Core.Models.v0_1.Person"
-                                 DataSource="@context.Dataset.Contacts"
-                                 HidePagination="@true">
-                    <ChildContent Context="contact">
-                        <AntDesign.Column @bind-Field="contact.Name"
-                                Width="30%" />
-                        <AntDesign.Column @bind-Field="contact.Email"
-                                Width="30%" />
-                        <AntDesign.Column @bind-Field="contact.Role"
-                                Width="30%" />
-                        <ActionColumn Title="Action">
-                            <Space Size="small">
-                                <SpaceItem>
-                                    <Button OnClick="() => OpenPersonModalTemplate(contact)">
-                                        <Icon Type="edit" />
-                                    </Button>
-                                </SpaceItem>
-                                <SpaceItem>
-                                    <Button Danger OnClick="() => DeleteContactHandler(contact)">
-                                        <Icon Type="delete" />
-                                    </Button>
-                                </SpaceItem>
-                            </Space>
-                        </ActionColumn>
-                    </ChildContent>
-
-                </AntDesign.Table>
-            }
-        </FormItem>
-
-        <FormItem Label="Tags">
-            <Space Style="width:100%;">
-                <SpaceItem>
-                    <Input @bind-Value="NewDatasetTag" />
-                </SpaceItem>
-                <SpaceItem>
-                    <Button OnClick="AddDatasetTagHandler">Add</Button>
-                </SpaceItem>
-                <SpaceItem><Divider Type="vertical" /></SpaceItem>
-                <div style="width: 100%;">
-                    <SpaceItem>
-                        <SimpleSelect Placeholder="Add saved tag"
-                                      OnSelectedItemChanged="DatasetTagSelectedItemChangedHandler"
-                                      EnableSearch
-                                      @bind-Value="SavedDatasetTag"
-                                      AutoClearSearchValue>
+                    Layout="@FormLayout.Vertical">
+        <Tabs>
+            <TabPane Key="1">
+                <Tab>Basic</Tab>
+                <ChildContent>
+                    <FormItem Label="Zone">
+                        <SimpleSelect @bind-Value="@context.Dataset.Zone"
+                                      Placeholder="Zone that holds dataset">
                             <SelectOptions>
-                                @foreach (var tag in State.AppConfig.Tags)
+                                @foreach (var zone in State.AppConfig.Zones)
                                 {
-                                    <SimpleSelectOption Value=@tag Label=@tag />
+                                    <SimpleSelectOption Value=@zone Label=@zone />
                                 }
                             </SelectOptions>
                         </SimpleSelect>
-                    </SpaceItem>
-                </div>
-                
-
-            </Space>
-            <br />
-            @if (context.Dataset.Tags.Count > 0)
-            {
-                <AntList DataSource="@context.Dataset.Tags">
-                    <ChildContent Context="tag">
-                        <ListItem>
-                            <span><Tag>@tag</Tag></span>
-                            <Button Danger OnClick="() => DeleteDatasetTagHandler(tag)">
-                                <Icon Type="delete" />
-                            </Button>
-                        </ListItem>
-                    </ChildContent>
-                </AntList>
-            }
-        </FormItem>
-        <FormItem Label="Spatial Repeats">
-            <AntDesign.InputNumber id="spatial-repeats"
-                                   @bind-Value="context.Dataset.SpatialRepeats" />
-        </FormItem>
-        <FormItem Label="Spatial Extent">
-            <FormItem>
-                <SimpleSelect @bind-Value="this.GeometryTemplate"
-                              Placeholder="Saved values"
-                              AllowClear="true"
-                              OnSelectedItemChanged="OnGeometryItemChangedHandler">
-                    <SelectOptions>
-                        @if (State.AppConfig.Geometries != null)
+                    </FormItem>
+                    <FormItem Label="Name">
+                        <AntDesign.Input @bind-Value="context.Dataset.Name"
+                                         Placeholder="Name of dataset" />
+                    </FormItem>
+                    <FormItem Label="Project">
+                        <AntDesign.Input @bind-Value="context.Dataset.Project"
+                                         Placeholder="Name of project that produced the dataset" />
+                    </FormItem>
+                    <FormItem Label="Description">
+                        <AntDesign.TextArea @bind-Value="context.Dataset.Description"
+                                            Placeholder="Description of dataset"
+                                            MinRows="5"
+                                            AutoSize="true" />
+                    </FormItem>
+                    <FormItem Label="Contacts">
+                        <Button OnClick="AddContactHandler">Add</Button>
+                        <br />
+                        @if (context.Dataset.Contacts.Count > 0)
                         {
-                            @foreach (var geom in State.AppConfig.Geometries)
-                            {
-                                <SimpleSelectOption Value="@geom.GeoJson"
-                                                    Label="@geom.Name" />
-                            }
+                            <AntDesign.Table TItem="Caf.Midden.Core.Models.v0_1.Person"
+                                             DataSource="@context.Dataset.Contacts"
+                                             HidePagination="@true">
+                                <ChildContent Context="contact">
+                                    <AntDesign.Column @bind-Field="contact.Name"
+                                                      Width="30%" />
+                                    <AntDesign.Column @bind-Field="contact.Email"
+                                                      Width="30%" />
+                                    <AntDesign.Column @bind-Field="contact.Role"
+                                                      Width="30%" />
+                                    <ActionColumn Title="Action">
+                                        <Space Size="small">
+                                            <SpaceItem>
+                                                <Button OnClick="() => OpenPersonModalTemplate(contact)">
+                                                    <Icon Type="edit" />
+                                                </Button>
+                                            </SpaceItem>
+                                            <SpaceItem>
+                                                <Button Danger OnClick="() => DeleteContactHandler(contact)">
+                                                    <Icon Type="delete" />
+                                                </Button>
+                                            </SpaceItem>
+                                        </Space>
+                                    </ActionColumn>
+                                </ChildContent>
+
+                            </AntDesign.Table>
                         }
-                    </SelectOptions>
-                </SimpleSelect>
-            </FormItem>
-            <FormItem>
-                <AntDesign.TextArea @bind-Value="context.Dataset.Geometry"
-                                    Placeholder="Valid geojson" />
-            </FormItem>
-        </FormItem>
-        <FormItem Label="Temporal Resolution">
-            <AntDesign.Input @bind-Value="context.Dataset.TemporalResolution"
-                             Placeholder="e.g. '15 min'" />
-        </FormItem>
-        <FormItem Label="Temporal Extent">
-            <AntDesign.Input @bind-Value="context.Dataset.TemporalExtent"
-                             Placeholder="YYYY-MM-DD/YYYY-MM-DD" />
-        </FormItem>
-        <FormItem Label="File Format">
-            <AntDesign.Input @bind-Value="context.Dataset.Format"
-                             Placeholder="Format, usually file extension" />
-        </FormItem>
-        <FormItem Label="File Path Template">
-            <AntDesign.Input @bind-Value="context.Dataset.FilePathTemplate"
-                             Placeholder="e.g. '{YYYY}/Filename_{YYYYMMDD}.csv'" />
-        </FormItem>
-        <FormItem Label="File Path Description">
-            <AntDesign.TextArea @bind-Value="context.Dataset.FilePathDescriptor"
-                                Placeholder="Describe template values; e.g. {YYYY}" />
-        </FormItem>
-        <FormItem Label="Dataset Structure">
-            <SimpleSelect @bind-Value="context.Dataset.Structure"
-                          Placeholder="Select">
-                <SelectOptions>
-                    @if (State.AppConfig.DatasetStructures != null)
-                    {
-                        @foreach (var structure in State.AppConfig.DatasetStructures)
+                    </FormItem>
+                    <FormItem Label="Tags">
+                        <Space Style="width:100%;">
+                            <SpaceItem>
+                                <Input @bind-Value="NewDatasetTag" />
+                            </SpaceItem>
+                            <SpaceItem>
+                                <Button OnClick="AddDatasetTagHandler">Add</Button>
+                            </SpaceItem>
+                            <SpaceItem><Divider Type="vertical" /></SpaceItem>
+                            <div style="width: 100%;">
+                                <SpaceItem>
+                                    <SimpleSelect Placeholder="Add saved tag"
+                                                  OnSelectedItemChanged="DatasetTagSelectedItemChangedHandler"
+                                                  EnableSearch
+                                                  @bind-Value="SavedDatasetTag"
+                                                  AutoClearSearchValue>
+                                        <SelectOptions>
+                                            @foreach (var tag in State.AppConfig.Tags)
+                                            {
+                                                <SimpleSelectOption Value=@tag Label=@tag />
+                                            }
+                                        </SelectOptions>
+                                    </SimpleSelect>
+                                </SpaceItem>
+                            </div>
+
+
+                        </Space>
+                        <br />
+                        @if (context.Dataset.Tags.Count > 0)
                         {
-                            <AntDesign.SimpleSelectOption Value="@structure"
-                                                          Label="@structure" />
+                            <AntList DataSource="@context.Dataset.Tags">
+                                <ChildContent Context="tag">
+                                    <ListItem>
+                                        <span><Tag>@tag</Tag></span>
+                                        <Button Danger OnClick="() => DeleteDatasetTagHandler(tag)">
+                                            <Icon Type="delete" />
+                                        </Button>
+                                    </ListItem>
+                                </ChildContent>
+                            </AntList>
                         }
-                    }
-                </SelectOptions>
-            </SimpleSelect>
-        </FormItem>
+                    </FormItem>
+                </ChildContent> 
+            </TabPane>
+            <TabPane Key="2">
+                <Tab>Variables</Tab>
+                <ChildContent>
+                    <FormItem Label="Variables">
+                        <Space>
+                            <SpaceItem>
+                                <Button OnClick="AddVariableHandler">Add</Button>
+                            </SpaceItem>
+                            <SpaceItem>
+                                <DataDictionaryLoaderCafCsv />
+                            </SpaceItem>
+                            <SpaceItem>
+                                <Tooltip Title="@("WARNING: Uploading will replace all current variables. The uploaded file must be a CSV with the following column headers: FieldName, Units, Description")">
+                                    <Icon Type="info-circle" Theme="fill" />
+                                </Tooltip>
+                            </SpaceItem>
+                        </Space>
 
-        <FormItem Label="Methods">
-            <InputGroup>
-                <Row Justify="space-between">
-                    <AntDesign.Col Span="20">
-                        <Input @bind-Value="NewDatasetMethod" />
-                    </AntDesign.Col>
-                    <AntDesign.Col Span="4">
-                        <Button OnClick="AddDatasetMethodHandler">Add</Button>
-                    </AntDesign.Col>
-                </Row>
-            </InputGroup>
-            <br />
-            @if (context.Dataset.Methods.Count > 0)
-            {
-                <AntList DataSource="@context.Dataset.Methods"
-                         Size="small">
-                    <ChildContent Context="method">
-                        <ListItem>
-                            <span><Text>@method</Text></span>
-                            <Button Danger OnClick="() => DeleteDatasetMethodHandler(method)">
-                                <Icon Type="delete" />
-                            </Button>
-                        </ListItem>
-                    </ChildContent>
-                </AntList>
-            }
-        </FormItem>
 
-        <FormItem Label="Derived Works">
-            <InputGroup>
-                <Row Justify="space-between">
-                    <AntDesign.Col Span="20">
-                        <Input @bind-Value="NewDerivedWork" />
-                    </AntDesign.Col>
-                    <AntDesign.Col Span="4">
-                        <Button OnClick="AddDerivedWorkHandler">Add</Button>
-                    </AntDesign.Col>
-                </Row>
-            </InputGroup>
-            <br />
-            @if (context.Dataset.DerivedWorks.Count > 0)
-            {
-                <AntList DataSource="@context.Dataset.DerivedWorks">
-                    <ChildContent Context="derived">
-                        <ListItem>
-                            <span><Text>@derived</Text></span>
-                            <Button Danger OnClick="() => DeleteDerivedWorkHandler(derived)">
-                                <Icon Type="delete" />
-                            </Button>
-                        </ListItem>
-                    </ChildContent>
-                </AntList>
-            }
-        </FormItem>
+                        <br />
+                        @if (context.Dataset.Variables.Count > 0)
+                        {
+                            <AntDesign.Table TItem="Caf.Midden.Core.Models.v0_1.Variable"
+                                             DataSource="@context.Dataset.Variables"
+                                             Size="@TableSize.Small"
+                                             ScrollX="1400">
+                                <ChildContent Context="variable">
+                                    <AntDesign.Column @bind-Field="variable.Name"
+                                                      Fixed="left" />
+                                    <AntDesign.Column @bind-Field="variable.Description"
+                                                      Ellipsis />
+                                    <AntDesign.Column @bind-Field="variable.Units" />
+                                    <AntDesign.Column @bind-Field="variable.Methods"
+                                                      Ellipsis>
+                                        @foreach (var method in variable.Methods)
+                                            {
+                                            <p>@method</p>
+                                            }
+                                    </AntDesign.Column>
 
-        <FormItem Label="Variables">
-            <Space>
-                <SpaceItem>
-                    <Button OnClick="AddVariableHandler">Add</Button>
-                </SpaceItem>
-                <SpaceItem>
-                    <DataDictionaryLoaderCafCsv />
-                </SpaceItem>
-                <SpaceItem>
-                    <Tooltip Title="@("WARNING: Uploading will replace all current variables. The uploaded file must be a CSV with the following column headers: FieldName, Units, Description")">
-                        <Icon Type="info-circle" Theme="fill" />
-                    </Tooltip>
-                </SpaceItem>
-            </Space>
-            
-            
-            <br />
-            @if (context.Dataset.Variables.Count > 0)
-            {
-                <AntDesign.Table TItem="Caf.Midden.Core.Models.v0_1.Variable"
-                                 DataSource="@context.Dataset.Variables"
-                                 Size="@TableSize.Small"
-                                 ScrollX="1400">
-                    <ChildContent Context="variable">
-                        <AntDesign.Column @bind-Field="variable.Name"
-                                Fixed="left" />
-                        <AntDesign.Column @bind-Field="variable.Description"
-                                Ellipsis />
-                        <AntDesign.Column @bind-Field="variable.Units" />
-                        <AntDesign.Column @bind-Field="variable.Methods"
-                                Ellipsis>
-                            @foreach (var method in variable.Methods)
+                                    <AntDesign.Column @bind-Field="variable.QCApplied"
+                                                      Title="Quality Control">
+                                        @foreach (var qc in variable.QCApplied)
+                                            {
+                                            <Tag>@qc</Tag>
+                                            }
+                                    </AntDesign.Column>
+                                    <AntDesign.Column @bind-Field="variable.ProcessingLevel"
+                                                      Title="Processing">
+                                        <Tag>@variable.ProcessingLevel</Tag>
+                                    </AntDesign.Column>
+
+                                    <AntDesign.Column @bind-Field="variable.Tags">
+                                        @foreach (var tag in variable.Tags)
+                                            {
+                                            <Tag>@tag</Tag>
+                                            }
+                                    </AntDesign.Column>
+                                    <AntDesign.Column @bind-Field="variable.Height" />
+                                    <ActionColumn Title="Action"
+                                                  Fixed="right">
+                                        <Space Size="small">
+                                            <SpaceItem>
+                                                <Button OnClick="() => OpenVariableModalTemplate(variable)">
+                                                    <Icon Type="edit" />
+                                                </Button>
+                                            </SpaceItem>
+                                            <SpaceItem>
+                                                <Button Danger OnClick="() => DeleteVariableHandler(variable)">
+                                                    <Icon Type="delete" />
+                                                </Button>
+                                            </SpaceItem>
+                                        </Space>
+                                    </ActionColumn>
+                                </ChildContent>
+                            </AntDesign.Table>
+                        }
+                    </FormItem>
+                </ChildContent>
+            </TabPane>
+            <TabPane Key="3">
+                <Tab>Coverage</Tab>
+                <ChildContent>
+                    <FormItem Label="Spatial Repeats">
+                        <AntDesign.InputNumber id="spatial-repeats"
+                                               @bind-Value="context.Dataset.SpatialRepeats" />
+                    </FormItem>
+                    <FormItem Label="Spatial Extent">
+                        <FormItem>
+                            <SimpleSelect @bind-Value="this.GeometryTemplate"
+                                          Placeholder="Saved values"
+                                          AllowClear="true"
+                                          OnSelectedItemChanged="OnGeometryItemChangedHandler">
+                                <SelectOptions>
+                                    @if (State.AppConfig.Geometries != null)
+                                    {
+                                        @foreach (var geom in State.AppConfig.Geometries)
+                                        {
+                                            <SimpleSelectOption Value="@geom.GeoJson"
+                                                                Label="@geom.Name" />
+                                        }
+                                    }
+                                </SelectOptions>
+                            </SimpleSelect>
+                        </FormItem>
+                        <FormItem>
+                            <AntDesign.TextArea @bind-Value="context.Dataset.Geometry"
+                                                Placeholder="Valid geojson" />
+                        </FormItem>
+                    </FormItem>
+                    <FormItem Label="Temporal Resolution">
+                        <AntDesign.Input @bind-Value="context.Dataset.TemporalResolution"
+                                         Placeholder="e.g. '15 min'" />
+                    </FormItem>
+                    <FormItem Label="Temporal Extent">
+                        <AntDesign.Input @bind-Value="context.Dataset.TemporalExtent"
+                                         Placeholder="YYYY-MM-DD/YYYY-MM-DD" />
+                    </FormItem>
+                </ChildContent>
+            </TabPane>
+            <TabPane Key="4">
+                <Tab>Structure</Tab>
+                <ChildContent>
+                    <FormItem Label="File Format">
+                        <AntDesign.Input @bind-Value="context.Dataset.Format"
+                                         Placeholder="Format, usually file extension" />
+                    </FormItem>
+                    <FormItem Label="File Path Template">
+                        <AntDesign.Input @bind-Value="context.Dataset.FilePathTemplate"
+                                         Placeholder="e.g. '{YYYY}/Filename_{YYYYMMDD}.csv'" />
+                    </FormItem>
+                    <FormItem Label="File Path Description">
+                        <AntDesign.TextArea @bind-Value="context.Dataset.FilePathDescriptor"
+                                            Placeholder="Describe template values; e.g. {YYYY}" />
+                    </FormItem>
+                    <FormItem Label="Dataset Structure">
+                        <SimpleSelect @bind-Value="context.Dataset.Structure"
+                                      Placeholder="Select">
+                            <SelectOptions>
+                                @if (State.AppConfig.DatasetStructures != null)
                                 {
-                                <p>@method</p>
+                                    @foreach (var structure in State.AppConfig.DatasetStructures)
+                                    {
+                                        <AntDesign.SimpleSelectOption Value="@structure"
+                                                                      Label="@structure" />
+                                    }
                                 }
-                        </AntDesign.Column>
+                            </SelectOptions>
+                        </SimpleSelect>
+                    </FormItem>
+                </ChildContent>
+            </TabPane>
+            <TabPane Key="5">
+                <Tab>Processing</Tab>
+                <ChildContent>
+                    <FormItem Label="Methods">
+                        <InputGroup>
+                            <Row Justify="space-between">
+                                <AntDesign.Col Span="20">
+                                    <Input @bind-Value="NewDatasetMethod" />
+                                </AntDesign.Col>
+                                <AntDesign.Col Span="4">
+                                    <Button OnClick="AddDatasetMethodHandler">Add</Button>
+                                </AntDesign.Col>
+                            </Row>
+                        </InputGroup>
+                        <br />
+                        @if (context.Dataset.Methods.Count > 0)
+                        {
+                            <AntList DataSource="@context.Dataset.Methods"
+                                     Size="small">
+                                <ChildContent Context="method">
+                                    <ListItem>
+                                        <span><Text>@method</Text></span>
+                                        <Button Danger OnClick="() => DeleteDatasetMethodHandler(method)">
+                                            <Icon Type="delete" />
+                                        </Button>
+                                    </ListItem>
+                                </ChildContent>
+                            </AntList>
+                        }
+                    </FormItem>
 
-                        <AntDesign.Column @bind-Field="variable.QCApplied"
-                                          Title="Quality Control">
-                            @foreach (var qc in variable.QCApplied)
-                                {
-                                <Tag>@qc</Tag>
-                                }
-                        </AntDesign.Column>
-                        <AntDesign.Column @bind-Field="variable.ProcessingLevel"
-                                          Title="Processing">
-                            <Tag>@variable.ProcessingLevel</Tag>
-                        </AntDesign.Column>
-
-                        <AntDesign.Column @bind-Field="variable.Tags">
-                            @foreach (var tag in variable.Tags)
-                                {
-                                <Tag>@tag</Tag>
-                                }
-                        </AntDesign.Column>
-                        <AntDesign.Column @bind-Field="variable.Height" />
-                        <ActionColumn Title="Action"
-                                      Fixed="right">
-                            <Space Size="small">
-                                <SpaceItem>
-                                    <Button OnClick="() => OpenVariableModalTemplate(variable)">
-                                        <Icon Type="edit" />
-                                    </Button>
-                                </SpaceItem>
-                                <SpaceItem>
-                                    <Button Danger OnClick="() => DeleteVariableHandler(variable)">
-                                        <Icon Type="delete" />
-                                    </Button>
-                                </SpaceItem>
-                            </Space>
-                        </ActionColumn>
-                    </ChildContent>
-                </AntDesign.Table>
-            }
-        </FormItem>
+                    <FormItem Label="Derived Works">
+                        <InputGroup>
+                            <Row Justify="space-between">
+                                <AntDesign.Col Span="20">
+                                    <Input @bind-Value="NewDerivedWork" />
+                                </AntDesign.Col>
+                                <AntDesign.Col Span="4">
+                                    <Button OnClick="AddDerivedWorkHandler">Add</Button>
+                                </AntDesign.Col>
+                            </Row>
+                        </InputGroup>
+                        <br />
+                        @if (context.Dataset.DerivedWorks.Count > 0)
+                        {
+                            <AntList DataSource="@context.Dataset.DerivedWorks">
+                                <ChildContent Context="derived">
+                                    <ListItem>
+                                        <span><Text>@derived</Text></span>
+                                        <Button Danger OnClick="() => DeleteDerivedWorkHandler(derived)">
+                                            <Icon Type="delete" />
+                                        </Button>
+                                    </ListItem>
+                                </ChildContent>
+                            </AntList>
+                        }
+                    </FormItem>
+                </ChildContent>
+            </TabPane>
+        </Tabs>
     </AntDesign.Form>
     <Divider />
     <Row Justify="end">
