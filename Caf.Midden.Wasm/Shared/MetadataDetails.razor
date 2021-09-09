@@ -82,23 +82,26 @@
                                 <AntDesign.Table TItem="Caf.Midden.Core.Models.v0_1.Variable"
                                                  DataSource="@Metadata.Dataset.Variables"
                                                  Size="@TableSize.Small"
-                                                 ScrollX="1900"
-                                                 Bordered>
+                                                 ScrollX="@Convert.ToString(TableWidth)"
+                                                 Bordered
+                                                 PageSize="50">
                                     <ChildContent Context="variable">
-                                        <AntDesign.Column @bind-Field="variable.Name"
+                                        <AntDesign.Column @bind-Field="variable.Name" 
+                                                          Width="200"
                                                           Fixed="left" />
                                         <AntDesign.Column @bind-Field="variable.Description"
-                                                          Width="600">
+                                                          Width="400">
                                             <textarea readonly
                                                       rows="@(string.IsNullOrEmpty(variable.Description) ? 1 : variable.Description.Split('\n').Length + 1)"
                                                       style="width:100%; border:none;">@variable.Description</textarea>
                                         </AntDesign.Column>
-                                        <AntDesign.Column @bind-Field="variable.Units" />
+                                        <AntDesign.Column @bind-Field="variable.Units" 
+                                                          Width="100" />
 
                                         @if (VarsHaveMethods)
                                         {
-                                            <AntDesign.Column @bind-Field="variable.Methods"
-                                                              Width="500">
+                                            <AntDesign.Column @bind-Field="variable.Methods" 
+                                                              Width="400">
                                                 @foreach (var method in variable.Methods)
                                                             {
                                                     <textarea readonly
@@ -111,7 +114,8 @@
                                         @if (VarsHaveQCApplied)
                                         {
                                             <AntDesign.Column @bind-Field="variable.QCApplied"
-                                                              Title="Quality Control">
+                                                              Title="Quality Control" 
+                                                              Width="100">
                                                 @foreach (var qc in variable.QCApplied)
                                                             {
                                                     <Tag>@qc</Tag>
@@ -122,14 +126,16 @@
                                         @if (VarsHaveProcessingLevel)
                                         {
                                             <AntDesign.Column @bind-Field="variable.ProcessingLevel"
-                                                              Title="Processing">
+                                                              Title="Processing" 
+                                                              Width="100">
                                                 <Tag>@variable.ProcessingLevel</Tag>
                                             </AntDesign.Column>
                                         }
 
                                         @if(VarsHaveTags)
                                         {
-                                        <AntDesign.Column @bind-Field="variable.Tags">
+                                        <AntDesign.Column @bind-Field="variable.Tags" 
+                                                          Width="100">
                                             @foreach (var tag in variable.Tags)
                                                         {
                                                 <Tag>@tag</Tag>
@@ -138,7 +144,8 @@
                                         }
                                         @if(VarsHaveHeight)
                                         {
-                                        <AntDesign.Column @bind-Field="variable.Height" />
+                                        <AntDesign.Column @bind-Field="variable.Height" 
+                                                          Width="50"/>
                                         }
 
                                         
