@@ -14,6 +14,8 @@ Midden meets researchers where they are comfortable.
 
 Midden is a suite of three tools; an editor, a crawler, and a data catalog. The editor and catalog are static web apps that can be hosted for free from various providers ([Github](https://pages.github.com/), [Azure](https://azure.microsoft.com/en-us/services/app-service/static/), [netlify](https://www.netlify.com/)) and the crawler is a cross-platform command line interface.
 
+Please visit the [Wiki](https://github.com/CafIncubator/Midden/wiki) if you intend to actually use Midden.
+
 ### The Editor
 
 Midden has a metadata editor that supports fields common in many standard metadata formats including contact info, data dictionaries, methods, tags, spatial information, and much more.
@@ -40,6 +42,8 @@ Midden supports viewing all metadata through a rich interactive interface that s
 4. The data catalog is updated with the new metadata
 5. Collaborators find data using the Catalog, rejoice
 
+![workflow of Midden](media/midden-workflow-figure.jpg)
+
 ## Screenshots
 
 **Insights Dashboard** shows interesting statistics of your data holdings.
@@ -65,7 +69,7 @@ Midden supports viewing all metadata through a rich interactive interface that s
 1. Fork the [repository](https://github.com/cafincubator/midden)
 2. Create a local clone
 
-    `git clone https://github.com/your-account/midden.git`
+    `git clone https://github.com/{your-account}/midden.git`
 
 3. Make it yours by editing Midden/Caf.Midden.Wasm/wwwroot/app-config.json
 
