@@ -83,8 +83,7 @@
                                                  DataSource="@Metadata.Dataset.Variables"
                                                  Size="@TableSize.Small"
                                                  ScrollX="@Convert.ToString(TableWidth)"
-                                                 Bordered
-                                                 PageSize="50">
+                                                 Bordered>
                                     <ChildContent Context="variable">
                                         <AntDesign.Column TData="string"
                                                           @bind-Field="variable.Name" 
@@ -141,21 +140,19 @@
 
                                         @if(VarsHaveTags)
                                         {
-                                        <AntDesign.Column @bind-Field="variable.Tags" 
-                                                          Width="100">
-                                            @foreach (var tag in variable.Tags)
-                                                        {
-                                                <Tag>@tag</Tag>
-                                                        }
-                                        </AntDesign.Column>
+                                            <AntDesign.Column @bind-Field="variable.Tags" 
+                                                              Width="100">
+                                                @foreach (var tag in variable.Tags)
+                                                            {
+                                                    <Tag>@tag</Tag>
+                                                            }
+                                            </AntDesign.Column>
                                         }
                                         @if(VarsHaveHeight)
                                         {
-                                        <AntDesign.Column @bind-Field="variable.Height" 
-                                                          Width="50"/>
+                                            <AntDesign.Column @bind-Field="variable.Height" 
+                                                              Width="50"/>
                                         }
-
-                                        
                                     </ChildContent>
                                 </AntDesign.Table>
                             }
