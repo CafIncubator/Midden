@@ -13,6 +13,8 @@ namespace Caf.Midden.Wasm.Shared
     public partial class CatalogVariableViewer : IDisposable
     {
         CatalogVariableViewerViewModel ViewModel { get; set; } = new CatalogVariableViewerViewModel();
+        public TableFilter<string>[] FilterProcessing;
+        public TableFilter<string>[] FilterZone;
 
         protected override void OnInitialized()
         {
@@ -21,6 +23,9 @@ namespace Caf.Midden.Wasm.Shared
 
             if (State?.Catalog != null)
                 SetCatalogVariables(State?.Catalog?.Metadatas);
+
+            if (State?.AppConfig != null)
+                SetFilters(State?.AppConfig);
         }
 
         private async Task StateChanged(
@@ -32,12 +37,33 @@ namespace Caf.Midden.Wasm.Shared
                 if (property == "UpdateCatalog")
                 {
                     SetCatalogVariables(State?.Catalog?.Metadatas);
+                    SetFilters(State?.AppConfig);
                 }
 
                 await InvokeAsync(StateHasChanged);
             }
 
 
+        }
+
+        private void SetFilters(Configuration appConfig)
+        {
+            if (appConfig == null)
+                return;
+
+            List<TableFilter<string>> processings = new List<TableFilter<string>>();
+            foreach(var processing in appConfig.ProcessingLevels)
+            {
+                processings.Add(new TableFilter<string> { Text = processing, Value = processing });
+            }
+            this.FilterProcessing = processings.ToArray();
+
+            List<TableFilter<string>> zones = new List<TableFilter<string>>();
+            foreach(var zone in appConfig.Zones)
+            {
+                zones.Add(new TableFilter<string> { Text = zone, Value = zone });
+            }
+            this.FilterZone = zones.ToArray();
         }
 
         private void SetCatalogVariables(List<Metadata> metadatas)
