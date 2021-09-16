@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AntDesign;
 
 namespace Caf.Midden.Wasm.Shared
 {
@@ -24,6 +25,7 @@ namespace Caf.Midden.Wasm.Shared
 
         public int TableWidth { get; set; }
 
+        public TableFilter<string>[] FilterProcessing;
 
         protected override void OnInitialized()
         {
@@ -68,6 +70,22 @@ namespace Caf.Midden.Wasm.Shared
 
                 StateHasChanged();
             }
+
+            if(State?.AppConfig != null)
+                SetFilters(State?.AppConfig);
+        }
+
+        private void SetFilters(Configuration appConfig)
+        {
+            if (appConfig == null)
+                return;
+
+            List<TableFilter<string>> processings = new List<TableFilter<string>>();
+            foreach (var processing in appConfig.ProcessingLevels)
+            {
+                processings.Add(new TableFilter<string> { Text = processing, Value = processing });
+            }
+            this.FilterProcessing = processings.ToArray();
         }
     }
 }

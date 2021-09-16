@@ -11,6 +11,9 @@
       "sslPort": 44321
     }
   },
+  "environmentVariables": {
+    "NO_PROXY": "localhost"
+  },
   "profiles": {
     "IIS Express": {
       "commandName": "IISExpress",
@@ -22,7 +25,6 @@
     },
     "Caf.Midden.Wasm": {
       "commandName": "Project",
-      "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
@@ -30,8 +32,5 @@
       "applicationUrl": "https://localhost:5001;http://localhost:5000",
       "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}"
     }
-  },
-  "environmentVariables": {
-    "NO_PROXY": "localhost"
   }
 }

@@ -1,7 +1,7 @@
 ﻿@using Caf.Midden.Core.Models.v0_1
 @using Microsoft.AspNetCore.Components
 @using AntDesign
-@inherits ModalTemplate<Caf.Midden.Wasm.Shared.ViewModels.MetadataDetailsViewModel>
+@inherits FeedbackComponent<Caf.Midden.Wasm.Shared.ViewModels.MetadataDetailsViewModel>
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Components.Forms
 @using Caf.Midden.Wasm.Shared.ViewModels
@@ -38,7 +38,7 @@
 
     private void ViewFull()
     {
-        _ = base.ModalRef.CloseAsync();
+        _ = base.FeedbackRef.CloseAsync();
         NavManager.NavigateTo($"catalog/{_model.Metadata.Dataset.Zone}/{_model.Metadata.Dataset.Project}/{_model.Metadata.Dataset.Name}");
     }
 

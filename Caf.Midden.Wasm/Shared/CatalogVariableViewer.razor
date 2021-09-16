@@ -25,10 +25,14 @@
                          ScrollX="2800"
                          Bordered>
             <ChildContent Context="cv">
-                <AntDesign.Column @bind-Field="cv.Name"
-                        Fixed="left" />
-                <AntDesign.Column @bind-Field="cv.Description"
-                        Width="600">
+                <AntDesign.Column TData="string"
+                                  @bind-Field="cv.Name"
+                                  Fixed="left"
+                                  Sortable
+                                  Filterable />
+                <AntDesign.Column TData="string"
+                                  @bind-Field="cv.Description"
+                                  Width="600">
                     <textarea readonly
                               rows="@(string.IsNullOrEmpty(cv.Description) ? 1 : cv.Description.Split('\n').Length + 1)"
                               style="width:100%; border:none;">@cv.Description</textarea>
@@ -52,7 +56,11 @@
                         }
                 </AntDesign.Column>
                 <AntDesign.Column @bind-Field="cv.ProcessingLevel"
-                                  Title="Processing">
+                                  TData="string"
+                                  Title="Processing"
+                                  Filters="FilterProcessing"
+                                  OnFilter="(value, processing)=>processing.StartsWith(value)"
+                                  FilterMultiple="false">
                     <Tag>@cv.ProcessingLevel</Tag>
                 </AntDesign.Column>
 
@@ -62,14 +70,20 @@
                         <Tag>@tag</Tag>
                         }
                 </AntDesign.Column>
-                <AntDesign.Column @bind-Field="cv.Zone" />
+                <AntDesign.Column TData="string"
+                                  @bind-Field="cv.Zone"
+                                  Filters="FilterZone"
+                                  OnFilter="(value, zone)=>zone.StartsWith(value)"
+                                  FilterMultiple="false" />
                 <AntDesign.Column @bind-Field="cv.ProjectName"
                                   Title="Project"/>
-                <AntDesign.Column @bind-Field="cv.DatasetName"
-                                  Title="Dataset"/>
+                <AntDesign.Column TData="string"
+                                  @bind-Field="cv.DatasetName"
+                                  Title="Dataset"
+                                  Sortable />
                 <ActionColumn Title="Action"
                               Fixed="right">
-                    <Space Size="small">
+                    <Space>
                         <SpaceItem>
                             <Button OnClick="() => OpenMetadataDetailsModalTemplate(cv)">
                                 <Icon Type="zoom-in" Theme="outline" /> View
