@@ -86,9 +86,12 @@
                                                  Bordered
                                                  PageSize="50">
                                     <ChildContent Context="variable">
-                                        <AntDesign.Column @bind-Field="variable.Name" 
+                                        <AntDesign.Column TData="string"
+                                                          @bind-Field="variable.Name" 
                                                           Width="200"
-                                                          Fixed="left" />
+                                                          Fixed="left"
+                                                          Filterable
+                                                          Sortable />
                                         <AntDesign.Column @bind-Field="variable.Description"
                                                           Width="400">
                                             <textarea readonly
@@ -126,8 +129,12 @@
                                         @if (VarsHaveProcessingLevel)
                                         {
                                             <AntDesign.Column @bind-Field="variable.ProcessingLevel"
+                                                              TData="string"
                                                               Title="Processing" 
-                                                              Width="100">
+                                                              Width="100"
+                                                              Filters="FilterProcessing"
+                                                              OnFilter="(value, processing)=>processing.StartsWith(value)"
+                                                              FilterMultiple="false">
                                                 <Tag>@variable.ProcessingLevel</Tag>
                                             </AntDesign.Column>
                                         }
