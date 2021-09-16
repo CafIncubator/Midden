@@ -21,17 +21,11 @@
     <CatalogLoader />
     <PageHeader Class="site-page-header" Title="Catalog" />
     <Tabs Type="@TabType.Card">
-        <TabPane Key="1">
-            <Tab>Datasets</Tab>
-            <ChildContent>
-                <CatalogMetadataViewer />
-            </ChildContent>
+        <TabPane Key="1" Tab="Datasets">
+            <CatalogMetadataViewer />
         </TabPane>
-        <TabPane Key="2">
-            <Tab>Variables</Tab>
-            <ChildContent>
-                <CatalogVariableViewer />
-            </ChildContent>
+        <TabPane Key="2" Tab="Variables">
+            <CatalogVariableViewer />
         </TabPane>
     </Tabs>
     
