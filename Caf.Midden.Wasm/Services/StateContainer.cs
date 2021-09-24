@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Caf.Midden.Core.Models.v0_1;
 using Microsoft.AspNetCore.Components;
@@ -10,7 +11,8 @@ namespace Caf.Midden.Wasm.Services
 {
     public class StateContainer
     {
-        public string SchemaVersion { get; } = "v0.1";
+        //public string SchemaVersion { get; } = "v0.1";
+        public string AssemblyVersion { get; private set; }
         
         public DateTime LastUpdated { get; private set; } = 
             DateTime.UtcNow;
@@ -48,6 +50,14 @@ namespace Caf.Midden.Wasm.Services
         {
             this.Catalog = value;
             NotifyStateChanged(source, "UpdateCatalog");
+        }
+
+        public StateContainer()
+        {
+            this.AssemblyVersion = 
+                Assembly.GetExecutingAssembly()
+                    .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+                    .InformationalVersion;
         }
 
         public event Action<ComponentBase, string> StateChanged;

@@ -10,13 +10,13 @@
                 <div class="tool-name">@State.AppConfig.ToolName</div>
             }
 
-            <!-- 
-                <div class="configure-icon">
-                <a href="#">
-                    <Icon Type="setting" Theme="outline" />
-                </a>
-            </div>
-            -->
+            <!--
+        <div class="configure-icon">
+        <a href="#">
+            <Icon Type="setting" Theme="outline" />
+        </a>
+    </div>
+    -->
         </Header>
         <Layout>
             <Sider Collapsible
@@ -62,6 +62,7 @@
                     Made with <a href="https://github.com/cafincubator/midden">
                         <Icon Type="github" Theme="outline" /> Midden
                     </a>
+                    <span>@($"v{State.AssemblyVersion}")</span>
                 </Footer>
             </Layout>
         </Layout>
