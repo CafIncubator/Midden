@@ -13,6 +13,7 @@ namespace Caf.Midden.Cli.Models
         GithubOrganization,
         GoogleWorkspaceSharedDrive,
         FileTransferProtocol,
-        Office365OneDrive
+        Office365OneDrive,
+        AzureFileShares
     }
 }

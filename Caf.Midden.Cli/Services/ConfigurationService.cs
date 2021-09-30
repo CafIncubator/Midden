@@ -40,7 +40,7 @@ namespace Caf.Midden.Cli.Services
                     {
                         Name = "DataStoreName",
                         Type = DataStoreTypes.LocalFileSystem,
-                        LocalPath = @"C:\Path\To\Projects"
+                        Path = @"C:\Path\To\Projects"
                     }
                 }
             };
