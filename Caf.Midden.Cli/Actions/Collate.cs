@@ -111,10 +111,10 @@ namespace Caf.Midden.Cli.Actions
                 switch (currStore.Type)
                 {
                     case DataStoreTypes.LocalFileSystem:
-                        if(currStore.LocalPath is not null)
+                        if(currStore.Path is not null)
                         {
                             crawler = new LocalFileSystemCrawler(
-                                currStore.LocalPath);
+                                currStore.Path);
                         }
                         else
                         {
@@ -158,6 +158,25 @@ namespace Caf.Midden.Cli.Actions
                                 currStore.ClientId,
                                 currStore.ClientSecret,
                                 currStore.ApplicationName);
+                        }
+                        else
+                        {
+                            Console.WriteLine(
+                                $"Not enough information provided to crawl {currStore.Name}");
+                        }
+
+                        break;
+
+                    case DataStoreTypes.AzureFileShares:
+                        if(
+                            currStore.Uri is not null &&
+                            currStore.Path is not null &&
+                            currStore.SharedAccessSignature is not null)
+                        {
+                            crawler = new AzureFileShareCrawler(
+                                currStore.Uri,
+                                currStore.Path,
+                                currStore.SharedAccessSignature);
                         }
                         else
                         {
