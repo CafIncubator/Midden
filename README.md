@@ -14,7 +14,7 @@ Midden meets researchers where they are comfortable.
 
 Midden is a suite of three tools; an editor, a crawler, and a data catalog. The editor and catalog are static web apps that can be hosted for free from various providers ([Github](https://pages.github.com/), [Azure](https://azure.microsoft.com/en-us/services/app-service/static/), [netlify](https://www.netlify.com/)) and the crawler is a cross-platform command line interface.
 
-Please visit the [Wiki](https://github.com/CafIncubator/Midden/wiki) if you intend to actually use Midden.
+**Please visit the [Wiki](https://github.com/CafIncubator/Midden/wiki) if you intend to actually use Midden**.
 
 ### The Editor
 
