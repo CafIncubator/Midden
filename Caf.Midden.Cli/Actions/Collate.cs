@@ -24,29 +24,20 @@ namespace Caf.Midden.Cli.Actions
             CliConfiguration? configuration) 
             : base(name, description)
         {
-            // Abort if not configuration found
-            if (configuration == null)
-            {
-                Console.WriteLine("Unable to read 'configuration.json' file. To create a configuration file, use the 'setup' action");
-                return;
-            }
-
             this.config = configuration;
-
 
             Add(new Option<List<string>>(
                 new[] { "--datastores", "-d" },
                 "List of names of data stores to crawl"));
-            Add(new Option<bool?>(
+            Add(new Option<bool>(
                 new[] { "--silent", "-s" },
                 "Runs in silent mode without user prompt."));
             Add(new Option<string?>(
                 new[] { "--outdir", "-o" },
                 "Directory to write the catalog.json file."));
             
-
             Handler = CommandHandler
-                .Create<List<string>, bool?, string?, IConsole>(HandleCollate);
+                .Create<List<string>, bool, string?, IConsole>(HandleCollate);
         }
 
         private void Add(Option<string?> option, object getDefaultValue)
@@ -56,11 +47,19 @@ namespace Caf.Midden.Cli.Actions
 
         public void HandleCollate(
             List<string> datastores,
-            bool? silent,
+            bool silent,
             string? outdir,
             IConsole console)
         {
-            bool silentMode = silent ??= false;
+            // Abort if not configuration found
+            if (this.config == null)
+            {
+                Console.WriteLine("Unable to read 'configuration.json' file. To create a configuration file, use the 'setup' action");
+                return;
+            }
+
+            //bool silentMode = silent ??= false;
+            bool silentMode = silent;
 
             // Set output directory if none specified
             outdir ??= Path.Combine(
