@@ -92,6 +92,7 @@ namespace Caf.Midden.Wasm.Shared
             var modalConfig = new ModalOptions();
             modalConfig.Title = "Metadata Preview";
             modalConfig.Width = "90%";
+            modalConfig.DestroyOnClose = true;
             modalConfig.OnCancel = async (e) =>
             {
                 await metadataDetailsModalRef.CloseAsync();
