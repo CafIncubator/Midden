@@ -36,9 +36,10 @@
         base.OnInitialized();
     }
 
-    private void ViewFull()
+    private async void ViewFull()
     {
-        _ = base.FeedbackRef.CloseAsync();
+        await base.CloseFeedbackAsync();
+       
         NavManager.NavigateTo($"catalog/{_model.Metadata.Dataset.Zone}/{_model.Metadata.Dataset.Project}/{_model.Metadata.Dataset.Name}");
     }
 
