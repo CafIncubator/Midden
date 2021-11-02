@@ -1,4 +1,4 @@
-﻿@page "/catalog/zones/{ZoneName}"
+﻿@page "/catalog/tags/{TagName}"
 @inject Services.StateContainer State
 
 <Breadcrumb Style="margin:16px 0;">
@@ -13,19 +13,19 @@
         </a>
     </BreadcrumbItem>
     <BreadcrumbItem>
-            @ZoneName
+            @TagName
     </BreadcrumbItem>
 </Breadcrumb>
 
 <div class="site-layout-background">
     <CatalogLoader />
     <PageHeader Class="site-page-header"
-                Title="@($"Catalog for Zone: {ZoneName}")" />
-    <FilteredCatalogMetadataViewer Zone="@ZoneName" />
+                Title="@($"{TagName} Catalog")" />
+    <FilteredCatalogMetadataViewer Tag="@TagName"/>
 </div>
 
 
 @code {
     [Parameter]
-    public string ZoneName { get; set; }
+    public string TagName { get; set; }
 } 
