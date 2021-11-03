@@ -221,7 +221,7 @@
                         <Body>
                             @foreach (var tag in Metadata.Dataset.Tags)
                             {
-                                <Tag>@tag</Tag>
+                            <Tag><a href="catalog/tags/@tag">@tag</a></Tag>
                             }
                         </Body>
                     </Card>
