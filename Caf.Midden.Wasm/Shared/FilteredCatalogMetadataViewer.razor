@@ -23,7 +23,7 @@
         <AntDesign.Col Span="12" Style="padding:10px">
             <Card Style="overflow:hidden">
                 <TitleTemplate>
-                    <a href="catalog/@metadata.Dataset.Zone/@metadata.Dataset.Project/@metadata.Dataset.Name">
+                    <a href="catalog/zones/@metadata.Dataset.Zone/projects/@metadata.Dataset.Project/datasets/@metadata.Dataset.Name">
                         @metadata.Dataset.Name
                     </a>
                 </TitleTemplate>
@@ -33,10 +33,10 @@
                     </Button>
                 </Extra>
                 <Body>
-                    <a href="catalog/@metadata.Dataset.Zone">
+                    <a href="catalog/zones/@metadata.Dataset.Zone">
                         @metadata.Dataset.Zone
                     </a> /
-                    <a href="catalog/@metadata.Dataset.Zone/@metadata.Dataset.Project">
+                    <a href="catalog/zones/@metadata.Dataset.Zone/projects/@metadata.Dataset.Project">
                         @metadata.Dataset.Project
                     </a>
 
@@ -48,7 +48,7 @@
 
                     @foreach (var tag in metadata.Dataset.Tags)
                     {
-                        <Tag>@tag</Tag>
+                        <Tag><a href="catalog/tags/@tag">@tag</a></Tag>
                     }
                 </Body>
             </Card>

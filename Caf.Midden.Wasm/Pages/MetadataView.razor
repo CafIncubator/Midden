@@ -1,5 +1,6 @@
 ﻿@page "/catalog/{ZoneName}/{ProjectName}/{DatasetName}"
 @page "/datasets/{ZoneName}/{ProjectName}/{DatasetName}"
+@page "/catalog/zones/{ZoneName}/projects/{ProjectName}/datasets/{DatasetName}"
 
 @inject Services.StateContainer State
 @inject NavigationManager NavManager
@@ -16,17 +17,17 @@
         </a>
     </BreadcrumbItem>
     <BreadcrumbItem>
-        <a href="catalog/@ZoneName">
-            @ZoneName
+        <a href="catalog/zones/@ZoneName">
+            <Icon Type="folder" /> @ZoneName
         </a>
     </BreadcrumbItem>
     <BreadcrumbItem>
-        <a href="catalog/@ZoneName/@ProjectName">
-            @ProjectName
+        <a href="catalog/zones/@ZoneName/projects/@ProjectName">
+            <Icon Type="project" /> @ProjectName
         </a>
     </BreadcrumbItem>
     <BreadcrumbItem>
-        @DatasetName
+        <Icon Type="file-text" /> @DatasetName
     </BreadcrumbItem>
 </Breadcrumb>
 

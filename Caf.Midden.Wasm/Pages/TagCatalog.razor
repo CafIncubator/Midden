@@ -1,4 +1,4 @@
-﻿@page "/catalog/projects/{ProjectName}"
+﻿@page "/catalog/tags/{TagName}"
 @inject Services.StateContainer State
 
 <Breadcrumb Style="margin:16px 0;">
@@ -13,7 +13,7 @@
         </a>
     </BreadcrumbItem>
     <BreadcrumbItem>
-        <Icon Type="project" /> @ProjectName
+        <Icon Type="tag" /> @TagName
     </BreadcrumbItem>
 </Breadcrumb>
 
@@ -21,12 +21,12 @@
     <CatalogLoader />
     <PageHeader Class="site-page-header"
                 Title="Dataset Catalog"
-                Subtitle="Filtered project" />
-    <FilteredCatalogMetadataViewer Project="@ProjectName" />
+                Subtitle="Filtered by tag" />
+    <FilteredCatalogMetadataViewer Tag="@TagName"/>
 </div>
 
 
 @code {
     [Parameter]
-    public string ProjectName { get; set; }
+    public string TagName { get; set; }
 } 

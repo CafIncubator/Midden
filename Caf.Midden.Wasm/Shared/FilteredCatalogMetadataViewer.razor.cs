@@ -9,8 +9,19 @@ using System.Threading.Tasks;
 
 namespace Caf.Midden.Wasm.Shared
 {
-    public partial class CatalogMetadataViewer : IDisposable
+    public partial class FilteredCatalogMetadataViewer : IDisposable
     {
+        [Parameter]
+        public string Zone { get; set; }
+
+        [Parameter]
+        public string Project { get; set; }
+
+        [Parameter]
+        public string Tag { get; set; }
+
+
+        public List<Metadata> BaseMetadatas { get; set; } = new List<Metadata>();
         public List<Metadata> FilteredMetadata { get; set; } = new List<Metadata>();
 
         public string SearchTerm { get; set; }
@@ -21,38 +32,50 @@ namespace Caf.Midden.Wasm.Shared
                 => await StateChanged(source, property);
 
             if (State?.Catalog != null)
-                FilteredMetadata = State?.Catalog?.Metadatas;
+            {
+                SetBaseMetadatas();
+                FilteredMetadata = this.BaseMetadatas;
+            }
         }
 
         private async Task StateChanged(
             ComponentBase source,
             string property)
         {
-            if(source != this)
+            if (source != this)
             {
                 if (property == "UpdateCatalog")
                 {
-                    FilteredMetadata = State?.Catalog?.Metadatas;
+                    SetBaseMetadatas();
+                    FilteredMetadata = this.BaseMetadatas;
                 }
 
                 await InvokeAsync(StateHasChanged);
             }
 
-            
+
         }
 
+        private void SetBaseMetadatas()
+        {
+            BaseMetadatas = State.Catalog.Metadatas
+                .Where(m =>
+                    (String.IsNullOrEmpty(this.Zone) || m.Dataset.Zone.ToLower() == this.Zone.ToLower()) &&
+                    (String.IsNullOrEmpty(this.Project) || m.Dataset.Project.ToLower() == this.Project.ToLower()) &&
+                    (String.IsNullOrEmpty(this.Tag) || m.Dataset.Tags.Any(t => t.ToLower() == this.Tag.ToLower())))
+                .ToList();
+
+        }
         private void SearchHandler()
         {
             if (string.IsNullOrWhiteSpace(SearchTerm))
             {
-                FilteredMetadata = State.Catalog.Metadatas;
+                FilteredMetadata = this.BaseMetadatas;
             }
             else
             {
-                FilteredMetadata = State.Catalog.Metadatas
+                FilteredMetadata = this.BaseMetadatas
                     .Where(m =>
-                        (m.Dataset.Project.ToLower().Contains(
-                            SearchTerm.ToLower())) ||
                         (m.Dataset.Name.ToLower().Contains(
                             SearchTerm.ToLower())) ||
                         (m.Dataset.Description.ToLower().Contains(
