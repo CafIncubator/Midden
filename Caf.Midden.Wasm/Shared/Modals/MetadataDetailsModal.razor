@@ -40,7 +40,7 @@
     {
         await base.CloseFeedbackAsync();
        
-        NavManager.NavigateTo($"catalog/{_model.Metadata.Dataset.Zone}/{_model.Metadata.Dataset.Project}/{_model.Metadata.Dataset.Name}");
+        NavManager.NavigateTo($"catalog/zones/{_model.Metadata.Dataset.Zone}/projects/{_model.Metadata.Dataset.Project}/datasets/{_model.Metadata.Dataset.Name}");
     }
 
     private void OnFinish(EditContext editContext)
