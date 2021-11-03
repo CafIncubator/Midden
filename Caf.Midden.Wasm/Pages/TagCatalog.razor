@@ -13,6 +13,11 @@
         </a>
     </BreadcrumbItem>
     <BreadcrumbItem>
+        <a href="catalog/tags">
+            <Icon Type="tag" /> Tags
+        </a>
+    </BreadcrumbItem>
+    <BreadcrumbItem>
             @TagName
     </BreadcrumbItem>
 </Breadcrumb>
@@ -20,7 +25,7 @@
 <div class="site-layout-background">
     <CatalogLoader />
     <PageHeader Class="site-page-header"
-                Title="@($"{TagName} Catalog")" />
+                Title="@($"Catalog filtered by Tag: {TagName}")" />
     <FilteredCatalogMetadataViewer Tag="@TagName"/>
 </div>
 
