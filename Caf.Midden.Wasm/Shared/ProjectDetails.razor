@@ -1,16 +1,25 @@
 ﻿@inject Caf.Midden.Wasm.Services.StateContainer State
 @inject ModalService ModalService
 
-<Divider Orientation="center">Project</Divider>
+<Divider Orientation="center">Project Information</Divider>
 
 @if (Project != null)
 {
-<Card Style="overflow:hidden">
+<Card>
     <TitleTemplate>
-        <Icon Type="project" /> @Project.Name
+        <Icon Type="project" Theme="outline" /> @Project.Name
     </TitleTemplate>
     <Body>
-        @Project.Description
+        <textarea readonly
+            rows="@(string.IsNullOrEmpty(Project.Description) ? 1 : Project.Description.Split('\n').Length + 2)"
+            style="width:100%; border:none;">@Project.Description</textarea>
+            
+        <Divider />
+        <Icon Type="file-text" /> 14 Datasets
     </Body>
 </Card>
+}
+else
+{
+<Empty Simple />
 }

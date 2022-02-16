@@ -8,7 +8,7 @@
     },
     {
       "name": "CafPlantGridPointSurvey",
-      "description": "TestDescription"
+      "description": "---\nauthor:\t\t        Bryan Carlson  \nrevision-date:\t\t12/12/2018\n---\n\n# Project Description\n\n## Title\nCafPlantGridPointSurvey\n\n## Purpose\nOrganize and process yield and biomass survey data collected from georeferenced points located on fields; CookEast, CookWest, BoydNorth, BoydSouth\n\n## Contributors\n* Bryan Carlson [bryan.carlson@ars.usda.gov]\n\n## Current status\nIncomplete\n\n## Starting date\n8/30/2017\n\n## Expected completion date\nOn-going\n\n## Actual completion date"
     },
     {
       "name": "CookEastGeophysicalEM38",
