@@ -1,0 +1,16 @@
+﻿@inject Caf.Midden.Wasm.Services.StateContainer State
+@inject ModalService ModalService
+
+<Divider Orientation="center">Project</Divider>
+
+@if (Project != null)
+{
+<Card Style="overflow:hidden">
+    <TitleTemplate>
+        <Icon Type="project" /> @Project.Name
+    </TitleTemplate>
+    <Body>
+        @Project.Description
+    </Body>
+</Card>
+}
