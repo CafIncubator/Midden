@@ -16,6 +16,8 @@ namespace Caf.Midden.Wasm.Shared
 
         public Project Project { get; set; }
 
+        public int NumberDatasets { get; set; }
+
         protected override void OnInitialized()
         {
             State.StateChanged += async (source, property)
@@ -24,6 +26,7 @@ namespace Caf.Midden.Wasm.Shared
             if (State?.Catalog != null)
             {
                 SetProject();
+                SetNumberDatasets();
             }
         }
 
@@ -36,12 +39,11 @@ namespace Caf.Midden.Wasm.Shared
                 if (property == "UpdateCatalog")
                 {
                     SetProject();
+                    SetNumberDatasets();
                 }
 
                 await InvokeAsync(StateHasChanged);
             }
-
-
         }
 
         private void SetProject()
@@ -50,6 +52,17 @@ namespace Caf.Midden.Wasm.Shared
                 .Where(p =>
                     (String.IsNullOrEmpty(p.Name) || p.Name.ToLower() == this.ProjectName.ToLower()))
                 .FirstOrDefault();
+        }
+
+        private void SetNumberDatasets()
+        {
+            int num = 0;
+            num = State.Catalog.Metadatas
+                .Where(m =>
+                    (String.IsNullOrEmpty(this.ProjectName) || m.Dataset.Project.ToLower() == this.ProjectName.ToLower()))
+                .Count();
+
+            this.NumberDatasets = num;
         }
 
         public void Dispose()
