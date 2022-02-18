@@ -10,10 +10,10 @@
         <Icon Type="project" Theme="outline" /> @Project.Name
     </TitleTemplate>
     <Body>
-        <textarea readonly
+        <!-- <textarea readonly
             rows="@(string.IsNullOrEmpty(Project.Description) ? 1 : Project.Description.Split('\n').Length + 2)"
-            style="width:100%; border:none;">@Project.Description</textarea>
-            
+            style="width:100%; border:none;">@Project.Description</textarea> -->
+        <div>@((MarkupString)MarkdownDescription)</div>
         <Divider />
         <Icon Type="file-text" /> @NumberDatasets Datasets
     </Body>

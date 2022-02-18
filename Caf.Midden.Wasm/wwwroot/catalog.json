@@ -20,7 +20,7 @@
     },
     {
       "name": "CafModelingAgroecologicalClasses",
-      "description": "TestDescription"
+      "description": "Testing advanced markup\nHere is a link: [Caf blog](https://www.cafltar.org/blog/posts/2018/march/flexcroppingspringcanola/)\n\nHere is an image:\n![](https://www.cafltar.org/media/1037/feb1-precip-diff.png?width=500&height=468.125)"
     }
   ],
   "metadatas": [
