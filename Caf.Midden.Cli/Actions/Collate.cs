@@ -91,6 +91,7 @@ namespace Caf.Midden.Cli.Actions
                
             // Start crawling all specified data stores
             List<Metadata> middenMetadatas = new List<Metadata>();
+            List<Project> mippenProjects = new List<Project>();
 
             foreach (string store in datastores)
             {
@@ -191,18 +192,30 @@ namespace Caf.Midden.Cli.Actions
 
                 var metadatas = crawler?.GetMetadatas();
 
+                List<Project> projects = new List<Project>();
+                if(currStore.ShouldCollateProjects is true)
+                {
+                    projects = crawler?.GetProjects();
+                }
+
                 if(metadatas != null)
                 {
                     AppendDataStoreNameToPath(metadatas, currStore.Name);
 
                     if (middenMetadatas != null) middenMetadatas.AddRange(metadatas);
                 }
+
+                if(projects.Count > 0)
+                {
+                    if (mippenProjects != null) mippenProjects.AddRange(projects);
+                }
             }
 
             Catalog catalog = new Catalog()
             {
                 CreationDate = DateTime.UtcNow,
-                Metadatas = middenMetadatas
+                Metadatas = middenMetadatas,
+                Projects = mippenProjects
             };
 
             Console.WriteLine($"Writing output to {outdir}");

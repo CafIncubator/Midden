@@ -8,7 +8,7 @@ namespace Caf.Midden.Cli.Models
 {
     public class DataStore
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = "";
         public DataStoreTypes Type { get; set; }
         public string? Path { get; set; }
         public string? TenantId { get; set; }
@@ -19,5 +19,6 @@ namespace Caf.Midden.Cli.Models
         public string? ApplicationName { get; set; }
         public string? SharedAccessSignature { get; set; }
         public string? Uri { get; set; }
+        public bool? ShouldCollateProjects { get; set; }
     }
 }

@@ -43,7 +43,7 @@ namespace Caf.Midden.Cli.Services
         }
 
         // Gets a list of midden file names
-        public List<string> GetFileNames()
+        public List<string> GetFileNames(string fileExtension)
         {
             var names = new List<string>();
 
@@ -61,7 +61,7 @@ namespace Caf.Midden.Cli.Services
                         {
                             remaining.Enqueue(dir.GetSubdirectoryClient(item.Name));
                         }
-                        else if (item.Name.Contains(FILE_EXTENSION))
+                        else if (item.Name.Contains(fileExtension))
                         {
                             Console.WriteLine($"  In {dir.Name} found {item.Name}");
 
@@ -139,6 +139,11 @@ namespace Caf.Midden.Cli.Services
             }
 
             return metadatas;
+        }
+
+        public List<Project> GetProjects()
+        {
+            throw new NotImplementedException();
         }
     }
 }

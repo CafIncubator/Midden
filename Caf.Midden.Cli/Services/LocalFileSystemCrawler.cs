@@ -25,11 +25,11 @@ namespace Caf.Midden.Cli.Services
 
             this.rootDirectory = rootDirectory;
         }
-        public List<string> GetFileNames()
+        public List<string> GetFileNames(string fileExtension)
         {
             string[] files = Directory.GetFiles(
                 rootDirectory, 
-                $"*{FILE_EXTENSION}", 
+                $"*{fileExtension}", 
                 SearchOption.AllDirectories);
 
             Console.WriteLine($"Found a total of {files.Length} files");
@@ -40,7 +40,7 @@ namespace Caf.Midden.Cli.Services
 
         public List<Metadata> GetMetadatas()
         {
-            var files = GetFileNames();
+            var files = GetFileNames(FILE_EXTENSION);
 
             List<Metadata> metadatas = new List<Metadata>();
 
@@ -62,6 +62,11 @@ namespace Caf.Midden.Cli.Services
             }
 
             return metadatas;
+        }
+
+        public List<Project> GetProjects()
+        {
+            throw new NotImplementedException();
         }
     }
 }

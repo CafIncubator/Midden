@@ -133,7 +133,7 @@ namespace Caf.Midden.Cli.Services
 
         // Gets a list of Google File Ids for files in Shared Drives with the extension ".midden"
         // Limited to searching 100 shared drives and returning 100 midden files within each shared drive (TODO: Update paging to support more)
-        public List<string> GetFileNames()
+        public List<string> GetFileNames(string fileExtension = FILE_EXTENSION)
         {
             List<string> names = new List<string>();
 
@@ -153,7 +153,7 @@ namespace Caf.Midden.Cli.Services
                     listRequest.IncludeItemsFromAllDrives = true;
                     listRequest.SupportsAllDrives = true;
                     listRequest.Corpora = "drive";
-                    listRequest.Q = $"name contains '{FILE_EXTENSION}'";
+                    listRequest.Q = $"name contains '{fileExtension}'";
 
                     IList<Google.Apis.Drive.v3.Data.File> files = listRequest.Execute().Files;
 
@@ -161,7 +161,7 @@ namespace Caf.Midden.Cli.Services
                     {
                         foreach (var file in files)
                         {
-                            if(file.Name.EndsWith(FILE_EXTENSION))
+                            if(file.Name.EndsWith(fileExtension))
                             {
                                 Console.WriteLine($"  In {drive.Name} found {file.Name}");
                                 names.Add(file.Id);
@@ -261,6 +261,11 @@ namespace Caf.Midden.Cli.Services
             }
 
             return metadatas;
+        }
+
+        public List<Project> GetProjects()
+        {
+            throw new NotImplementedException();
         }
     }
 }
