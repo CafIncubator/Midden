@@ -8,6 +8,6 @@ namespace Caf.Midden.Core.Services.Metadata
 {
     public interface IMetadataParser
     {
-        Models.v0_1.Metadata Parse(string json);
+        Models.v0_2.Metadata Parse(string json);
     }
 }

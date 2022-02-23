@@ -1,5 +1,5 @@
 ﻿using AntDesign;
-using Caf.Midden.Core.Models.v0_1;
+using Caf.Midden.Core.Models.v0_2;
 using Caf.Midden.Wasm.Shared.Modals;
 using Caf.Midden.Wasm.Shared.ViewModels;
 using Microsoft.AspNetCore.Components;

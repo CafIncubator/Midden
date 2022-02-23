@@ -21,7 +21,7 @@ namespace Caf.Midden.Core.Tests
 
             var actual = sut.Parse(json);
 
-            Assert.IsType<Models.v0_1.Metadata>(actual);
+            Assert.IsType<Models.v0_2.Metadata>(actual);
         }
     }
 }

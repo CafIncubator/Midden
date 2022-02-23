@@ -54,7 +54,7 @@
                     <br />
                     @if (context.Dataset.Contacts.Count > 0)
                     {
-                        <AntDesign.Table TItem="Caf.Midden.Core.Models.v0_1.Person"
+                        <AntDesign.Table TItem="Caf.Midden.Core.Models.v0_2.Person"
                                             DataSource="@context.Dataset.Contacts"
                                             HidePagination="@true">
                             <ChildContent Context="contact">
@@ -147,7 +147,7 @@
                     <br />
                     @if (context.Dataset.Variables.Count > 0)
                     {
-                        <AntDesign.Table TItem="Caf.Midden.Core.Models.v0_1.Variable"
+                        <AntDesign.Table TItem="Caf.Midden.Core.Models.v0_2.Variable"
                                             DataSource="@context.Dataset.Variables"
                                             Size="@TableSize.Small"
                                             ScrollX="1400"

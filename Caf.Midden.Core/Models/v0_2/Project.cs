@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace Caf.Midden.Core.Models.v0_1
+namespace Caf.Midden.Core.Models.v0_2
 {
     public class Project
     {

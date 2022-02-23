@@ -1,5 +1,5 @@
-﻿using Caf.Midden.Core.Models.v0_1;
-using Caf.Midden.Core.Models.v0_1.DataDictionary;
+﻿using Caf.Midden.Core.Models.v0_2;
+using Caf.Midden.Core.Models.v0_2.DataDictionary;
 using CsvHelper;
 using CsvHelper.Configuration;
 using System;

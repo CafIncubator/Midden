@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Caf.Midden.Core.Services.Metadata;
-using Caf.Midden.Core.Models.v0_1;
+using Caf.Midden.Core.Models.v0_2;
 using Microsoft.AspNetCore.Components;
 using AntDesign;
 

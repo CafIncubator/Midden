@@ -1,4 +1,4 @@
-﻿using Caf.Midden.Core.Models.v0_1;
+﻿using Caf.Midden.Core.Models.v0_2;
 using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;

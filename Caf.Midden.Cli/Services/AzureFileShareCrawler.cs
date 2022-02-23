@@ -2,7 +2,7 @@
 using Azure.Storage.Files.Shares;
 using Azure.Storage.Files.Shares.Models;
 using Caf.Midden.Cli.Common;
-using Caf.Midden.Core.Models.v0_1;
+using Caf.Midden.Core.Models.v0_2;
 using Caf.Midden.Core.Services.Metadata;
 using System;
 using System.Collections.Generic;

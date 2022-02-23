@@ -79,7 +79,7 @@
                         <Body>
                             @if (Metadata.Dataset.Variables?.Count > 0)
                             {
-                                <AntDesign.Table TItem="Caf.Midden.Core.Models.v0_1.Variable"
+                                <AntDesign.Table TItem="Caf.Midden.Core.Models.v0_2.Variable"
                                                  DataSource="@Metadata.Dataset.Variables"
                                                  Size="@TableSize.Small"
                                                  ScrollX="@Convert.ToString(TableWidth)"
@@ -198,7 +198,7 @@
                             <Icon Type="user" Theme="outline" /> Contacts
                         </TitleTemplate>
                         <Body>
-                            <AntDesign.Table TItem="Caf.Midden.Core.Models.v0_1.Person"
+                            <AntDesign.Table TItem="Caf.Midden.Core.Models.v0_2.Person"
                                              DataSource="@Metadata.Dataset.Contacts"
                                              HidePagination="@true">
                                 <ChildContent Context="contact">

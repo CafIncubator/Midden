@@ -1,7 +1,7 @@
 ﻿using Caf.Midden.Cli.Common;
 using Caf.Midden.Cli.Models;
 using Caf.Midden.Cli.Services;
-using Caf.Midden.Core.Models.v0_1;
+using Caf.Midden.Core.Models.v0_2;
 using System;
 using System.Collections.Generic;
 using System.CommandLine;
