@@ -9,7 +9,8 @@ namespace Caf.Midden.Cli.Common
 {
     public interface ICrawl
     {
-        List<string> GetFileNames();
+        List<string> GetFileNames(string fileExtension);
         List<Metadata> GetMetadatas();
+        List<Project> GetProjects();
     }
 }

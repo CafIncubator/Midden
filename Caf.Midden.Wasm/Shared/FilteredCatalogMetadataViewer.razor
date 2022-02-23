@@ -1,6 +1,8 @@
 ﻿@inject Caf.Midden.Wasm.Services.StateContainer State
 @inject ModalService ModalService
 
+<Divider Orientation="center">Datasets</Divider>
+
 @if (State.Catalog != null)
 {
     <AntDesign.Row>
@@ -11,9 +13,9 @@
                     AllowClear="true" />
         </AntDesign.Col>
     </AntDesign.Row>
+    
+    <Space />
 }
-
-<Divider Orientation="center">Datasets</Divider>
 
 @if (FilteredMetadata != null)
 {

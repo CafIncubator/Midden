@@ -1,0 +1,39 @@
+﻿@inject Caf.Midden.Wasm.Services.StateContainer State
+@inject ModalService ModalService
+
+<Divider Orientation="center">Projects</Divider>
+
+@if (State.Catalog != null)
+{
+    <AntDesign.Row>
+        <AntDesign.Col Offset="8" Span="8">
+            <Search Placeholder="Search all things"
+                    OnChange="SearchHandler"
+                    EnterButton="true" @bind-Value="SearchTerm"
+                    AllowClear="true" />
+        </AntDesign.Col>
+    </AntDesign.Row>
+    
+    <Space />
+}
+
+@if (FilteredProjects != null)
+{
+    <Row Gutter="16">
+        @foreach (var project in FilteredProjects)
+        {
+        <AntDesign.Col Span="12" Style="padding:10px">
+            <Card Style="overflow:hidden">
+                <TitleTemplate>
+                    <a href="catalog/projects/@project.Name">
+                        @project.Name
+                    </a>
+                </TitleTemplate>
+                <Body>
+                    @project.Description
+                </Body>
+            </Card>
+        </AntDesign.Col>
+        }
+    </Row>
+}

@@ -15,6 +15,9 @@ namespace Caf.Midden.Core.Models.v0_1
         [JsonPropertyName("creationDate")]
         public DateTime CreationDate { get; set; }
 
+        [JsonPropertyName("projects")]
+        public List<Project> Projects { get; set; } = new List<Project>();
+
         [JsonPropertyName("metadatas")]
         public List<Metadata> Metadatas { get; set; } = new List<Metadata>();
 

@@ -1,6 +1,28 @@
 {
   "schemaVersion": "v0.1.0-alpha4",
   "creationDate": "2021-02-18T23:29:24.5538603Z",
+  "projects": [
+    {
+      "name": "CafModelingRegionalSoilConditioningIndex",
+      "description": "TestDescription"
+    },
+    {
+      "name": "CafPlantGridPointSurvey",
+      "description": "# Project Summary\r\n\r\n## Overview\r\n\r\nBlah blah blah blah.\r\n\r\n- This person\r\n- Then we do this\r\n- Then this\r\n\r\n## Reponsible party\r\n\r\n- This name \u003Cbob@bob.com\u003E\r\n- Bob Boberson \u003Cbob@bob.com\u003E\r\n"
+    },
+    {
+      "name": "CookEastGeophysicalEM38",
+      "description": "TestDescription"
+    },
+    {
+      "name": "CookEastWaterQualitySubsurfaceTransportDrp",
+      "description": "TestDescription"
+    },
+    {
+      "name": "CafModelingAgroecologicalClasses",
+      "description": "Testing advanced markup\nHere is a link: [Caf blog](https://www.cafltar.org/blog/posts/2018/march/flexcroppingspringcanola/)\n\nHere is an image:\n![](https://www.cafltar.org/media/1037/feb1-precip-diff.png?width=500&height=468.125)"
+    }
+  ],
   "metadatas": [
     {
       "schemaVersion": "v0.1.0-alpha4",

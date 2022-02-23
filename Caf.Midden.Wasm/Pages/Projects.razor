@@ -1,5 +1,6 @@
 ﻿@page "/catalog/projects"
 @inject Services.StateContainer State
+@inject NavigationManager NavManager
 
 <Breadcrumb Style="margin:16px 0;">
     <BreadcrumbItem>
@@ -18,9 +19,11 @@
 </Breadcrumb>
 
 <div class="site-layout-background">
+    <CatalogLoader />
     <PageHeader Class="site-page-header"
                 Title="Projects" />
-    <p>Coming soon...</p>
+    
+    <FilteredCatalogProjectViewer />
 </div>
 
 
