@@ -8,7 +8,7 @@
     },
     {
       "name": "CafPlantGridPointSurvey",
-      "description": "---\nauthor:\t\t        Bryan Carlson  \nrevision-date:\t\t12/12/2018\n---\n\n# Project Description\n\n## Title\nCafPlantGridPointSurvey\n\n## Purpose\nOrganize and process yield and biomass survey data collected from georeferenced points located on fields; CookEast, CookWest, BoydNorth, BoydSouth\n\n## Contributors\n* Bryan Carlson [bryan.carlson@ars.usda.gov]\n\n## Current status\nIncomplete\n\n## Starting date\n8/30/2017\n\n## Expected completion date\nOn-going\n\n## Actual completion date"
+      "description": "# Project Summary\r\n\r\n## Overview\r\n\r\nBlah blah blah blah.\r\n\r\n- This person\r\n- Then we do this\r\n- Then this\r\n\r\n## Reponsible party\r\n\r\n- This name \u003Cbob@bob.com\u003E\r\n- Bob Boberson \u003Cbob@bob.com\u003E\r\n"
     },
     {
       "name": "CookEastGeophysicalEM38",
