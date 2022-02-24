@@ -77,5 +77,8 @@ namespace Caf.Midden.Core.Models.v0_2
 
         [JsonPropertyName("derivedWorks")]
         public List<string>? DerivedWorks { get; set; } = new List<string>();
+
+        [JsonPropertyName("parentDatasets")]
+        public List<string>? ParentDatasets { get; set; } = new List<string>();
     }
 }
