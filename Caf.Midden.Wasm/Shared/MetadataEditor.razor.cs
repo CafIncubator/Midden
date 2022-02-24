@@ -320,9 +320,38 @@ namespace Caf.Midden.Wasm.Shared
         }
         #endregion
 
+        #region Parent Datasets
+        private string NewParentDataset { get; set; }
+
+        private void AddParentDataset(string parentDataset)
+        {
+            if (!string.IsNullOrWhiteSpace(parentDataset) &&
+                !IsDuplicateParentDataset(parentDataset))
+            {
+                State.MetadataEdit.Dataset.ParentDatasets.Add(parentDataset);
+                NewParentDataset = "";
+            }
+        }
+        private bool IsDuplicateParentDataset(string parentDataset)
+        {
+            var dup = State.MetadataEdit.Dataset.ParentDatasets.Find(p => p == parentDataset);
+            if (string.IsNullOrEmpty(dup))
+                return false;
+            else { return true; }
+        }
+
+        private void AddParentDatasetHandler()
+        {
+            AddParentDataset(NewParentDataset);
+        }
+        private void DeleteParentDatasetHandler(string parentDataset)
+        {
+            State.MetadataEdit.Dataset.ParentDatasets.Remove(parentDataset);
+        }
+        #endregion
+
         #region Derived Works
         private string NewDerivedWork { get; set; }
-
 
         private void AddDerivedWork(string derived)
         {
