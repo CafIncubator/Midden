@@ -13,23 +13,24 @@ namespace Caf.Midden.Core.Services.Metadata
             this.converter = converter;
         }
 
-        public Models.v0_1.Metadata Parse(
+        public Models.v0_2.Metadata Parse(
             string json)
         {
             string version = GetVersion(json);
-            Models.v0_1.Metadata result = version switch
+            Models.v0_2.Metadata result = version switch
             {
                 "v0.1.0-alpha1" or 
                 "v0.1.0-alpha2" or 
                 "v0.1.0-alpha3" => Deserialize_v0_1_0alpha3(json),
                 "v0.1.0-alpha4" or
-                "v0.1"          => Deserialize_v0_1(json),
+                "v0.1"          or
+                "v0.2"          => Deserialize_v0_2(json),
                 _ => throw new ArgumentException("Unable to parse JSON"),
             };
             return result;
         }
 
-        private Models.v0_1.Metadata Deserialize_v0_1_0alpha3(
+        private Models.v0_2.Metadata Deserialize_v0_1_0alpha3(
             string json)
         {
             JsonSerializerOptions options = new JsonSerializerOptions()
@@ -45,12 +46,12 @@ namespace Caf.Midden.Core.Services.Metadata
             Models.v0_1_0alpha3.Metadata m = 
                 JsonSerializer.Deserialize<Models.v0_1_0alpha3.Metadata>(
                     json, options);
-            Models.v0_1.Metadata result = 
+            Models.v0_2.Metadata result = 
                 converter.Convert(m);
 
             return result;
         }
-        private Models.v0_1.Metadata Deserialize_v0_1(
+        private Models.v0_2.Metadata Deserialize_v0_2(
             string json)
         {
             JsonSerializerOptions options = new JsonSerializerOptions()
@@ -63,10 +64,10 @@ namespace Caf.Midden.Core.Services.Metadata
                     .UnsafeRelaxedJsonEscaping
             };
 
-            Models.v0_1.Metadata m = 
-                JsonSerializer.Deserialize<Models.v0_1.Metadata>(
+            Models.v0_2.Metadata m = 
+                JsonSerializer.Deserialize<Models.v0_2.Metadata>(
                     json, options);
-            Models.v0_1.Metadata result = 
+            Models.v0_2.Metadata result = 
                 converter.Convert(m);
 
             return result;

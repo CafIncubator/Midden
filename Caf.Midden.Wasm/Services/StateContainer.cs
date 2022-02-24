@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Caf.Midden.Core.Models.v0_1;
+using Caf.Midden.Core.Models.v0_2;
 using Microsoft.AspNetCore.Components;
 
 namespace Caf.Midden.Wasm.Services

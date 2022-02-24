@@ -54,7 +54,7 @@
                     <br />
                     @if (context.Dataset.Contacts.Count > 0)
                     {
-                        <AntDesign.Table TItem="Caf.Midden.Core.Models.v0_1.Person"
+                        <AntDesign.Table TItem="Caf.Midden.Core.Models.v0_2.Person"
                                             DataSource="@context.Dataset.Contacts"
                                             HidePagination="@true">
                             <ChildContent Context="contact">
@@ -147,7 +147,7 @@
                     <br />
                     @if (context.Dataset.Variables.Count > 0)
                     {
-                        <AntDesign.Table TItem="Caf.Midden.Core.Models.v0_1.Variable"
+                        <AntDesign.Table TItem="Caf.Midden.Core.Models.v0_2.Variable"
                                             DataSource="@context.Dataset.Variables"
                                             Size="@TableSize.Small"
                                             ScrollX="1400"
@@ -276,7 +276,8 @@
                     <InputGroup>
                         <Row Justify="space-between">
                             <AntDesign.Col Span="20">
-                                <Input @bind-Value="NewDatasetMethod" />
+                                <Input @bind-Value="NewDatasetMethod"
+                                    Placeholder="Enter URL, text, or markdown"/>
                             </AntDesign.Col>
                             <AntDesign.Col Span="4">
                                 <Button OnClick="AddDatasetMethodHandler">Add</Button>
@@ -292,6 +293,34 @@
                                 <ListItem>
                                     <span><Text>@method</Text></span>
                                     <Button Danger OnClick="() => DeleteDatasetMethodHandler(method)">
+                                        <Icon Type="delete" />
+                                    </Button>
+                                </ListItem>
+                            </ChildContent>
+                        </AntList>
+                    }
+                </FormItem>
+
+                <FormItem Label="Parent Datasets">
+                    <InputGroup>
+                        <Row Justify="space-between">
+                            <AntDesign.Col Span="20">
+                                <Input @bind-Value="NewParentDataset"
+                                    Placeholder="Enter URL"/>
+                            </AntDesign.Col>
+                            <AntDesign.Col Span="4">
+                                <Button OnClick="AddParentDatasetHandler">Add</Button>
+                            </AntDesign.Col>
+                        </Row>
+                    </InputGroup>
+                    <br />
+                    @if (context.Dataset.ParentDatasets.Count > 0)
+                    {
+                        <AntList DataSource="@context.Dataset.ParentDatasets">
+                            <ChildContent Context="parentDataset">
+                                <ListItem>
+                                    <span><Text>@parentDataset</Text></span>
+                                    <Button Danger OnClick="() => DeleteParentDatasetHandler(parentDataset)">
                                         <Icon Type="delete" />
                                     </Button>
                                 </ListItem>
@@ -326,6 +355,7 @@
                         </AntList>
                     }
                 </FormItem>
+
             </TabPane>
         </Tabs>
     </AntDesign.Form>

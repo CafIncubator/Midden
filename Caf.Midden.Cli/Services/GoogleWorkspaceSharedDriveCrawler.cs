@@ -5,7 +5,7 @@ using Azure.Storage.Files.DataLake;
 using Azure.Storage.Files.DataLake.Models;
 using Caf.Midden.Cli.Common;
 using Caf.Midden.Cli.Models;
-using Caf.Midden.Core.Models.v0_1;
+using Caf.Midden.Core.Models.v0_2;
 using Caf.Midden.Core.Services.Metadata;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Drive.v3;

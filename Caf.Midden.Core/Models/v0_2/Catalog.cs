@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace Caf.Midden.Core.Models.v0_1
+namespace Caf.Midden.Core.Models.v0_2
 {
     public class Catalog
     {
@@ -15,12 +15,15 @@ namespace Caf.Midden.Core.Models.v0_1
         [JsonPropertyName("creationDate")]
         public DateTime CreationDate { get; set; }
 
+        [JsonPropertyName("projects")]
+        public List<Project> Projects { get; set; } = new List<Project>();
+
         [JsonPropertyName("metadatas")]
         public List<Metadata> Metadatas { get; set; } = new List<Metadata>();
 
         public Catalog()
         {
-            this.SchemaVersion = "v0.1";
+            this.SchemaVersion = "v0.2";
         }
     }
 }

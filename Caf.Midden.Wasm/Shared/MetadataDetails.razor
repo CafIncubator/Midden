@@ -37,6 +37,22 @@
                 </AntDesign.Col>
             </Row>
             <Row>
+                <AntDesign.Col Span="@((Metadata.Dataset.ParentDatasets == null) || (!Metadata.Dataset.ParentDatasets.Any()) ? 0 : 24)" Style="padding:5px">
+                    <AntList Bordered DataSource="@Metadata.Dataset.ParentDatasets">
+                        <Header>
+                            <Icon Type="comment" Theme="outline" /> Parent Datasets
+                        </Header>
+                        <ChildContent Context="parentDataset">
+                            <ListItem Style="overflow:auto;">
+                                <textarea readonly
+                                          rows="@(string.IsNullOrEmpty(parentDataset) ? 1 : parentDataset.Split('\n').Length + 1)"
+                                          style="width:100%; border:none;">@parentDataset</textarea>
+                            </ListItem>
+                        </ChildContent>
+                    </AntList>
+                </AntDesign.Col>
+            </Row>
+            <Row>
                 <AntDesign.Col Span="@((Metadata.Dataset.DerivedWorks == null) || (!Metadata.Dataset.DerivedWorks.Any()) ? 0 : 24)" Style="padding:5px">
                     <AntList Bordered DataSource="@Metadata.Dataset.DerivedWorks">
                         <Header>
@@ -79,7 +95,7 @@
                         <Body>
                             @if (Metadata.Dataset.Variables?.Count > 0)
                             {
-                                <AntDesign.Table TItem="Caf.Midden.Core.Models.v0_1.Variable"
+                                <AntDesign.Table TItem="Caf.Midden.Core.Models.v0_2.Variable"
                                                  DataSource="@Metadata.Dataset.Variables"
                                                  Size="@TableSize.Small"
                                                  ScrollX="@Convert.ToString(TableWidth)"
@@ -198,7 +214,7 @@
                             <Icon Type="user" Theme="outline" /> Contacts
                         </TitleTemplate>
                         <Body>
-                            <AntDesign.Table TItem="Caf.Midden.Core.Models.v0_1.Person"
+                            <AntDesign.Table TItem="Caf.Midden.Core.Models.v0_2.Person"
                                              DataSource="@Metadata.Dataset.Contacts"
                                              HidePagination="@true">
                                 <ChildContent Context="contact">
