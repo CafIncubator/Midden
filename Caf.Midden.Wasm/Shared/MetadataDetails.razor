@@ -13,9 +13,14 @@
                             <Icon Type="read" Theme="outline" /> Description
                         </TitleTemplate>
                         <Body>
-                            <textarea readonly
-                                      rows="@(string.IsNullOrEmpty(Metadata.Dataset.Description) ? 1 : Metadata.Dataset.Description.Split('\n').Length + 2)"
-                                      style="width:100%; border:none;">@Metadata.Dataset.Description</textarea>
+                        @if (!String.IsNullOrEmpty(Metadata.Dataset.Description))
+                        {
+                            @((MarkupString)(Markdig.Markdown.ToHtml(Metadata.Dataset.Description, pipeline)))
+                        }
+                        else
+                        {
+                            <Empty Simple />
+                        }
                         </Body>
                     </Card>
                 </AntDesign.Col>
