@@ -1,5 +1,6 @@
 ﻿using Caf.Midden.Cli.Common;
 using Caf.Midden.Core.Models.v0_2;
+using Caf.Midden.Core.Services;
 using Caf.Midden.Core.Services.Metadata;
 using System;
 using System.Collections.Generic;
@@ -39,15 +40,12 @@ namespace Caf.Midden.Cli.Services
         }
 
 
-        public List<Metadata> GetMetadatas()
+        public List<Metadata> GetMetadatas(
+            IMetadataParser parser)
         {
             var files = GetFileNames(MIDDEN_FILE_EXTENSION);
 
             List<Metadata> metadatas = new List<Metadata>();
-
-            MetadataParser parser =
-                new MetadataParser(
-                    new MetadataConverter());
 
             foreach (var file in files)
             {
@@ -65,7 +63,8 @@ namespace Caf.Midden.Cli.Services
             return metadatas;
         }
 
-        public List<Project> GetProjects()
+        public List<Project> GetProjects(
+            ProjectReader reader)
         {
             var files = GetFileNames(MIPPEN_FILE_EXTENSION);
 
