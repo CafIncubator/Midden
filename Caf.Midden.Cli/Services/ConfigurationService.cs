@@ -18,19 +18,21 @@ namespace Caf.Midden.Cli.Services
             WriteIndented = true
         };
         
-        public CliConfiguration? GetConfiguration()
+        public CliConfiguration? GetConfiguration(
+            string configPath = CONFIG_FILE)
         {
-            if (!File.Exists(CONFIG_FILE))
+            if (!File.Exists(configPath))
                 return null;
 
-            string json = File.ReadAllText(CONFIG_FILE);
+            string json = File.ReadAllText(configPath);
             CliConfiguration? config = 
                 JsonSerializer.Deserialize<CliConfiguration>(json, jsonOptions);
 
             return config;
         }
 
-        public void CreateConfiguration()
+        public void CreateConfiguration(
+            string configPath = CONFIG_FILE)
         {
             CliConfiguration config = new CliConfiguration()
             {
@@ -46,7 +48,7 @@ namespace Caf.Midden.Cli.Services
             };
 
             File.WriteAllText(
-                CONFIG_FILE,
+                configPath,
                 JsonSerializer.Serialize(config, jsonOptions));
         }
     }
