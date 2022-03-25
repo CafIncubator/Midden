@@ -24,6 +24,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Assets\CliConfigurationSecrets\AzureDataLakeProjectTest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\CliConfigurationSecrets\GoogleWorkspaceSharedDriveProjectTest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\CliConfigurationSecrets\LocalFileSystemProjectTest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\MockDataStoreLocal\Production\DESCRIPTION.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Assets\MockDataStoreLocal\Production\DynamicAec_v1.midden">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -31,6 +43,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Assets\MockDataStoreLocal\Raw\CookEastMet_V40826.midden">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\MockDataStoreLocal\Raw\DESCRIPTION.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Assets\MockDataStoreLocal\Raw\wepsV5_2.midden">

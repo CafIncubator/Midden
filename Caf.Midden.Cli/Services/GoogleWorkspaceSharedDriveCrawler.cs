@@ -136,7 +136,8 @@ namespace Caf.Midden.Cli.Services
 
         // Gets a list of Google File Ids for files in Shared Drives with the extension ".midden"
         // Limited to searching 100 shared drives and returning 100 midden files within each shared drive (TODO: Update paging to support more)
-        public List<string> GetFileNames(string fileExtension = MIDDEN_FILE_EXTENSION)
+        public List<string> GetFileNames(
+            string fileNameContains = MIDDEN_FILE_EXTENSION)
         {
             List<string> names = new List<string>();
 
@@ -156,7 +157,7 @@ namespace Caf.Midden.Cli.Services
                     listRequest.IncludeItemsFromAllDrives = true;
                     listRequest.SupportsAllDrives = true;
                     listRequest.Corpora = "drive";
-                    listRequest.Q = $"name contains '{fileExtension}'";
+                    listRequest.Q = $"name contains '{fileNameContains}'";
 
                     IList<Google.Apis.Drive.v3.Data.File> files = listRequest.Execute().Files;
 
@@ -164,7 +165,7 @@ namespace Caf.Midden.Cli.Services
                     {
                         foreach (var file in files)
                         {
-                            if(file.Name.EndsWith(fileExtension))
+                            if(file.Name.EndsWith(fileNameContains))
                             {
                                 Console.WriteLine($"  In {drive.Name} found {file.Name}");
                                 names.Add(file.Id);
@@ -180,7 +181,10 @@ namespace Caf.Midden.Cli.Services
         }
 
         
-        public List<Google.Apis.Drive.v3.Data.File> GetFiles(string fileExtension)
+        public List<Google.Apis.Drive.v3.Data.File> GetFiles(
+            string fileNameContains = MIDDEN_FILE_EXTENSION,
+            bool fileNameContainsIsExactMatch = false,
+            string? fileNameEndsWith = null)
         {
             List<Google.Apis.Drive.v3.Data.File> files = new List<Google.Apis.Drive.v3.Data.File>();
 
@@ -200,18 +204,42 @@ namespace Caf.Midden.Cli.Services
                     listRequest.IncludeItemsFromAllDrives = true;
                     listRequest.SupportsAllDrives = true;
                     listRequest.Corpora = "drive";
-                    listRequest.Q = $"name contains '{fileExtension}'";
+
+                    string searchQuery;
+                    if (fileNameContainsIsExactMatch)
+                        searchQuery = $"name = '{fileNameContains}'";
+                    else
+                        searchQuery = $"name contains '{fileNameContains}'";
+
+                    listRequest.Q = searchQuery;
 
                     List<Google.Apis.Drive.v3.Data.File> dirFiles = listRequest.Execute().Files.ToList();
 
                     if (dirFiles != null && dirFiles.Count > 0)
                     {
-                        foreach (var file in dirFiles)
+                        if(string.IsNullOrEmpty(fileNameEndsWith))
                         {
-                            Console.WriteLine($"  In {drive.Name} found {file.Name}");
+                            foreach (var file in dirFiles)
+                            {
+                                Console.WriteLine($"  In {drive.Name} found {file.Name}");
 
-                            files.Add(file);
+                                files.Add(file);
+                            }
                         }
+                        else
+                        {
+                            foreach (var file in dirFiles)
+                            {
+                                if(file.Name.EndsWith(fileNameEndsWith))
+                                {
+                                    Console.WriteLine($"  In {drive.Name} found {file.Name}");
+
+                                    files.Add(file);
+                                }
+                                
+                            }
+                        }
+                        
                     }
                 }
             }
@@ -222,7 +250,10 @@ namespace Caf.Midden.Cli.Services
         public List<Metadata> GetMetadatas(
             IMetadataParser parser)
         {
-            List<Google.Apis.Drive.v3.Data.File> files = GetFiles(MIDDEN_FILE_EXTENSION);
+            List<Google.Apis.Drive.v3.Data.File> files = GetFiles(
+                MIDDEN_FILE_EXTENSION,
+                false,
+                MIDDEN_FILE_EXTENSION);
 
             List<Metadata> metadatas = new List<Metadata>();
 
@@ -266,43 +297,41 @@ namespace Caf.Midden.Cli.Services
         public List<Project> GetProjects(
             ProjectReader reader)
         {
-            List<Google.Apis.Drive.v3.Data.File> files = GetFiles(MIPPEN_FILE_SEARCH_TERM);
+            List<Google.Apis.Drive.v3.Data.File> files = GetFiles(
+                MIPPEN_FILE_SEARCH_TERM,
+                true,
+                ".md");
 
             List<Project> projects = new List<Project>();
 
             foreach (var file in files)
             {
-                //string fileString;
+                string fileString;
 
-                //using (MemoryStream ms = new MemoryStream())
-                //{
-                //    var fileRequest = service.Files.Get(file.Id);
-                //    fileRequest.Download(ms);
-                //    fileString = Encoding.UTF8.GetString(ms.ToArray());
-                //}
+                 //Option 1
+                Project project;
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    var fileRequest = service.Files.Get(file.Id);
+                    fileRequest.Download(ms);
+                    fileString = Encoding.UTF8.GetString(ms.ToArray());
 
+                    // Google's API threw an error when passing the stream directly to Read() (also used ExecuteAsStream())
+                    byte[] byteArray = Encoding.UTF8.GetBytes(fileString);
+                    MemoryStream stream = new MemoryStream(byteArray);
+                    project = reader.Read(stream);
+                }
+
+                /* Option 2 (
                 Project project;
                 var fileRequest = service.Files.Get(file.Id);
                 using (var stream = fileRequest.ExecuteAsStream())
                 {
                     project = reader.Read(stream);
                 }
+                */
 
-
-                //Project project;
-                //try
-                //{
-                //    project = new Project()
-                //    {
-                //        Name = file.Name.Replace(MIPPEN_FILE_EXTENSION, ""),
-                //        Description = fileString
-                //    };
-                //}
-                //catch // Probably not a good idea
-                //{
-                //    continue;
-                //}
-                if(project is not null)
+                if (project is not null)
                     projects.Add(project);
             }
 
