@@ -109,7 +109,7 @@ namespace Caf.Midden.Cli.Actions
 
                 Console.WriteLine($"Crawling Data Store: {currStore.Name}");
 
-                ICrawl crawler = null;
+                ICrawl? crawler = null;
                 switch (currStore.Type)
                 {
                     case DataStoreTypes.LocalFileSystem:
