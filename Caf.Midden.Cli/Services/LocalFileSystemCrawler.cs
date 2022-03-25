@@ -1,5 +1,6 @@
 ﻿using Caf.Midden.Cli.Common;
 using Caf.Midden.Core.Models.v0_2;
+using Caf.Midden.Core.Services;
 using Caf.Midden.Core.Services.Metadata;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ namespace Caf.Midden.Cli.Services
     public class LocalFileSystemCrawler: ICrawl
     {
         private const string MIDDEN_FILE_EXTENSION = ".midden";
-        private const string MIPPEN_FILE_EXTENSION = ".mippen";
+        private const string MIPPEN_FILE_SEARCH_TERM = "DESCRIPTION.md";
 
         private readonly string rootDirectory;
         public LocalFileSystemCrawler(string rootDirectory)
@@ -39,15 +40,12 @@ namespace Caf.Midden.Cli.Services
         }
 
 
-        public List<Metadata> GetMetadatas()
+        public List<Metadata> GetMetadatas(
+            IMetadataParser parser)
         {
             var files = GetFileNames(MIDDEN_FILE_EXTENSION);
 
             List<Metadata> metadatas = new List<Metadata>();
-
-            MetadataParser parser =
-                new MetadataParser(
-                    new MetadataConverter());
 
             foreach (var file in files)
             {
@@ -65,23 +63,23 @@ namespace Caf.Midden.Cli.Services
             return metadatas;
         }
 
-        public List<Project> GetProjects()
+        public List<Project> GetProjects(
+            ProjectReader reader)
         {
-            var files = GetFileNames(MIPPEN_FILE_EXTENSION);
+            var files = GetFileNames(MIPPEN_FILE_SEARCH_TERM);
 
             List<Project> projects = new List<Project>();
 
             foreach (var file in files)
             {
-                string fileString = File.ReadAllText(file);
-
-                Project project = new Project()
+                Project project;
+                using(var stream = File.OpenRead(file))
                 {
-                    Name = Path.GetFileName(file).Replace(MIPPEN_FILE_EXTENSION, ""),
-                    Description = fileString
-                };
-
-                projects.Add(project);
+                    project = reader.Read(stream);
+                }
+ 
+                if(project is not null)
+                    projects.Add(project);
             }
 
             return projects;

@@ -2,6 +2,8 @@
 using Caf.Midden.Cli.Models;
 using Caf.Midden.Cli.Services;
 using Caf.Midden.Core.Models.v0_2;
+using Caf.Midden.Core.Services;
+using Caf.Midden.Core.Services.Metadata;
 using System;
 using System.Collections.Generic;
 using System.CommandLine;
@@ -107,7 +109,7 @@ namespace Caf.Midden.Cli.Actions
 
                 Console.WriteLine($"Crawling Data Store: {currStore.Name}");
 
-                ICrawl crawler = null;
+                ICrawl? crawler = null;
                 switch (currStore.Type)
                 {
                     case DataStoreTypes.LocalFileSystem:
@@ -190,12 +192,16 @@ namespace Caf.Midden.Cli.Actions
                         break;
                 }
 
-                var metadatas = crawler?.GetMetadatas();
+                var metadatas = crawler?.GetMetadatas(
+                    new MetadataParser(
+                        new MetadataConverter()));
 
-                List<Project> projects = new List<Project>();
+                List<Project>? projects = new List<Project>();
                 if(currStore.ShouldCollateProjects is true)
                 {
-                    projects = crawler?.GetProjects();
+                    projects = crawler?.GetProjects(
+                        new ProjectReader(
+                            new ProjectParser()));
                 }
 
                 if(metadatas != null)
@@ -205,7 +211,7 @@ namespace Caf.Midden.Cli.Actions
                     if (middenMetadatas != null) middenMetadatas.AddRange(metadatas);
                 }
 
-                if(projects.Count > 0)
+                if(projects?.Count > 0)
                 {
                     if (mippenProjects != null) mippenProjects.AddRange(projects);
                 }
@@ -219,7 +225,11 @@ namespace Caf.Midden.Cli.Actions
             };
 
             Console.WriteLine($"Writing output to {outdir}");
-            File.WriteAllText(outdir, JsonSerializer.Serialize(catalog));
+            JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+            };
+            File.WriteAllText(outdir, JsonSerializer.Serialize(catalog, jsonSerializerOptions));
         }
     
         private void AppendDataStoreNameToPath(
