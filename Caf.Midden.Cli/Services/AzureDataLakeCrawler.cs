@@ -125,7 +125,7 @@ namespace Caf.Midden.Cli.Services
         }
 
         public List<Project> GetProjects(
-            ProjectReader projectReader)
+            ProjectReader reader)
         {
             List<string> fileNames = GetFileNames(MIPPEN_FILE_SEARCH_TERM);
 
@@ -144,10 +144,10 @@ namespace Caf.Midden.Cli.Services
                 Project project;
                 using (var stream = fileClient.OpenRead())
                 {
-                    project = projectReader.ReadAsync(stream);
+                    project = reader.Read(stream);
                 }
 
-                if(project != null)
+                if(project is not null)
                     projects.Add(project);
             }
 

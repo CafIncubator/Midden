@@ -22,7 +22,7 @@ namespace Caf.Midden.Core.Tests
             Models.v0_2.Project actual;
             using (Stream stream = File.OpenRead(filePath))
             {
-                actual = sut.ReadAsync(stream);
+                actual = sut.Read(stream);
             }
 
             Assert.Null(actual);
@@ -38,7 +38,7 @@ namespace Caf.Midden.Core.Tests
             Models.v0_2.Project actual;
             using (Stream stream = File.OpenRead(filePath))
             {
-                actual = sut.ReadAsync(stream);
+                actual = sut.Read(stream);
             }
 
             Assert.Null(actual);
@@ -54,7 +54,7 @@ namespace Caf.Midden.Core.Tests
             Models.v0_2.Project actual;
             using (Stream stream = File.OpenRead(filePath))
             {
-                actual = sut.ReadAsync(stream);
+                actual = sut.Read(stream);
             }
 
             Assert.Null(actual);
@@ -70,7 +70,7 @@ namespace Caf.Midden.Core.Tests
             Models.v0_2.Project actual;
             using (Stream stream = File.OpenRead(filePath))
             {
-                actual = sut.ReadAsync(stream);
+                actual = sut.Read(stream);
             }
 
             Assert.NotNull(actual);
@@ -88,7 +88,7 @@ namespace Caf.Midden.Core.Tests
             Models.v0_2.Project actual;
             using (Stream stream = File.OpenRead(filePath))
             {
-                actual = sut.ReadAsync(stream);
+                actual = sut.Read(stream);
             }
 
             Assert.NotNull(actual);

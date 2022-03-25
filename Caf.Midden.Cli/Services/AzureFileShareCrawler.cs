@@ -15,7 +15,7 @@ namespace Caf.Midden.Cli.Services
     public class AzureFileShareCrawler : ICrawl
     {
         private const string MIDDEN_FILE_EXTENSION = ".midden";
-        private const string MIPPEN_FILE_EXTENSION = ".mippen";
+        private const string MIPPEN_FILE_SEARCH_TERM = "DESCRIPTION.md";
 
         private readonly string uri;
         private readonly string path;
@@ -159,25 +159,33 @@ namespace Caf.Midden.Cli.Services
                         {
                             remaining.Enqueue(dir.GetSubdirectoryClient(item.Name));
                         }
-                        else if (item.Name.Contains(MIPPEN_FILE_EXTENSION))
+                        else if (item.Name.Contains(MIPPEN_FILE_SEARCH_TERM))
                         {
                             Console.WriteLine($"  In {dir.Uri.AbsolutePath} found {item.Name}");
 
                             ShareFileClient file = dir.GetFileClient(item.Name);
 
                             ShareFileDownloadInfo fileContents = file.Download();
-                            string fileString;
-                            using (MemoryStream ms = new MemoryStream())
+                            Project project;
+                            using (var stream = fileContents.Content)
                             {
-                                fileContents.Content.CopyTo(ms);
-                                fileString = Encoding.UTF8.GetString(ms.ToArray());
+                                project = reader.Read(stream);
                             }
 
-                            Project project = new Project()
-                            {
-                                Name = file.Name.Replace(MIPPEN_FILE_EXTENSION, ""),
-                                Description = fileString
-                            };
+                            if(project is not null)
+                                projects.Add(project);
+                            //string fileString;
+                            //using (MemoryStream ms = new MemoryStream())
+                            //{
+                            //    fileContents.Content.CopyTo(ms);
+                            //    fileString = Encoding.UTF8.GetString(ms.ToArray());
+                            //}
+                            //
+                            //Project project = new Project()
+                            //{
+                            //    Name = file.Name.Replace(MIPPEN_FILE_EXTENSION, ""),
+                            //    Description = fileString
+                            //};
                         }
                     }
                 }

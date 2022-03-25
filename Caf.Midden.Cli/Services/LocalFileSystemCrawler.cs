@@ -14,7 +14,7 @@ namespace Caf.Midden.Cli.Services
     public class LocalFileSystemCrawler: ICrawl
     {
         private const string MIDDEN_FILE_EXTENSION = ".midden";
-        private const string MIPPEN_FILE_EXTENSION = ".mippen";
+        private const string MIPPEN_FILE_SEARCH_TERM = "DESCRIPTION.md";
 
         private readonly string rootDirectory;
         public LocalFileSystemCrawler(string rootDirectory)
@@ -66,21 +66,20 @@ namespace Caf.Midden.Cli.Services
         public List<Project> GetProjects(
             ProjectReader reader)
         {
-            var files = GetFileNames(MIPPEN_FILE_EXTENSION);
+            var files = GetFileNames(MIPPEN_FILE_SEARCH_TERM);
 
             List<Project> projects = new List<Project>();
 
             foreach (var file in files)
             {
-                string fileString = File.ReadAllText(file);
-
-                Project project = new Project()
+                Project project;
+                using(var stream = File.OpenRead(file))
                 {
-                    Name = Path.GetFileName(file).Replace(MIPPEN_FILE_EXTENSION, ""),
-                    Description = fileString
-                };
-
-                projects.Add(project);
+                    project = reader.Read(stream);
+                }
+ 
+                if(project is not null)
+                    projects.Add(project);
             }
 
             return projects;

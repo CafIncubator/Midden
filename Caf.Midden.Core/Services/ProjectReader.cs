@@ -18,7 +18,7 @@ namespace Caf.Midden.Core.Services
             this.parser = parser;
         }
 
-        public Project ReadAsync(
+        public Project Read(
             Stream stream)
         {
             Project project;

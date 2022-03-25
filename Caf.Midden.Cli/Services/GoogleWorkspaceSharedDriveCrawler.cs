@@ -25,7 +25,7 @@ namespace Caf.Midden.Cli.Services
     public class GoogleWorkspaceSharedDriveCrawler : ICrawl
     {
         private const string MIDDEN_FILE_EXTENSION = ".midden";
-        private const string MIPPEN_FILE_EXTENSION = ".mippen";
+        private const string MIPPEN_FILE_SEARCH_TERM = "DESCRIPTION.md";
 
         string[] Scopes = { DriveService.Scope.DriveReadonly };
 
@@ -266,36 +266,44 @@ namespace Caf.Midden.Cli.Services
         public List<Project> GetProjects(
             ProjectReader reader)
         {
-            List<Google.Apis.Drive.v3.Data.File> files = GetFiles(MIPPEN_FILE_EXTENSION);
+            List<Google.Apis.Drive.v3.Data.File> files = GetFiles(MIPPEN_FILE_SEARCH_TERM);
 
             List<Project> projects = new List<Project>();
 
             foreach (var file in files)
             {
-                string fileString;
+                //string fileString;
 
-                using (MemoryStream ms = new MemoryStream())
-                {
-                    var fileRequest = service.Files.Get(file.Id);
-                    fileRequest.Download(ms);
-                    fileString = Encoding.UTF8.GetString(ms.ToArray());
-                }
+                //using (MemoryStream ms = new MemoryStream())
+                //{
+                //    var fileRequest = service.Files.Get(file.Id);
+                //    fileRequest.Download(ms);
+                //    fileString = Encoding.UTF8.GetString(ms.ToArray());
+                //}
 
                 Project project;
-                try
+                var fileRequest = service.Files.Get(file.Id);
+                using (var stream = fileRequest.ExecuteAsStream())
                 {
-                    project = new Project()
-                    {
-                        Name = file.Name.Replace(MIPPEN_FILE_EXTENSION, ""),
-                        Description = fileString
-                    };
-                }
-                catch // Probably not a good idea
-                {
-                    continue;
+                    project = reader.Read(stream);
                 }
 
-                projects.Add(project);
+
+                //Project project;
+                //try
+                //{
+                //    project = new Project()
+                //    {
+                //        Name = file.Name.Replace(MIPPEN_FILE_EXTENSION, ""),
+                //        Description = fileString
+                //    };
+                //}
+                //catch // Probably not a good idea
+                //{
+                //    continue;
+                //}
+                if(project is not null)
+                    projects.Add(project);
             }
 
             return projects;
