@@ -35,7 +35,7 @@ namespace Caf.Midden.Core.Services.Metadata
         {
             JsonSerializerOptions options = new JsonSerializerOptions()
             {
-                IgnoreNullValues = true,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                 WriteIndented = true,
                 Converters = { new JsonStringEnumConverter() },
                 Encoder = System.Text.Encodings.Web
@@ -56,7 +56,7 @@ namespace Caf.Midden.Core.Services.Metadata
         {
             JsonSerializerOptions options = new JsonSerializerOptions()
             {
-                IgnoreNullValues = true,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                 WriteIndented = true,
                 Converters = { new JsonStringEnumConverter() },
                 Encoder = System.Text.Encodings.Web

@@ -492,7 +492,7 @@ namespace Caf.Midden.Wasm.Shared
         {
             JsonSerializerOptions options = new JsonSerializerOptions()
             {
-                IgnoreNullValues = true,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                 WriteIndented = true,
                 Converters = { new JsonStringEnumConverter() },
                 Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping

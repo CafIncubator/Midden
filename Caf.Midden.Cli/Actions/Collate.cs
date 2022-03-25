@@ -225,7 +225,11 @@ namespace Caf.Midden.Cli.Actions
             };
 
             Console.WriteLine($"Writing output to {outdir}");
-            File.WriteAllText(outdir, JsonSerializer.Serialize(catalog));
+            JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+            };
+            File.WriteAllText(outdir, JsonSerializer.Serialize(catalog, jsonSerializerOptions));
         }
     
         private void AppendDataStoreNameToPath(
