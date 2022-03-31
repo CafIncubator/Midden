@@ -1,5 +1,6 @@
 ﻿@page "/catalog"
 @page "/datasets"
+@page "/catalog/datasets"
 @page "/variable-catalog"
 @page "/dataset-catalog"
 
@@ -15,21 +16,14 @@
     <BreadcrumbItem>
         <Icon Type="read" /> Catalog
     </BreadcrumbItem>
+    <BreadcrumbItem>
+        <Icon Type="file-text" /> Datasets
+    </BreadcrumbItem>
+    
 </Breadcrumb>
 
 <div class="site-layout-background">
     <CatalogLoader />
-    <PageHeader Class="site-page-header" Title="Catalog" />
-    <Tabs Type="@TabType.Card">
-        <TabPane Key="1" Tab="Datasets">
-            <FilteredCatalogMetadataViewer />
-        </TabPane>
-        <TabPane Key="2" Tab="Variables">
-            <CatalogVariableViewer />
-        </TabPane>
-        <TabPane Key="3" Tab="Projects">
-            <FilteredCatalogProjectViewer />
-        </TabPane>
-    </Tabs>
-    
+    <PageHeader Class="site-page-header" Title="Dataset Catalog" />
+    <FilteredCatalogMetadataViewer />    
 </div>

@@ -1,4 +1,4 @@
-﻿@page "/catalog/zones/{ZoneName}"
+﻿@page "/catalog/tags/{TagName}"
 @inject Services.StateContainer State
 
 <Breadcrumb Style="margin:16px 0;">
@@ -8,12 +8,15 @@
         </a>
     </BreadcrumbItem>
     <BreadcrumbItem>
-        <a href="catalog">
-            <Icon Type="read" /> Catalog
+        <Icon Type="read" /> Catalog
+    </BreadcrumbItem>
+    <BreadcrumbItem>
+        <a href="catalog/tags">
+            <Icon Type="tag" />
         </a>
     </BreadcrumbItem>
     <BreadcrumbItem>
-        <Icon Type="folder" /> @ZoneName
+         @TagName
     </BreadcrumbItem>
 </Breadcrumb>
 
@@ -21,12 +24,12 @@
     <CatalogLoader />
     <PageHeader Class="site-page-header"
                 Title="Dataset Catalog"
-                Subtitle="Filtered by zone" />
-    <FilteredCatalogMetadataViewer Zone="@ZoneName" />
+                Subtitle="Filtered by tag" />
+    <FilteredCatalogMetadataViewer Tag="@TagName"/>
 </div>
 
 
 @code {
     [Parameter]
-    public string ZoneName { get; set; }
+    public string TagName { get; set; }
 } 

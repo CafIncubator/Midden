@@ -1,5 +1,7 @@
-﻿@page "/catalog/tags"
+﻿@page "/catalog/variables"
+
 @inject Services.StateContainer State
+
 
 <Breadcrumb Style="margin:16px 0;">
     <BreadcrumbItem>
@@ -8,22 +10,16 @@
         </a>
     </BreadcrumbItem>
     <BreadcrumbItem>
-        <a href="catalog">
-            <Icon Type="read" /> Catalog
-        </a>
+        <Icon Type="read" /> Catalog
     </BreadcrumbItem>
     <BreadcrumbItem>
-        <Icon Type="tag" /> Tags
+       <Icon Type="calculator" /> Variables
     </BreadcrumbItem>
+    
 </Breadcrumb>
 
 <div class="site-layout-background">
-    <PageHeader Class="site-page-header"
-                Title="Tags" />
-    <p>Coming soon...</p>
+    <CatalogLoader />
+    <PageHeader Class="site-page-header" Title="Variable Catalog" />
+    <CatalogVariableViewer />    
 </div>
-
-
-@code {
-
-} 

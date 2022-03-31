@@ -1,0 +1,29 @@
+﻿@page "/editor"
+@page "/editor/dataset"
+
+@inject Services.StateContainer State
+
+
+<Breadcrumb Style="margin:16px 0;">
+    <BreadcrumbItem>
+        <a href="">
+            <Icon Type="home" Theme="fill" />
+        </a>
+    </BreadcrumbItem>
+    <BreadcrumbItem>
+        <Icon Type="edit" /> Editor
+    </BreadcrumbItem>
+    <BreadcrumbItem>
+        <Icon Type="dot-chart" /> Dataset
+    </BreadcrumbItem>
+</Breadcrumb>
+
+<div class="site-layout-background">
+    <PageHeader Title="Editor" />
+    <AntDesign.Row Justify="center">
+        <AntDesign.Col Span="18">
+            <MetadataEditor />
+        </AntDesign.Col>
+    </AntDesign.Row>
+    <BackTop></BackTop>
+</div>

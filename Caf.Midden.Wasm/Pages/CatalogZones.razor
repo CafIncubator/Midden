@@ -1,6 +1,5 @@
-﻿@page "/editor"
+﻿@page "/catalog/zones"
 @inject Services.StateContainer State
-
 
 <Breadcrumb Style="margin:16px 0;">
     <BreadcrumbItem>
@@ -9,16 +8,20 @@
         </a>
     </BreadcrumbItem>
     <BreadcrumbItem>
-        <Icon Type="edit" /> Editor
+        <Icon Type="read" /> Catalog
+    </BreadcrumbItem>
+    <BreadcrumbItem>
+        <Icon Type="folder" /> Zones
     </BreadcrumbItem>
 </Breadcrumb>
 
 <div class="site-layout-background">
-    <PageHeader Title="Editor" />
-    <AntDesign.Row Justify="center">
-        <AntDesign.Col Span="18">
-            <MetadataEditor />
-        </AntDesign.Col>
-    </AntDesign.Row>
-    <BackTop></BackTop>
+    <PageHeader Class="site-page-header"
+                Title="Zones" />
+    <p>Coming soon...</p>
 </div>
+
+
+@code {
+
+} 
