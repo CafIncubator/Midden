@@ -1,5 +1,4 @@
-﻿@page "/editor"
-@page "/editor/dataset"
+﻿@page "/editor/dataset"
 
 @inject Services.StateContainer State
 
@@ -11,7 +10,9 @@
         </a>
     </BreadcrumbItem>
     <BreadcrumbItem>
-        <Icon Type="edit" /> Editor
+        <a href="editor">
+            <Icon Type="edit" />
+        </a>
     </BreadcrumbItem>
     <BreadcrumbItem>
         <Icon Type="dot-chart" /> Dataset
@@ -19,7 +20,7 @@
 </Breadcrumb>
 
 <div class="site-layout-background">
-    <PageHeader Title="Editor" />
+    <PageHeader Title="Dataset Editor" />
     <AntDesign.Row Justify="center">
         <AntDesign.Col Span="18">
             <MetadataEditor />

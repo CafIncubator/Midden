@@ -1,0 +1,50 @@
+﻿@page "/catalog"
+
+@inject Services.StateContainer State
+
+
+<Breadcrumb Style="margin:16px 0;">
+    <BreadcrumbItem>
+        <a href="">
+            <Icon Type="home" Theme="fill" />
+        </a>
+    </BreadcrumbItem>
+    <BreadcrumbItem>
+        <Icon Type="read" /> Catalog
+    </BreadcrumbItem>    
+</Breadcrumb>
+
+<div class="site-layout-background">
+    <CatalogLoader />
+    <PageHeader Class="site-page-header" Title="Catalog" />
+    <Row Gutter="16">
+        <AntDesign.Col Span="8">
+            <a href="catalog/datasets">
+                <Card Hoverable>
+                    <CardMeta Title="Datasets" Description="Listing of all the datasets" />
+                </Card>
+            </a>
+        </AntDesign.Col>
+        <AntDesign.Col Span="8">
+            <a href="catalog/variables">
+                <Card Hoverable>
+                    <CardMeta Title="Variables" Description="Listing of all variables in all datasets" />
+                </Card>
+            </a>
+        </AntDesign.Col>
+        <AntDesign.Col Span="8">
+            <a href="catalog/projects">
+                <Card Hoverable>
+                    <CardMeta Title="Projects" Description="Listing of all projects" />
+                </Card>
+            </a>
+        </AntDesign.Col>
+    </Row>
+</div>
+
+@code
+{
+
+    private RenderFragment coverTemplate =@<img alt="example"  src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png" />;
+
+}
