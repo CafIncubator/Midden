@@ -9,7 +9,7 @@
         <AntDesign.Col Offset="8" Span="8">
             <Search Placeholder="Search all things"
                     OnChange="SearchHandler"
-                    EnterButton="true" @bind-Value="SearchTerm"
+                    EnterButton="true" @bind-Value="ViewModel.SearchTerm"
                     AllowClear="true" />
         </AntDesign.Col>
     </AntDesign.Row>
@@ -17,10 +17,10 @@
     <Space />
 }
 
-@if (FilteredProjects != null)
+@if (ViewModel.FilteredCatalogProjects != null)
 {
     <Row Gutter="16">
-        @foreach (var project in FilteredProjects)
+        @foreach (var project in ViewModel.FilteredCatalogProjects)
         {
         <AntDesign.Col Span="12" Style="padding:10px">
             <Card Style="overflow:hidden">
@@ -30,7 +30,9 @@
                     </a>
                 </TitleTemplate>
                 <Body>
-                    @project.Description
+                    <div>@((MarkupString)project.MarkdownDescription)</div>
+                    <Divider />
+                    <Icon Type="file-text" /> @project.DatasetCount Datasets
                 </Body>
             </Card>
         </AntDesign.Col>
