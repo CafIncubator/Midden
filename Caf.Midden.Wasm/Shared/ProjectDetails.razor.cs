@@ -87,7 +87,7 @@ namespace Caf.Midden.Wasm.Shared
             num = State.Catalog.Metadatas
                 .Where(m =>
                     (String.IsNullOrEmpty(this.ProjectName) || 
-                        m.Dataset.Project.ToLower() == this.ProjectName.ToLower()))
+                        m.Dataset.Project.ToLower().Trim() == this.ProjectName.ToLower().Trim()))
                 .Count();
 
             this.NumberDatasets = num;

@@ -1,6 +1,4 @@
-﻿@page "/catalog/zones/{ZoneName}/projects/{ProjectName}"
-@page "/catalog/zones/{ZoneName}/projects/{ProjectName}/datasets"
-
+﻿@page "/catalog/zones/{ZoneName}/projects"
 @inject Services.StateContainer State
 
 <Breadcrumb Style="margin:16px 0;">
@@ -11,32 +9,32 @@
     </BreadcrumbItem>
     <BreadcrumbItem>
         <a href="catalog">
-            <Icon Type="read" /> Catalog
+            <Icon Type="read" />
+        </a>
+    </BreadcrumbItem>
+    <BreadcrumbItem>
+        <a href="catalog/zones">
+            <Icon Type="folder" />
         </a>
     </BreadcrumbItem>
     <BreadcrumbItem>
         <a href="catalog/zones/@ZoneName">
-            <Icon Type="folder" /> @ZoneName
+            @ZoneName
         </a>
     </BreadcrumbItem>
     <BreadcrumbItem>
-        <Icon Type="project" /> @ProjectName
+        <Icon Type="project" /> Projects
     </BreadcrumbItem>
 </Breadcrumb>
 
 <div class="site-layout-background">
-    <CatalogLoader />
     <PageHeader Class="site-page-header" 
-                Title="Dataset Catalog"
-                Subtitle="Filtered by zone and project"/>
-    <FilteredCatalogMetadataViewer Zone="@ZoneName"
-                                   Project="@ProjectName" />
+                Title=@($"Projects in Zone: {ZoneName}") />
+    <p>Coming soon...</p>
 </div>
 
 
 @code {
-    [Parameter]
-    public string ProjectName { get; set; }
 
     [Parameter]
     public string ZoneName { get; set; }

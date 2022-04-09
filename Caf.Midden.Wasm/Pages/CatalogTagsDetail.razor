@@ -1,0 +1,37 @@
+﻿@page "/catalog/tags/{TagName}"
+@inject Services.StateContainer State
+
+<Breadcrumb Style="margin:16px 0;">
+    <BreadcrumbItem>
+        <a href="">
+            <Icon Type="home" Theme="fill" />
+        </a>
+    </BreadcrumbItem>
+    <BreadcrumbItem>
+        <a href="catalog">
+            <Icon Type="read" />
+        </a>
+    </BreadcrumbItem>
+    <BreadcrumbItem>
+        <a href="catalog/tags">
+            <Icon Type="tag" />
+        </a>
+    </BreadcrumbItem>
+    <BreadcrumbItem>
+         @TagName
+    </BreadcrumbItem>
+</Breadcrumb>
+
+<div class="site-layout-background">
+    <CatalogLoader />
+    <PageHeader Class="site-page-header"
+                Title="Dataset Catalog"
+                Subtitle="Filtered by tag" />
+    <FilteredCatalogMetadataViewer Tag="@TagName"/>
+</div>
+
+
+@code {
+    [Parameter]
+    public string TagName { get; set; }
+} 

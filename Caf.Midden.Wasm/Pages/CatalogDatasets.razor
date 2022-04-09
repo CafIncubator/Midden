@@ -1,6 +1,10 @@
-﻿@page "/catalog/projects"
+﻿@page "/datasets"
+@page "/catalog/datasets"
+@page "/variable-catalog"
+@page "/dataset-catalog"
+
 @inject Services.StateContainer State
-@inject NavigationManager NavManager
+
 
 <Breadcrumb Style="margin:16px 0;">
     <BreadcrumbItem>
@@ -10,23 +14,17 @@
     </BreadcrumbItem>
     <BreadcrumbItem>
         <a href="catalog">
-            <Icon Type="read" /> Catalog
+            <Icon Type="read" />
         </a>
     </BreadcrumbItem>
     <BreadcrumbItem>
-        <Icon Type="project" /> Projects
+        <Icon Type="file-text" /> Datasets
     </BreadcrumbItem>
+    
 </Breadcrumb>
 
 <div class="site-layout-background">
     <CatalogLoader />
-    <PageHeader Class="site-page-header"
-                Title="Projects" />
-    
-    <FilteredCatalogProjectViewer />
+    <PageHeader Class="site-page-header" Title="Dataset Catalog" />
+    <FilteredCatalogMetadataViewer />    
 </div>
-
-
-@code {
-
-} 

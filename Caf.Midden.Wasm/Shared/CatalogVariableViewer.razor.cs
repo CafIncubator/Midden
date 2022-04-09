@@ -12,6 +12,9 @@ namespace Caf.Midden.Wasm.Shared
 {
     public partial class CatalogVariableViewer : IDisposable
     {
+        [Parameter]
+        public string Project { get; set; }
+
         CatalogVariableViewerViewModel ViewModel { get; set; } = new CatalogVariableViewerViewModel();
         public TableFilter<string>[] FilterProcessing;
         public TableFilter<string>[] FilterZone;
@@ -75,7 +78,10 @@ namespace Caf.Midden.Wasm.Shared
 
             foreach(var metadata in metadatas)
             {
-                if ((metadata.Dataset != null) && (metadata.Dataset.Variables != null))
+                if ((metadata.Dataset != null) && 
+                    (metadata.Dataset.Variables != null) && 
+                    (string.IsNullOrEmpty(this.Project) || 
+                        metadata.Dataset.Project.ToLower().Trim() == this.Project.ToLower().Trim()))
                 {
                     foreach (var variable in metadata.Dataset.Variables)
                     {

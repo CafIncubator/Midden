@@ -13,21 +13,36 @@
     </BreadcrumbItem>
     <BreadcrumbItem>
         <a href="catalog">
-            <Icon Type="read" /> Catalog
+            <Icon Type="read" />
+        </a>
+    </BreadcrumbItem>
+    <BreadcrumbItem>
+        <a href="catalog/zones">
+            <Icon Type="folder" />
         </a>
     </BreadcrumbItem>
     <BreadcrumbItem>
         <a href="catalog/zones/@ZoneName">
-            <Icon Type="folder" /> @ZoneName
+            @ZoneName
+        </a>
+    </BreadcrumbItem>
+    <BreadcrumbItem>
+        <a href="catalog/zones/@ZoneName/projects">
+            <Icon Type="project" /> 
         </a>
     </BreadcrumbItem>
     <BreadcrumbItem>
         <a href="catalog/zones/@ZoneName/projects/@ProjectName">
-            <Icon Type="project" /> @ProjectName
+            @ProjectName
         </a>
     </BreadcrumbItem>
     <BreadcrumbItem>
-        <Icon Type="file-text" /> @DatasetName
+        <a href="catalog/zones/@ZoneName/projects/@ProjectName/datasets">
+            <Icon Type="file-text" />
+        </a>
+    </BreadcrumbItem>
+    <BreadcrumbItem>
+        @DatasetName
     </BreadcrumbItem>
 </Breadcrumb>
 

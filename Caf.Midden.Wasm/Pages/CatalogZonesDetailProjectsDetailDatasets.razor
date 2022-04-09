@@ -1,0 +1,57 @@
+﻿@page "/catalog/zones/{ZoneName}/projects/{ProjectName}/datasets"
+
+@inject Services.StateContainer State
+
+<Breadcrumb Style="margin:16px 0;">
+    <BreadcrumbItem>
+        <a href="">
+            <Icon Type="home" Theme="fill" />
+        </a>
+    </BreadcrumbItem>
+    <BreadcrumbItem>
+        <a href="catalog">
+            <Icon Type="read" />
+        </a>
+    </BreadcrumbItem>
+    <BreadcrumbItem>
+        <a href="catalog/zones">
+            <Icon Type="folder" />
+        </a>
+    </BreadcrumbItem>
+    <BreadcrumbItem>
+        <a href="catalog/zones/@ZoneName">
+            @ZoneName
+        </a>
+    </BreadcrumbItem>
+    <BreadcrumbItem>
+        <a href="catalog/zones/@ZoneName/projects">
+            <Icon Type="project" /> 
+        </a>
+    </BreadcrumbItem>
+    <BreadcrumbItem>
+        <a href="catalog/zones/@ZoneName/projects/@ProjectName">
+            @ProjectName
+        </a>
+    </BreadcrumbItem>
+    <BreadcrumbItem>
+        <Icon Type="file-text" /> Datasets
+    </BreadcrumbItem>
+</Breadcrumb>
+
+<div class="site-layout-background">
+    <CatalogLoader />
+    <PageHeader Class="site-page-header" 
+                Title="Dataset Catalog"
+                Subtitle="Filtered by zone and project"/>
+    <FilteredCatalogMetadataViewer Zone="@ZoneName"
+                                   Project="@ProjectName" />
+</div>
+
+
+@code {
+    [Parameter]
+    public string ProjectName { get; set; }
+
+    [Parameter]
+    public string ZoneName { get; set; }
+} 

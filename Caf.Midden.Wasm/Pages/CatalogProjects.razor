@@ -1,5 +1,6 @@
-﻿@page "/catalog/zones/{ZoneName}"
+﻿@page "/catalog/projects"
 @inject Services.StateContainer State
+@inject NavigationManager NavManager
 
 <Breadcrumb Style="margin:16px 0;">
     <BreadcrumbItem>
@@ -9,24 +10,23 @@
     </BreadcrumbItem>
     <BreadcrumbItem>
         <a href="catalog">
-            <Icon Type="read" /> Catalog
+            <Icon Type="read" />
         </a>
     </BreadcrumbItem>
     <BreadcrumbItem>
-        <Icon Type="folder" /> @ZoneName
+        <Icon Type="project" /> Projects
     </BreadcrumbItem>
 </Breadcrumb>
 
 <div class="site-layout-background">
     <CatalogLoader />
     <PageHeader Class="site-page-header"
-                Title="Dataset Catalog"
-                Subtitle="Filtered by zone" />
-    <FilteredCatalogMetadataViewer Zone="@ZoneName" />
+                Title="Project Catalog" />
+    
+    <FilteredCatalogProjectViewer />
 </div>
 
 
 @code {
-    [Parameter]
-    public string ZoneName { get; set; }
+
 } 

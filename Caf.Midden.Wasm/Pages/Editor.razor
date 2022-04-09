@@ -1,4 +1,5 @@
 ﻿@page "/editor"
+
 @inject Services.StateContainer State
 
 
@@ -9,16 +10,28 @@
         </a>
     </BreadcrumbItem>
     <BreadcrumbItem>
-        <Icon Type="edit" /> Editor
+        <a href="editor">
+            <Icon Type="edit" /> Editor
+        </a>
     </BreadcrumbItem>
 </Breadcrumb>
 
 <div class="site-layout-background">
     <PageHeader Title="Editor" />
-    <AntDesign.Row Justify="center">
-        <AntDesign.Col Span="18">
-            <MetadataEditor />
+    <Row Gutter="16">
+        <AntDesign.Col Span="8">
+            <a href="editor/dataset">
+                <Card Hoverable>
+                    <CardMeta Title="Dataset" Description="Create or edit dataset metadata" />
+                </Card>
+            </a>
         </AntDesign.Col>
-    </AntDesign.Row>
-    <BackTop></BackTop>
+        <AntDesign.Col Span="8">
+            <a href="editor/project">
+                <Card Hoverable>
+                    <CardMeta Title="Variables" Description="Create or edit project information" />
+                </Card>
+            </a>
+        </AntDesign.Col>
+    </Row>
 </div>

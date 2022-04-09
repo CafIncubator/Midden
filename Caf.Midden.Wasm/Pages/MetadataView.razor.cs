@@ -68,7 +68,7 @@ namespace Caf.Midden.Wasm.Pages
         public void EditMetadata()
         {
             State.MetadataEdit = this.Metadata;
-            NavManager.NavigateTo("editor");
+            NavManager.NavigateTo("editor/dataset");
         }
     }
 }

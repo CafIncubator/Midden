@@ -1,5 +1,7 @@
-﻿@page "/catalog/tags/{TagName}"
+﻿@page "/catalog/variables"
+
 @inject Services.StateContainer State
+
 
 <Breadcrumb Style="margin:16px 0;">
     <BreadcrumbItem>
@@ -9,24 +11,17 @@
     </BreadcrumbItem>
     <BreadcrumbItem>
         <a href="catalog">
-            <Icon Type="read" /> Catalog
+            <Icon Type="read" />
         </a>
     </BreadcrumbItem>
     <BreadcrumbItem>
-        <Icon Type="tag" /> @TagName
+       <Icon Type="calculator" /> Variables
     </BreadcrumbItem>
+    
 </Breadcrumb>
 
 <div class="site-layout-background">
     <CatalogLoader />
-    <PageHeader Class="site-page-header"
-                Title="Dataset Catalog"
-                Subtitle="Filtered by tag" />
-    <FilteredCatalogMetadataViewer Tag="@TagName"/>
+    <PageHeader Class="site-page-header" Title="Variable Catalog" />
+    <CatalogVariableViewer />    
 </div>
-
-
-@code {
-    [Parameter]
-    public string TagName { get; set; }
-} 

@@ -19,6 +19,8 @@
 
 @if(ViewModel?.FilteredCatalogVariables != null)
 {
+if(ViewModel?.FilteredCatalogVariables.Count > 0)
+{
 <Row Gutter="16">
     <AntDesign.Col Span="24">
         <AntDesign.Table TItem="Caf.Midden.Wasm.Shared.ViewModels.CatalogVariable"
@@ -97,4 +99,7 @@
         </AntDesign.Table>
     </AntDesign.Col>
 </Row>
+} else {
+    <Empty Simple />
+}
 }

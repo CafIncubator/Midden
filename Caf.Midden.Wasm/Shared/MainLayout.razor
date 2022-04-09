@@ -35,23 +35,51 @@
                         <Icon Type="menu-fold" Theme="outline" Class="trigger" OnClick="toggle" />
                     }
                 </div>
-                <Menu Theme="MenuTheme.Light" DefaultSelectedKeys=@(new[]{"1"}) Mode="MenuMode.Inline">
-                    <MenuItem Key="1" RouterLink="" RouterMatch="NavLinkMatch.All">
+                <Menu   Theme="MenuTheme.Light" 
+                        DefaultSelectedKeys=@(new[]{"1"}) 
+                        DefaultOpenKeys=@(new[]{"3", "4"})
+                        Mode="MenuMode.Inline">
+                    <MenuItem Key="1" RouterLink="" RouterMatch="NavLinkMatch.Prefix">
                         <Icon Type="home" Theme="outline" />
                         <span>Home</span>
                     </MenuItem>
-                    <MenuItem Key="2" RouterLink="insights" RouterMatch="NavLinkMatch.All">
+                    <MenuItem Key="2" RouterLink="insights" RouterMatch="NavLinkMatch.Prefix">
                         <Icon Type="line-chart" Theme="outline" />
                         <span>Insights</span>
                     </MenuItem>
-                    <MenuItem Key="3" RouterLink="catalog" RouterMatch="NavLinkMatch.All">
-                        <Icon Type="read" Theme="outline" />
-                        <span>Catalog</span>
-                    </MenuItem>
-                    <MenuItem Key="4" RouterLink="editor" RouterMatch="NavLinkMatch.All">
-                        <Icon Type="edit" Theme="outline" />
-                        <span>Editor</span>
-                    </MenuItem>
+                    <SubMenu Key="3" Title="Catalog" TitleTemplate=@catalogTitle>
+                        <MenuItem Key="3a" RouterLink="catalog/datasets" RouterMatch="NavLinkMatch.Prefix">
+                            <Icon Type="file-text" Theme="outline" />
+                            <span>Datasets</span>
+                        </MenuItem>
+                        <MenuItem Key="3b" RouterLink="catalog/variables" RouterMatch="NavLinkMatch.Prefix">
+                            <Icon Type="calculator" Theme="outline" />
+                            <span>Variables</span>
+                        </MenuItem>
+                        <MenuItem Key="3c" RouterLink="catalog/projects" RouterMatch="NavLinkMatch.Prefix">
+                            <Icon Type="project" Theme="outline" />
+                            <span>Projects</span>
+                        </MenuItem>
+                        <MenuItem Key="3d" RouterLink="catalog/zones" RouterMatch="NavLinkMatch.Prefix">
+                            <Icon Type="folder" Theme="outline" />
+                            <span>Zones</span>
+                        </MenuItem>
+                         <MenuItem Key="3e" RouterLink="catalog/tags" RouterMatch="NavLinkMatch.Prefix">
+                            <Icon Type="tag" Theme="outline" />
+                            <span>Tags</span>
+                        </MenuItem>
+                    </SubMenu>
+                    <SubMenu Key="4" Title="Editor" TitleTemplate=@editorTitle>
+                        <MenuItem Key="4a" RouterLink="editor/dataset" RouterMatch="NavLinkMatch.Prefix">
+                            <Icon Type="file-text" Theme="outline" />
+                            <span>Dataset</span>
+                        </MenuItem>
+                        <MenuItem Key="4b" RouterLink="editor/project" RouterMatch="NavLinkMatch.Prefix">
+                            <Icon Type="project" Theme="outline" />
+                            <span>Project</span>
+                        </MenuItem>
+                    </SubMenu>
+                    
                 </Menu>
             </Sider>
             <Layout Class="site-layout">
@@ -62,9 +90,25 @@
                     Made with <a href="https://github.com/cafincubator/midden">
                         <Icon Type="github" Theme="outline" /> Midden
                     </a>
+                    <Divider Type="DirectionVHType.Vertical" />
                     <span>Web Tools @($"v{State.AssemblyVersion}")</span>
                 </Footer>
             </Layout>
         </Layout>
     </Layout>
 </Caf.Midden.Wasm.Shared.ConfigurationLoader>
+
+@code {
+    RenderFragment catalogTitle =
+        @<span>
+            <Icon Type="read" Theme="outline" />
+            <span>Catalog</span>
+        </span>;
+
+    RenderFragment editorTitle =
+        @<span>
+            <Icon Type="edit" Theme="outline" />
+            <span>Editor</span>
+        </span>;
+                
+}
