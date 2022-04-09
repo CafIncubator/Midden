@@ -29,5 +29,19 @@ namespace Caf.Midden.Core.Services
 
             return project;
         }
+
+        public Project Read(
+            string fileString)
+        {
+            Project project;
+            MemoryStream ms = new MemoryStream(Encoding.UTF8.GetBytes(fileString));
+            using(var sr = new StreamReader(ms, Encoding.UTF8))
+            {
+                project = parser.Parse(sr);
+            }
+            
+
+            return project;
+        }
     }
 }

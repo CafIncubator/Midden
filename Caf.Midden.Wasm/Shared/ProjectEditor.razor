@@ -1,0 +1,53 @@
+﻿@using AntDesign
+@inject Caf.Midden.Wasm.Services.StateContainer State
+@inject ModalService ModalService
+@inject IJSRuntime JS
+
+<Space>
+    <SpaceItem>
+        <Popconfirm Title="Confirm reset"
+                    OkText="Reset"
+                    CancelText="Cancel"
+                    OnConfirm="NewProject">
+            <Button><Icon Type="plus" Theme="outline" /> New</Button>
+        </Popconfirm>
+    </SpaceItem>
+    <SpaceItem>
+        <div class="file-input-zone">
+        <InputFile id="inputFileProject"
+                   OnChange="OnInputFileProjectChange" />
+        @if (isLoading)
+        {
+            <span><Icon Type="loading" /> Uploading..</span>
+        }
+        else
+        {
+            <span><Icon Type="upload" /> Upload</span>
+        }
+    </div>
+    </SpaceItem>
+</Space>
+<AntDesign.Divider />
+@if(this.Project is not null)
+{
+    <AntDesign.Form Model="@Project"
+                    Layout="@FormLayout.Vertical"> 
+                <FormItem Label="Name">
+                    <AntDesign.Input @bind-Value="@context.Name"
+                                        Placeholder="Name of project" />
+                </FormItem>
+                <FormItem Label="Description">
+                    <MarkdownEditor @bind-Value="@context.Description" 
+                        ValueHTMLChanged="@OnMarkdownValueHTMLChanged" />
+                </FormItem>
+    </AntDesign.Form>
+    <Divider />
+    <Row Justify="end">
+        <Button Type="primary" OnClick="SaveProject">
+            <Icon Type="download" />
+            Download
+        </Button>
+    </Row>
+} else {
+    <p>Loading...</p>
+}
