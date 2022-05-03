@@ -485,7 +485,7 @@ namespace Caf.Midden.Wasm.Shared
             await JS.InvokeAsync<string>(
                 "saveAsFile", 
                 $"{State.MetadataEdit.Dataset.Name}.midden", 
-                fileBytes);
+                Convert.ToBase64String(fileBytes));
 
             return jsonString;
         }
