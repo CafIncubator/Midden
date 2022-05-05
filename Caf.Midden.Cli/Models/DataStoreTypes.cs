@@ -14,6 +14,7 @@ namespace Caf.Midden.Cli.Models
         GoogleWorkspaceSharedDrive,
         FileTransferProtocol,
         Office365OneDrive,
-        AzureFileShares
+        AzureFileShares,
+        GoogleDrive
     }
 }
