@@ -150,6 +150,25 @@ namespace Caf.Midden.Cli.Actions
 
                         break;
 
+                    case DataStoreTypes.GoogleDrive:
+                        if (
+                            currStore.ClientId is not null &&
+                            currStore.ClientSecret is not null &&
+                            currStore.ApplicationName is not null)
+                        {
+                            crawler = new GoogleDriveCrawler(
+                                currStore.ClientId,
+                                currStore.ClientSecret,
+                                currStore.ApplicationName);
+                        }
+                        else
+                        {
+                            Console.WriteLine(
+                                $"Not enough information provided to crawl {currStore.Name}");
+                        }
+
+                        break;
+
                     case DataStoreTypes.GoogleWorkspaceSharedDrive:
                         if(
                             currStore.ClientId is not null &&

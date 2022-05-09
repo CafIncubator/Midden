@@ -34,6 +34,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Assets\MockDataStoreLocal\Production\DESCRIPTION.md">
+    <None Update="Assets\CliConfigurationSecrets\GoogleDriveProjectTest.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Assets\MockDataStoreLocal\Production\DynamicAec_v1.midden">
