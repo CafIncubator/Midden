@@ -18,6 +18,7 @@ namespace Caf.Midden.Cli.Tests
 
         /// <summary>
         /// These tests require `GoogleDriveProjectTest.json` file to be defined in `Assets/CliConfigurationSecrets`, included in the project, with proper formatting (conforms to CliConfiguration json), and at least one .midden file in the Google Drive that the configuration file points to 
+        /// Also, requires a 'DESCRIPTION.md' file in the Google Drive with project = ProductionProject
         /// </summary>
         public GoogleDriveCrawlerTests()
         {
@@ -86,6 +87,8 @@ namespace Caf.Midden.Cli.Tests
                 var actual = sut.GetProjects(reader);
 
                 Assert.NotNull(actual);
+                Assert.True(actual.Count > 0);
+                Assert.Equal("ProductionProject", actual[0].Name);
             }
             else
             {
