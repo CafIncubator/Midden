@@ -74,7 +74,8 @@ namespace Caf.Midden.Wasm.Shared
                     Name = project.Name,
                     Description = project.Description,
                     MarkdownDescription = GetMarkdown(project.Description),
-                    DatasetCount = GetNumberDatasets(project.Name, catalog.Metadatas)
+                    DatasetCount = GetNumberDatasets(project.Name, catalog.Metadatas),
+                    VariableCount = GetNumberVariables(project.Name, catalog.Metadatas)
                 };
 
                 catalogProjects.Add(catalogProject);
@@ -109,6 +110,20 @@ namespace Caf.Midden.Wasm.Shared
                     (String.IsNullOrEmpty(projectName) ||
                         m.Dataset.Project.ToLower().Trim() == projectName.ToLower().Trim()))
                 .Count();
+
+            return num;
+        }
+
+        private int GetNumberVariables(
+            string projectName,
+            List<Metadata> metadatas)
+        {
+            int num = 0;
+            num = metadatas
+                .Where(m =>
+                    (String.IsNullOrEmpty(projectName) ||
+                        m.Dataset.Project.ToLower().Trim() == projectName.ToLower().Trim()))
+                .SelectMany(m => m.Dataset.Variables).Count();
 
             return num;
         }

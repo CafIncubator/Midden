@@ -16,5 +16,6 @@ namespace Caf.Midden.Wasm.Shared.ViewModels
         public string Description { get; set; }
         public string MarkdownDescription { get; set; }
         public int DatasetCount { get; set; }
+        public int VariableCount { get; set; }
     }
 }

@@ -18,6 +18,7 @@ namespace Caf.Midden.Wasm.Shared
         public Project Project { get; set; }
 
         public int NumberDatasets { get; set; }
+        public int NumberVariables { get; set; }
 
         public string MarkdownDescription { get; set; }
 
@@ -33,6 +34,7 @@ namespace Caf.Midden.Wasm.Shared
                 {
                     SetMarkdown();
                     SetNumberDatasets();
+                    SetNumberVariables();
                 }
             }
         }
@@ -50,6 +52,7 @@ namespace Caf.Midden.Wasm.Shared
                     {
                         SetMarkdown();
                         SetNumberDatasets();
+                        SetNumberVariables();
                     }
                     
                 }
@@ -91,6 +94,18 @@ namespace Caf.Midden.Wasm.Shared
                 .Count();
 
             this.NumberDatasets = num;
+        }
+
+        private void SetNumberVariables()
+        {
+            int num = 0;
+            num = State.Catalog.Metadatas
+                .Where(m =>
+                    (String.IsNullOrEmpty(this.ProjectName) ||
+                        m.Dataset.Project.ToLower().Trim() == this.ProjectName.ToLower().Trim()))
+                .SelectMany(m => m.Dataset.Variables).Count();
+
+            this.NumberVariables = num;
         }
 
         public void Dispose()
