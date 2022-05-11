@@ -46,9 +46,16 @@
                     </a>
 
                     <Divider />
-
-                    @metadata.Dataset.Description
-
+                    <div>
+                    @if (!String.IsNullOrEmpty(metadata.Dataset.Description))
+                        {
+                            @((MarkupString)(Markdig.Markdown.ToHtml(metadata.Dataset.Description, pipeline)))
+                        }
+                        else
+                        {
+                            <Empty Simple />
+                        }
+                    </div>
                     <Divider />
 
                     @foreach (var tag in metadata.Dataset.Tags)
