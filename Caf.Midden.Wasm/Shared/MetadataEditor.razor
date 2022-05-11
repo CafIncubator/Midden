@@ -44,10 +44,12 @@
                                         Placeholder="Name of project that produced the dataset" />
                 </FormItem>
                 <FormItem Label="Description">
-                    <AntDesign.TextArea @bind-Value="context.Dataset.Description"
+                    <!-- <AntDesign.TextArea @bind-Value="context.Dataset.Description"
                                         Placeholder="Description of dataset"
                                         MinRows="5"
-                                        AutoSize="true" />
+                                        AutoSize="true" />-->
+                         <MarkdownEditor @bind-Value="@context.Dataset.Description"
+                            ValueHTMLChanged="@OnMarkdownDescriptionValueHTMLChanged" />
                 </FormItem>
                 <FormItem Label="Contacts">
                     <Button OnClick="AddContactHandler">Add</Button>

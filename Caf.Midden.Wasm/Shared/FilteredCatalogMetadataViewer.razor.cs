@@ -1,6 +1,7 @@
 ﻿using AntDesign;
 using Caf.Midden.Core.Models.v0_2;
 using Caf.Midden.Wasm.Shared.Modals;
+using Markdig;
 using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
@@ -25,6 +26,11 @@ namespace Caf.Midden.Wasm.Shared
         public List<Metadata> FilteredMetadata { get; set; } = new List<Metadata>();
 
         public string SearchTerm { get; set; }
+
+        private MarkdownPipeline pipeline = new MarkdownPipelineBuilder()
+            .UseAdvancedExtensions()
+            .UseYamlFrontMatter()
+            .Build();
 
         protected override void OnInitialized()
         {

@@ -21,7 +21,7 @@ namespace Caf.Midden.Wasm.Shared
         //public Configuration AppConfig { get; set; }
 
         //private Metadata metadata { set; get; }
-        
+
         //[Parameter]
         ////public Metadata Metadata { get; set; }
         //public Metadata Metadata
@@ -43,88 +43,8 @@ namespace Caf.Midden.Wasm.Shared
         //    DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
 
         //private EditContext EditContext { get; set; }
-        
-        public void LoadMetadataTest()
-        {
-            // Mock for now
-            var now = DateTime.UtcNow;
 
-            Metadata metadata = new Metadata()
-            {
-                CreationDate = now,
-                ModifiedDate = now,
-                Dataset = new Dataset()
-                {
-                    Zone = "Raw",
-                    Name = "Test",
-                    Contacts = new List<Person>()
-                    {
-                        new Person()
-                        {
-                            Name = "Test",
-                            Email = "Test@test.com",
-                            Role = "User"
-                        }
-                    },
-                    Tags = new List<string>()
-                    {
-                        "Foo",
-                        "[ISO]someThing"
-                    },
-                    Variables = new List<Variable>()
-                    {
-                        new Variable()
-                        {
-                            Name = "Var1",
-                            Description = "Varvar",
-                            Units = "unitless",
-                            QCApplied = new List<string>()
-                            {
-                                "Assurance", "Review"
-                            },
-                            ProcessingLevel = "Calculated",
-                            Methods = new List<string>(){"Tiagatron 3000" },
-                            Tags = new List<string>()
-                            {
-                                "Met", "CAF", "Test"
-                            }
-                        },
-                        new Variable()
-                        {
-                            Name = "Var3",
-                            Description = "Varvarbst",
-                            Units = "unitless",
-                            QCApplied = new List<string>()
-                            {
-                                "Assurance"
-                            },
-                            ProcessingLevel = "Unknown",
-                            Tags = new List<string>()
-                            {
-                                "Met"
-                            }
-                        },
-                        new Variable()
-                        {
-                            Name = "Var4",
-                            Description = "Calculation of the slope and specific catchment area based Topographic Wetness Index. It shows water accumulation. This can be useful for soil or flood mapping",
-                            Units = "unitless",
-                            QCApplied = new List<string>()
-                            {
-                                "Assurance"
-                            },
-                            ProcessingLevel = "Unknown",
-                            Tags = new List<string>()
-                            {
-                                "Met"
-                            }
-                        }
-                    }
-                }
-            };
-
-            State.UpdateMetadataEdit(this, metadata);
-        }
+        string markdownDescriptionHtml = "";
 
         private async Task LastUpdated_StateChanged(
             ComponentBase source,
@@ -142,8 +62,17 @@ namespace Caf.Midden.Wasm.Shared
             //this.EditContext = new EditContext(State.MetadataEdit);
             //this.EditContext.OnFieldChanged +=
             //    EditContext_OnFieldChange;
+
+            markdownDescriptionHtml = Markdig.Markdown.ToHtml(State.MetadataEdit.Dataset.Description ?? string.Empty);
+
             State.StateChanged += async (source, property) =>
                 await LastUpdated_StateChanged(source, property);
+        }
+
+        Task OnMarkdownDescriptionValueHTMLChanged(string value)
+        {
+            markdownDescriptionHtml = value;
+            return Task.CompletedTask;
         }
 
         private void EditContext_OnFieldChange(
