@@ -1,32 +1,6 @@
 ﻿@page "/catalog/zones/{ZoneName}/projects"
 @inject Services.StateContainer State
 
-<Breadcrumb Style="margin:16px 0;">
-    <BreadcrumbItem>
-        <a href="">
-            <Icon Type="home" Theme="fill" />
-        </a>
-    </BreadcrumbItem>
-    <BreadcrumbItem>
-        <a href="catalog">
-            <Icon Type="read" />
-        </a>
-    </BreadcrumbItem>
-    <BreadcrumbItem>
-        <a href="catalog/zones">
-            <Icon Type="folder" />
-        </a>
-    </BreadcrumbItem>
-    <BreadcrumbItem>
-        <a href="catalog/zones/@ZoneName">
-            @ZoneName
-        </a>
-    </BreadcrumbItem>
-    <BreadcrumbItem>
-        <Icon Type="project" /> Projects
-    </BreadcrumbItem>
-</Breadcrumb>
-
 <div class="site-layout-background">
     <PageHeader Class="site-page-header" 
                 Title=@($"Projects in Zone: {ZoneName}") />

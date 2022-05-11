@@ -1,27 +1,6 @@
 ﻿@page "/catalog/projects/{ProjectName}"
 @inject Services.StateContainer State
 
-<Breadcrumb Style="margin:16px 0;">
-    <BreadcrumbItem>
-        <a href="">
-            <Icon Type="home" Theme="fill" />
-        </a>
-    </BreadcrumbItem>
-    <BreadcrumbItem>
-        <a href="catalog">
-            <Icon Type="read" />
-        </a>
-    </BreadcrumbItem>
-    <BreadcrumbItem>
-        <a href="catalog/projects">
-            <Icon Type="project" />
-        </a>
-    </BreadcrumbItem>
-    <BreadcrumbItem>
-        @ProjectName
-    </BreadcrumbItem>
-</Breadcrumb>
-
 <div class="site-layout-background">
     <CatalogLoader />
     <PageHeader Class="site-page-header"

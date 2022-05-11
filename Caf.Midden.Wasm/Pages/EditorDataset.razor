@@ -2,29 +2,8 @@
 
 @inject Services.StateContainer State
 
-
-<Breadcrumb Style="margin:16px 0;">
-    <BreadcrumbItem>
-        <a href="">
-            <Icon Type="home" Theme="fill" />
-        </a>
-    </BreadcrumbItem>
-    <BreadcrumbItem>
-        <a href="editor">
-            <Icon Type="edit" />
-        </a>
-    </BreadcrumbItem>
-    <BreadcrumbItem>
-        <Icon Type="dot-chart" /> Dataset
-    </BreadcrumbItem>
-</Breadcrumb>
-
 <div class="site-layout-background">
     <PageHeader Title="Dataset Editor" />
-    <AntDesign.Row Justify="center">
-        <AntDesign.Col Span="18">
-            <MetadataEditor />
-        </AntDesign.Col>
-    </AntDesign.Row>
+        <MetadataEditor />
     <BackTop></BackTop>
 </div>

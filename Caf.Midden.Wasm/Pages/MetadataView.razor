@@ -1,50 +1,10 @@
 ﻿@page "/catalog/{ZoneName}/{ProjectName}/{DatasetName}"
 @page "/datasets/{ZoneName}/{ProjectName}/{DatasetName}"
 @page "/catalog/zones/{ZoneName}/projects/{ProjectName}/datasets/{DatasetName}"
+@page "/catalog/datasets/zones/{ZoneName}/projects/{ProjectName}/datasets/{DatasetName}"
 
 @inject Services.StateContainer State
 @inject NavigationManager NavManager
-
-<Breadcrumb Style="margin:16px 0;">
-    <BreadcrumbItem>
-        <a href="">
-            <Icon Type="home" Theme="fill" />
-        </a>
-    </BreadcrumbItem>
-    <BreadcrumbItem>
-        <a href="catalog">
-            <Icon Type="read" />
-        </a>
-    </BreadcrumbItem>
-    <BreadcrumbItem>
-        <a href="catalog/zones">
-            <Icon Type="folder" />
-        </a>
-    </BreadcrumbItem>
-    <BreadcrumbItem>
-        <a href="catalog/zones/@ZoneName">
-            @ZoneName
-        </a>
-    </BreadcrumbItem>
-    <BreadcrumbItem>
-        <a href="catalog/zones/@ZoneName/projects">
-            <Icon Type="project" /> 
-        </a>
-    </BreadcrumbItem>
-    <BreadcrumbItem>
-        <a href="catalog/zones/@ZoneName/projects/@ProjectName">
-            @ProjectName
-        </a>
-    </BreadcrumbItem>
-    <BreadcrumbItem>
-        <a href="catalog/zones/@ZoneName/projects/@ProjectName/datasets">
-            <Icon Type="file-text" />
-        </a>
-    </BreadcrumbItem>
-    <BreadcrumbItem>
-        @DatasetName
-    </BreadcrumbItem>
-</Breadcrumb>
 
 <div class="site-layout-background">
     <CatalogLoader />

@@ -3,7 +3,23 @@
 @if (this.Metadata != null)
 {
     <PageHeader Class="site-page-header" Title="@Metadata.Dataset.Name" Subtitle="@($"Last updated: {Metadata.ModifiedDate}")">
+        
     </PageHeader>
+    
+    <Row>
+        <AntDesign.Col Span="24" Style="padding:5px">
+            <Icon Type="folder" />
+            <a href="catalog/datasets/zones/@Metadata.Dataset.Zone">
+                @Metadata.Dataset.Zone
+            </a>
+            <Divider Type="DirectionVHType.Vertical" />
+            <Icon Type="project" />
+            <a href="catalog/projects/@Metadata.Dataset.Project">
+                @Metadata.Dataset.Project
+            </a>
+        </AntDesign.Col>
+    </Row>
+    <Divider />
     <Row>
         <AntDesign.Col Span="17">
             <Row>
