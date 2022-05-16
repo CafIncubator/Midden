@@ -30,6 +30,9 @@ namespace Caf.Midden.Core.Models.v0_2
         [JsonPropertyName("roles")]
         public List<string> Roles { get; set; } = new List<string>();
 
+        [JsonPropertyName("projectStatuses")]
+        public List<string> ProjectStatuses { get; set; } = new List<string>();
+
         [JsonPropertyName("processingLevels")]
         public List<string> ProcessingLevels { get; set; } = new List<string>();
 
