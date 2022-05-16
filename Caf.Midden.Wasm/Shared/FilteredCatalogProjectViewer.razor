@@ -25,9 +25,14 @@
         <AntDesign.Col Span="12" Style="padding:10px">
             <Card Style="overflow:hidden">
                 <TitleTemplate>
+                    
                     <a href="catalog/projects/@project.Name">
                         @project.Name
                     </a>
+                    @if(!string.IsNullOrEmpty(project.ProjectStatus))
+                        {
+                            <Tag>@project.ProjectStatus</Tag>
+                        }
                 </TitleTemplate>
                 <Body>
                     <div>@((MarkupString)project.MarkdownDescription)</div>
@@ -35,7 +40,12 @@
                     <Icon Type="file-text" /> @project.DatasetCount Datasets
                     <Divider Type="DirectionVHType.Vertical" />
                     <Icon Type="calculator" /> @project.VariableCount Variables
-                </Body>
+                    @if(project.LastModified is not null)
+                    {
+                        <Divider Type="DirectionVHType.Vertical" />
+                        <Icon Type="calendar" /> @project.LastModified?.ToString("d")
+                    }
+                    </Body>
             </Card>
         </AntDesign.Col>
         }

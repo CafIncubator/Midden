@@ -12,6 +12,9 @@ namespace Caf.Midden.Core.Services
     public class ProjectParser : IParseProjects
     {
         private const string PROJECT_VAR_NAME = "project";
+        private const string PROJECT_VAR_LAST_MODIFIED = "lastModified";
+        private const string PROEJCT_VAR_STATUS = "status";
+
         public Models.v0_2.Project Parse(string contents)
         {
             throw new NotImplementedException();
@@ -24,14 +27,26 @@ namespace Caf.Midden.Core.Services
                 return null;
 
             // Read through front-matter and try to find project name
-            string? projectName = "";
+            string projectName = "";
+            DateTime? lastModified = DateTime.MinValue;
+            string projectStatus = "";
+
             string? line;
             while((line = sr.ReadLine()) != null)
             {
                 if (line == "---") break;
                 if (line.StartsWith(PROJECT_VAR_NAME + ":"))
                 {
-                    projectName = ParseProjectName(line);
+                    projectName = ParseFrontMatter(line);
+                }
+                if (line.StartsWith(PROJECT_VAR_LAST_MODIFIED + ":"))
+                {
+                    string modifiedDateTime = ParseFrontMatter(line);
+                    lastModified = DateTime.Parse(modifiedDateTime);
+                }
+                if (line.StartsWith(PROEJCT_VAR_STATUS + ":"))
+                {
+                    projectStatus = ParseFrontMatter(line);
                 }
             }
 
@@ -42,12 +57,14 @@ namespace Caf.Midden.Core.Services
             // Found a project name, so create a project and get the contents
             Models.v0_2.Project project = new Models.v0_2.Project();
             project.Name = projectName;
+            if(lastModified != DateTime.MinValue) project.LastModified = lastModified;
+            project.ProjectStatus = projectStatus;
             project.Description = sr.ReadToEnd();
 
             return project;
         }
 
-        private string ParseProjectName(string line)
+        private string ParseFrontMatter(string line)
         {
             Regex regex = new Regex("\"(.*?)\"");
 
