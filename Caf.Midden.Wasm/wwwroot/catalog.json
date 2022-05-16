@@ -4,7 +4,9 @@
   "projects": [
     {
       "name": "CafModelingRegionalSoilConditioningIndex",
-      "description": "TestDescription"
+      "description": "TestDescription",
+      "lastModified": "2022-05-12T23:37:22.6390000Z",
+      "status": "Incomplete"
     },
     {
       "name": "CafPlantGridPointSurvey",
@@ -12,11 +14,14 @@
     },
     {
       "name": "CookEastGeophysicalEM38",
-      "description": "TestDescription"
+      "description": "TestDescription",
+      "lastModified": "2021-03-12T23:37:22.6390000Z",
+      "status": "Complete"
     },
     {
       "name": "CookEastWaterQualitySubsurfaceTransportDrp",
-      "description": "TestDescription"
+      "description": "TestDescription",
+      "lastModified": "2020-10-12T23:37:22.6390000Z"
     },
     {
       "name": "CafModelingAgroecologicalClasses",

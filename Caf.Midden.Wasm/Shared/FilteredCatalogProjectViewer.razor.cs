@@ -74,6 +74,8 @@ namespace Caf.Midden.Wasm.Shared
                     Name = project.Name,
                     Description = project.Description,
                     MarkdownDescription = GetMarkdown(project.Description),
+                    LastModified = project.LastModified,
+                    ProjectStatus = project.ProjectStatus,
                     DatasetCount = GetNumberDatasets(project.Name, catalog.Metadatas),
                     VariableCount = GetNumberVariables(project.Name, catalog.Metadatas)
                 };

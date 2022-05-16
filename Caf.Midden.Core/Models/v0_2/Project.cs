@@ -17,5 +17,11 @@ namespace Caf.Midden.Core.Models.v0_2
         [JsonPropertyName("description")]
         [Required]
         public string Description { get; set; }
+
+        [JsonPropertyName("lastModified")]
+        public DateTime? LastModified { get; set; }
+
+        [JsonPropertyName("status")]
+        public string? ProjectStatus { get; set; }
     }
 }

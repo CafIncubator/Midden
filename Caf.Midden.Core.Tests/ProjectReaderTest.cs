@@ -76,6 +76,8 @@ namespace Caf.Midden.Core.Tests
             Assert.NotNull(actual);
             Assert.Equal("TestProject", actual.Name);
             Assert.Equal("# Heading", actual.Description);
+            Assert.Equal(DateTime.Parse("2022-05-12T23:37:22.6390000Z"), actual.LastModified);
+            Assert.Equal("Incomplete", actual.ProjectStatus);
         }
 
         [Fact]

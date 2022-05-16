@@ -36,6 +36,17 @@
                     <AntDesign.Input @bind-Value="@context.Name"
                                         Placeholder="Name of project" />
                 </FormItem>
+                <FormItem Label="Status">
+                    <SimpleSelect @bind-Value="@context.ProjectStatus"
+                        Placeholder="Current status of project">
+                        <SelectOptions>
+                            @foreach (var status in State.AppConfig.ProjectStatuses)
+                            {
+                            <SimpleSelectOption Value="@status" Label="@status" />
+                            }
+                        </SelectOptions>
+                    </SimpleSelect>
+                </FormItem>
                 <FormItem Label="Description">
                     <MarkdownEditor @bind-Value="@context.Description" 
                         ValueHTMLChanged="@OnMarkdownValueHTMLChanged" />

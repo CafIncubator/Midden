@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Caf.Midden.Wasm.Shared.ViewModels
 {
@@ -15,6 +16,8 @@ namespace Caf.Midden.Wasm.Shared.ViewModels
         public string Name { get; set; }
         public string Description { get; set; }
         public string MarkdownDescription { get; set; }
+        public DateTime? LastModified { get; set; }
+        public string ProjectStatus { get; set; }
         public int DatasetCount { get; set; }
         public int VariableCount { get; set; }
     }

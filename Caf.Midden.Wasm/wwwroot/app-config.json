@@ -21,6 +21,10 @@
     "Resource provider",
     "User"
   ],
+  "projectStatuses": [
+    "Complete",
+    "Incomplete"
+  ],
   "processingLevels": [
     "Unknown",
     "Measured",
