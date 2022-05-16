@@ -67,6 +67,7 @@ namespace Caf.Midden.Wasm.Shared
                     (String.IsNullOrEmpty(this.Zone) || m.Dataset.Zone.ToLower() == this.Zone.ToLower()) &&
                     (String.IsNullOrEmpty(this.Project) || m.Dataset.Project.ToLower() == this.Project.ToLower()) &&
                     (String.IsNullOrEmpty(this.Tag) || m.Dataset.Tags.Any(t => t.ToLower() == this.Tag.ToLower())))
+                .OrderByDescending(m => m.Dataset.LastUpdate)
                 .ToList();
 
         }
@@ -86,6 +87,7 @@ namespace Caf.Midden.Wasm.Shared
                             SearchTerm.ToLower())) ||
                         (m.Dataset.Tags.Any(t => t.ToLower().Contains(
                             SearchTerm.ToLower()))))
+                    .OrderByDescending(m => m.Dataset.LastUpdate)
                     .ToList();
             }
         }
