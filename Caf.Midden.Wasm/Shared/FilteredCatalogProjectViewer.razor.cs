@@ -83,7 +83,9 @@ namespace Caf.Midden.Wasm.Shared
                 catalogProjects.Add(catalogProject);
             }
 
-            ViewModel.BaseCatalogProjects = new List<CatalogProject>(catalogProjects);
+            ViewModel.BaseCatalogProjects = new List<CatalogProject>(catalogProjects)
+                .OrderByDescending(c => c.LastModified)
+                .ToList();
         }
 
         private string GetMarkdown(string description)
@@ -144,6 +146,7 @@ namespace Caf.Midden.Wasm.Shared
                             ViewModel.SearchTerm.ToLower())) ||
                         (p.Description.ToLower().Contains(
                             ViewModel.SearchTerm.ToLower())))
+                    .OrderByDescending(p => p.LastModified)
                     .ToList();
             }
         }

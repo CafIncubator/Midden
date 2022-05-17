@@ -35,16 +35,16 @@
                         }
                 </TitleTemplate>
                 <Body>
+                    @if(project.LastModified is not null)
+                    {
+                        <Icon Type="calendar" /> @project.LastModified?.ToString("d")
+                        <Divider />
+                    }
                     <div>@((MarkupString)project.MarkdownDescription)</div>
                     <Divider />
                     <Icon Type="file-text" /> @project.DatasetCount Datasets
                     <Divider Type="DirectionVHType.Vertical" />
-                    <Icon Type="calculator" /> @project.VariableCount Variables
-                    @if(project.LastModified is not null)
-                    {
-                        <Divider Type="DirectionVHType.Vertical" />
-                        <Icon Type="calendar" /> @project.LastModified?.ToString("d")
-                    }
+                    <Icon Type="calculator" /> @project.VariableCount Variables 
                     </Body>
             </Card>
         </AntDesign.Col>

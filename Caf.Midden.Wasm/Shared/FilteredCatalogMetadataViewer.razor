@@ -44,7 +44,8 @@
                     <a href="catalog/projects/@metadata.Dataset.Project">
                         @metadata.Dataset.Project
                     </a>
-
+                    <Divider Type="DirectionVHType.Vertical" />
+                    <Icon Type="calendar" /> @metadata.ModifiedDate.ToString("d")
                     <Divider />
                     <div>
                     @if (!String.IsNullOrEmpty(metadata.Dataset.Description))
