@@ -6,8 +6,8 @@
 <div class="site-layout-background">
     <CatalogLoader />
     <PageHeader Class="site-page-header" 
-                Title="Dataset Catalog"
-                Subtitle="Filtered by zone and project"/>
+                Title="@($"Dataset Catalog for \"{ZoneName}\" and \"{ProjectName}\"")"
+                Subtitle="Datasets are filtered by zone and project"/>
     <FilteredCatalogMetadataViewer Zone="@ZoneName"
                                    Project="@ProjectName" />
 </div>

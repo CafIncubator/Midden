@@ -7,7 +7,7 @@
 {
     <AntDesign.Row>
         <AntDesign.Col Offset="8" Span="8">
-            <Search Placeholder="Search all things"
+            <Search Placeholder="Search datasets"
                     OnChange="SearchHandler"
                     EnterButton="true" @bind-Value="SearchTerm"
                     AllowClear="true" />
@@ -65,7 +65,7 @@
 
                     @foreach (var tag in metadata.Dataset.Tags)
                     {
-                        <Tag><a href="catalog/tags/@tag">@tag</a></Tag>
+                        <Tag><a href="catalog/datasets/tags/@tag">@tag</a></Tag>
                     }
                 </Body>
             </Card>
@@ -75,5 +75,4 @@
 }
 else {
     <Empty Simple />
-}
 }

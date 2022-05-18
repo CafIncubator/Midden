@@ -1,11 +1,13 @@
 ﻿@page "/catalog/tags/{TagName}"
+@page "/catalog/datasets/tags/{TagName}"
+
 @inject Services.StateContainer State
 
 <div class="site-layout-background">
     <CatalogLoader />
     <PageHeader Class="site-page-header"
-                Title="Dataset Catalog"
-                Subtitle="Filtered by tag" />
+                Title="@($"Dataset Catalog for \"{TagName}\"")"
+                Subtitle="Datasets filtered by tag" />
     <FilteredCatalogMetadataViewer Tag="@TagName"/>
 </div>
 
