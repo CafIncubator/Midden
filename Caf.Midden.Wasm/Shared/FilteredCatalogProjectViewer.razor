@@ -7,7 +7,7 @@
 {
     <AntDesign.Row>
         <AntDesign.Col Offset="8" Span="8">
-            <Search Placeholder="Search all things"
+            <Search Placeholder="Search projects"
                     OnChange="SearchHandler"
                     EnterButton="true" @bind-Value="ViewModel.SearchTerm"
                     AllowClear="true" />
@@ -35,16 +35,16 @@
                         }
                 </TitleTemplate>
                 <Body>
+                    <Icon Type="file-text" /> @project.DatasetCount
+                    <Divider Type="DirectionVHType.Vertical" />
+                    <Icon Type="calculator" /> @project.VariableCount 
                     @if(project.LastModified is not null)
                     {
+                        <Divider Type="DirectionVHType.Vertical" />
                         <Icon Type="calendar" /> @project.LastModified?.ToString("d")
-                        <Divider />
                     }
-                    <div>@((MarkupString)project.MarkdownDescription)</div>
                     <Divider />
-                    <Icon Type="file-text" /> @project.DatasetCount Datasets
-                    <Divider Type="DirectionVHType.Vertical" />
-                    <Icon Type="calculator" /> @project.VariableCount Variables 
+                    <div>@((MarkupString)project.MarkdownDescription)</div>                    
                     </Body>
             </Card>
         </AntDesign.Col>

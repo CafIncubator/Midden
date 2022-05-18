@@ -8,7 +8,7 @@
         <Popconfirm Title="Confirm reset"
                     OkText="Reset"
                     CancelText="Cancel"
-                    OnConfirm="NewProject">
+                    OnConfirm="NewProjectEdit">
             <Button><Icon Type="plus" Theme="outline" /> New</Button>
         </Popconfirm>
     </SpaceItem>
@@ -28,9 +28,9 @@
     </SpaceItem>
 </Space>
 <AntDesign.Divider />
-@if(this.Project is not null)
+@if(State?.ProjectEdit != null && State?.AppConfig != null)
 {
-    <AntDesign.Form Model="@Project"
+    <AntDesign.Form Model="State.ProjectEdit"
                     Layout="@FormLayout.Vertical"> 
                 <FormItem Label="Name">
                     <AntDesign.Input @bind-Value="@context.Name"

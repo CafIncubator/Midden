@@ -22,23 +22,28 @@ namespace Caf.Midden.Wasm.Shared
         public Project Project { get; set; } = new Project();
 
         [Parameter]
-        public EventCallback<Project> ProjectChanged { get; set; }
-
-        [Parameter]
         public bool isLoading { get; set; } = false;
 
         string markdownHtml = "";
 
-        protected override void OnInitialized()
+        private async Task LastUpdated_StateChanged(
+            ComponentBase source,
+            string lastUpdated)
         {
-            this.Project = new Project();
-            markdownHtml = Markdig.Markdown.ToHtml(Project.Description ?? string.Empty);
-            base.OnInitialized();
+            if (source != this)
+            {
+                await InvokeAsync(StateHasChanged);
+                Console.WriteLine("LastUpdate_StateChanged");
+            }
         }
 
-        Task OnMarkdownValueChanged(string value)
+        protected override void OnInitialized()
         {
-            return Task.CompletedTask;
+            markdownHtml = Markdig.Markdown.ToHtml(
+                State.ProjectEdit.Description ?? string.Empty);
+
+            State.StateChanged += async (source, property) =>
+                await LastUpdated_StateChanged(source, property);
         }
 
         Task OnMarkdownValueHTMLChanged(string value)
@@ -47,21 +52,21 @@ namespace Caf.Midden.Wasm.Shared
             return Task.CompletedTask;
         }
 
-        private void NewProject()
+        private void NewProjectEdit()
         {
-            DateTime dt = DateTime.UtcNow;
+            //DateTime dt = DateTime.UtcNow;
 
-            Project = new Project();
+            State.UpdateProjectEdit(this, new Project());
         }
 
         private async Task<string> SaveProject()
         {
             var now = DateTime.UtcNow;
 
-            State.MetadataEdit.ModifiedDate = now;
+            //State.MetadataEdit.ModifiedDate = now;
 
-            string frontMatter = $"---\nproject: \"{Project.Name}\"\nlastModified: \"{now.ToString("O")}\"\nstatus: \"{Project.ProjectStatus}\"\n---";
-            string fileString = frontMatter + "\n" + Project.Description;
+            string frontMatter = $"---\nproject: \"{State.ProjectEdit.Name}\"\nlastModified: \"{now.ToString("O")}\"\nstatus: \"{State.ProjectEdit.ProjectStatus}\"\n---";
+            string fileString = frontMatter + "\n" + State.ProjectEdit.Description;
 
             var buffer = Encoding.UTF8.GetBytes(fileString);
             var stream = new MemoryStream(buffer);
@@ -98,8 +103,9 @@ namespace Caf.Midden.Wasm.Shared
                     fileString = await sr.ReadToEndAsync();
                 }
 
-                this.Project = projectReader.Read(fileString);
-                await ProjectChanged.InvokeAsync(this.Project);
+                var project = projectReader.Read(fileString);
+                State.UpdateProjectEdit(this, project);
+                //await ProjectChanged.InvokeAsync(this.Project);
             }
             catch
             {

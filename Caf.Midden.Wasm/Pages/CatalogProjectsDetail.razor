@@ -1,8 +1,16 @@
 ﻿@page "/catalog/projects/{ProjectName}"
 @inject Services.StateContainer State
+@inject NavigationManager NavManager
 
 <div class="site-layout-background">
     <CatalogLoader />
+    <AntDesign.Row Justify="end">
+            <AntDesign.Col Span="2">
+                <Button OnClick="EditProject">
+                    <Icon Type="edit" /> Edit
+                </Button>
+            </AntDesign.Col>
+        </AntDesign.Row>
     <ProjectDetails ProjectName="@ProjectName" />
     <FilteredCatalogMetadataViewer  Project="@ProjectName" />
     <CatalogVariableViewer Project=@ProjectName />
@@ -12,4 +20,24 @@
 @code {
     [Parameter]
     public string ProjectName { get; set; }
+
+    public void EditProject()
+    {
+        if(State != null && State.Catalog != null && State.Catalog.Projects != null)
+        {
+            var project = State.Catalog.Projects.FirstOrDefault(p =>
+                p.Name.ToLower().Trim() == ProjectName.ToLower().Trim());
+
+            if(project != null)
+            {
+                State.UpdateProjectEdit(this, project);
+            }
+            else
+            {
+                State.UpdateProjectEdit(this, new Project() { Name = ProjectName });
+            }
+
+            NavManager.NavigateTo("editor/project");
+        }
+    }
 } 

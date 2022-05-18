@@ -93,7 +93,7 @@
                 <AntDesign.Col Span="@((string.IsNullOrEmpty(Metadata.Dataset.DatasetPath) && string.IsNullOrEmpty(Metadata.Dataset.Format) && string.IsNullOrEmpty(Metadata.Dataset.FilePathTemplate) && string.IsNullOrEmpty(Metadata.Dataset.FilePathDescriptor))  ? 0 : 24)" Style="padding:5px">
                     <Card>
                         <TitleTemplate>
-                            <Icon Type="file-text" Theme="outline" /> File Information
+                            <Icon Type="database" Theme="outline" /> File Information
                         </TitleTemplate>
                         <Body>
                             @if (!string.IsNullOrEmpty(Metadata.Dataset.DatasetPath))
@@ -111,7 +111,7 @@
                 <AntDesign.Col Span="@((Metadata.Dataset.Variables == null) || (!Metadata.Dataset.Variables.Any()) ? 0 : 24)" Style="padding:5px;">
                     <Card>
                         <TitleTemplate>
-                            <Icon Type="read" Theme="outline" /> Variables
+                            <Icon Type="calculator" Theme="outline" /> Variables
                         </TitleTemplate>
                         <Body>
                             @if (Metadata.Dataset.Variables?.Count > 0)
@@ -258,7 +258,7 @@
                         <Body>
                             @foreach (var tag in Metadata.Dataset.Tags)
                             {
-                            <Tag><a href="catalog/tags/@tag">@tag</a></Tag>
+                            <Tag><a href="catalog/datasets/tags/@tag">@tag</a></Tag>
                             }
                         </Body>
                     </Card>
