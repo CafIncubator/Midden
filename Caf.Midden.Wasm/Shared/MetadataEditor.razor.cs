@@ -15,35 +15,8 @@ using Microsoft.JSInterop;
 
 namespace Caf.Midden.Wasm.Shared
 {
-    public partial class MetadataEditor : ComponentBase//, IDisposable
+    public partial class MetadataEditor : ComponentBase
     {
-        //[Parameter]
-        //public Configuration AppConfig { get; set; }
-
-        //private Metadata metadata { set; get; }
-
-        //[Parameter]
-        ////public Metadata Metadata { get; set; }
-        //public Metadata Metadata
-        //{
-        //    get => metadata;
-        //    set
-        //    {
-        //        if (metadata == value) return;
-        //        metadata = value;
-        //        State.UpdateLastUpdated(this, DateTime.UtcNow);
-        //        MetadataChanged.InvokeAsync(value);
-        //    }
-        //}
-
-        //[Parameter]
-        //public EventCallback<Metadata> MetadataChanged { get; set; }
-
-        //private string LastUpdated { get; set; } =
-        //    DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
-
-        //private EditContext EditContext { get; set; }
-
         string markdownDescriptionHtml = "";
 
         private async Task LastUpdated_StateChanged(
@@ -63,7 +36,8 @@ namespace Caf.Midden.Wasm.Shared
             //this.EditContext.OnFieldChanged +=
             //    EditContext_OnFieldChange;
 
-            markdownDescriptionHtml = Markdig.Markdown.ToHtml(State.MetadataEdit.Dataset.Description ?? string.Empty);
+            markdownDescriptionHtml = Markdig.Markdown.ToHtml(
+                State.MetadataEdit.Dataset.Description ?? string.Empty);
 
             State.StateChanged += async (source, property) =>
                 await LastUpdated_StateChanged(source, property);
@@ -79,9 +53,6 @@ namespace Caf.Midden.Wasm.Shared
             object sender, 
             FieldChangedEventArgs e)
         {
-            //MetadataChanged.InvokeAsync(this.Metadata);
-
-            //LastUpdated = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
             State.UpdateLastUpdated(this, DateTime.UtcNow);
         }
 

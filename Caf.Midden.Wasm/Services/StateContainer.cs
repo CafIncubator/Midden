@@ -11,7 +11,6 @@ namespace Caf.Midden.Wasm.Services
 {
     public class StateContainer
     {
-        //public string SchemaVersion { get; } = "v0.1";
         public string AssemblyVersion { get; private set; }
         
         public DateTime LastUpdated { get; private set; } = 
@@ -32,6 +31,15 @@ namespace Caf.Midden.Wasm.Services
         {
             this.MetadataEdit = value;
             NotifyStateChanged(source, "UpdateMetadataEdit");
+        }
+
+        public Project ProjectEdit { get; set; } = new Project();
+        public void UpdateProjectEdit(
+            ComponentBase source,
+            Project value)
+        {
+            this.ProjectEdit = value;
+            NotifyStateChanged(source, "UpdateProjectEdit");
         }
 
         public Configuration AppConfig { get; private set; }
