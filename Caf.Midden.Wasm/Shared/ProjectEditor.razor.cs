@@ -65,8 +65,8 @@ namespace Caf.Midden.Wasm.Shared
 
             //State.MetadataEdit.ModifiedDate = now;
 
-            string frontMatter = $"---\nproject: \"{Project.Name}\"\nlastModified: \"{now.ToString("O")}\"\nstatus: \"{Project.ProjectStatus}\"\n---";
-            string fileString = frontMatter + "\n" + Project.Description;
+            string frontMatter = $"---\nproject: \"{State.ProjectEdit.Name}\"\nlastModified: \"{now.ToString("O")}\"\nstatus: \"{State.ProjectEdit.ProjectStatus}\"\n---";
+            string fileString = frontMatter + "\n" + State.ProjectEdit.Description;
 
             var buffer = Encoding.UTF8.GetBytes(fileString);
             var stream = new MemoryStream(buffer);
