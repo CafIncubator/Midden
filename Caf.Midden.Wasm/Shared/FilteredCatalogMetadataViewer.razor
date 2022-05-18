@@ -46,7 +46,10 @@
                         @metadata.Dataset.Project
                     </a>
                     <Divider Type="DirectionVHType.Vertical" />
+                    <Icon Type="calculator" /> @(metadata.Dataset.Variables.Count())
+                    <Divider Type="DirectionVHType.Vertical" />
                     <Icon Type="calendar" /> @metadata.ModifiedDate.ToString("d")
+                    
                     <Divider />
                     <div>
                     @if (!String.IsNullOrEmpty(metadata.Dataset.Description))
