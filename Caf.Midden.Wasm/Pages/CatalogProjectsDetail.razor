@@ -28,7 +28,15 @@
             var project = State.Catalog.Projects.FirstOrDefault(p =>
                 p.Name.ToLower().Trim() == ProjectName.ToLower().Trim());
 
-            State.UpdateProjectEdit(this, project);
+            if(project != null)
+            {
+                State.UpdateProjectEdit(this, project);
+            }
+            else
+            {
+                State.UpdateProjectEdit(this, new Project() { Name = ProjectName });
+            }
+
             NavManager.NavigateTo("editor/project");
         }
     }

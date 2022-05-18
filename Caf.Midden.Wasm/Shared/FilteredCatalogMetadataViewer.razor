@@ -18,6 +18,7 @@
 }
 
 @if (FilteredMetadata != null)
+@if (FilteredMetadata.Count > 0)
 {
     <Row Gutter="16">
         @foreach (var metadata in FilteredMetadata)
@@ -68,4 +69,8 @@
         </AntDesign.Col>
         }
     </Row>
+}
+else {
+    <Empty Simple />
+}
 }
