@@ -17,7 +17,7 @@ namespace Caf.Midden.Cli.Services
             },
             WriteIndented = true
         };
-
+        
         public CliConfiguration? GetConfiguration(
             string configPath = CONFIG_FILE)
         {
@@ -25,7 +25,7 @@ namespace Caf.Midden.Cli.Services
                 return null;
 
             string json = File.ReadAllText(configPath);
-            CliConfiguration? config =
+            CliConfiguration? config = 
                 JsonSerializer.Deserialize<CliConfiguration>(json, jsonOptions);
 
             return config;

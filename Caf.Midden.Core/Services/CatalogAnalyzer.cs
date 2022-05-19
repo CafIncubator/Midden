@@ -1,4 +1,4 @@
-﻿using Caf.Midden.Core.Models.v0_1_0alpha4;
+﻿using Caf.Midden.Core.Models.v0_2;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -3,7 +3,23 @@
 @if (this.Metadata != null)
 {
     <PageHeader Class="site-page-header" Title="@Metadata.Dataset.Name" Subtitle="@($"Last updated: {Metadata.ModifiedDate}")">
+        
     </PageHeader>
+    
+    <Row>
+        <AntDesign.Col Span="24" Style="padding:5px">
+            <Icon Type="folder" />
+            <a href="catalog/datasets/@Metadata.Dataset.Zone">
+                @Metadata.Dataset.Zone
+            </a>
+            <Divider Type="DirectionVHType.Vertical" />
+            <Icon Type="project" />
+            <a href="catalog/projects/@Metadata.Dataset.Project">
+                @Metadata.Dataset.Project
+            </a>
+        </AntDesign.Col>
+    </Row>
+    <Divider />
     <Row>
         <AntDesign.Col Span="17">
             <Row>
@@ -13,9 +29,14 @@
                             <Icon Type="read" Theme="outline" /> Description
                         </TitleTemplate>
                         <Body>
-                            <textarea readonly
-                                      rows="@(string.IsNullOrEmpty(Metadata.Dataset.Description) ? 1 : Metadata.Dataset.Description.Split('\n').Length + 2)"
-                                      style="width:100%; border:none;">@Metadata.Dataset.Description</textarea>
+                        @if (!String.IsNullOrEmpty(Metadata.Dataset.Description))
+                        {
+                            @((MarkupString)(Markdig.Markdown.ToHtml(Metadata.Dataset.Description, pipeline)))
+                        }
+                        else
+                        {
+                            <Empty Simple />
+                        }
                         </Body>
                     </Card>
                 </AntDesign.Col>
@@ -31,6 +52,22 @@
                                 <textarea readonly
                                           rows="@(string.IsNullOrEmpty(method) ? 1 : method.Split('\n').Length + 1)"
                                           style="width:100%; border:none;">@method</textarea>
+                            </ListItem>
+                        </ChildContent>
+                    </AntList>
+                </AntDesign.Col>
+            </Row>
+            <Row>
+                <AntDesign.Col Span="@((Metadata.Dataset.ParentDatasets == null) || (!Metadata.Dataset.ParentDatasets.Any()) ? 0 : 24)" Style="padding:5px">
+                    <AntList Bordered DataSource="@Metadata.Dataset.ParentDatasets">
+                        <Header>
+                            <Icon Type="comment" Theme="outline" /> Parent Datasets
+                        </Header>
+                        <ChildContent Context="parentDataset">
+                            <ListItem Style="overflow:auto;">
+                                <textarea readonly
+                                          rows="@(string.IsNullOrEmpty(parentDataset) ? 1 : parentDataset.Split('\n').Length + 1)"
+                                          style="width:100%; border:none;">@parentDataset</textarea>
                             </ListItem>
                         </ChildContent>
                     </AntList>
@@ -56,7 +93,7 @@
                 <AntDesign.Col Span="@((string.IsNullOrEmpty(Metadata.Dataset.DatasetPath) && string.IsNullOrEmpty(Metadata.Dataset.Format) && string.IsNullOrEmpty(Metadata.Dataset.FilePathTemplate) && string.IsNullOrEmpty(Metadata.Dataset.FilePathDescriptor))  ? 0 : 24)" Style="padding:5px">
                     <Card>
                         <TitleTemplate>
-                            <Icon Type="file-text" Theme="outline" /> File Information
+                            <Icon Type="database" Theme="outline" /> File Information
                         </TitleTemplate>
                         <Body>
                             @if (!string.IsNullOrEmpty(Metadata.Dataset.DatasetPath))
@@ -74,12 +111,12 @@
                 <AntDesign.Col Span="@((Metadata.Dataset.Variables == null) || (!Metadata.Dataset.Variables.Any()) ? 0 : 24)" Style="padding:5px;">
                     <Card>
                         <TitleTemplate>
-                            <Icon Type="read" Theme="outline" /> Variables
+                            <Icon Type="calculator" Theme="outline" /> Variables
                         </TitleTemplate>
                         <Body>
                             @if (Metadata.Dataset.Variables?.Count > 0)
                             {
-                                <AntDesign.Table TItem="Caf.Midden.Core.Models.v0_1.Variable"
+                                <AntDesign.Table TItem="Caf.Midden.Core.Models.v0_2.Variable"
                                                  DataSource="@Metadata.Dataset.Variables"
                                                  Size="@TableSize.Small"
                                                  ScrollX="@Convert.ToString(TableWidth)"
@@ -198,7 +235,7 @@
                             <Icon Type="user" Theme="outline" /> Contacts
                         </TitleTemplate>
                         <Body>
-                            <AntDesign.Table TItem="Caf.Midden.Core.Models.v0_1.Person"
+                            <AntDesign.Table TItem="Caf.Midden.Core.Models.v0_2.Person"
                                              DataSource="@Metadata.Dataset.Contacts"
                                              HidePagination="@true">
                                 <ChildContent Context="contact">
@@ -221,7 +258,7 @@
                         <Body>
                             @foreach (var tag in Metadata.Dataset.Tags)
                             {
-                            <Tag><a href="catalog/tags/@tag">@tag</a></Tag>
+                            <Tag><a href="catalog/datasets/tags/@tag">@tag</a></Tag>
                             }
                         </Body>
                     </Card>

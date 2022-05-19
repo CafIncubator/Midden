@@ -1,4 +1,4 @@
-﻿using Caf.Midden.Core.Models.v0_1;
+﻿using Caf.Midden.Core.Models.v0_2;
 using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
@@ -15,116 +15,9 @@ using Microsoft.JSInterop;
 
 namespace Caf.Midden.Wasm.Shared
 {
-    public partial class MetadataEditor : ComponentBase//, IDisposable
+    public partial class MetadataEditor : ComponentBase
     {
-        //[Parameter]
-        //public Configuration AppConfig { get; set; }
-
-        //private Metadata metadata { set; get; }
-        
-        //[Parameter]
-        ////public Metadata Metadata { get; set; }
-        //public Metadata Metadata
-        //{
-        //    get => metadata;
-        //    set
-        //    {
-        //        if (metadata == value) return;
-        //        metadata = value;
-        //        State.UpdateLastUpdated(this, DateTime.UtcNow);
-        //        MetadataChanged.InvokeAsync(value);
-        //    }
-        //}
-
-        //[Parameter]
-        //public EventCallback<Metadata> MetadataChanged { get; set; }
-
-        //private string LastUpdated { get; set; } =
-        //    DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
-
-        //private EditContext EditContext { get; set; }
-        
-        public void LoadMetadataTest()
-        {
-            // Mock for now
-            var now = DateTime.UtcNow;
-
-            Metadata metadata = new Metadata()
-            {
-                CreationDate = now,
-                ModifiedDate = now,
-                Dataset = new Dataset()
-                {
-                    Zone = "Raw",
-                    Name = "Test",
-                    Contacts = new List<Person>()
-                    {
-                        new Person()
-                        {
-                            Name = "Test",
-                            Email = "Test@test.com",
-                            Role = "User"
-                        }
-                    },
-                    Tags = new List<string>()
-                    {
-                        "Foo",
-                        "[ISO]someThing"
-                    },
-                    Variables = new List<Variable>()
-                    {
-                        new Variable()
-                        {
-                            Name = "Var1",
-                            Description = "Varvar",
-                            Units = "unitless",
-                            QCApplied = new List<string>()
-                            {
-                                "Assurance", "Review"
-                            },
-                            ProcessingLevel = "Calculated",
-                            Methods = new List<string>(){"Tiagatron 3000" },
-                            Tags = new List<string>()
-                            {
-                                "Met", "CAF", "Test"
-                            }
-                        },
-                        new Variable()
-                        {
-                            Name = "Var3",
-                            Description = "Varvarbst",
-                            Units = "unitless",
-                            QCApplied = new List<string>()
-                            {
-                                "Assurance"
-                            },
-                            ProcessingLevel = "Unknown",
-                            Tags = new List<string>()
-                            {
-                                "Met"
-                            }
-                        },
-                        new Variable()
-                        {
-                            Name = "Var4",
-                            Description = "Calculation of the slope and specific catchment area based Topographic Wetness Index. It shows water accumulation. This can be useful for soil or flood mapping",
-                            Units = "unitless",
-                            QCApplied = new List<string>()
-                            {
-                                "Assurance"
-                            },
-                            ProcessingLevel = "Unknown",
-                            Tags = new List<string>()
-                            {
-                                "Met"
-                            }
-                        }
-                    }
-                }
-            };
-
-            State.UpdateMetadataEdit(this, metadata);
-        }
+        string markdownDescriptionHtml = "";
 
         private async Task LastUpdated_StateChanged(
             ComponentBase source,
@@ -142,17 +35,24 @@ namespace Caf.Midden.Wasm.Shared
             //this.EditContext = new EditContext(State.MetadataEdit);
             //this.EditContext.OnFieldChanged +=
             //    EditContext_OnFieldChange;
+
+            markdownDescriptionHtml = Markdig.Markdown.ToHtml(
+                State.MetadataEdit.Dataset.Description ?? string.Empty);
+
             State.StateChanged += async (source, property) =>
                 await LastUpdated_StateChanged(source, property);
+        }
+
+        Task OnMarkdownDescriptionValueHTMLChanged(string value)
+        {
+            markdownDescriptionHtml = value;
+            return Task.CompletedTask;
         }
 
         private void EditContext_OnFieldChange(
             object sender, 
             FieldChangedEventArgs e)
         {
-            //MetadataChanged.InvokeAsync(this.Metadata);
-
-            //LastUpdated = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
             State.UpdateLastUpdated(this, DateTime.UtcNow);
         }
 
@@ -320,9 +220,38 @@ namespace Caf.Midden.Wasm.Shared
         }
         #endregion
 
+        #region Parent Datasets
+        private string NewParentDataset { get; set; }
+
+        private void AddParentDataset(string parentDataset)
+        {
+            if (!string.IsNullOrWhiteSpace(parentDataset) &&
+                !IsDuplicateParentDataset(parentDataset))
+            {
+                State.MetadataEdit.Dataset.ParentDatasets.Add(parentDataset);
+                NewParentDataset = "";
+            }
+        }
+        private bool IsDuplicateParentDataset(string parentDataset)
+        {
+            var dup = State.MetadataEdit.Dataset.ParentDatasets.Find(p => p == parentDataset);
+            if (string.IsNullOrEmpty(dup))
+                return false;
+            else { return true; }
+        }
+
+        private void AddParentDatasetHandler()
+        {
+            AddParentDataset(NewParentDataset);
+        }
+        private void DeleteParentDatasetHandler(string parentDataset)
+        {
+            State.MetadataEdit.Dataset.ParentDatasets.Remove(parentDataset);
+        }
+        #endregion
+
         #region Derived Works
         private string NewDerivedWork { get; set; }
-
 
         private void AddDerivedWork(string derived)
         {
@@ -463,7 +392,7 @@ namespace Caf.Midden.Wasm.Shared
         {
             JsonSerializerOptions options = new JsonSerializerOptions()
             {
-                IgnoreNullValues = true,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                 WriteIndented = true,
                 Converters = { new JsonStringEnumConverter() },
                 Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
@@ -484,7 +413,7 @@ namespace Caf.Midden.Wasm.Shared
             
             await JS.InvokeAsync<string>(
                 "saveAsFile", 
-                $"{State.MetadataEdit.Dataset.Name}.midden", 
+                $"{State.MetadataEdit.Dataset.Name}.midden",
                 Convert.ToBase64String(fileBytes));
 
             return jsonString;

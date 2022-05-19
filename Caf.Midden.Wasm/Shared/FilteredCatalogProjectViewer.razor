@@ -1,0 +1,53 @@
+﻿@inject Caf.Midden.Wasm.Services.StateContainer State
+@inject ModalService ModalService
+
+<Divider Orientation="center">Projects</Divider>
+
+@if (State.Catalog != null)
+{
+    <AntDesign.Row>
+        <AntDesign.Col Offset="8" Span="8">
+            <Search Placeholder="Search projects"
+                    OnChange="SearchHandler"
+                    EnterButton="true" @bind-Value="ViewModel.SearchTerm"
+                    AllowClear="true" />
+        </AntDesign.Col>
+    </AntDesign.Row>
+    
+    <Space />
+}
+
+@if (ViewModel.FilteredCatalogProjects != null)
+{
+    <Row Gutter="16">
+        @foreach (var project in ViewModel.FilteredCatalogProjects)
+        {
+        <AntDesign.Col Span="12" Style="padding:10px">
+            <Card Style="overflow:hidden">
+                <TitleTemplate>
+                    
+                    <a href="catalog/projects/@project.Name">
+                        @project.Name
+                    </a>
+                    @if(!string.IsNullOrEmpty(project.ProjectStatus))
+                        {
+                            <Tag>@project.ProjectStatus</Tag>
+                        }
+                </TitleTemplate>
+                <Body>
+                    <Icon Type="file-text" /> @project.DatasetCount
+                    <Divider Type="DirectionVHType.Vertical" />
+                    <Icon Type="calculator" /> @project.VariableCount 
+                    @if(project.LastModified is not null)
+                    {
+                        <Divider Type="DirectionVHType.Vertical" />
+                        <Icon Type="calendar" /> @project.LastModified?.ToString("d")
+                    }
+                    <Divider />
+                    <div>@((MarkupString)project.MarkdownDescription)</div>                    
+                    </Body>
+            </Card>
+        </AntDesign.Col>
+        }
+    </Row>
+}

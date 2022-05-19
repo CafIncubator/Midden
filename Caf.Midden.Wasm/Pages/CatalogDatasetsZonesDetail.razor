@@ -1,0 +1,18 @@
+﻿@page "/catalog/datasets/zones/{ZoneName}"
+@page "/catalog/datasets/{ZoneName}"
+
+@inject Services.StateContainer State
+
+<div class="site-layout-background">
+    <CatalogLoader />
+    <PageHeader Class="site-page-header"
+                Title="@($"Dataset Catalog for \"{ZoneName}\"")"
+                Subtitle="Datasets are filtered by zone"/>
+    <FilteredCatalogMetadataViewer Zone="@ZoneName" />
+</div>
+
+
+@code {
+    [Parameter]
+    public string ZoneName { get; set; }
+} 

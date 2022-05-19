@@ -1,0 +1,32 @@
+﻿@inject Caf.Midden.Wasm.Services.StateContainer State
+@inject ModalService ModalService
+
+@if (Project != null)
+{
+<PageHeader Class="site-page-header" Title="@Project.Name" Subtitle="@($"Last updated: {Project.LastModified}")"></PageHeader>
+ @if(!string.IsNullOrEmpty(Project.ProjectStatus))
+{
+<Row>
+    <AntDesign.Col Span="24" Style="padding:5px">
+        <Tag>@Project.ProjectStatus</Tag>
+    </AntDesign.Col>
+</Row>
+}
+<Divider />
+<Card>
+    <TitleTemplate>
+        <Icon Type="project" Theme="outline" /> Description
+    </TitleTemplate>
+    <Body>
+        <div>@((MarkupString)MarkdownDescription)</div>
+        <Divider />
+        <Icon Type="file-text" /> @NumberDatasets Datasets
+        <Divider Type="DirectionVHType.Vertical" />
+        <Icon Type="calculator" /> @NumberVariables Variables
+    </Body>
+</Card>
+}
+else
+{
+<Empty Simple />
+}

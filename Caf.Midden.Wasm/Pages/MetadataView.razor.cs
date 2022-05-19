@@ -1,4 +1,4 @@
-﻿using Caf.Midden.Core.Models.v0_1;
+﻿using Caf.Midden.Core.Models.v0_2;
 using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
@@ -68,7 +68,7 @@ namespace Caf.Midden.Wasm.Pages
         public void EditMetadata()
         {
             State.MetadataEdit = this.Metadata;
-            NavManager.NavigateTo("editor");
+            NavManager.NavigateTo("editor/dataset");
         }
     }
 }

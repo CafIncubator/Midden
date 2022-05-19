@@ -1,0 +1,16 @@
+﻿@page "/catalog/projects"
+@inject Services.StateContainer State
+@inject NavigationManager NavManager
+
+<div class="site-layout-background">
+    <CatalogLoader />
+    <PageHeader Class="site-page-header"
+                Title="Project Catalog" />
+    
+    <FilteredCatalogProjectViewer />
+</div>
+
+
+@code {
+
+} 

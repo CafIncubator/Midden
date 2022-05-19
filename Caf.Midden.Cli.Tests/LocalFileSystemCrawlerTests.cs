@@ -15,7 +15,7 @@ namespace Caf.Midden.Cli.Tests
         {
             var sut = new LocalFileSystemCrawler(@"Assets\MockDataStoreLocal");
 
-            var actual = sut.GetFileNames();
+            var actual = sut.GetFileNames(".midden");
 
             Assert.Equal(5, actual.Count);
         }

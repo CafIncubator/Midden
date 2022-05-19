@@ -1,21 +1,25 @@
 ﻿@inject Caf.Midden.Wasm.Services.StateContainer State
 @inject ModalService ModalService
 
+<Divider Orientation="center">Variables</Divider>
+
 @if (State.Catalog != null)
 {
     <AntDesign.Row>
         <AntDesign.Col Offset="8" Span="8">
-            <Search Placeholder="Search all things"
+            <Search Placeholder="Search variables"
                     OnChange="SearchHandler"
                     EnterButton="true" @bind-Value="ViewModel.SearchTerm"
                     AllowClear="true"/>
         </AntDesign.Col>
     </AntDesign.Row>
+
+    <Space />
 }
 
-<Divider Orientation="center">Variables</Divider>
-
 @if(ViewModel?.FilteredCatalogVariables != null)
+{
+if(ViewModel?.FilteredCatalogVariables.Count > 0)
 {
 <Row Gutter="16">
     <AntDesign.Col Span="24">
@@ -95,4 +99,7 @@
         </AntDesign.Table>
     </AntDesign.Col>
 </Row>
+} else {
+    <Empty Simple />
+}
 }

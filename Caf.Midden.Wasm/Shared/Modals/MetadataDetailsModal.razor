@@ -1,4 +1,4 @@
-﻿@using Caf.Midden.Core.Models.v0_1
+﻿@using Caf.Midden.Core.Models.v0_2
 @using Microsoft.AspNetCore.Components
 @using AntDesign
 @inherits FeedbackComponent<Caf.Midden.Wasm.Shared.ViewModels.MetadataDetailsViewModel>
@@ -40,7 +40,7 @@
     {
         await base.CloseFeedbackAsync();
        
-        NavManager.NavigateTo($"catalog/zones/{_model.Metadata.Dataset.Zone}/projects/{_model.Metadata.Dataset.Project}/datasets/{_model.Metadata.Dataset.Name}");
+        NavManager.NavigateTo($"catalog/datasets/{_model.Metadata.Dataset.Zone}/{_model.Metadata.Dataset.Project}/{_model.Metadata.Dataset.Name}");
     }
 
     private void OnFinish(EditContext editContext)

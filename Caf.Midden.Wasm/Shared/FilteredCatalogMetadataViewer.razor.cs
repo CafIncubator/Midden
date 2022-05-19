@@ -1,6 +1,7 @@
 ﻿using AntDesign;
-using Caf.Midden.Core.Models.v0_1;
+using Caf.Midden.Core.Models.v0_2;
 using Caf.Midden.Wasm.Shared.Modals;
+using Markdig;
 using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
@@ -25,6 +26,11 @@ namespace Caf.Midden.Wasm.Shared
         public List<Metadata> FilteredMetadata { get; set; } = new List<Metadata>();
 
         public string SearchTerm { get; set; }
+
+        private MarkdownPipeline pipeline = new MarkdownPipelineBuilder()
+            .UseAdvancedExtensions()
+            .UseYamlFrontMatter()
+            .Build();
 
         protected override void OnInitialized()
         {
@@ -52,8 +58,6 @@ namespace Caf.Midden.Wasm.Shared
 
                 await InvokeAsync(StateHasChanged);
             }
-
-
         }
 
         private void SetBaseMetadatas()
@@ -63,6 +67,7 @@ namespace Caf.Midden.Wasm.Shared
                     (String.IsNullOrEmpty(this.Zone) || m.Dataset.Zone.ToLower() == this.Zone.ToLower()) &&
                     (String.IsNullOrEmpty(this.Project) || m.Dataset.Project.ToLower() == this.Project.ToLower()) &&
                     (String.IsNullOrEmpty(this.Tag) || m.Dataset.Tags.Any(t => t.ToLower() == this.Tag.ToLower())))
+                .OrderByDescending(m => m.Dataset.LastUpdate)
                 .ToList();
 
         }
@@ -82,6 +87,7 @@ namespace Caf.Midden.Wasm.Shared
                             SearchTerm.ToLower())) ||
                         (m.Dataset.Tags.Any(t => t.ToLower().Contains(
                             SearchTerm.ToLower()))))
+                    .OrderByDescending(m => m.Dataset.LastUpdate)
                     .ToList();
             }
         }

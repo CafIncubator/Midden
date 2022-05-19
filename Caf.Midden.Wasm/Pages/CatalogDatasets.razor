@@ -1,0 +1,12 @@
+﻿@page "/datasets"
+@page "/catalog/datasets"
+@page "/variable-catalog"
+@page "/dataset-catalog"
+
+@inject Services.StateContainer State
+
+<div class="site-layout-background">
+    <CatalogLoader />
+    <PageHeader Class="site-page-header" Title="Dataset Catalog" />
+    <FilteredCatalogMetadataViewer />    
+</div>

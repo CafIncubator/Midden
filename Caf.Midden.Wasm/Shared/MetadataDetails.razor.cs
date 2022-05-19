@@ -1,10 +1,11 @@
-﻿using Caf.Midden.Core.Models.v0_1;
+﻿using Caf.Midden.Core.Models.v0_2;
 using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AntDesign;
+using Markdig;
 
 namespace Caf.Midden.Wasm.Shared
 {
@@ -26,6 +27,11 @@ namespace Caf.Midden.Wasm.Shared
         public int TableWidth { get; set; }
 
         public TableFilter<string>[] FilterProcessing;
+
+        private MarkdownPipeline pipeline = new MarkdownPipelineBuilder()
+            .UseAdvancedExtensions()
+            .UseYamlFrontMatter()
+            .Build();
 
         protected override void OnInitialized()
         {

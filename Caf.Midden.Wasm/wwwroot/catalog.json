@@ -1,6 +1,33 @@
 {
   "schemaVersion": "v0.1.0-alpha4",
   "creationDate": "2021-02-18T23:29:24.5538603Z",
+  "projects": [
+    {
+      "name": "CafModelingRegionalSoilConditioningIndex",
+      "description": "TestDescription",
+      "lastModified": "2022-05-12T23:37:22.6390000Z",
+      "status": "Incomplete"
+    },
+    {
+      "name": "CafPlantGridPointSurvey",
+      "description": "# Project Summary\r\n\r\n## Overview\r\n\r\nBlah blah blah blah.\r\n\r\n- This person\r\n- Then we do this\r\n- Then this\r\n\r\n## Reponsible party\r\n\r\n- This name \u003Cbob@bob.com\u003E\r\n- Bob Boberson \u003Cbob@bob.com\u003E\r\n"
+    },
+    {
+      "name": "CookEastGeophysicalEM38",
+      "description": "TestDescription",
+      "lastModified": "2021-03-12T23:37:22.6390000Z",
+      "status": "Complete"
+    },
+    {
+      "name": "CookEastWaterQualitySubsurfaceTransportDrp",
+      "description": "TestDescription",
+      "lastModified": "2020-10-12T23:37:22.6390000Z"
+    },
+    {
+      "name": "CafModelingAgroecologicalClasses",
+      "description": "Testing advanced markup\nHere is a link: [Caf blog](https://www.cafltar.org/blog/posts/2018/march/flexcroppingspringcanola/)\n\nHere is an image:\n![](https://www.cafltar.org/media/1037/feb1-precip-diff.png?width=500&height=468.125)"
+    }
+  ],
   "metadatas": [
     {
       "schemaVersion": "v0.1.0-alpha4",
