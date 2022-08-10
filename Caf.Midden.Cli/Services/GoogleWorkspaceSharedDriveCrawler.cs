@@ -29,9 +29,6 @@ namespace Caf.Midden.Cli.Services
 
         string[] Scopes = { DriveService.Scope.DriveReadonly };
 
-        private readonly string clientId;
-        private readonly string clientSecret;
-        private readonly string applicationName;
         private readonly DriveService service;
 
         private List<Google.Apis.Drive.v3.Data.TeamDrive> cachedDriveList;
@@ -41,15 +38,11 @@ namespace Caf.Midden.Cli.Services
             string clientSecret,
             string applicationName)
         {
-            this.clientId = clientId;
-            this.clientSecret = clientSecret;
-            this.applicationName = applicationName;
-
             UserCredential credential;
             ClientSecrets clientSecrets = new ClientSecrets()
             {
-                ClientId = this.clientId,
-                ClientSecret = this.clientSecret
+                ClientId = clientId,
+                ClientSecret = clientSecret
             };
 
             credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
@@ -62,7 +55,22 @@ namespace Caf.Midden.Cli.Services
             this.service = new DriveService(new BaseClientService.Initializer()
             {
                 HttpClientInitializer = credential,
-                ApplicationName = this.applicationName
+                ApplicationName = applicationName
+            });
+        }
+
+        public GoogleWorkspaceSharedDriveCrawler(
+            string jsonKeyPath,
+            string applicationName)
+        {
+            GoogleCredential credential = GoogleCredential
+                .FromFile(jsonKeyPath)
+                .CreateScoped(Scopes);
+
+            this.service = new DriveService(new BaseClientService.Initializer()
+            {
+                HttpClientInitializer = credential,
+                ApplicationName = applicationName
             });
         }
 

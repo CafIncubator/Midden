@@ -13,7 +13,7 @@ namespace Caf.Midden.Cli.Tests
 {
     public class CrawlerIntegrationTests
     {
-        // NOTE: These tests require configuration files that are not included in the repository. These need to be generated for each clone.
+        // NOTE: These tests require configuration files that are not included in the repository. These need to be generated for each clone of the repository.
         [Fact]
         public void GetProjects_Local()
         {
@@ -79,6 +79,29 @@ namespace Caf.Midden.Cli.Tests
             GoogleWorkspaceSharedDriveCrawler sut = new GoogleWorkspaceSharedDriveCrawler(
                 dataStore.ClientId,
                 dataStore.ClientSecret,
+                dataStore.ApplicationName);
+
+            List<Core.Models.v0_2.Project> actual = sut.GetProjects(new ProjectReader(
+                new ProjectParser()));
+
+            Assert.NotNull(actual);
+            Assert.True(actual.Count() > 0);
+        }
+
+        [Fact]
+        public void GetProjects_GoogleWorkspaceSharedDrive_ServiceAccount()
+        {
+            string configPath = "Assets/CliConfigurationSecrets/GoogleWorkspaceSharedDriveProjectTestWithServiceAccount.json";
+            if (!File.Exists(configPath))
+                throw new FileNotFoundException(configPath);
+
+            // Gets config file, fails if not exist
+            ConfigurationService configurationService = new ConfigurationService();
+            CliConfiguration config = configurationService.GetConfiguration(configPath);
+
+            DataStore dataStore = config.DataStores[0];
+            GoogleWorkspaceSharedDriveCrawler sut = new GoogleWorkspaceSharedDriveCrawler(
+                dataStore.AuthFilePath,
                 dataStore.ApplicationName);
 
             List<Core.Models.v0_2.Project> actual = sut.GetProjects(new ProjectReader(

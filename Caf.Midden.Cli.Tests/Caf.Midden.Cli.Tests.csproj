@@ -27,10 +27,16 @@
     <None Update="Assets\CliConfigurationSecrets\AzureDataLakeProjectTest.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Assets\CliConfigurationSecrets\GoogleWorkspaceSharedDriveProjectTestWithServiceAccount.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Assets\CliConfigurationSecrets\GoogleWorkspaceSharedDriveProjectTest.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Assets\CliConfigurationSecrets\LocalFileSystemProjectTest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\CliConfigurationSecrets\middencli-1613753843824-7ab2426f841e.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Assets\MockDataStoreLocal\Production\DESCRIPTION.md">

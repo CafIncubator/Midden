@@ -20,5 +20,7 @@ namespace Caf.Midden.Cli.Models
         public string? SharedAccessSignature { get; set; }
         public string? Uri { get; set; }
         public bool? ShouldCollateProjects { get; set; }
+        // Used for authentication methods that can be configured using a file, like a json file. Google allows this with their Serive Accounts, for example
+        public string? AuthFilePath { get; set; }
     }
 }

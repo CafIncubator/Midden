@@ -180,6 +180,14 @@ namespace Caf.Midden.Cli.Actions
                                 currStore.ClientSecret,
                                 currStore.ApplicationName);
                         }
+                        else if(
+                            currStore.AuthFilePath is not null &&
+                            currStore.ApplicationName is not null)
+                        {
+                            crawler = new GoogleWorkspaceSharedDriveCrawler(
+                                currStore.AuthFilePath,
+                                currStore.ApplicationName);
+                        }
                         else
                         {
                             Console.WriteLine(
