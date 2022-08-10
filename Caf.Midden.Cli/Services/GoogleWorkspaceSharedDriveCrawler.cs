@@ -173,7 +173,10 @@ namespace Caf.Midden.Cli.Services
                     {
                         foreach (var file in files)
                         {
-                            if(file.Name.EndsWith(fileNameContains))
+                            if (file.Trashed == true)
+                                continue;
+
+                            if (file.Name.EndsWith(fileNameContains))
                             {
                                 Console.WriteLine($"  In {drive.Name} found {file.Name}");
                                 names.Add(file.Id);
@@ -238,7 +241,10 @@ namespace Caf.Midden.Cli.Services
                         {
                             foreach (var file in dirFiles)
                             {
-                                if(file.Name.EndsWith(fileNameEndsWith))
+                                if (file.Trashed == true)
+                                    continue;
+
+                                if (file.Name.EndsWith(fileNameEndsWith))
                                 {
                                     Console.WriteLine($"  In {drive.Name} found {file.Name}");
 
@@ -267,6 +273,9 @@ namespace Caf.Midden.Cli.Services
 
             foreach(var file in files)
             {
+                if (file.Trashed == true)
+                    continue;
+
                 string json;
                 
                 using (MemoryStream ms = new MemoryStream())
@@ -314,6 +323,9 @@ namespace Caf.Midden.Cli.Services
 
             foreach (var file in files)
             {
+                if (file.Trashed == true)
+                    continue;
+
                 string fileString;
 
                  //Option 1

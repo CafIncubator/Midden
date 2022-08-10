@@ -125,7 +125,10 @@ namespace Caf.Midden.Cli.Services
             {
                 foreach (var file in files)
                 {
-                    if(file.Name.EndsWith(fileNameContains))
+                    if (file.Trashed == true)
+                        continue;
+
+                    if (file.Name.EndsWith(fileNameContains))
                     {
                         Console.WriteLine($" Found {file.Name}");
                         names.Add(file.Id);
@@ -165,6 +168,9 @@ namespace Caf.Midden.Cli.Services
                 {
                     foreach (var file in dirFiles)
                     {
+                        if (file.Trashed == true)
+                            continue;
+
                         Console.WriteLine($"  Found {file.Name}");
 
                         files.Add(file);
@@ -174,6 +180,9 @@ namespace Caf.Midden.Cli.Services
                 {
                     foreach (var file in dirFiles)
                     {
+                        if (file.Trashed == true)
+                            continue;
+
                         Console.WriteLine($"  Found {file.Name}");
 
                         files.Add(file);
@@ -196,6 +205,9 @@ namespace Caf.Midden.Cli.Services
 
             foreach(var file in files)
             {
+                if (file.Trashed == true)
+                    continue;
+
                 string json;
                 
                 using (MemoryStream ms = new MemoryStream())
@@ -243,6 +255,9 @@ namespace Caf.Midden.Cli.Services
 
             foreach (var file in files)
             {
+                if (file.Trashed == true)
+                    continue;
+
                 string fileString;
 
                 //Option 1
