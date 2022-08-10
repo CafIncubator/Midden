@@ -99,7 +99,7 @@ namespace Caf.Midden.Cli.Services
         {        
             // Fetch file from drive
             FilesResource.GetRequest request = service.Files.Get(id);
-            request.Fields = "id, name, parents, driveId";
+            request.Fields = "id, name, parents, driveId, trashed";
             request.SupportsAllDrives = true;
             request.SupportsTeamDrives = true;
             var parent = request.Execute();
@@ -116,7 +116,7 @@ namespace Caf.Midden.Cli.Services
 
             FilesResource.ListRequest listRequest = service.Files.List();
             listRequest.PageSize = 100;
-            listRequest.Fields = "nextPageToken, files(id, name, parents)";
+            listRequest.Fields = "nextPageToken, files(id, name, parents, trashed)";
             listRequest.Q = $"name contains '{fileNameContains}'";
 
             IList<Google.Apis.Drive.v3.Data.File> files = listRequest.Execute().Files;
@@ -150,7 +150,7 @@ namespace Caf.Midden.Cli.Services
             
             FilesResource.ListRequest listRequest = service.Files.List();
             listRequest.PageSize = 100;
-            listRequest.Fields = "nextPageToken, files(id, name, parents)";
+            listRequest.Fields = "nextPageToken, files(id, name, parents, trashed)";
 
             string searchQuery;
             if (fileNameContainsIsExactMatch)

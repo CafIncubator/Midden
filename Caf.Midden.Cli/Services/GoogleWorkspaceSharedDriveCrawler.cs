@@ -121,7 +121,7 @@ namespace Caf.Midden.Cli.Services
         {        
             // Fetch file from drive
             FilesResource.GetRequest request = service.Files.Get(id);
-            request.Fields = "id, name, parents, driveId";
+            request.Fields = "id, name, parents, driveId, trashed";
             request.SupportsAllDrives = true;
             request.SupportsTeamDrives = true;
             var parent = request.Execute();
@@ -161,7 +161,7 @@ namespace Caf.Midden.Cli.Services
                     FilesResource.ListRequest listRequest = service.Files.List();
                     listRequest.DriveId = drive.Id;
                     listRequest.PageSize = 100;
-                    listRequest.Fields = "nextPageToken, files(id, name, parents)";
+                    listRequest.Fields = "nextPageToken, files(id, name, parents, trashed)";
                     listRequest.IncludeItemsFromAllDrives = true;
                     listRequest.SupportsAllDrives = true;
                     listRequest.Corpora = "drive";
@@ -211,7 +211,7 @@ namespace Caf.Midden.Cli.Services
                     FilesResource.ListRequest listRequest = service.Files.List();
                     listRequest.DriveId = drive.Id;
                     listRequest.PageSize = 100;
-                    listRequest.Fields = "nextPageToken, files(id, name, parents)";
+                    listRequest.Fields = "nextPageToken, files(id, name, parents, trashed)";
                     listRequest.IncludeItemsFromAllDrives = true;
                     listRequest.SupportsAllDrives = true;
                     listRequest.Corpora = "drive";
