@@ -1,7 +1,9 @@
 ﻿using Caf.Midden.Cli.Actions;
 using Caf.Midden.Cli.Models;
 using Caf.Midden.Cli.Services;
+using System;
 using System.CommandLine;
+using System.IO;
 
 namespace Caf.Midden.Cli
 {
@@ -10,7 +12,10 @@ namespace Caf.Midden.Cli
         static int Main(string[] args)
         {
             ConfigurationService configReader = new ConfigurationService();
-            CliConfiguration? config = configReader.GetConfiguration();
+
+            string currDir = AppDomain.CurrentDomain.BaseDirectory;
+            Console.WriteLine("MiddenCli: CurrentDirectory is: " + currDir);
+            CliConfiguration? config = configReader.GetConfiguration(Path.Combine(currDir, "configuration.json"));
 
             var cmd = new RootCommand
             {

@@ -19,8 +19,11 @@ namespace Caf.Midden.Cli.Services
         };
         
         public CliConfiguration? GetConfiguration(
-            string configPath = CONFIG_FILE)
+            string? configPath)
         {
+            if (string.IsNullOrEmpty(configPath))
+                configPath = CONFIG_FILE;
+
             if (!File.Exists(configPath))
                 return null;
 
