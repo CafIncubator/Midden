@@ -20,6 +20,8 @@ namespace Caf.Midden.Wasm.Pages
         Dictionary<string, int> TopVariableTags { get; set; }
         Dictionary<string, int> TopContacts { get; set; }
 
+        List<Dataset> RecentDatasets { get; set; }
+
         DateTime CatalogLastUpdate { get; set; }
 
         protected override void OnInitialized()

@@ -75,52 +75,12 @@
     </AntDesign.Row>
 
     <Divider />
-
-    <AntDesign.Row Gutter="16">
-        <AntDesign.Col Span="12" Style="padding: 5px;">
-            <AntDesign.AntList DataSource="@TopDatasetTags"
-                               Bordered>
-                <Header>Top Dataset Tags</Header>
-                <ChildContent Context="item">
-                    <ListItem>
-
-                        <span><a href="catalog/datasets/tags/@item.Key"><Text>@item.Key</Text></a></span> @item.Value
-                    </ListItem>
-                </ChildContent>
-            </AntDesign.AntList>
-        </AntDesign.Col>
-        <AntDesign.Col Span="12" Style="padding: 5px;">
-            <AntDesign.AntList DataSource="@TopVariableTags"
-                               Bordered>
-                <Header>Top Variable Tags</Header>
-                <ChildContent Context="item">
-                    <ListItem>
-
-                        <span><a href="catalog/variables/tags/@item.Key"><Text>@item.Key</Text></a></span> @item.Value
-                    </ListItem>
-                </ChildContent>
-            </AntDesign.AntList>
-        </AntDesign.Col>
-    </AntDesign.Row>
-    <AntDesign.Row Gutter="16">
-        <AntDesign.Col Span="16" Style="padding: 5px;">
-            <AntDesign.AntList DataSource="@TopContacts"
-                               Bordered>
-                <Header>Top Contributors</Header>
-                <ChildContent Context="item">
-                    <ListItem>
-                        <span><Text>@item.Key</Text></span> @item.Value
-                    </ListItem>
-                </ChildContent>
-            </AntDesign.AntList>
-        </AntDesign.Col>
-    </AntDesign.Row>
-
+    <!-- 
     <Row Gutter="16">
         <AntDesign.Col Span="8">
-            <a href="insights">
+            <a href="catalog/projects">
                 <Card Hoverable>
-                    <CardMeta Title="Insights" Description="Stats for nerds" />
+                    <CardMeta Title="Project Catalog" Description="Find and view projects" />
                 </Card>
             </a>
         </AntDesign.Col>
@@ -139,6 +99,53 @@
             </a>
         </AntDesign.Col>
     </Row>
+    -->
+
+    <AntDesign.Row Gutter="16">
+        <AntDesign.Col Span="12" Style="padding: 5px;">
+            <AntDesign.AntList DataSource="@TopDatasetTags"
+                               Bordered>
+                <Header>Top Dataset Tags</Header>
+                <ChildContent Context="item">
+                    <a href="catalog/datasets/tags/@item.Key">
+                        <ListItem>
+
+                        <span><Text>@item.Key</Text></span> @item.Value
+                        </ListItem>
+                    </a>
+                </ChildContent>
+            </AntDesign.AntList>
+        </AntDesign.Col>
+        <AntDesign.Col Span="12" Style="padding: 5px;">
+            <AntDesign.AntList DataSource="@TopVariableTags"
+                               Bordered>
+                <Header>Top Variable Tags</Header>
+                <ChildContent Context="item">
+                    <a href="catalog/variables/tags/@item.Key" class="ListItemLink">
+                        <ListItem>
+
+                        <span><Text>@item.Key</Text></span> @item.Value
+                        </ListItem>
+                    </a>
+                </ChildContent>
+            </AntDesign.AntList>
+        </AntDesign.Col>
+    </AntDesign.Row>
+    <AntDesign.Row Gutter="16">
+        <AntDesign.Col Span="16" Style="padding: 5px;">
+            <AntDesign.AntList DataSource="@TopContacts"
+                               Bordered>
+                <Header>Top Contributors</Header>
+                <ChildContent Context="item">
+                    <ListItem>
+                        <span><Text>@item.Key</Text></span> @item.Value
+                    </ListItem>
+                </ChildContent>
+            </AntDesign.AntList>
+        </AntDesign.Col>
+    </AntDesign.Row>
+
+    
 
 </div>
 
