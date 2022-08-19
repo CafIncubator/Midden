@@ -106,6 +106,24 @@ namespace Caf.Midden.Wasm.Shared
                                 DatasetName = metadata.Dataset.Name
                             });
                         }
+                        else
+                        {
+                            catalogVariables.Add(new CatalogVariable()
+                            {
+                                Name = variable.Name,
+                                Description = variable.Description,
+                                Units = variable.Units,
+                                Tags = new List<string>(variable.Tags),
+                                Methods = new List<string>(variable.Methods),
+                                TemporalResolution = variable.TemporalResolution,
+                                TemporalExtent = variable.TemporalExtent,
+                                QCApplied = variable.QCApplied,
+                                ProcessingLevel = variable.ProcessingLevel,
+                                Zone = metadata.Dataset.Zone,
+                                ProjectName = metadata.Dataset.Project,
+                                DatasetName = metadata.Dataset.Name
+                            });
+                        }
                     }
                 }
             }
