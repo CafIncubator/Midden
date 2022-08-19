@@ -76,9 +76,16 @@
 
     <Divider />
     
-    <Title Level="2">Recent Datasets</Title>
-    <FilteredCatalogMetadataViewer ShowSearch=false ShowHeader=false ShowRecentNumber="2" />
+    <Title Level="2">Recent Projects</Title>
+    <FilteredCatalogProjectViewer ShowSearch=false ShowHeader=false ShowRecentNumber="2" />
+    <Divider />
 
+    <Title Level="2">Recent Datasets</Title>
+
+    <FilteredCatalogMetadataViewer ShowSearch=false ShowHeader=false ShowRecentNumber="2" />
+    <Divider />
+   
+    <Title Level="2">Stats for Nerds</Title>
     <AntDesign.Row Gutter="16">
         <AntDesign.Col Span="12" Style="padding: 5px;">
             <AntDesign.AntList DataSource="@TopDatasetTags"

@@ -22,6 +22,15 @@ namespace Caf.Midden.Wasm.Shared
 
         //public string SearchTerm { get; set; }
 
+        [Parameter]
+        public bool ShowSearch { get; set; } = true;
+
+        [Parameter]
+        public bool ShowHeader { get; set; } = true;
+
+        [Parameter]
+        public int ShowRecentNumber { get; set; } = 0;
+
         protected override void OnInitialized()
         {
             State.StateChanged += async (source, property)
@@ -83,9 +92,21 @@ namespace Caf.Midden.Wasm.Shared
                 catalogProjects.Add(catalogProject);
             }
 
-            ViewModel.BaseCatalogProjects = new List<CatalogProject>(catalogProjects)
+            var projs = new List<CatalogProject>(catalogProjects)
                 .OrderByDescending(c => c.LastModified)
                 .ToList();
+
+            if(projs != null && projs.Count > 0 && ShowRecentNumber > 0)
+            {
+                int toTake = ShowRecentNumber;
+                if (projs.Count < toTake) toTake = projs.Count;
+
+                ViewModel.BaseCatalogProjects = projs.GetRange(0, toTake);
+            }
+            else
+            {
+                ViewModel.BaseCatalogProjects = projs;
+            }
         }
 
         private string GetMarkdown(string description)
