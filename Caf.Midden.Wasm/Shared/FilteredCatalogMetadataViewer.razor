@@ -1,9 +1,12 @@
 ﻿@inject Caf.Midden.Wasm.Services.StateContainer State
 @inject ModalService ModalService
 
-<Divider Orientation="center">Datasets</Divider>
+@if (this.ShowHeader)
+{
+    <Divider Orientation="center">Datasets</Divider>
+}
 
-@if (State.Catalog != null)
+@if (State.Catalog != null && this.ShowSearch)
 {
     <AntDesign.Row>
         <AntDesign.Col Offset="8" Span="8">

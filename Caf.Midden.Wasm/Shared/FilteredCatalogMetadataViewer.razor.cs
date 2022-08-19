@@ -21,6 +21,15 @@ namespace Caf.Midden.Wasm.Shared
         [Parameter]
         public string Tag { get; set; }
 
+        [Parameter]
+        public bool ShowSearch { get; set; } = true;
+
+        [Parameter]
+        public bool ShowHeader { get; set; } = true;
+
+        [Parameter]
+        public int ShowRecentNumber { get; set; } = 0;
+
 
         public List<Metadata> BaseMetadatas { get; set; } = new List<Metadata>();
         public List<Metadata> FilteredMetadata { get; set; } = new List<Metadata>();
@@ -62,13 +71,26 @@ namespace Caf.Midden.Wasm.Shared
 
         private void SetBaseMetadatas()
         {
-            BaseMetadatas = State.Catalog.Metadatas
+            List<Metadata> metas = State.Catalog.Metadatas
                 .Where(m =>
                     (String.IsNullOrEmpty(this.Zone) || m.Dataset.Zone.ToLower() == this.Zone.ToLower()) &&
                     (String.IsNullOrEmpty(this.Project) || m.Dataset.Project.ToLower() == this.Project.ToLower()) &&
                     (String.IsNullOrEmpty(this.Tag) || m.Dataset.Tags.Any(t => t.ToLower() == this.Tag.ToLower())))
                 .OrderByDescending(m => m.Dataset.LastUpdate)
                 .ToList();
+
+            if(metas != null && metas.Count > 0 && ShowRecentNumber > 0)
+            {
+                int toTake = ShowRecentNumber;
+                if (metas.Count < toTake) toTake = metas.Count;
+
+                this.BaseMetadatas = metas.GetRange(0, toTake);
+            }
+            else
+            {
+                this.BaseMetadatas = metas;
+            }
+
 
         }
         private void SearchHandler()
