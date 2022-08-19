@@ -71,7 +71,7 @@ if(ViewModel?.FilteredCatalogVariables.Count > 0)
                 <AntDesign.Column @bind-Field="cv.Tags">
                     @foreach (var tag in cv.Tags)
                         {
-                        <Tag>@tag</Tag>
+                                <Tag><a href="catalog/variables/tags/@tag">@tag</a></Tag>
                         }
                 </AntDesign.Column>
                 <AntDesign.Column TData="string"

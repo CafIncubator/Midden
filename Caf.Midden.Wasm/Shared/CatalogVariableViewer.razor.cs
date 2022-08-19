@@ -88,7 +88,7 @@ namespace Caf.Midden.Wasm.Shared
                 {
                     foreach (var variable in metadata.Dataset.Variables)
                     {
-                        if(!string.IsNullOrEmpty(this.TagName) && variable.Tags.Contains(this.TagName))
+                        if (string.IsNullOrEmpty(this.TagName))
                         {
                             catalogVariables.Add(new CatalogVariable()
                             {
@@ -106,7 +106,7 @@ namespace Caf.Midden.Wasm.Shared
                                 DatasetName = metadata.Dataset.Name
                             });
                         }
-                        else
+                        else if (!string.IsNullOrEmpty(this.TagName) && variable.Tags.Contains(this.TagName))
                         {
                             catalogVariables.Add(new CatalogVariable()
                             {
