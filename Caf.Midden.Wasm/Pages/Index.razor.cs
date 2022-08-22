@@ -1,7 +1,9 @@
-﻿using Caf.Midden.Core.Models.v0_2;
+﻿using AntDesign.Charts;
+using Caf.Midden.Core.Models.v0_2;
 using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -23,6 +25,62 @@ namespace Caf.Midden.Wasm.Pages
         List<Dataset> RecentDatasets { get; set; }
 
         DateTime CatalogLastUpdate { get; set; }
+
+        IChartComponent MetadataPerZone = new Column();
+        public object[] MetadataPerZoneData { get; set; }
+        ColumnConfig MetadataPerZoneConfig = new ColumnConfig
+        {
+            Title = new Title
+            {
+                Visible = true,
+                Text = "Datasets per Zone"
+            },
+            ForceFit = true,
+            Padding = "auto",
+            XField = "zone",
+            YField = "count"
+        };
+
+        IChartComponent ProjectsPerStatus = new Column();
+        public object[] ProjectsPerStatusData { get; set; }
+        ColumnConfig ProjectsPerStatusConfig = new ColumnConfig
+        {
+            Title = new Title
+            {
+                Visible = true,
+                Text = "Projects per Status"
+            },
+            ForceFit = true,
+            Padding = "auto",
+            XField = "status",
+            YField = "count"
+        };
+
+
+        IChartComponent DatasetsOverTime = new Area();
+        public object[] DatasetsOverTimeData { get; set; }
+        AreaConfig DatasetsOverTimeConfig = new AreaConfig
+        {
+            Title = new Title
+            {
+                Visible = false,
+                Text = "Dataset growth"
+            },
+            ForceFit = true,
+            Padding = 0,
+            XField = "date",
+            YField = "count",
+            XAxis = new ValueCatTimeAxis
+            {
+                Visible = false
+            },
+            YAxis = new ValueAxis
+            {
+                Visible = true,
+                Min = 0
+            },
+            Height = 200
+        };
 
         protected override void OnInitialized()
         {
@@ -57,8 +115,9 @@ namespace Caf.Midden.Wasm.Pages
                 return;
 
             SetSimpleStats();
-            //CreateDatasetsPerZone();
-            //CreateDatasetsOverTime();
+            CreateDatasetsPerZone();
+            CreateDatasetsOverTime();
+            CreateProjectsPerStatus();
             SetTopStats();
         }
 
@@ -102,6 +161,110 @@ namespace Caf.Midden.Wasm.Pages
 
             this.TotalTags = UniqueTags.Count;
             this.TotalContacts = UniqueContacts.Count;
+        }
+
+        private void CreateDatasetsPerZone()
+        {
+            List<object> objs = new List<object>();
+
+            foreach (string zone in State.AppConfig.Zones)
+            {
+                int numberMetas = State.Catalog.Metadatas.Count(m =>
+                    m.Dataset.Zone == zone);
+
+                object obj = new
+                {
+                    zone = zone,
+                    count = numberMetas
+                };
+
+                objs.Add(obj);
+            }
+
+            this.MetadataPerZoneData = objs.ToArray();
+
+            MetadataPerZone.ChangeData(MetadataPerZoneData);
+        }
+
+        private void CreateProjectsPerStatus()
+        {
+            List<object> objs = new List<object>();
+        
+            foreach(string status in State.AppConfig.ProjectStatuses)
+            {
+                int numberProjectsInStatus = State.Catalog.Projects.Count(p =>
+                    p.ProjectStatus == status);
+
+                object obj = new
+                {
+                    status = status,
+                    count = numberProjectsInStatus
+                };
+
+                objs.Add(obj);
+            }
+
+            this.ProjectsPerStatusData = objs.ToArray();
+            ProjectsPerStatus.ChangeData(ProjectsPerStatusData);
+        }
+
+        private void CreateDatasetsOverTime()
+        {
+            List<object> objs = new List<object>();
+
+            // Groups datasets by creation date to get counts of those added the same month
+            var grouped = State.Catalog.Metadatas.GroupBy(m => m.CreationDate.ToString("yyyyMM"))
+                .Select(i => new
+                {
+                    date = DateTime.ParseExact(i.Key, "yyyyMM", CultureInfo.InvariantCulture),
+                    count = i.Count()
+                })
+                .OrderBy(g => g.date)
+                .ToList();
+
+            int total = 0;
+
+            if (grouped.Count == 0)
+                return;
+
+            DateTime min = grouped.Min(g => g.date);
+            DateTime now = DateTime.UtcNow;
+            DateTime curr = min;
+
+            // Set threshold of year diff to displaying 10 years of data
+            if ((curr.Year - min.Year) > 10)
+            {
+                min = new DateTime(curr.Year - 10, 1, 1);
+            }
+
+            while (grouped.Count > 0)
+            {
+                object obj;
+
+                // Moving in accending order, so curr should only match first index
+                if (grouped[0].date.Month == curr.Month && grouped[0].date.Year == curr.Year)
+                {
+                    total += grouped[0].count;
+
+                    grouped.RemoveAt(0);
+
+                }
+
+                obj = new
+                {
+                    date = curr.ToString("yyyy-MM"),
+                    count = total
+                };
+
+                objs.Add(obj);
+
+                curr = curr.AddMonths(1);
+
+            }
+
+            this.DatasetsOverTimeData = objs.ToArray();
+
+            DatasetsOverTime.ChangeData(DatasetsOverTimeData);
         }
 
         private void SetTopStats()

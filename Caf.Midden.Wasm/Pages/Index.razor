@@ -86,6 +86,27 @@
     <Divider />
    
     <Title Level="2">Stats for Nerds</Title>
+
+    <AntDesign.Row Gutter="16">
+        <AntDesign.Col Span="12" Style="padding: 5px;">
+            @if (ProjectsPerStatus != null)
+            {
+                <AntDesign.Charts.Column @ref="ProjectsPerStatus"
+                                     Data="ProjectsPerStatusData"
+                                     Config="ProjectsPerStatusConfig" />
+            }
+        </AntDesign.Col>
+        <AntDesign.Col Span="12" Style="padding: 5px;">
+            @if (MetadataPerZoneData != null)
+            {
+                <AntDesign.Charts.Column @ref="MetadataPerZone"
+                                     Data="MetadataPerZoneData"
+                                     Config="MetadataPerZoneConfig" />
+            }
+        </AntDesign.Col>
+        
+    </AntDesign.Row>
+
     <AntDesign.Row Gutter="16">
         <AntDesign.Col Span="12" Style="padding: 5px;">
             <AntDesign.AntList DataSource="@TopDatasetTags"
@@ -116,8 +137,9 @@
             </AntDesign.AntList>
         </AntDesign.Col>
     </AntDesign.Row>
+
     <AntDesign.Row Gutter="16">
-        <AntDesign.Col Span="16" Style="padding: 5px;">
+        <AntDesign.Col Span="12" Style="padding: 5px;">
             <AntDesign.AntList DataSource="@TopContacts"
                                Bordered>
                 <Header>Top Contributors</Header>
@@ -127,6 +149,16 @@
                     </ListItem>
                 </ChildContent>
             </AntDesign.AntList>
+        </AntDesign.Col>
+        <AntDesign.Col Span="12" Style="padding: 5px;">
+            <AntDesign.Card Bordered Title="Dataset growth">
+                @if (DatasetsOverTimeData != null)
+                {
+                    <AntDesign.Charts.Area @ref="DatasetsOverTime"
+                                       Data="DatasetsOverTimeData"
+                                       Config="DatasetsOverTimeConfig" />
+                }
+            </AntDesign.Card>
         </AntDesign.Col>
     </AntDesign.Row>
 
