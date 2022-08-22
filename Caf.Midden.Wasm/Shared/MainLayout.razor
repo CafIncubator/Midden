@@ -37,26 +37,28 @@
                 </div>
                 <Menu   Theme="MenuTheme.Light" 
                         DefaultSelectedKeys=@(new[]{"1"}) 
-                        DefaultOpenKeys=@(new[]{"3", "4"})
+                        DefaultOpenKeys=@(new[]{"2"})
                         Mode="MenuMode.Inline">
                     <MenuItem Key="1" RouterLink="" RouterMatch="NavLinkMatch.Prefix">
                         <Icon Type="home" Theme="outline" />
                         <span>Home</span>
                     </MenuItem>
+                    <!--
                     <MenuItem Key="2" RouterLink="insights" RouterMatch="NavLinkMatch.Prefix">
                         <Icon Type="line-chart" Theme="outline" />
                         <span>Insights</span>
                     </MenuItem>
-                    <SubMenu Key="3" Title="Catalog" TitleTemplate=@catalogTitle>
-                        <MenuItem Key="3a" RouterLink="catalog/datasets" RouterMatch="NavLinkMatch.Prefix">
+                    -->
+                    <SubMenu Key="2" Title="Catalog" TitleTemplate=@catalogTitle>
+                        <MenuItem Key="2a" RouterLink="catalog/datasets" RouterMatch="NavLinkMatch.Prefix">
                             <Icon Type="file-text" Theme="outline" />
                             <span>Datasets</span>
                         </MenuItem>
-                        <MenuItem Key="3b" RouterLink="catalog/variables" RouterMatch="NavLinkMatch.Prefix">
+                        <MenuItem Key="2b" RouterLink="catalog/variables" RouterMatch="NavLinkMatch.Prefix">
                             <Icon Type="calculator" Theme="outline" />
                             <span>Variables</span>
                         </MenuItem>
-                        <MenuItem Key="3c" RouterLink="catalog/projects" RouterMatch="NavLinkMatch.Prefix">
+                        <MenuItem Key="2c" RouterLink="catalog/projects" RouterMatch="NavLinkMatch.Prefix">
                             <Icon Type="project" Theme="outline" />
                             <span>Projects</span>
                         </MenuItem>
@@ -69,12 +71,12 @@
                             <span>Tags</span>
                         </MenuItem>-->
                     </SubMenu>
-                    <SubMenu Key="4" Title="Editor" TitleTemplate=@editorTitle>
-                        <MenuItem Key="4a" RouterLink="editor/dataset" RouterMatch="NavLinkMatch.Prefix">
+                    <SubMenu Key="3" Title="Editor" TitleTemplate=@editorTitle>
+                        <MenuItem Key="3a" RouterLink="editor/dataset" RouterMatch="NavLinkMatch.Prefix">
                             <Icon Type="file-text" Theme="outline" />
                             <span>Dataset</span>
                         </MenuItem>
-                        <MenuItem Key="4b" RouterLink="editor/project" RouterMatch="NavLinkMatch.Prefix">
+                        <MenuItem Key="3b" RouterLink="editor/project" RouterMatch="NavLinkMatch.Prefix">
                             <Icon Type="project" Theme="outline" />
                             <span>Project</span>
                         </MenuItem>

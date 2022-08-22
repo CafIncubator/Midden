@@ -2,62 +2,197 @@
 @inject Services.StateContainer State
 
 <div class="site-layout-background">
+    <CatalogLoader />
     @if (State?.AppConfig != null)
     {
         <PageHeader Class="site-page-header"
                     Title="@State.AppConfig.OrganizationName"
                     Subtitle="Metadata Tool" />
     }
+    <Divider />
 
-    <Row Gutter="16">
-        <AntDesign.Col Span="8">
-            <a href="insights">
-                <Card Hoverable>
-                    <CardMeta Title="Insights" Description="Stats for nerds" />
+    <AntDesign.Row Gutter="16">
+        <AntDesign.Col Span="4">
+            <Card Bordered="false" Size="small">
+                <Statistic Title="Last Updated" Value="@($"{CatalogLastUpdate.Month}/{CatalogLastUpdate.Day}/{CatalogLastUpdate.Year}")">
+                    <PrefixTemplate>
+                        <span><Icon Type="calendar" /></span>
+                    </PrefixTemplate>
+                </Statistic>
+            </Card>
+        </AntDesign.Col>
+        <AntDesign.Col Span="4">
+            <a href="catalog/projects">
+                <Card Hoverable Bordered="false" Size="small">
+                    <Statistic Title="Total Projects" Value="@TotalProjects">
+                        <PrefixTemplate>
+                            <span><Icon Type="project" /></span>
+                        </PrefixTemplate>
+                    </Statistic>
                 </Card>
             </a>
         </AntDesign.Col>
-        <AntDesign.Col Span="8">
+        <AntDesign.Col Span="4">
             <a href="catalog/datasets">
-                <Card Hoverable>
-                    <CardMeta Title="Dataset Catalog" Description="Find and view datasets" />
+                <Card Hoverable Bordered="false" Size="small">
+                    <Statistic Title="Total Datasets" Value="@TotalDatasets">
+                        <PrefixTemplate>
+                            <span><Icon Type="file-text" /></span>
+                        </PrefixTemplate>
+                    </Statistic>
                 </Card>
             </a>
         </AntDesign.Col>
-        <AntDesign.Col Span="8">
-            <a href="editor/dataset">
-                <Card Hoverable>
-                    <CardMeta Title="Dataset Editor" Description="Add dataset" />
+        <AntDesign.Col Span="4">
+            <a href="catalog/variables">
+                <Card Hoverable Bordered="false" Size="small">
+                    <Statistic Title="Total Variables" Value="@TotalVariables">
+                        <PrefixTemplate>
+                            <span><Icon Type="calculator" /></span>
+                        </PrefixTemplate>
+                    </Statistic>
                 </Card>
             </a>
         </AntDesign.Col>
-    </Row>
+        <AntDesign.Col Span="4">
+            <Card Bordered="false" Size="small">
+                <Statistic Title="Unique Tags" Value="@TotalTags">
+                    <PrefixTemplate>
+                        <span><Icon Type="tags" /></span>
+                    </PrefixTemplate>
+                </Statistic>
+            </Card>
+        </AntDesign.Col>
+        <AntDesign.Col Span="4">
+            <Card Bordered="false" Size="small">
+                <Statistic Title="Contributors" Value="@TotalContacts">
+                    <PrefixTemplate>
+                        <span><Icon Type="user" /></span>
+                    </PrefixTemplate>
+                </Statistic>
+            </Card>
+        </AntDesign.Col>
+    </AntDesign.Row>
+
+    <Divider />
+    
+    <Title Level="2">Recent Projects</Title>
+    <FilteredCatalogProjectViewer ShowSearch=false ShowHeader=false ShowRecentNumber="2" />
+    <Divider />
+
+    <Title Level="2">Recent Datasets</Title>
+
+    <FilteredCatalogMetadataViewer ShowSearch=false ShowHeader=false ShowRecentNumber="2" />
+    <Divider />
+   
+    <Title Level="2">Stats for Nerds</Title>
+
+    <AntDesign.Row Gutter="16">
+        <AntDesign.Col Span="12" Style="padding: 5px;">
+            <AntDesign.Card Bordered Title="Projects by status">
+                @if (ProjectsPerStatus != null)
+                {
+                    <AntDesign.Charts.Column @ref="ProjectsPerStatus"
+                                         Data="ProjectsPerStatusData"
+                                         Config="ProjectsPerStatusConfig" />
+                }
+            </AntDesign.Card>
+            
+        </AntDesign.Col>
+        <AntDesign.Col Span="12" Style="padding: 5px;">
+            <AntDesign.Card Bordered Title="Datasets by Zone">
+                @if (MetadataPerZoneData != null)
+                {
+                    <AntDesign.Charts.Column @ref="MetadataPerZone"
+                                         Data="MetadataPerZoneData"
+                                         Config="MetadataPerZoneConfig" />
+                }
+            </AntDesign.Card>
+        </AntDesign.Col>
+    </AntDesign.Row>
+
+    <AntDesign.Row Gutter="16">
+        <AntDesign.Col Span="12" Style="padding: 5px;">
+            <AntDesign.AntList DataSource="@TopDatasetTags"
+                               Bordered>
+                <Header>Top Dataset Tags</Header>
+                <ChildContent Context="item">
+                    <a href="catalog/datasets/tags/@item.Key">
+                        <ListItem>
+
+                        <span><Text>@item.Key</Text></span> @item.Value
+                        </ListItem>
+                    </a>
+                </ChildContent>
+            </AntDesign.AntList>
+        </AntDesign.Col>
+        <AntDesign.Col Span="12" Style="padding: 5px;">
+            <AntDesign.AntList DataSource="@TopVariableTags"
+                               Bordered>
+                <Header>Top Variable Tags</Header>
+                <ChildContent Context="item">
+                    <a href="catalog/variables/tags/@item.Key" class="ListItemLink">
+                        <ListItem>
+
+                        <span><Text>@item.Key</Text></span> @item.Value
+                        </ListItem>
+                    </a>
+                </ChildContent>
+            </AntDesign.AntList>
+        </AntDesign.Col>
+    </AntDesign.Row>
+
+    <AntDesign.Row Gutter="16">
+        <AntDesign.Col Span="12" Style="padding: 5px;">
+            <AntDesign.AntList DataSource="@TopContacts"
+                               Bordered>
+                <Header>Top Contributors</Header>
+                <ChildContent Context="item">
+                    <ListItem>
+                        <span><Text>@item.Key</Text></span> @item.Value
+                    </ListItem>
+                </ChildContent>
+            </AntDesign.AntList>
+        </AntDesign.Col>
+        <AntDesign.Col Span="12" Style="padding: 5px;">
+            <AntDesign.Card Bordered Title="Dataset growth">
+                @if (DatasetsOverTimeData != null)
+                {
+                    <AntDesign.Charts.Area @ref="DatasetsOverTime"
+                                       Data="DatasetsOverTimeData"
+                                       Config="DatasetsOverTimeConfig" />
+                }
+            </AntDesign.Card>
+        </AntDesign.Col>
+    </AntDesign.Row>
+
+    
 
 </div>
 
 
 @code{
-private string DebugMsg { get; set; }
+    private string DebugMsg { get; set; }
 
-private async Task AppConfig_StateChanged(
-ComponentBase source,
-string appConfig)
-{
-if (source != this)
-{
-await InvokeAsync(StateHasChanged);
-DebugMsg = "StateHasChanged";
-}
-}
+    private async Task AppConfig_StateChanged(
+    ComponentBase source,
+    string appConfig)
+    {
+        if (source != this)
+        {
+            await InvokeAsync(StateHasChanged);
+            DebugMsg = "StateHasChanged";
+        }
+    }
 
-protected override void OnInitialized()
-{
-State.StateChanged += async (source, property)
-=> await AppConfig_StateChanged(source, property);
-}
-public void Dispose()
-{
-State.StateChanged -= async (source, property)
-=> await AppConfig_StateChanged(source, property);
-}
+    //protected override void OnInitialized()
+    //{
+    //    State.StateChanged += async (source, property)
+    //    => await AppConfig_StateChanged(source, property);
+    //}
+    //public void Dispose()
+    //{
+    //    State.StateChanged -= async (source, property)
+    //    => await AppConfig_StateChanged(source, property);
+    //}
 }

@@ -1,0 +1,7 @@
+﻿::deep .ant-list-item {
+    color: unset !important;
+}
+
+::deep .ant-typography {
+    color: unset !important;
+}

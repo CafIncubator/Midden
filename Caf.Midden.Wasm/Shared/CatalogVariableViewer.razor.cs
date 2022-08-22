@@ -15,6 +15,9 @@ namespace Caf.Midden.Wasm.Shared
         [Parameter]
         public string Project { get; set; }
 
+        [Parameter]
+        public string TagName { get; set; }
+
         CatalogVariableViewerViewModel ViewModel { get; set; } = new CatalogVariableViewerViewModel();
         public TableFilter<string>[] FilterProcessing;
         public TableFilter<string>[] FilterZone;
@@ -85,21 +88,42 @@ namespace Caf.Midden.Wasm.Shared
                 {
                     foreach (var variable in metadata.Dataset.Variables)
                     {
-                        catalogVariables.Add(new CatalogVariable()
+                        if (string.IsNullOrEmpty(this.TagName))
                         {
-                            Name = variable.Name,
-                            Description = variable.Description,
-                            Units = variable.Units,
-                            Tags = new List<string>(variable.Tags),
-                            Methods = new List<string>(variable.Methods),
-                            TemporalResolution = variable.TemporalResolution,
-                            TemporalExtent = variable.TemporalExtent,
-                            QCApplied = variable.QCApplied,
-                            ProcessingLevel = variable.ProcessingLevel,
-                            Zone = metadata.Dataset.Zone,
-                            ProjectName = metadata.Dataset.Project,
-                            DatasetName = metadata.Dataset.Name
-                        });
+                            catalogVariables.Add(new CatalogVariable()
+                            {
+                                Name = variable.Name,
+                                Description = variable.Description,
+                                Units = variable.Units,
+                                Tags = new List<string>(variable.Tags),
+                                Methods = new List<string>(variable.Methods),
+                                TemporalResolution = variable.TemporalResolution,
+                                TemporalExtent = variable.TemporalExtent,
+                                QCApplied = variable.QCApplied,
+                                ProcessingLevel = variable.ProcessingLevel,
+                                Zone = metadata.Dataset.Zone,
+                                ProjectName = metadata.Dataset.Project,
+                                DatasetName = metadata.Dataset.Name
+                            });
+                        }
+                        else if (!string.IsNullOrEmpty(this.TagName) && variable.Tags.Contains(this.TagName))
+                        {
+                            catalogVariables.Add(new CatalogVariable()
+                            {
+                                Name = variable.Name,
+                                Description = variable.Description,
+                                Units = variable.Units,
+                                Tags = new List<string>(variable.Tags),
+                                Methods = new List<string>(variable.Methods),
+                                TemporalResolution = variable.TemporalResolution,
+                                TemporalExtent = variable.TemporalExtent,
+                                QCApplied = variable.QCApplied,
+                                ProcessingLevel = variable.ProcessingLevel,
+                                Zone = metadata.Dataset.Zone,
+                                ProjectName = metadata.Dataset.Project,
+                                DatasetName = metadata.Dataset.Name
+                            });
+                        }
                     }
                 }
             }
