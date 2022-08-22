@@ -89,22 +89,26 @@
 
     <AntDesign.Row Gutter="16">
         <AntDesign.Col Span="12" Style="padding: 5px;">
-            @if (ProjectsPerStatus != null)
-            {
-                <AntDesign.Charts.Column @ref="ProjectsPerStatus"
-                                     Data="ProjectsPerStatusData"
-                                     Config="ProjectsPerStatusConfig" />
-            }
+            <AntDesign.Card Bordered Title="Projects by status">
+                @if (ProjectsPerStatus != null)
+                {
+                    <AntDesign.Charts.Column @ref="ProjectsPerStatus"
+                                         Data="ProjectsPerStatusData"
+                                         Config="ProjectsPerStatusConfig" />
+                }
+            </AntDesign.Card>
+            
         </AntDesign.Col>
         <AntDesign.Col Span="12" Style="padding: 5px;">
-            @if (MetadataPerZoneData != null)
-            {
-                <AntDesign.Charts.Column @ref="MetadataPerZone"
-                                     Data="MetadataPerZoneData"
-                                     Config="MetadataPerZoneConfig" />
-            }
+            <AntDesign.Card Bordered Title="Datasets by Zone">
+                @if (MetadataPerZoneData != null)
+                {
+                    <AntDesign.Charts.Column @ref="MetadataPerZone"
+                                         Data="MetadataPerZoneData"
+                                         Config="MetadataPerZoneConfig" />
+                }
+            </AntDesign.Card>
         </AntDesign.Col>
-        
     </AntDesign.Row>
 
     <AntDesign.Row Gutter="16">

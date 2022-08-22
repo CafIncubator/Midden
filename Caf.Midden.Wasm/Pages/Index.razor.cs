@@ -32,7 +32,7 @@ namespace Caf.Midden.Wasm.Pages
         {
             Title = new Title
             {
-                Visible = true,
+                Visible = false,
                 Text = "Datasets per Zone"
             },
             ForceFit = true,
@@ -47,7 +47,7 @@ namespace Caf.Midden.Wasm.Pages
         {
             Title = new Title
             {
-                Visible = true,
+                Visible = false,
                 Text = "Projects per Status"
             },
             ForceFit = true,
