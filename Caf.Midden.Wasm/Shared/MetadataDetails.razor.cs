@@ -33,6 +33,8 @@ namespace Caf.Midden.Wasm.Shared
             .UseYamlFrontMatter()
             .Build();
 
+        EmbeddedProperty Property(int span, int offset) => new() { Span = span, Offset = offset };
+
         protected override void OnInitialized()
         {
             if(Metadata?.Dataset?.Variables != null)

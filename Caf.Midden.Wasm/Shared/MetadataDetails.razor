@@ -20,8 +20,8 @@
         </AntDesign.Col>
     </Row>
     <Divider />
-    <Row>
-        <AntDesign.Col Span="17">
+    <Row Wrap="true">
+        <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(17,0)">
             <Row>
                 <AntDesign.Col Span="24" Style="padding:5px">
                     <Card>
@@ -198,7 +198,7 @@
                 </AntDesign.Col>
             </Row>
         </AntDesign.Col>
-        <AntDesign.Col Span="7">
+        <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(7,0)">
             <Row>
                 <AntDesign.Col Span="@(string.IsNullOrEmpty(Metadata.Dataset.Geometry) ? 0 : 24)" Style="padding:5px">
                     <Card>
