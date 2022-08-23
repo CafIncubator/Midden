@@ -11,8 +11,8 @@
     }
     <Divider />
 
-    <AntDesign.Row Wrap="true" Gutter="16">
-        <AntDesign.Col Xs="@Property(24,0)" Md="@Property(8,0)" Xl="@Property(4,0)" >
+    <AntDesign.Row Wrap="true" Justify="space-around">
+        <AntDesign.Col Xs="@Property(12,0)" Md="@Property(8,0)" Xl="@Property(4,0)" >
             <Card Bordered="false" Size="small">
                 <Statistic Title="Last Updated" Value="@($"{CatalogLastUpdate.Month}/{CatalogLastUpdate.Day}/{CatalogLastUpdate.Year}")">
                     <PrefixTemplate>
@@ -21,7 +21,7 @@
                 </Statistic>
             </Card>
         </AntDesign.Col>
-        <AntDesign.Col Xs="@Property(24,0)" Md="@Property(8,0)" Xl="@Property(4,0)">
+        <AntDesign.Col Xs="@Property(12,0)" Md="@Property(8,0)" Xl="@Property(4,0)">
             <a href="catalog/projects">
                 <Card Hoverable Bordered="false" Size="small">
                     <Statistic Title="Total Projects" Value="@TotalProjects">
@@ -32,7 +32,7 @@
                 </Card>
             </a>
         </AntDesign.Col>
-        <AntDesign.Col Xs="@Property(24,0)" Md="@Property(8,0)" Xl="@Property(4,0)">
+        <AntDesign.Col Xs="@Property(12,0)" Md="@Property(8,0)" Xl="@Property(4,0)">
             <a href="catalog/datasets">
                 <Card Hoverable Bordered="false" Size="small">
                     <Statistic Title="Total Datasets" Value="@TotalDatasets">
@@ -43,7 +43,7 @@
                 </Card>
             </a>
         </AntDesign.Col>
-        <AntDesign.Col Xs="@Property(24,0)" Md="@Property(8,0)" Xl="@Property(4,0)">
+        <AntDesign.Col Xs="@Property(12,0)" Md="@Property(8,0)" Xl="@Property(4,0)">
             <a href="catalog/variables">
                 <Card Hoverable Bordered="false" Size="small">
                     <Statistic Title="Total Variables" Value="@TotalVariables">
@@ -54,7 +54,7 @@
                 </Card>
             </a>
         </AntDesign.Col>
-        <AntDesign.Col Xs="@Property(24,0)" Md="@Property(8,0)" Xl="@Property(4,0)">
+        <AntDesign.Col Xs="@Property(12,0)" Md="@Property(8,0)" Xl="@Property(4,0)">
             <Card Bordered="false" Size="small">
                 <Statistic Title="Unique Tags" Value="@TotalTags">
                     <PrefixTemplate>
@@ -63,7 +63,7 @@
                 </Statistic>
             </Card>
         </AntDesign.Col>
-        <AntDesign.Col Xs="@Property(24,0)" Md="@Property(8,0)" Xl="@Property(4,0)">
+        <AntDesign.Col Xs="@Property(12,0)" Md="@Property(8,0)" Xl="@Property(4,0)">
             <Card Bordered="false" Size="small">
                 <Statistic Title="Contributors" Value="@TotalContacts">
                     <PrefixTemplate>
