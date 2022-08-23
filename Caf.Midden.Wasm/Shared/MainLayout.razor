@@ -19,13 +19,12 @@
     -->
         </Header>
         <Layout>
-            <Sider Collapsible
+            <Sider 
                    Collapsed=@collapsed
-                   NoTrigger
-                   OnCollapse=@OnCollapse
                    Theme=SiderTheme.Light
-                   Breakpoint="BreakpointType.Lg">
-                <div class="menu-toggle">
+                   Breakpoint="@BreakpointType.Lg"
+                   CollapsedWidth="0">
+               <!-- <div class="menu-toggle">
                     @if (collapsed)
                     {
                         <Icon Type="menu-unfold" Theme="outline" Class="trigger" OnClick="toggle" />
@@ -34,7 +33,7 @@
                     {
                         <Icon Type="menu-fold" Theme="outline" Class="trigger" OnClick="toggle" />
                     }
-                </div>
+                </div>-->
                 <Menu   Theme="MenuTheme.Light" 
                         DefaultSelectedKeys=@(new[]{"1"}) 
                         DefaultOpenKeys=@(new[]{"2"})
