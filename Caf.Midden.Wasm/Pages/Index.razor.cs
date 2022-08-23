@@ -1,4 +1,5 @@
-﻿using AntDesign.Charts;
+﻿using AntDesign;
+using AntDesign.Charts;
 using Caf.Midden.Core.Models.v0_2;
 using Microsoft.AspNetCore.Components;
 using System;
@@ -26,11 +27,13 @@ namespace Caf.Midden.Wasm.Pages
 
         DateTime CatalogLastUpdate { get; set; }
 
+        EmbeddedProperty Property(int span, int offset) => new() { Span = span, Offset = offset };
+
         IChartComponent MetadataPerZone = new Column();
         public object[] MetadataPerZoneData { get; set; }
         ColumnConfig MetadataPerZoneConfig = new ColumnConfig
         {
-            Title = new Title
+            Title = new AntDesign.Charts.Title
             {
                 Visible = false,
                 Text = "Datasets per Zone"
@@ -45,7 +48,7 @@ namespace Caf.Midden.Wasm.Pages
         public object[] ProjectsPerStatusData { get; set; }
         ColumnConfig ProjectsPerStatusConfig = new ColumnConfig
         {
-            Title = new Title
+            Title = new AntDesign.Charts.Title
             {
                 Visible = false,
                 Text = "Projects per Status"
@@ -61,7 +64,7 @@ namespace Caf.Midden.Wasm.Pages
         public object[] DatasetsOverTimeData { get; set; }
         AreaConfig DatasetsOverTimeConfig = new AreaConfig
         {
-            Title = new Title
+            Title = new AntDesign.Charts.Title
             {
                 Visible = false,
                 Text = "Dataset growth"
