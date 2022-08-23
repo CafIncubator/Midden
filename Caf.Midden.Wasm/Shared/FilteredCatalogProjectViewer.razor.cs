@@ -31,6 +31,8 @@ namespace Caf.Midden.Wasm.Shared
         [Parameter]
         public int ShowRecentNumber { get; set; } = 0;
 
+        EmbeddedProperty Property(int span, int offset) => new() { Span = span, Offset = offset };
+
         protected override void OnInitialized()
         {
             State.StateChanged += async (source, property)
