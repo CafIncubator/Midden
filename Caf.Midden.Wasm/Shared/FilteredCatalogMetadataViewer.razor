@@ -9,7 +9,7 @@
 @if (State.Catalog != null && this.ShowSearch)
 {
     <AntDesign.Row>
-        <AntDesign.Col Offset="8" Span="8">
+        <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(8,8)">
             <Search Placeholder="Search datasets"
                     OnChange="SearchHandler"
                     EnterButton="true" @bind-Value="SearchTerm"
@@ -23,10 +23,10 @@
 @if (FilteredMetadata != null)
 @if (FilteredMetadata.Count > 0)
 {
-    <Row Gutter="16">
+    <Row Gutter="16" Wrap="true">
         @foreach (var metadata in FilteredMetadata)
         {
-        <AntDesign.Col Span="12" Style="padding:10px">
+            <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(12,0)" Style="padding:5px">
             <Card Style="overflow:hidden">
                 <TitleTemplate>
                     <a href="catalog/datasets/@metadata.Dataset.Zone/@metadata.Dataset.Project/@metadata.Dataset.Name">

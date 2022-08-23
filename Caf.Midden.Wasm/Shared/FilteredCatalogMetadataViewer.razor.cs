@@ -30,6 +30,8 @@ namespace Caf.Midden.Wasm.Shared
         [Parameter]
         public int ShowRecentNumber { get; set; } = 0;
 
+        EmbeddedProperty Property(int span, int offset) => new() { Span = span, Offset = offset };
+
 
         public List<Metadata> BaseMetadatas { get; set; } = new List<Metadata>();
         public List<Metadata> FilteredMetadata { get; set; } = new List<Metadata>();

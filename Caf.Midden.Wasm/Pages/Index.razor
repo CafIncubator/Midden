@@ -11,8 +11,8 @@
     }
     <Divider />
 
-    <AntDesign.Row Gutter="16">
-        <AntDesign.Col Span="4">
+    <AntDesign.Row Wrap="true" Justify="space-around">
+        <AntDesign.Col Xs="@Property(12,0)" Md="@Property(8,0)" Xl="@Property(4,0)" >
             <Card Bordered="false" Size="small">
                 <Statistic Title="Last Updated" Value="@($"{CatalogLastUpdate.Month}/{CatalogLastUpdate.Day}/{CatalogLastUpdate.Year}")">
                     <PrefixTemplate>
@@ -21,7 +21,7 @@
                 </Statistic>
             </Card>
         </AntDesign.Col>
-        <AntDesign.Col Span="4">
+        <AntDesign.Col Xs="@Property(12,0)" Md="@Property(8,0)" Xl="@Property(4,0)">
             <a href="catalog/projects">
                 <Card Hoverable Bordered="false" Size="small">
                     <Statistic Title="Total Projects" Value="@TotalProjects">
@@ -32,7 +32,7 @@
                 </Card>
             </a>
         </AntDesign.Col>
-        <AntDesign.Col Span="4">
+        <AntDesign.Col Xs="@Property(12,0)" Md="@Property(8,0)" Xl="@Property(4,0)">
             <a href="catalog/datasets">
                 <Card Hoverable Bordered="false" Size="small">
                     <Statistic Title="Total Datasets" Value="@TotalDatasets">
@@ -43,7 +43,7 @@
                 </Card>
             </a>
         </AntDesign.Col>
-        <AntDesign.Col Span="4">
+        <AntDesign.Col Xs="@Property(12,0)" Md="@Property(8,0)" Xl="@Property(4,0)">
             <a href="catalog/variables">
                 <Card Hoverable Bordered="false" Size="small">
                     <Statistic Title="Total Variables" Value="@TotalVariables">
@@ -54,7 +54,7 @@
                 </Card>
             </a>
         </AntDesign.Col>
-        <AntDesign.Col Span="4">
+        <AntDesign.Col Xs="@Property(12,0)" Md="@Property(8,0)" Xl="@Property(4,0)">
             <Card Bordered="false" Size="small">
                 <Statistic Title="Unique Tags" Value="@TotalTags">
                     <PrefixTemplate>
@@ -63,7 +63,7 @@
                 </Statistic>
             </Card>
         </AntDesign.Col>
-        <AntDesign.Col Span="4">
+        <AntDesign.Col Xs="@Property(12,0)" Md="@Property(8,0)" Xl="@Property(4,0)">
             <Card Bordered="false" Size="small">
                 <Statistic Title="Contributors" Value="@TotalContacts">
                     <PrefixTemplate>
@@ -87,8 +87,8 @@
    
     <Title Level="2">Stats for Nerds</Title>
 
-    <AntDesign.Row Gutter="16">
-        <AntDesign.Col Span="12" Style="padding: 5px;">
+    <AntDesign.Row Gutter="16" Wrap="true">
+        <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(12,0)" Style="padding: 5px;">
             <AntDesign.Card Bordered Title="Projects by status">
                 @if (ProjectsPerStatus != null)
                 {
@@ -99,7 +99,7 @@
             </AntDesign.Card>
             
         </AntDesign.Col>
-        <AntDesign.Col Span="12" Style="padding: 5px;">
+        <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(12,0)" Style="padding: 5px;">
             <AntDesign.Card Bordered Title="Datasets by Zone">
                 @if (MetadataPerZoneData != null)
                 {
@@ -111,8 +111,8 @@
         </AntDesign.Col>
     </AntDesign.Row>
 
-    <AntDesign.Row Gutter="16">
-        <AntDesign.Col Span="12" Style="padding: 5px;">
+    <AntDesign.Row Gutter="16" Wrap="true">
+        <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(12,0)" Style="padding: 5px;">
             <AntDesign.AntList DataSource="@TopDatasetTags"
                                Bordered>
                 <Header>Top Dataset Tags</Header>
@@ -126,7 +126,7 @@
                 </ChildContent>
             </AntDesign.AntList>
         </AntDesign.Col>
-        <AntDesign.Col Span="12" Style="padding: 5px;">
+        <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(12,0)" Style="padding: 5px;">
             <AntDesign.AntList DataSource="@TopVariableTags"
                                Bordered>
                 <Header>Top Variable Tags</Header>
@@ -142,8 +142,8 @@
         </AntDesign.Col>
     </AntDesign.Row>
 
-    <AntDesign.Row Gutter="16">
-        <AntDesign.Col Span="12" Style="padding: 5px;">
+    <AntDesign.Row Gutter="16" Wrap="true">
+        <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(12,0)" Style="padding: 5px;">
             <AntDesign.AntList DataSource="@TopContacts"
                                Bordered>
                 <Header>Top Contributors</Header>
@@ -154,7 +154,7 @@
                 </ChildContent>
             </AntDesign.AntList>
         </AntDesign.Col>
-        <AntDesign.Col Span="12" Style="padding: 5px;">
+        <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(12,0)" Style="padding: 5px;">
             <AntDesign.Card Bordered Title="Dataset growth">
                 @if (DatasetsOverTimeData != null)
                 {
@@ -195,4 +195,5 @@
     //    State.StateChanged -= async (source, property)
     //    => await AppConfig_StateChanged(source, property);
     //}
+    
 }

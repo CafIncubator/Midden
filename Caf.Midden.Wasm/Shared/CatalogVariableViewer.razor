@@ -6,7 +6,7 @@
 @if (State.Catalog != null)
 {
     <AntDesign.Row>
-        <AntDesign.Col Offset="8" Span="8">
+        <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(8,8)">
             <Search Placeholder="Search variables"
                     OnChange="SearchHandler"
                     EnterButton="true" @bind-Value="ViewModel.SearchTerm"
@@ -27,7 +27,8 @@ if(ViewModel?.FilteredCatalogVariables.Count > 0)
                          DataSource="@ViewModel.FilteredCatalogVariables"
                          Size="@TableSize.Small"
                          ScrollX="2800"
-                         Bordered>
+                         Bordered
+                        Responsive>
             <ChildContent Context="cv">
                 <AntDesign.Column TData="string"
                                   @bind-Field="cv.Name"

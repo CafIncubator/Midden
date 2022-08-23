@@ -35,14 +35,14 @@ namespace Caf.Midden.Wasm.Shared
                 => await LastUpdated_StateChanged(source, property);
         }
 
-        void OnCollapse(bool isCollapsed)
-        {
-            // Nothing
-        }
+        //void OnCollapse(bool isCollapsed)
+        //{
+        //    // Nothing
+        //}
 
-        void toggle()
-        {
-            collapsed = !collapsed;
-        }
+        //void toggle()
+        //{
+        //    collapsed = !collapsed;
+        //}
     }
 }

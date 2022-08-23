@@ -22,6 +22,8 @@ namespace Caf.Midden.Wasm.Shared
         public TableFilter<string>[] FilterProcessing;
         public TableFilter<string>[] FilterZone;
 
+        EmbeddedProperty Property(int span, int offset) => new() { Span = span, Offset = offset };
+
         protected override void OnInitialized()
         {
             State.StateChanged += async (source, property)
