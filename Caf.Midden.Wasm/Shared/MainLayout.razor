@@ -24,16 +24,6 @@
                    Theme=SiderTheme.Light
                    Breakpoint="@BreakpointType.Lg"
                    CollapsedWidth="0">
-               <!-- <div class="menu-toggle">
-                    @if (collapsed)
-                    {
-                        <Icon Type="menu-unfold" Theme="outline" Class="trigger" OnClick="toggle" />
-                    }
-                    else
-                    {
-                        <Icon Type="menu-fold" Theme="outline" Class="trigger" OnClick="toggle" />
-                    }
-                </div>-->
                 <Menu   Theme="MenuTheme.Light" 
                         DefaultSelectedKeys=@(new[]{"1"}) 
                         DefaultOpenKeys=@(new[]{"2"})
@@ -42,12 +32,6 @@
                         <Icon Type="home" Theme="outline" />
                         <span>Home</span>
                     </MenuItem>
-                    <!--
-                    <MenuItem Key="2" RouterLink="insights" RouterMatch="NavLinkMatch.Prefix">
-                        <Icon Type="line-chart" Theme="outline" />
-                        <span>Insights</span>
-                    </MenuItem>
-                    -->
                     <SubMenu Key="2" Title="Catalog" TitleTemplate=@catalogTitle>
                         <MenuItem Key="2a" RouterLink="catalog/datasets" RouterMatch="NavLinkMatch.Prefix">
                             <Icon Type="file-text" Theme="outline" />
@@ -61,14 +45,6 @@
                             <Icon Type="project" Theme="outline" />
                             <span>Projects</span>
                         </MenuItem>
-                        <!--<MenuItem Key="3d" RouterLink="catalog/zones" RouterMatch="NavLinkMatch.Prefix">
-                            <Icon Type="folder" Theme="outline" />
-                            <span>Zones</span>
-                        </MenuItem>
-                         <MenuItem Key="3e" RouterLink="catalog/tags" RouterMatch="NavLinkMatch.Prefix">
-                            <Icon Type="tag" Theme="outline" />
-                            <span>Tags</span>
-                        </MenuItem>-->
                     </SubMenu>
                     <SubMenu Key="3" Title="Editor" TitleTemplate=@editorTitle>
                         <MenuItem Key="3a" RouterLink="editor/dataset" RouterMatch="NavLinkMatch.Prefix">
