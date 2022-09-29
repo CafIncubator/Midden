@@ -24,34 +24,34 @@
                     Layout="@FormLayout.Vertical">
         <Tabs>
             <TabPane Key="1" Tab="Basic">
-                <FormItem Label="Zone">
-                    <SimpleSelect @bind-Value="@context.Dataset.Zone"
+                <EditorFormItemWithHelpPopup Label="Zone" Id="zone" Tooltip="@ZoneTooltip">
+                    <SimpleSelect Id="zone" @bind-Value="@context.Dataset.Zone"
                                     Placeholder="Zone that holds dataset">
-                        <SelectOptions>
-                            @foreach (var zone in State.AppConfig.Zones)
-                            {
+                            <SelectOptions>
+                                @foreach (var zone in State.AppConfig.Zones)
+                                {
                                 <SimpleSelectOption Value=@zone Label=@zone />
-                            }
-                        </SelectOptions>
-                    </SimpleSelect>
-                </FormItem>
-                <FormItem Label="Name">
-                    <AntDesign.Input @bind-Value="context.Dataset.Name"
-                                        Placeholder="Name of dataset" />
-                </FormItem>
-                <FormItem Label="Project">
-                    <AntDesign.Input @bind-Value="context.Dataset.Project"
+                                }
+                            </SelectOptions>
+                        </SimpleSelect>
+                </EditorFormItemWithHelpPopup>
+               
+                <EditorFormItemWithHelpPopup Label="Name" Id="name" Tooltip="@DatasetNameTooltip">
+                    <AntDesign.Input Id="name" @bind-Value="context.Dataset.Name"
+                                                    Placeholder="Name of dataset" />
+                </EditorFormItemWithHelpPopup>
+                
+                <EditorFormItemWithHelpPopup Label="Project" Id="project" Tooltip="@ProjectTooltip">
+                    <AntDesign.Input Id="project" @bind-Value="context.Dataset.Project"
                                         Placeholder="Name of project that produced the dataset" />
-                </FormItem>
-                <FormItem Label="Description">
-                    <!-- <AntDesign.TextArea @bind-Value="context.Dataset.Description"
-                                        Placeholder="Description of dataset"
-                                        MinRows="5"
-                                        AutoSize="true" />-->
-                         <MarkdownEditor @bind-Value="@context.Dataset.Description"
+                </EditorFormItemWithHelpPopup>
+
+                <EditorFormItemWithHelpPopup Label="Description" Id="description" Tooltip="@DatasetDescriptionTooltip" IsRequired=false>
+                    <MarkdownEditor @bind-Value="@context.Dataset.Description"
                             ValueHTMLChanged="@OnMarkdownDescriptionValueHTMLChanged" />
-                </FormItem>
-                <FormItem Label="Contacts">
+                </EditorFormItemWithHelpPopup>
+
+                <EditorFormItemWithHelpPopup Label="Contacts" Id="contacts" Tooltip="@ContactsTooltip">
                     <Button OnClick="AddContactHandler">Add</Button>
                     <br />
                     @if (context.Dataset.Contacts.Count > 0)
@@ -84,8 +84,9 @@
 
                         </AntDesign.Table>
                     }
-                </FormItem>
-                <FormItem Label="Tags">
+                </EditorFormItemWithHelpPopup>
+
+                <EditorFormItemWithHelpPopup Label="Tags" Id="tags" Tooltip="@DatasetTagsTooltip" IsRequired=false>
                     <Space Style="width:100%;">
                         <SpaceItem>
                             <Input @bind-Value="NewDatasetTag" />
@@ -110,10 +111,10 @@
                                 </SimpleSelect>
                             </SpaceItem>
                         </div>
-
-
                     </Space>
-                    <br />
+
+                    <br /><br />
+
                     @if (context.Dataset.Tags.Count > 0)
                     {
                         <AntList DataSource="@context.Dataset.Tags">
@@ -127,10 +128,13 @@
                             </ChildContent>
                         </AntList>
                     }
-                </FormItem>
+                </EditorFormItemWithHelpPopup>
+
             </TabPane>
+
             <TabPane Key="2" Tab="Variables">
-                <FormItem Label="Variables">
+
+                <EditorFormItemWithHelpPopup Label="Variables" Id="variables" Tooltip="@VariablesTooltip" IsRequired=false>
                     <Space>
                         <SpaceItem>
                             <Button OnClick="AddVariableHandler">Add</Button>
@@ -145,8 +149,9 @@
                         </SpaceItem>
                     </Space>
 
+                    <br /><br />
+                   
 
-                    <br />
                     @if (context.Dataset.Variables.Count > 0)
                     {
                         <AntDesign.Table TItem="Caf.Midden.Core.Models.v0_2.Variable"
@@ -205,16 +210,18 @@
                             </ChildContent>
                         </AntDesign.Table>
                     }
-                </FormItem>
+                </EditorFormItemWithHelpPopup>
+
             </TabPane>
             <TabPane Key="3" Tab="Coverage">
-                <FormItem Label="Spatial Repeats">
-                    <AntDesign.InputNumber id="spatial-repeats"
+                <EditorFormItemWithHelpPopup Label="Spatial Repeats" Id="spatial-repeats" Tooltip="@SpatialRepeatsTooltip" IsRequired=false>
+                    <AntDesign.InputNumber Id="spatial-repeats"
                                             @bind-Value="context.Dataset.SpatialRepeats" />
-                </FormItem>
-                <FormItem Label="Spatial Extent">
+                </EditorFormItemWithHelpPopup>
+
+                <EditorFormItemWithHelpPopup Label="Spatial Extent" Id="spatial-extent" Tooltip="@SpatialExtentTooltip" IsRequired=false>
                     <FormItem>
-                        <SimpleSelect @bind-Value="this.GeometryTemplate"
+                        <SimpleSelect Id="spatial-extent" @bind-Value="this.GeometryTemplate"
                                         Placeholder="Saved values"
                                         AllowClear="true"
                                         OnSelectedItemChanged="OnGeometryItemChangedHandler">
@@ -234,51 +241,60 @@
                         <AntDesign.TextArea @bind-Value="context.Dataset.Geometry"
                                             Placeholder="Valid geojson" />
                     </FormItem>
-                </FormItem>
-                <FormItem Label="Temporal Resolution">
-                    <AntDesign.Input @bind-Value="context.Dataset.TemporalResolution"
+                </EditorFormItemWithHelpPopup>
+
+                <EditorFormItemWithHelpPopup Label="Temporal Resolution" Id="temporal-resolution" Tooltip="@TemporalResolutionTooltip" IsRequired=false>
+                    <AntDesign.Input Id="temporal-resolution" @bind-Value="context.Dataset.TemporalResolution"
                                         Placeholder="e.g. '15 min'" />
-                </FormItem>
-                <FormItem Label="Temporal Extent">
-                    <AntDesign.Input @bind-Value="context.Dataset.TemporalExtent"
-                                        Placeholder="YYYY-MM-DD/YYYY-MM-DD" />
-                </FormItem>
+                </EditorFormItemWithHelpPopup>
+
+                <EditorFormItemWithHelpPopup Label="Temporal Extent" Id="temporal-extent" Tooltip="@TemporalExtentTooltip" IsRequired=false>
+                    <AntDesign.Input Id="temporal-extent" @bind-Value="context.Dataset.TemporalExtent"
+                                 Placeholder="YYYY-MM-DD/YYYY-MM-DD" />
+                </EditorFormItemWithHelpPopup>
+
             </TabPane>
             <TabPane Key="4" Tab="Structure">
-                <FormItem Label="File Format">
-                    <AntDesign.Input @bind-Value="context.Dataset.Format"
-                                        Placeholder="Format, usually file extension" />
-                </FormItem>
-                <FormItem Label="File Path Template">
-                    <AntDesign.Input @bind-Value="context.Dataset.FilePathTemplate"
-                                        Placeholder="e.g. '{YYYY}/Filename_{YYYYMMDD}.csv'" />
-                </FormItem>
-                <FormItem Label="File Path Description">
-                    <AntDesign.TextArea @bind-Value="context.Dataset.FilePathDescriptor"
+                <EditorFormItemWithHelpPopup Label="File Format" Id="file-format" Tooltip="@FileFormatTooltip" IsRequired=false>
+                    <AntDesign.Input Id="file-format" @bind-Value="context.Dataset.Format"
+                                 Placeholder="Format, usually file extension" />
+                </EditorFormItemWithHelpPopup>
+
+                <EditorFormItemWithHelpPopup Label="File Path Template" Id="file-path-template" Tooltip="@FilePathTemplateTooltip" IsRequired=false>
+                    <AntDesign.Input Id="file-path-template" @bind-Value="context.Dataset.FilePathTemplate"
+                                 Placeholder="e.g. '{YYYY}/Filename_{YYYYMMDD}.csv'" />
+                </EditorFormItemWithHelpPopup>
+
+                <EditorFormItemWithHelpPopup Label="File Path Description" Id="file-path-description" Tooltip="@FilePathDescriptionTooltip" IsRequired=false>
+                    <AntDesign.TextArea Id="file-path-description" @bind-Value="context.Dataset.FilePathDescriptor"
                                         Placeholder="Describe template values; e.g. {YYYY}" />
-                </FormItem>
-                <FormItem Label="Dataset Structure">
-                    <SimpleSelect @bind-Value="context.Dataset.Structure"
-                                    Placeholder="Select">
+                </EditorFormItemWithHelpPopup>
+
+                <EditorFormItemWithHelpPopup Label="Dataset Structure" Id="dataset-structure" Tooltip="@DatasetStructureTooltip" IsRequired=false>
+                    <SimpleSelect Id="dataset-structure" @bind-Value="context.Dataset.Structure"
+                              Placeholder="Select">
                         <SelectOptions>
                             @if (State.AppConfig.DatasetStructures != null)
                             {
                                 @foreach (var structure in State.AppConfig.DatasetStructures)
                                 {
                                     <AntDesign.SimpleSelectOption Value="@structure"
-                                                                    Label="@structure" />
+                                                      Label="@structure" />
                                 }
                             }
                         </SelectOptions>
                     </SimpleSelect>
-                </FormItem>
+                </EditorFormItemWithHelpPopup>
+
+
             </TabPane>
             <TabPane Key="5" Tab="Processing">
-                <FormItem Label="Methods">
+
+                <EditorFormItemWithHelpPopup Label="Methods" Id="methods" Tooltip="@DatasetMethodsTooltip" IsRequired=false>
                     <InputGroup>
                         <Row Justify="space-between">
                             <AntDesign.Col Span="20">
-                                <Input @bind-Value="NewDatasetMethod"
+                                <Input Id="methods" @bind-Value="NewDatasetMethod"
                                     Placeholder="Enter URL, text, or markdown"/>
                             </AntDesign.Col>
                             <AntDesign.Col Span="4">
@@ -301,14 +317,14 @@
                             </ChildContent>
                         </AntList>
                     }
-                </FormItem>
+                </EditorFormItemWithHelpPopup>
 
-                <FormItem Label="Parent Datasets">
+                <EditorFormItemWithHelpPopup Label="Parent Datasets" Id="parent-datasets" Tooltip="@ParentDatasetsTooltip" IsRequired=false>
                     <InputGroup>
                         <Row Justify="space-between">
                             <AntDesign.Col Span="20">
-                                <Input @bind-Value="NewParentDataset"
-                                    Placeholder="Enter URL"/>
+                                <Input Id="parent-datasets" @bind-Value="NewParentDataset"
+                                   Placeholder="Enter URL" />
                             </AntDesign.Col>
                             <AntDesign.Col Span="4">
                                 <Button OnClick="AddParentDatasetHandler">Add</Button>
@@ -329,13 +345,13 @@
                             </ChildContent>
                         </AntList>
                     }
-                </FormItem>
+                </EditorFormItemWithHelpPopup>
 
-                <FormItem Label="Derived Works">
+                <EditorFormItemWithHelpPopup Label="Derived Works" Id="derived-works" Tooltip="@DerivedWorksTooltip" IsRequired=false>
                     <InputGroup>
                         <Row Justify="space-between">
                             <AntDesign.Col Span="20">
-                                <Input @bind-Value="NewDerivedWork" />
+                                <Input Id="derived-works" @bind-Value="NewDerivedWork" />
                             </AntDesign.Col>
                             <AntDesign.Col Span="4">
                                 <Button OnClick="AddDerivedWorkHandler">Add</Button>
@@ -356,7 +372,7 @@
                             </ChildContent>
                         </AntList>
                     }
-                </FormItem>
+                </EditorFormItemWithHelpPopup>
 
             </TabPane>
         </Tabs>

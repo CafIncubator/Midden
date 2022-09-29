@@ -7,30 +7,31 @@
 @using Caf.Midden.Wasm.Shared.ViewModels
 
 <Form Model="@_model"
-      LabelCol="new ColLayoutParam { Span = 8 }"
-      WrapperCol="new ColLayoutParam { Span = 16 }"
       OnFinish="OnFinish"
-      OnFinishFailed="OnFinishFailed">
-    <FormItem Label="Name">
-        <Input @bind-Value="@context.Variable.Name"
+      OnFinishFailed="OnFinishFailed"
+      Layout="@FormLayout.Vertical">
+
+    <EditorFormItemWithHelpPopup Label="Name" Id="variable-name" Tooltip="@VariableNameTooltip">
+        <Input Id="variable-name" @bind-Value="@context.Variable.Name"
                Placeholder="Variable Name" />
-    </FormItem>
+     </EditorFormItemWithHelpPopup>
 
-    <FormItem Label="Description">
-        <TextArea @bind-Value="@context.Variable.Description"
+    <EditorFormItemWithHelpPopup Label="Description" Id="variable-description" Tooltip="@VariableDescriptionTooltip">
+        <TextArea Id="variable-description" @bind-Value="@context.Variable.Description"
                   Placeholder="Variable description" />
-    </FormItem>
+    </EditorFormItemWithHelpPopup>
 
-    <FormItem Label="Units">
-        <Input @bind-Value="@context.Variable.Units"
+
+    <EditorFormItemWithHelpPopup Label="Units" Id="variable-units" Tooltip="@VariableUnitsTooltip">
+        <Input Id="variable-units" @bind-Value="@context.Variable.Units"
                Placeholder="Variable units" />
-    </FormItem>
+    </EditorFormItemWithHelpPopup>
 
-    <FormItem Label="Methods">
+    <EditorFormItemWithHelpPopup Label="Methods" Id="variable-methods" Tooltip="@VariableMethodsTooltip" IsRequired=false>
         <InputGroup>
             <Row Justify="space-between">
                 <AntDesign.Col Span="20">
-                    <Input @bind-Value="NewVariableMethod" />
+                    <Input Id="variable-methods" @bind-Value="NewVariableMethod" />
                 </AntDesign.Col>
                 <AntDesign.Col Span="4">
                     <Button OnClick="AddVariableMethodHandler">Add</Button>
@@ -52,10 +53,25 @@
                 </ChildContent>
             </AntList>
         }
-    </FormItem>
+    </EditorFormItemWithHelpPopup>
+
+    <EditorFormItemWithHelpPopup Label="Quality Control" Id="variable-quality-control" Tooltip="@VariableQualityControlsTooltip" IsRequired=false>
+        <Select Mode="multiple"
+                    Placeholder="Select Quality Control"
+                    @bind-Values="@context.SelectedQCApplied"
+                    TItemValue="string"
+                    TItem="string">
+                <SelectOptions>
+                    @foreach (var item in context.QCFlags)
+                    {
+                        <SelectOption TItemValue="string" TItem="string" Value=@item Label=@item />
+                    }
+                </SelectOptions>
+            </Select>
+    </EditorFormItemWithHelpPopup>
 
     <!-- Not using "FormItem" tag here because it throws an error; something about using a bind-Value with string -->
-    <Row Gutter="2">
+    @*<Row Gutter="2">
         <AntDesign.Col Span="8"><div style="text-align: right;">Quality Control: </div></AntDesign.Col>
         <AntDesign.Col Span="16">
             <Select Mode="multiple"
@@ -71,10 +87,10 @@
                 </SelectOptions>
             </Select>
         </AntDesign.Col>
-    </Row>
+    </Row>*@
 
-    <FormItem Label="Processing">
-        <SimpleSelect @bind-Value="@context.Variable.ProcessingLevel"
+    <EditorFormItemWithHelpPopup Label="Processing" Id="variable-processing" Tooltip="@VariableProcessingTooltip" IsRequired=false>
+        <SimpleSelect Id="variable-processing" @bind-Value="@context.Variable.ProcessingLevel"
                       Placeholder="Processing Level">
             <SelectOptions>
                 @foreach (var item in context.ProcessingLevels)
@@ -83,12 +99,12 @@
                 }
             </SelectOptions>
         </SimpleSelect>
-    </FormItem>
+    </EditorFormItemWithHelpPopup>
 
-    <FormItem Label="Tags">
+    <EditorFormItemWithHelpPopup Label="Tags" Id="variable-tags" Tooltip="@VariableTagsTooltip" IsRequired=false>
         <Space Style="width:100%;">
             <SpaceItem>
-                <Input @bind-Value="NewVariableTag" />
+                <Input Id="variable-tags" @bind-Value="NewVariableTag" />
             </SpaceItem>
             <SpaceItem>
                 <Button OnClick="AddVariableTagHandler">Add</Button>
@@ -125,16 +141,25 @@
                 </ChildContent>
             </AntList>
         }
-    </FormItem>
+    </EditorFormItemWithHelpPopup>
 
-    <FormItem Label="Height">
-        <Input @bind-Value="@context.Variable.Height"
+    <EditorFormItemWithHelpPopup Label="Height" Id="variable-height" Tooltip="@VariableHeightTooltip" IsRequired=false>
+        <Input Id="variable-height" @bind-Value="@context.Variable.Height"
                Placeholder="Variable height" />
-    </FormItem>
+    </EditorFormItemWithHelpPopup>
 </Form>
 
 @code {
     private VariableModalViewModel _model;
+
+    private string VariableNameTooltip = @"This is the name of the variable (e.g. a column header in a CSV file or a field name in a shapefile/geojson). ";
+    private string VariableDescriptionTooltip = @"This is the description of the variable and should describe any coded values, variable type (numeric, int, VARCHAR, string, etc.), and acceptable values (e.g. 0.0-9999).";
+    private string VariableUnitsTooltip = @"This is the units of the variable, if applicable.";
+    private string VariableMethodsTooltip = @"These are methods details that are specific to the variable such as sensor information, analytic equipment, etc. The intent for these fields is to provide multiple links (e.g. GitHub repository, protocols.io, standard operating procedures), but this currently also supports free text.";
+    private string VariableQualityControlsTooltip = @"This is a list of quality control checks that have been applied to the variable. These are intended to be general categories of checks that can be used to filter variables when searching for certain data quality. Specific details of the quality control checks can be described in the methods field (or in a linked resource). Items in the dropdown menu are populated by information specified in the app configuration.";
+    private string VariableProcessingTooltip = @"This provides information on how the data value was created. These are intended to be general categories to be used to filter variables when searching for certain level of processing (e.g. directly measured values vs modeled values). Details of the processing should be defined in the methods field (or in a linked resource). Items in the dropdown menu are populated by information specified in the app configuration.";
+    private string VariableTagsTooltip = @"These tags are specific to the individual variable, as opposed to tags used for the parent dataset, and help with data discoverablity. These tags can also be used to map variable names to controlled vocabularies (e.g. ICASA,  AGROVOC).";
+    private string VariableHeightTooltip = @"Uhg, does anyone use this? Height at which the measurement was taken, if applicable. Depricated and likely will be removed.";
 
     protected override void OnInitialized()
     {
