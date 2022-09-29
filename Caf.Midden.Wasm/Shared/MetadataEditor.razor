@@ -53,7 +53,7 @@
 
                 <EditorFormItemWithHelpPopup Label="Contacts" Id="contacts" Tooltip="@ContactsTooltip">
                     <Button OnClick="AddContactHandler">Add</Button>
-                    <br />
+                    <br /><br />
                     @if (context.Dataset.Contacts.Count > 0)
                     {
                         <AntDesign.Table TItem="Caf.Midden.Core.Models.v0_2.Person"
@@ -113,7 +113,7 @@
                         </div>
                     </Space>
 
-                    <br /><br />
+                    <br />
 
                     @if (context.Dataset.Tags.Count > 0)
                     {
