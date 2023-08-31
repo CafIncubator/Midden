@@ -39,7 +39,7 @@ namespace Caf.Midden.Wasm.Pages
                 Text = "Datasets per Zone"
             },
             ForceFit = true,
-            Padding = "auto",
+            Padding = new[] {10,0,50,50},
             XField = "zone",
             YField = "count"
         };
@@ -54,7 +54,7 @@ namespace Caf.Midden.Wasm.Pages
                 Text = "Projects per Status"
             },
             ForceFit = true,
-            Padding = "auto",
+            Padding = new[] { 10, 0, 50, 52 },
             XField = "status",
             YField = "count"
         };
@@ -70,7 +70,7 @@ namespace Caf.Midden.Wasm.Pages
                 Text = "Dataset growth"
             },
             ForceFit = true,
-            Padding = 0,
+            Padding = new[] {0,0,10,28},
             XField = "date",
             YField = "count",
             XAxis = new ValueCatTimeAxis
