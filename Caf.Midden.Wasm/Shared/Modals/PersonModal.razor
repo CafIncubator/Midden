@@ -7,20 +7,21 @@
 @using Caf.Midden.Wasm.Shared.ViewModels
 
 <Form Model="@_model"
-      LabelCol="new ColLayoutParam { Span = 8 }"
-      WrapperCol="new ColLayoutParam { Span = 16 }"
       OnFinish="OnFinish"
-      OnFinishFailed="OnFinishFailed">
-    <FormItem Label="Name">
-        <Input @bind-Value="@context.Person.Name"
-               Placeholder="Name of contact"/>
-    </FormItem>
-    <FormItem Label="Email">
-        <Input @bind-Value="@context.Person.Email"
-               Placeholder="Email of contact"/>
-    </FormItem>
-    <FormItem Label="Role">
-        <SimpleSelect @bind-Value="@context.Person.Role"
+      OnFinishFailed="OnFinishFailed"
+      Layout="@FormLayout.Vertical">
+    <EditorFormItemWithHelpPopup Label="Name" Id="contact-name" Tooltip="@ContactsNameTooltip">
+        <Input Id="contact-name" @bind-Value="@context.Person.Name"
+               Placeholder="Name of contact" />
+    </EditorFormItemWithHelpPopup>
+    
+    <EditorFormItemWithHelpPopup Label="Email" Id="contact-email" Tooltip="@ContactsEmailTooltip" IsRequired=false>
+        <Input Id="contact-email" @bind-Value="@context.Person.Email"
+               Placeholder="Email of contact" />
+    </EditorFormItemWithHelpPopup>
+
+    <EditorFormItemWithHelpPopup Label="Role" Id="contact-role" Tooltip="@ContactsRoleTooltip" IsRequired=false>
+        <SimpleSelect Id="contact-role" @bind-Value="@context.Person.Role"
                       Placeholder="Role of contact">
             <SelectOptions>
                 @foreach (var role in context.Roles)
@@ -28,12 +29,16 @@
                     <SimpleSelectOption Value=@role Label=@role />
                 }
             </SelectOptions>
-        </SimpleSelect>
-    </FormItem>
+        </SimpleSelect>        
+    </EditorFormItemWithHelpPopup>
 </Form>
 
 @code {
     private PersonModalViewModel _model;
+
+    private string ContactsNameTooltip = @"This is the name of the contact person.";
+    private string ContactsEmailTooltip = @"This is the email address of the contact person.";
+    private string ContactsRoleTooltip = @"This is the role of the contact person. Items in the dropdown menu are populated by information in the app configuration.";
 
     protected override void OnInitialized()
     {
