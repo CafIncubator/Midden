@@ -1,4 +1,4 @@
-﻿<FormItem>
+﻿<FormItem Rules=Rules>
     <LabelTemplate>
         <label class="@LabelStyle" for="@Id">
             <Tooltip Title="@Tooltip">@Label <Icon Type="info-circle" /></Tooltip>
@@ -25,6 +25,9 @@
 
     [Parameter]
     public bool IsRequired { get; set; } = true;
+
+    [Parameter]
+    public FormValidationRule[] Rules { get; set; }
 
     private string LabelStyle { get; set; }
 

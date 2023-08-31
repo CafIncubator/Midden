@@ -21,10 +21,16 @@
 @if (State?.MetadataEdit != null && State?.AppConfig != null)
 {
     <AntDesign.Form Model="State.MetadataEdit"
-                    Layout="@FormLayout.Vertical">
+                    Layout="@FormLayout.Vertical"
+                    ValidateMode="@FormValidateMode.Rules"
+                    @ref="form">
         <Tabs>
             <TabPane Key="1" Tab="Basic">
-                <EditorFormItemWithHelpPopup Label="Zone" Id="zone" Tooltip="@ZoneTooltip">
+                <EditorFormItemWithHelpPopup 
+                    Label="Zone" 
+                    Id="zone" 
+                    Tooltip="@ZoneTooltip"
+                    Rules="@(new FormValidationRule[] { new FormValidationRule{ Required = true }})">
                     <SimpleSelect Id="zone" @bind-Value="@context.Dataset.Zone"
                                     Placeholder="Zone that holds dataset">
                             <SelectOptions>
@@ -36,22 +42,36 @@
                         </SimpleSelect>
                 </EditorFormItemWithHelpPopup>
                
-                <EditorFormItemWithHelpPopup Label="Name" Id="name" Tooltip="@DatasetNameTooltip">
+                <EditorFormItemWithHelpPopup 
+                    Label="Name" 
+                    Id="name" 
+                    Tooltip="@DatasetNameTooltip"
+                    Rules="@(new FormValidationRule[] { new FormValidationRule{ Required = true, Type = FormFieldType.String, Min = 2 }})">
                     <AntDesign.Input Id="name" @bind-Value="context.Dataset.Name"
                                                     Placeholder="Name of dataset" />
                 </EditorFormItemWithHelpPopup>
                 
-                <EditorFormItemWithHelpPopup Label="Project" Id="project" Tooltip="@ProjectTooltip">
+                <EditorFormItemWithHelpPopup 
+                    Label="Project" 
+                    Id="project" 
+                    Tooltip="@ProjectTooltip"
+                    Rules="@(new FormValidationRule[] { new FormValidationRule{ Required = true, Type = FormFieldType.String, Min = 2 }})">
                     <AntDesign.Input Id="project" @bind-Value="context.Dataset.Project"
                                         Placeholder="Name of project that produced the dataset" />
                 </EditorFormItemWithHelpPopup>
 
-                <EditorFormItemWithHelpPopup Label="Description" Id="description" Tooltip="@DatasetDescriptionTooltip" IsRequired=false>
+                <EditorFormItemWithHelpPopup 
+                    Label="Description" 
+                    Id="description" 
+                    Tooltip="@DatasetDescriptionTooltip" IsRequired=false>
                     <MarkdownEditor @bind-Value="@context.Dataset.Description"
                             ValueHTMLChanged="@OnMarkdownDescriptionValueHTMLChanged" />
                 </EditorFormItemWithHelpPopup>
 
-                <EditorFormItemWithHelpPopup Label="Contacts" Id="contacts" Tooltip="@ContactsTooltip">
+                <EditorFormItemWithHelpPopup 
+                    Label="Contacts" 
+                    Id="contacts" 
+                    Tooltip="@ContactsTooltip">
                     <Button OnClick="AddContactHandler">Add</Button>
                     <br /><br />
                     @if (context.Dataset.Contacts.Count > 0)
