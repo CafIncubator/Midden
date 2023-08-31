@@ -23,7 +23,7 @@
         </AntDesign.Col>
         <AntDesign.Col Xs="@Property(12,0)" Md="@Property(8,0)" Xl="@Property(4,0)">
             <a href="catalog/projects">
-                <Card Hoverable Bordered="false" Size="small">
+                <Card Hoverable Bordered="false" Size="small" Style="margin-right:5px; margin-bottom:5px;">
                     <Statistic Title="Total Projects" Value="@TotalProjects">
                         <PrefixTemplate>
                             <span><Icon Type="project" /></span>
@@ -34,7 +34,7 @@
         </AntDesign.Col>
         <AntDesign.Col Xs="@Property(12,0)" Md="@Property(8,0)" Xl="@Property(4,0)">
             <a href="catalog/datasets">
-                <Card Hoverable Bordered="false" Size="small">
+                 <Card Hoverable Bordered="false" Size="small" Style="margin-right:5px; margin-bottom:5px;">
                     <Statistic Title="Total Datasets" Value="@TotalDatasets">
                         <PrefixTemplate>
                             <span><Icon Type="file-text" /></span>
@@ -45,7 +45,7 @@
         </AntDesign.Col>
         <AntDesign.Col Xs="@Property(12,0)" Md="@Property(8,0)" Xl="@Property(4,0)">
             <a href="catalog/variables">
-                <Card Hoverable Bordered="false" Size="small">
+                 <Card Hoverable Bordered="false" Size="small" Style="margin-right:5px; margin-bottom:5px;">
                     <Statistic Title="Total Variables" Value="@TotalVariables">
                         <PrefixTemplate>
                             <span><Icon Type="calculator" /></span>
@@ -75,12 +75,12 @@
     </AntDesign.Row>
 
     <Divider />
-    
-    <Title Level="2">Recent Projects</Title>
+
+     <Title Level="2">Recent Projects <small><a href="/catalog/projects"><Icon Type="double-right" Theme="outline" /></a></small></Title>
     <FilteredCatalogProjectViewer ShowSearch=false ShowHeader=false ShowRecentNumber="2" />
     <Divider />
 
-    <Title Level="2">Recent Datasets</Title>
+     <Title Level="2">Recent Datasets <small><a href="/catalog/datasets"><Icon Type="double-right" Theme="outline" /></a></small></Title>
 
     <FilteredCatalogMetadataViewer ShowSearch=false ShowHeader=false ShowRecentNumber="2" />
     <Divider />
@@ -89,7 +89,7 @@
 
     <AntDesign.Row Gutter="16" Wrap="true">
         <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(12,0)" Style="padding: 5px;">
-            <AntDesign.Card Bordered Title="Projects by status">
+            <AntDesign.Card Bordered Title="Projects by Status" >
                 @if (ProjectsPerStatus != null)
                 {
                     <AntDesign.Charts.Column @ref="ProjectsPerStatus"
