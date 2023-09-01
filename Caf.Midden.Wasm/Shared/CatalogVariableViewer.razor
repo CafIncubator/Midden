@@ -64,9 +64,17 @@ if(ViewModel?.FilteredCatalogVariables.Count > 0)
                                   TData="string"
                                   Title="Processing"
                                   Filters="FilterProcessing"
-                                  OnFilter="(value, processing)=>processing.StartsWith(value)"
-                                  FilterMultiple="false">
+                                  OnFilter="(value, processing)=>(string.IsNullOrEmpty(processing) ? false : processing.StartsWith(value))"
+                                  FilterMultiple="true">
                     <Tag>@cv.ProcessingLevel</Tag>
+                </AntDesign.Column>
+                <AntDesign.Column @bind-Field="cv.VariableType"
+                                TData="string"
+                                Title="Type"
+                                Filters="FilterVariableType"
+                                OnFilter="(value, variableType)=>(string.IsNullOrEmpty(variableType) ? false : variableType.StartsWith(value))"
+                                FilterMultiple="true">
+                    <Tag>@cv.VariableType</Tag>
                 </AntDesign.Column>
 
                 <AntDesign.Column @bind-Field="cv.Tags">
@@ -75,11 +83,13 @@ if(ViewModel?.FilteredCatalogVariables.Count > 0)
                                 <Tag><a href="catalog/variables/tags/@tag">@tag</a></Tag>
                         }
                 </AntDesign.Column>
+
                 <AntDesign.Column TData="string"
                                   @bind-Field="cv.Zone"
                                   Filters="FilterZone"
-                                  OnFilter="(value, zone)=>zone.StartsWith(value)"
-                                  FilterMultiple="false" />
+                                  OnFilter="(value, zone)=>(string.IsNullOrEmpty(zone) ? false : zone.StartsWith(value))"
+                                  FilterMultiple="true" />
+
                 <AntDesign.Column @bind-Field="cv.ProjectName"
                                   Title="Project"/>
                 <AntDesign.Column TData="string"

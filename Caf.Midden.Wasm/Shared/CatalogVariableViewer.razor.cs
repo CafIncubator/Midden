@@ -20,6 +20,7 @@ namespace Caf.Midden.Wasm.Shared
 
         CatalogVariableViewerViewModel ViewModel { get; set; } = new CatalogVariableViewerViewModel();
         public TableFilter<string>[] FilterProcessing;
+        public TableFilter<string>[] FilterVariableType;
         public TableFilter<string>[] FilterZone;
 
         EmbeddedProperty Property(int span, int offset) => new() { Span = span, Offset = offset };
@@ -66,6 +67,13 @@ namespace Caf.Midden.Wasm.Shared
             }
             this.FilterProcessing = processings.ToArray();
 
+            List<TableFilter<string>> variableTypes = new List<TableFilter<string>>();
+            foreach (var variableType in appConfig.VariableTypes)
+            {
+                variableTypes.Add(new TableFilter<string> { Text = variableType, Value = variableType });
+            }
+            this.FilterVariableType = variableTypes.ToArray();
+
             List<TableFilter<string>> zones = new List<TableFilter<string>>();
             foreach(var zone in appConfig.Zones)
             {
@@ -103,6 +111,7 @@ namespace Caf.Midden.Wasm.Shared
                                 TemporalExtent = variable.TemporalExtent,
                                 QCApplied = variable.QCApplied,
                                 ProcessingLevel = variable.ProcessingLevel,
+                                VariableType = variable.VariableType,
                                 Zone = metadata.Dataset.Zone,
                                 ProjectName = metadata.Dataset.Project,
                                 DatasetName = metadata.Dataset.Name
@@ -121,6 +130,7 @@ namespace Caf.Midden.Wasm.Shared
                                 TemporalExtent = variable.TemporalExtent,
                                 QCApplied = variable.QCApplied,
                                 ProcessingLevel = variable.ProcessingLevel,
+                                VariableType = variable.VariableType,
                                 Zone = metadata.Dataset.Zone,
                                 ProjectName = metadata.Dataset.Project,
                                 DatasetName = metadata.Dataset.Name
