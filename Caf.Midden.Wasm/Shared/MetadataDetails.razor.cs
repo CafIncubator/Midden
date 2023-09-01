@@ -20,6 +20,8 @@ namespace Caf.Midden.Wasm.Shared
 
         public bool VarsHaveProcessingLevel { get; set; }
 
+        public bool VarsHaveVariableType { get; set; }
+
         public bool VarsHaveTags { get; set; }
 
         public bool VarsHaveHeight { get; set; }
@@ -27,6 +29,7 @@ namespace Caf.Midden.Wasm.Shared
         public int TableWidth { get; set; }
 
         public TableFilter<string>[] FilterProcessing;
+        public TableFilter<string>[] FilterVariableType;
 
         private MarkdownPipeline pipeline = new MarkdownPipelineBuilder()
             .UseAdvancedExtensions()
@@ -62,6 +65,13 @@ namespace Caf.Midden.Wasm.Shared
                     this.TableWidth += 100;
                 }
 
+                int numVariableType = Metadata.Dataset.Variables.Where(v => !string.IsNullOrEmpty(v.VariableType)).Count();
+                if (numVariableType > 0)
+                {
+                    this.VarsHaveVariableType = true;
+                    this.TableWidth += 100;
+                }
+
                 int numTags = Metadata.Dataset.Variables.SelectMany(v => v.Tags).Count();
                 if (numTags > 0)
                 {
@@ -94,6 +104,13 @@ namespace Caf.Midden.Wasm.Shared
                 processings.Add(new TableFilter<string> { Text = processing, Value = processing });
             }
             this.FilterProcessing = processings.ToArray();
+
+            List<TableFilter<string>> variableTypes = new List<TableFilter<string>>();
+            foreach (var variableType in appConfig.VariableTypes)
+            {
+                variableTypes.Add(new TableFilter<string> { Text = variableType, Value = variableType });
+            }
+            this.FilterVariableType = variableTypes.ToArray();
         }
     }
 }

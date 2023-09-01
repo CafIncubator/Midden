@@ -169,9 +169,22 @@
                                                               Title="Processing" 
                                                               Width="100"
                                                               Filters="FilterProcessing"
-                                                              OnFilter="(value, processing)=>processing.StartsWith(value)"
-                                                              FilterMultiple="false">
+                                                              OnFilter="(value, processing)=>(string.IsNullOrEmpty(processing) ? false : processing.StartsWith(value))"
+                                                              FilterMultiple="true">
                                                 <Tag>@variable.ProcessingLevel</Tag>
+                                            </AntDesign.Column>
+                                        }
+
+                                        @if (VarsHaveVariableType)
+                                        {
+                                            <AntDesign.Column @bind-Field="variable.VariableType"
+                                                              TData="string"
+                                                              Title="Type"
+                                                              Width="100"
+                                                              Filters="FilterVariableType"
+                                                              OnFilter="(value, variableType)=>(string.IsNullOrEmpty(variableType) ? false : variableType.StartsWith(value))"
+                                                              FilterMultiple="true">
+                                                <Tag>@variable.VariableType</Tag>
                                             </AntDesign.Column>
                                         }
 

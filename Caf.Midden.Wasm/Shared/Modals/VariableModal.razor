@@ -100,6 +100,17 @@
             </SelectOptions>
         </SimpleSelect>
     </EditorFormItemWithHelpPopup>
+    <EditorFormItemWithHelpPopup Label="Type" Id="variable-type" Tooltip="@VariableTypeTooltip" IsRequired=false>
+        <SimpleSelect Id="variable-type" @bind-Value="@context.Variable.VariableType"
+                      Placeholder="Variable Type">
+            <SelectOptions>
+                @foreach (var item in context.VariableTypes)
+                {
+                    <SimpleSelectOption Value=@item Label=@item />
+                }
+            </SelectOptions>
+        </SimpleSelect>
+    </EditorFormItemWithHelpPopup>
 
     <EditorFormItemWithHelpPopup Label="Tags" Id="variable-tags" Tooltip="@VariableTagsTooltip" IsRequired=false>
         <Space Style="width:100%;">
@@ -158,6 +169,7 @@
     private string VariableMethodsTooltip = @"These are methods details that are specific to the variable such as sensor information, analytic equipment, etc. The intent for these fields is to provide multiple links (e.g. GitHub repository, protocols.io, standard operating procedures), but this currently also supports free text.";
     private string VariableQualityControlsTooltip = @"This is a list of quality control checks that have been applied to the variable. These are intended to be general categories of checks that can be used to filter variables when searching for certain data quality. Specific details of the quality control checks can be described in the methods field (or in a linked resource). Items in the dropdown menu are populated by information specified in the app configuration.";
     private string VariableProcessingTooltip = @"This provides information on how the data value was created. These are intended to be general categories to be used to filter variables when searching for certain level of processing (e.g. directly measured values vs modeled values). Details of the processing should be defined in the methods field (or in a linked resource). Items in the dropdown menu are populated by information specified in the app configuration.";
+    private string VariableTypeTooltip = @"This provides additional filtering ability and further context to the variable. Examples based on statistical fields are 'discrete', 'continuous', 'nominal', etc. Default values 'dimension' and 'metric' are based on dimensional modeling. Items in the dropdown menu are populated by information specified in the app configuration.";
     private string VariableTagsTooltip = @"These tags are specific to the individual variable, as opposed to tags used for the parent dataset, and help with data discoverablity. These tags can also be used to map variable names to controlled vocabularies (e.g. ICASA,  AGROVOC).";
     private string VariableHeightTooltip = @"Uhg, does anyone use this? Height at which the measurement was taken, if applicable. Depricated and likely will be removed.";
 

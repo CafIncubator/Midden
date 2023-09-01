@@ -204,6 +204,10 @@
                                                     Title="Processing">
                                     <Tag>@variable.ProcessingLevel</Tag>
                                 </AntDesign.Column>
+                            <AntDesign.Column @bind-Field="variable.VariableType"
+                                              Title="Type">
+                                <Tag>@variable.VariableType</Tag>
+                            </AntDesign.Column>
 
                                 <AntDesign.Column @bind-Field="variable.Tags">
                                     @foreach (var tag in variable.Tags)

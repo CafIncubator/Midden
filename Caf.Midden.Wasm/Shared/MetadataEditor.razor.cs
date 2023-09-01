@@ -317,10 +317,12 @@ namespace Caf.Midden.Wasm.Shared
                     Tags = variable.Tags,
                     Methods = variable.Methods,
                     QCApplied = variable.QCApplied,
-                    ProcessingLevel = variable.ProcessingLevel
+                    ProcessingLevel = variable.ProcessingLevel,
+                    VariableType = variable.VariableType
                 },
                 ProcessingLevels = State.AppConfig.ProcessingLevels,
                 QCFlags = State.AppConfig.QCTags,
+                VariableTypes = State.AppConfig.VariableTypes,
                 Tags = State.AppConfig.Tags,
                 SelectedTags = variable.Tags ??= new List<string>(),
                 SelectedQCApplied = variable.QCApplied ??= new List<string>()
@@ -343,7 +345,7 @@ namespace Caf.Midden.Wasm.Shared
                 variable.Methods = templateOptions.Variable.Methods;
                 variable.QCApplied = templateOptions.SelectedQCApplied.ToList();
                 variable.ProcessingLevel = templateOptions.Variable.ProcessingLevel;
-
+                variable.VariableType = templateOptions.Variable.VariableType;
                 await variableModalRef.CloseAsync();
             };
 
