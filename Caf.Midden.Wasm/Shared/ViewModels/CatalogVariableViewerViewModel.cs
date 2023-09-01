@@ -28,6 +28,8 @@ namespace Caf.Midden.Wasm.Shared.ViewModels
 
         public string ProcessingLevel { get; set; }
 
+        public string VariableType { get; set; }
+
         public string Zone { get; set; }
 
         public string DatasetName { get; set; }

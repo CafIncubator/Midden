@@ -47,5 +47,8 @@ namespace Caf.Midden.Core.Models.v0_2
 
         [JsonPropertyName("qualityControlTags")]
         public List<string> QCTags { get; set; } = new List<string>();
+
+        [JsonPropertyName("variableTypes")]
+        public List<string> VariableTypes { get; set; } = new List<string>();
     }
 }
