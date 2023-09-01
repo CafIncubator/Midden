@@ -24,10 +24,14 @@ namespace Caf.Midden.Core.Services.Configuration
 
         public async Task<Models.v0_2.Configuration> Read()
         {
+            // Trick to override cache
+            string randomid = Guid.NewGuid().ToString();
+            var realPath = $"{jsonPath}?{randomid}";
+
             Models.v0_2.Configuration result = 
                 await client
                     .GetFromJsonAsync<Models.v0_2.Configuration>(
-                        jsonPath);
+                        realPath);
 
             return result;
         }
