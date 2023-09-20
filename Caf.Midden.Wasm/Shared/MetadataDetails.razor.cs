@@ -24,7 +24,8 @@ namespace Caf.Midden.Wasm.Shared
 
         public bool VarsHaveTags { get; set; }
 
-        public bool VarsHaveHeight { get; set; }
+// Depricated
+//        public bool VarsHaveHeight { get; set; }
 
         public int TableWidth { get; set; }
 
@@ -78,13 +79,13 @@ namespace Caf.Midden.Wasm.Shared
                     this.VarsHaveTags = true;
                     this.TableWidth += 100;
                 }
-                
-                int numHeight = Metadata.Dataset.Variables.Where(v => v.Height != null).Count();
-                if (numHeight > 0)
-                {
-                    this.VarsHaveHeight = true;
-                    this.TableWidth += 50;
-                }
+// Depricated
+//                int numHeight = Metadata.Dataset.Variables.Where(v => v.Height != null).Count();
+//                if (numHeight > 0)
+//                {
+//                    this.VarsHaveHeight = true;
+//                    this.TableWidth += 50;
+//                }
 
                 StateHasChanged();
             }
