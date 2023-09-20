@@ -54,7 +54,7 @@
                     <Icon Type="calendar" /> @metadata.ModifiedDate.ToString("d")
                     
                     <Divider />
-                    <div>
+                    <div class="truncate">
                     @if (!String.IsNullOrEmpty(metadata.Dataset.Description))
                         {
                             @((MarkupString)(Markdig.Markdown.ToHtml(metadata.Dataset.Description, pipeline)))

@@ -48,7 +48,7 @@
                         <Icon Type="calendar" /> @project.LastModified?.ToString("d")
                     }
                     <Divider />
-                    <div>@((MarkupString)project.MarkdownDescription)</div>                    
+                        <div class="truncate">@((MarkupString)project.MarkdownDescription)</div>
                     </Body>
             </Card>
         </AntDesign.Col>
