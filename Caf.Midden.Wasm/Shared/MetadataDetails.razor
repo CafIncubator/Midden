@@ -20,8 +20,8 @@
         </AntDesign.Col>
     </Row>
     <Divider />
-    <Row>
-        <AntDesign.Col Span="17">
+    <Row Wrap="true">
+        <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(17,0)">
             <Row>
                 <AntDesign.Col Span="24" Style="padding:5px">
                     <Card>
@@ -169,9 +169,22 @@
                                                               Title="Processing" 
                                                               Width="100"
                                                               Filters="FilterProcessing"
-                                                              OnFilter="(value, processing)=>processing.StartsWith(value)"
-                                                              FilterMultiple="false">
+                                                              OnFilter="(value, processing)=>(string.IsNullOrEmpty(processing) ? false : processing.StartsWith(value))"
+                                                              FilterMultiple="true">
                                                 <Tag>@variable.ProcessingLevel</Tag>
+                                            </AntDesign.Column>
+                                        }
+
+                                        @if (VarsHaveVariableType)
+                                        {
+                                            <AntDesign.Column @bind-Field="variable.VariableType"
+                                                              TData="string"
+                                                              Title="Type"
+                                                              Width="100"
+                                                              Filters="FilterVariableType"
+                                                              OnFilter="(value, variableType)=>(string.IsNullOrEmpty(variableType) ? false : variableType.StartsWith(value))"
+                                                              FilterMultiple="true">
+                                                <Tag>@variable.VariableType</Tag>
                                             </AntDesign.Column>
                                         }
 
@@ -185,11 +198,11 @@
                                                             }
                                             </AntDesign.Column>
                                         }
-                                        @if(VarsHaveHeight)
+@* Depricated                           @if(VarsHaveHeight)
                                         {
                                             <AntDesign.Column @bind-Field="variable.Height" 
                                                               Width="50"/>
-                                        }
+                                        }*@
                                     </ChildContent>
                                 </AntDesign.Table>
                             }
@@ -198,7 +211,7 @@
                 </AntDesign.Col>
             </Row>
         </AntDesign.Col>
-        <AntDesign.Col Span="7">
+        <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(7,0)">
             <Row>
                 <AntDesign.Col Span="@(string.IsNullOrEmpty(Metadata.Dataset.Geometry) ? 0 : 24)" Style="padding:5px">
                     <Card>

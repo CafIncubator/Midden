@@ -3,7 +3,11 @@
 @inject Services.StateContainer State
 
 <div class="site-layout-background">
-    <PageHeader Title="Dataset Editor" />
-        <MetadataEditor />
+    <PageHeader Title="Dataset Editor">
+        <PageHeaderExtra>
+            <a href="https://github.com/CafIncubator/Midden/wiki/Using-the-Midden-Dataset-Editor" target="_blank"><Button Icon="@IconType.TwoTone.QuestionCircle">Help</Button></a>
+        </PageHeaderExtra>
+    </PageHeader>
+        <MetadataEditor /> 
     <BackTop></BackTop>
 </div>

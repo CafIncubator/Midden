@@ -1,12 +1,16 @@
 ﻿@inject Caf.Midden.Wasm.Services.StateContainer State
 @inject ModalService ModalService
 
-<Divider Orientation="center">Projects</Divider>
+@if(ShowHeader)
+{
+    <Divider Orientation="center">Projects</Divider>
+}
 
-@if (State.Catalog != null)
+
+@if (State.Catalog != null && ShowSearch)
 {
     <AntDesign.Row>
-        <AntDesign.Col Offset="8" Span="8">
+        <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(8,8)">
             <Search Placeholder="Search projects"
                     OnChange="SearchHandler"
                     EnterButton="true" @bind-Value="ViewModel.SearchTerm"
@@ -19,10 +23,10 @@
 
 @if (ViewModel.FilteredCatalogProjects != null)
 {
-    <Row Gutter="16">
+    <Row Gutter="16" Wrap="true">
         @foreach (var project in ViewModel.FilteredCatalogProjects)
         {
-        <AntDesign.Col Span="12" Style="padding:10px">
+            <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(12,0)" Style="padding:5px">
             <Card Style="overflow:hidden">
                 <TitleTemplate>
                     
@@ -44,7 +48,7 @@
                         <Icon Type="calendar" /> @project.LastModified?.ToString("d")
                     }
                     <Divider />
-                    <div>@((MarkupString)project.MarkdownDescription)</div>                    
+                        <div class="truncate">@((MarkupString)project.MarkdownDescription)</div>
                     </Body>
             </Card>
         </AntDesign.Col>

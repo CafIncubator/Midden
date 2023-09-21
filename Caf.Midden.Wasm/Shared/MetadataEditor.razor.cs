@@ -19,6 +19,28 @@ namespace Caf.Midden.Wasm.Shared
     {
         string markdownDescriptionHtml = "";
 
+        private string ZoneTooltip = @"This is the ""data zone"" that the dataset belongs to. Items in the dropdown menu are populated by information specified in the app configuration.";
+        private string DatasetNameTooltip = @"This is the name of the dataset and should correspond to the name of the file or folder that contains the actual data. This also determines the name of the .midden file that is created by the Editor.";
+        private string ProjectTooltip = @"This is the name of the project that the dataset belongs to. Grouping datasets under the same project provides more context to the data through the associated Project pages.";
+        private string DatasetDescriptionTooltip = @"This is a description of the dataset and should include enough information for a data user to understand the basic origin and purpose of the data.";
+        private string ContactsTooltip = @"This is the contact information for the contributors to the dataset. Because Midden protects the data itself by not providing download links, providing contact information is important for potential data users to start a conversation about access.";
+        
+        private string DatasetTagsTooltip = @"These tags are used to make the dataset more discoverable. The ""Catalog"" supports browsing and searching datasets by tags. A dataset should contain at least a few tags and the use of those tags should be as consistent as possible. Items in the dropdown menu are populated by information specified in the app configuration.";
+        private string VariablesTooltip = @"These represent the measurements, or other information, represented in the dataset; i.e. the ""data dictionary"". Specifying variables is not required but it is highly recommended if the data are to be used without close oversight.";
+        private string SpatialRepeatsTooltip = @"This is the number of repeated measurements that are represented in the dataset. For example, a dataset that contains soil temperature measurements (a single variable described in the ""Variable"" section) at five locations buried at five different depths would have a value of 25.";
+        private string SpatialExtentTooltip = @"This is the region at which the data were collected and/or represent. Values should be valid GeoJSON (point, line, or polygon). Items in the dropdown menu are populated by information specified in the app configuration.";
+        private string TemporalResolutionTooltip = @"This is the frequency at which the variables in the dataset were measured. Air temperature measured every 15 minutes may have the value of ""15 min"". A dataset that contains plant community survey data taken annually may have a value of ""1 year"" or ""annually"".";
+        private string TemporalExtentTooltip = @"This is the starting and ending dates (and optionally time) that contain the date and time the data were collected or that the data represent. Consider using the ISO 8601 format for time-intervals (e.g. ""1997-07-16/1997-07-17"" corresponds to a time-period starting on July 16, 1997 and ending on July 17, 1997).";
+        private string FileFormatTooltip = @"This is the format that the data are stored in. This could be a file extension (e.g. "".json"", "".txt""), general category (e.g. ""tabular"", ""image""), or some standard (e.g. MIME types: ""text/csv"", ""application/java-archive"").";
+        private string FilePathTemplateTooltip = @"This is a description of the directory and file structure within the dataset folder, if applicable. For example, this can be used to describe a dataset comprised of time-series files generated every hour and separated into monthly folders via: ""{YYYY-MM}/{DD}T{hh}:{mm}_{VariableName}.csv""";
+        private string FilePathDescriptionTooltip = @"This is a description of the ""File Path Template"" where each variable is described. For example, ""{YYYY-MM} is the date, in ISO 8601 format, that the data were collected.""";
+        private string DatasetStructureTooltip = @"This is a category tag that broadly indicates how the data are structured. For example, a dataset folder that has multiple files but a dataset structure of ""Single"" may indicate that the various files are different versions of a single dataset. A value of ""Multiple"" on the other hand may indicate these files are timeseries data that can be aggregated. Items in the dropdown menu are populated by information specified in the app configuration.";
+        private string DatasetMethodsTooltip = @"These are methods used to generate the dataset and may include things like sample collection methods, data pipelines, and so on. Methods for specific measurements within the dataset can be described here but might be better to do so in the methods field of the associated variable. The intent for these fields is to provide multiple links (e.g. GitHub repository, protocols.io, standard operating procedures), but this currently also supports free text.";
+        private string ParentDatasetsTooltip = @"This is used to specify datasets that this dataset was derived from. Values are expected to be linked resources (URL) but a citation/reference is fine. This field is important for documenting data lineage.";
+        private string DerivedWorksTooltip = @"This is used to indicate related products that use the dataset (e.g. published papers, presentations, decision support tools). Values are expected to be linked resources (URL) but a citation/reference is fine. This field is not intended for derived datasets, see the field “Parent Datasets” for that.";
+
+        AntDesign.Form<Metadata> form;
+
         private async Task LastUpdated_StateChanged(
             ComponentBase source,
             string lastUpdated)
@@ -281,6 +303,73 @@ namespace Caf.Midden.Wasm.Shared
         #endregion
 
         #region Variable Functions
+
+        private Variable VariableQuickEditRef;
+        private ViewModels.VariableModalViewModel QuickEditViewModel;
+
+        private async Task StartQuickEdit(Variable variable)
+        {
+            VariableQuickEditRef = variable;
+            if(QuickEditViewModel == null)
+            {
+                QuickEditViewModel = new ViewModels.VariableModalViewModel
+                {
+                    Variable = new Variable()
+                    {
+                        Name = variable.Name,
+                        Description = variable.Description,
+                        Units = variable.Units,
+                        Height = variable.Height,
+                        Tags = variable.Tags,
+                        Methods = variable.Methods,
+                        QCApplied = variable.QCApplied,
+                        ProcessingLevel = variable.ProcessingLevel,
+                        VariableType = variable.VariableType
+                    },
+                    ProcessingLevels = State.AppConfig.ProcessingLevels,
+                    QCFlags = State.AppConfig.QCTags,
+                    VariableTypes = State.AppConfig.VariableTypes,
+                    Tags = State.AppConfig.Tags,
+                    SelectedTags = variable.Tags ??= new List<string>(),
+                    SelectedQCApplied = variable.QCApplied ??= new List<string>()
+                };
+            }
+            else
+            {
+                QuickEditViewModel.Variable = new Variable()
+                {
+                    Name = variable.Name,
+                    Description = variable.Description,
+                    Units = variable.Units,
+                    Height = variable.Height,
+                    Tags = variable.Tags,
+                    Methods = variable.Methods,
+                    QCApplied = variable.QCApplied,
+                    ProcessingLevel = variable.ProcessingLevel,
+                    VariableType = variable.VariableType
+                };
+                QuickEditViewModel.SelectedTags = variable.Tags ??= new List<string>();
+                QuickEditViewModel.SelectedQCApplied = variable.QCApplied ??= new List<string>();
+            }
+        }
+
+        private async Task EndQuickEdit()
+        {
+            // TODO: Some validation checks
+
+            VariableQuickEditRef.Name = QuickEditViewModel.Variable.Name;
+            VariableQuickEditRef.Description = QuickEditViewModel.Variable.Description;
+            VariableQuickEditRef.Units = QuickEditViewModel.Variable.Units;
+            VariableQuickEditRef.Height = QuickEditViewModel.Variable.Height;
+            VariableQuickEditRef.Tags = QuickEditViewModel.SelectedTags.ToList();
+            VariableQuickEditRef.Methods = QuickEditViewModel.Variable.Methods;
+            VariableQuickEditRef.QCApplied = QuickEditViewModel.SelectedQCApplied.ToList();
+            VariableQuickEditRef.ProcessingLevel = QuickEditViewModel.Variable.ProcessingLevel;
+            VariableQuickEditRef.VariableType = QuickEditViewModel.Variable.VariableType;
+
+            VariableQuickEditRef = null;
+        }
+
         private ModalRef variableModalRef;
         private async Task OpenVariableModalTemplate(Variable variable)
         {
@@ -295,10 +384,12 @@ namespace Caf.Midden.Wasm.Shared
                     Tags = variable.Tags,
                     Methods = variable.Methods,
                     QCApplied = variable.QCApplied,
-                    ProcessingLevel = variable.ProcessingLevel
+                    ProcessingLevel = variable.ProcessingLevel,
+                    VariableType = variable.VariableType
                 },
                 ProcessingLevels = State.AppConfig.ProcessingLevels,
                 QCFlags = State.AppConfig.QCTags,
+                VariableTypes = State.AppConfig.VariableTypes,
                 Tags = State.AppConfig.Tags,
                 SelectedTags = variable.Tags ??= new List<string>(),
                 SelectedQCApplied = variable.QCApplied ??= new List<string>()
@@ -321,7 +412,7 @@ namespace Caf.Midden.Wasm.Shared
                 variable.Methods = templateOptions.Variable.Methods;
                 variable.QCApplied = templateOptions.SelectedQCApplied.ToList();
                 variable.ProcessingLevel = templateOptions.Variable.ProcessingLevel;
-
+                variable.VariableType = templateOptions.Variable.VariableType;
                 await variableModalRef.CloseAsync();
             };
 
@@ -390,6 +481,8 @@ namespace Caf.Midden.Wasm.Shared
 
         private async Task<string> SaveDataset()
         {
+            // TODO: Validate first!
+
             JsonSerializerOptions options = new JsonSerializerOptions()
             {
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,

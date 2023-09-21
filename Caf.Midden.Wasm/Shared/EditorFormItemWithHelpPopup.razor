@@ -1,0 +1,41 @@
+﻿<FormItem Rules=Rules>
+    <LabelTemplate>
+        <label class="@LabelStyle" for="@Id">
+            <Tooltip Title="@Tooltip">@Label <Icon Type="info-circle" /></Tooltip>
+        </label>
+    </LabelTemplate>
+    <ChildContent>
+        @ChildContent
+    </ChildContent>
+
+</FormItem>
+
+@code {
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public string Label { get; set; }
+
+    [Parameter]
+    public string Tooltip { get; set; }
+
+    [Parameter]
+    public string Id { get; set; }
+
+    [Parameter]
+    public bool IsRequired { get; set; } = true;
+
+    [Parameter]
+    public FormValidationRule[] Rules { get; set; }
+
+    private string LabelStyle { get; set; }
+
+    protected override void OnInitialized()
+    {
+        LabelStyle = IsRequired ? "ant-form-item-required" : "ant-form-item";
+
+        StateHasChanged();
+    }
+
+}

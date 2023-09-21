@@ -13,6 +13,7 @@ namespace Caf.Midden.Wasm.Shared.ViewModels
         public List<string> Tags { get; set; }
         public List<string> ProcessingLevels { get; set; }
         public List<string> QCFlags { get; set; }
+        public List<string> VariableTypes { get; set; }
         public IEnumerable<string> SelectedTags { get; set; }
         public IEnumerable<string> SelectedQCApplied { get; set; }
     }

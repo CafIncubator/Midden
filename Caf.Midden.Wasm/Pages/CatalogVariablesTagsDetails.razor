@@ -1,0 +1,16 @@
+﻿@page "/catalog/variables/tags/{TagName}"
+
+@inject Services.StateContainer State
+
+<div class="site-layout-background">
+    <CatalogLoader />
+    <PageHeader Class="site-page-header"
+                Title="@($"Variable Catalog for \"{TagName}\"")"
+                Subtitle="Variables filtered by tag" />
+    <CatalogVariableViewer TagName="@TagName" />    
+</div>
+
+@code {
+    [Parameter]
+    public string TagName { get; set; }
+} 

@@ -29,9 +29,6 @@ namespace Caf.Midden.Cli.Services
 
         string[] Scopes = { DriveService.Scope.DriveReadonly };
 
-        private readonly string clientId;
-        private readonly string clientSecret;
-        private readonly string applicationName;
         private readonly DriveService service;
 
         private List<Google.Apis.Drive.v3.Data.TeamDrive> cachedDriveList;
@@ -41,15 +38,11 @@ namespace Caf.Midden.Cli.Services
             string clientSecret,
             string applicationName)
         {
-            this.clientId = clientId;
-            this.clientSecret = clientSecret;
-            this.applicationName = applicationName;
-
             UserCredential credential;
             ClientSecrets clientSecrets = new ClientSecrets()
             {
-                ClientId = this.clientId,
-                ClientSecret = this.clientSecret
+                ClientId = clientId,
+                ClientSecret = clientSecret
             };
 
             credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
@@ -62,7 +55,22 @@ namespace Caf.Midden.Cli.Services
             this.service = new DriveService(new BaseClientService.Initializer()
             {
                 HttpClientInitializer = credential,
-                ApplicationName = this.applicationName
+                ApplicationName = applicationName
+            });
+        }
+
+        public GoogleWorkspaceSharedDriveCrawler(
+            string jsonKeyPath,
+            string applicationName)
+        {
+            GoogleCredential credential = GoogleCredential
+                .FromFile(jsonKeyPath)
+                .CreateScoped(Scopes);
+
+            this.service = new DriveService(new BaseClientService.Initializer()
+            {
+                HttpClientInitializer = credential,
+                ApplicationName = applicationName
             });
         }
 
@@ -113,7 +121,7 @@ namespace Caf.Midden.Cli.Services
         {        
             // Fetch file from drive
             FilesResource.GetRequest request = service.Files.Get(id);
-            request.Fields = "id, name, parents, driveId";
+            request.Fields = "id, name, parents, driveId, trashed";
             request.SupportsAllDrives = true;
             request.SupportsTeamDrives = true;
             var parent = request.Execute();
@@ -153,7 +161,7 @@ namespace Caf.Midden.Cli.Services
                     FilesResource.ListRequest listRequest = service.Files.List();
                     listRequest.DriveId = drive.Id;
                     listRequest.PageSize = 100;
-                    listRequest.Fields = "nextPageToken, files(id, name, parents)";
+                    listRequest.Fields = "nextPageToken, files(id, name, parents, trashed)";
                     listRequest.IncludeItemsFromAllDrives = true;
                     listRequest.SupportsAllDrives = true;
                     listRequest.Corpora = "drive";
@@ -165,7 +173,10 @@ namespace Caf.Midden.Cli.Services
                     {
                         foreach (var file in files)
                         {
-                            if(file.Name.EndsWith(fileNameContains))
+                            if (file.Trashed == true)
+                                continue;
+
+                            if (file.Name.EndsWith(fileNameContains))
                             {
                                 Console.WriteLine($"  In {drive.Name} found {file.Name}");
                                 names.Add(file.Id);
@@ -200,7 +211,7 @@ namespace Caf.Midden.Cli.Services
                     FilesResource.ListRequest listRequest = service.Files.List();
                     listRequest.DriveId = drive.Id;
                     listRequest.PageSize = 100;
-                    listRequest.Fields = "nextPageToken, files(id, name, parents)";
+                    listRequest.Fields = "nextPageToken, files(id, name, parents, trashed)";
                     listRequest.IncludeItemsFromAllDrives = true;
                     listRequest.SupportsAllDrives = true;
                     listRequest.Corpora = "drive";
@@ -230,7 +241,10 @@ namespace Caf.Midden.Cli.Services
                         {
                             foreach (var file in dirFiles)
                             {
-                                if(file.Name.EndsWith(fileNameEndsWith))
+                                if (file.Trashed == true)
+                                    continue;
+
+                                if (file.Name.EndsWith(fileNameEndsWith))
                                 {
                                     Console.WriteLine($"  In {drive.Name} found {file.Name}");
 
@@ -259,6 +273,9 @@ namespace Caf.Midden.Cli.Services
 
             foreach(var file in files)
             {
+                if (file.Trashed == true)
+                    continue;
+
                 string json;
                 
                 using (MemoryStream ms = new MemoryStream())
@@ -306,6 +323,9 @@ namespace Caf.Midden.Cli.Services
 
             foreach (var file in files)
             {
+                if (file.Trashed == true)
+                    continue;
+
                 string fileString;
 
                  //Option 1

@@ -99,7 +99,7 @@ namespace Caf.Midden.Cli.Services
         {        
             // Fetch file from drive
             FilesResource.GetRequest request = service.Files.Get(id);
-            request.Fields = "id, name, parents, driveId";
+            request.Fields = "id, name, parents, driveId, trashed";
             request.SupportsAllDrives = true;
             request.SupportsTeamDrives = true;
             var parent = request.Execute();
@@ -116,7 +116,7 @@ namespace Caf.Midden.Cli.Services
 
             FilesResource.ListRequest listRequest = service.Files.List();
             listRequest.PageSize = 100;
-            listRequest.Fields = "nextPageToken, files(id, name, parents)";
+            listRequest.Fields = "nextPageToken, files(id, name, parents, trashed)";
             listRequest.Q = $"name contains '{fileNameContains}'";
 
             IList<Google.Apis.Drive.v3.Data.File> files = listRequest.Execute().Files;
@@ -125,7 +125,10 @@ namespace Caf.Midden.Cli.Services
             {
                 foreach (var file in files)
                 {
-                    if(file.Name.EndsWith(fileNameContains))
+                    if (file.Trashed == true)
+                        continue;
+
+                    if (file.Name.EndsWith(fileNameContains))
                     {
                         Console.WriteLine($" Found {file.Name}");
                         names.Add(file.Id);
@@ -147,7 +150,7 @@ namespace Caf.Midden.Cli.Services
             
             FilesResource.ListRequest listRequest = service.Files.List();
             listRequest.PageSize = 100;
-            listRequest.Fields = "nextPageToken, files(id, name, parents)";
+            listRequest.Fields = "nextPageToken, files(id, name, parents, trashed)";
 
             string searchQuery;
             if (fileNameContainsIsExactMatch)
@@ -165,6 +168,9 @@ namespace Caf.Midden.Cli.Services
                 {
                     foreach (var file in dirFiles)
                     {
+                        if (file.Trashed == true)
+                            continue;
+
                         Console.WriteLine($"  Found {file.Name}");
 
                         files.Add(file);
@@ -174,6 +180,9 @@ namespace Caf.Midden.Cli.Services
                 {
                     foreach (var file in dirFiles)
                     {
+                        if (file.Trashed == true)
+                            continue;
+
                         Console.WriteLine($"  Found {file.Name}");
 
                         files.Add(file);
@@ -196,6 +205,9 @@ namespace Caf.Midden.Cli.Services
 
             foreach(var file in files)
             {
+                if (file.Trashed == true)
+                    continue;
+
                 string json;
                 
                 using (MemoryStream ms = new MemoryStream())
@@ -243,6 +255,9 @@ namespace Caf.Midden.Cli.Services
 
             foreach (var file in files)
             {
+                if (file.Trashed == true)
+                    continue;
+
                 string fileString;
 
                 //Option 1
