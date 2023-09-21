@@ -181,10 +181,29 @@
                                             PageSize="50">
                             <ChildContent Context="variable">
                                 <AntDesign.Column @bind-Field="variable.Name"
-                                                    Fixed="left" />
+                                                    Fixed="left">
+                                                    @if(VariableQuickEditRef == variable)
+                                                    {
+                                    <Input @bind-Value="QuickEditViewModel.Variable.Name" />
+                                }
+                                else
+                                {
+                                    <div>@variable.Name</div>
+                                }
+
+                                                    </AntDesign.Column>
                                 <AntDesign.Column @bind-Field="variable.Description"
                                                     Ellipsis />
-                                <AntDesign.Column @bind-Field="variable.Units" />
+                                <AntDesign.Column @bind-Field="variable.Units">
+                                    @if(VariableQuickEditRef == variable)
+                                    {
+                                    <Input @bind-Value="QuickEditViewModel.Variable.Units" />
+                                }
+                                else
+                                {
+                                    <div>@variable.Units</div>
+                                }
+                            </AntDesign.Column>
                                 <AntDesign.Column @bind-Field="variable.Methods"
                                                     Ellipsis>
                                     @foreach (var method in variable.Methods)
@@ -195,18 +214,73 @@
 
                                 <AntDesign.Column @bind-Field="variable.QCApplied"
                                                     Title="Quality Control">
+                                @if(VariableQuickEditRef == variable)
+                                {
+                                    <Select Mode="multiple"
+                                            Placeholder="Select Quality Control"
+                                            @bind-Values="QuickEditViewModel.SelectedQCApplied"
+                                            TItemValue="string"
+                                            TItem="string">
+                                        <SelectOptions>
+                                            @foreach (var item in QuickEditViewModel.QCFlags)
+                                            {
+                                                <SelectOption TItemValue="string" TItem="string" Value=@item Label=@item />
+                                            }
+                                        </SelectOptions>
+                                    </Select>
+                                }
+                                else
+                                {
                                     @foreach (var qc in variable.QCApplied)
-                                        {
+                                    {
                                         <Tag>@qc</Tag>
-                                        }
+                                    }
+                                }
+                                
                                 </AntDesign.Column>
+
+
                                 <AntDesign.Column @bind-Field="variable.ProcessingLevel"
                                                     Title="Processing">
+                                @if(VariableQuickEditRef == variable)
+                                {
+                                    <SimpleSelect Id="variable-processing" @bind-Value="@QuickEditViewModel.Variable.ProcessingLevel"
+                                                  Placeholder="Processing Level">
+                                        <SelectOptions>
+                                            @foreach (var item in QuickEditViewModel.ProcessingLevels)
+                                            {
+                                                <SimpleSelectOption Value=@item Label=@item />
+                                            }
+                                        </SelectOptions>
+                                    </SimpleSelect>
+                                }
+                                else
+                                {
                                     <Tag>@variable.ProcessingLevel</Tag>
+                                }
+                                
                                 </AntDesign.Column>
+
+
                             <AntDesign.Column @bind-Field="variable.VariableType"
                                               Title="Type">
-                                <Tag>@variable.VariableType</Tag>
+                                @if(VariableQuickEditRef == variable)
+                                {
+                                    <SimpleSelect Id="variable-type" @bind-Value="@QuickEditViewModel.Variable.VariableType"
+                                                  Placeholder="Variable Type">
+                                        <SelectOptions>
+                                            @foreach (var item in QuickEditViewModel.VariableTypes)
+                                            {
+                                                <SimpleSelectOption Value=@item Label=@item />
+                                            }
+                                        </SelectOptions>
+                                    </SimpleSelect>
+                                }
+                                else
+                                {
+                                    <Tag>@variable.VariableType</Tag>
+                                }
+                                
                             </AntDesign.Column>
 
                                 <AntDesign.Column @bind-Field="variable.Tags">
@@ -219,6 +293,16 @@
                                 <ActionColumn Title="Action"
                                                 Fixed="right">
                                     <Space>
+                                    <SpaceItem>
+                                        @if(VariableQuickEditRef == variable)
+                                            {
+                                                <Button Type="@ButtonType.Link" OnClick="()=>EndQuickEdit()"><Icon Type="check"></Icon></Button>
+                                            }
+                                            else
+                                            {
+                                                <Button Type="@ButtonType.Link" OnClick="()=>StartQuickEdit(variable)"><Icon Type="edit"></Icon></Button>
+                                            }
+                                        </SpaceItem>
                                         <SpaceItem>
                                             <Button OnClick="() => OpenVariableModalTemplate(variable)">
                                                 <Icon Type="edit" />

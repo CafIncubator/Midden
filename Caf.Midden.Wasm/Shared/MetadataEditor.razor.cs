@@ -303,6 +303,73 @@ namespace Caf.Midden.Wasm.Shared
         #endregion
 
         #region Variable Functions
+
+        private Variable VariableQuickEditRef;
+        private ViewModels.VariableModalViewModel QuickEditViewModel;
+
+        private async Task StartQuickEdit(Variable variable)
+        {
+            VariableQuickEditRef = variable;
+            if(QuickEditViewModel == null)
+            {
+                QuickEditViewModel = new ViewModels.VariableModalViewModel
+                {
+                    Variable = new Variable()
+                    {
+                        Name = variable.Name,
+                        Description = variable.Description,
+                        Units = variable.Units,
+                        Height = variable.Height,
+                        Tags = variable.Tags,
+                        Methods = variable.Methods,
+                        QCApplied = variable.QCApplied,
+                        ProcessingLevel = variable.ProcessingLevel,
+                        VariableType = variable.VariableType
+                    },
+                    ProcessingLevels = State.AppConfig.ProcessingLevels,
+                    QCFlags = State.AppConfig.QCTags,
+                    VariableTypes = State.AppConfig.VariableTypes,
+                    Tags = State.AppConfig.Tags,
+                    SelectedTags = variable.Tags ??= new List<string>(),
+                    SelectedQCApplied = variable.QCApplied ??= new List<string>()
+                };
+            }
+            else
+            {
+                QuickEditViewModel.Variable = new Variable()
+                {
+                    Name = variable.Name,
+                    Description = variable.Description,
+                    Units = variable.Units,
+                    Height = variable.Height,
+                    Tags = variable.Tags,
+                    Methods = variable.Methods,
+                    QCApplied = variable.QCApplied,
+                    ProcessingLevel = variable.ProcessingLevel,
+                    VariableType = variable.VariableType
+                };
+                QuickEditViewModel.SelectedTags = variable.Tags ??= new List<string>();
+                QuickEditViewModel.SelectedQCApplied = variable.QCApplied ??= new List<string>();
+            }
+        }
+
+        private async Task EndQuickEdit()
+        {
+            // TODO: Some validation checks
+
+            VariableQuickEditRef.Name = QuickEditViewModel.Variable.Name;
+            VariableQuickEditRef.Description = QuickEditViewModel.Variable.Description;
+            VariableQuickEditRef.Units = QuickEditViewModel.Variable.Units;
+            VariableQuickEditRef.Height = QuickEditViewModel.Variable.Height;
+            VariableQuickEditRef.Tags = QuickEditViewModel.SelectedTags.ToList();
+            VariableQuickEditRef.Methods = QuickEditViewModel.Variable.Methods;
+            VariableQuickEditRef.QCApplied = QuickEditViewModel.SelectedQCApplied.ToList();
+            VariableQuickEditRef.ProcessingLevel = QuickEditViewModel.Variable.ProcessingLevel;
+            VariableQuickEditRef.VariableType = QuickEditViewModel.Variable.VariableType;
+
+            VariableQuickEditRef = null;
+        }
+
         private ModalRef variableModalRef;
         private async Task OpenVariableModalTemplate(Variable variable)
         {
