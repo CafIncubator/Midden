@@ -110,7 +110,8 @@ namespace Caf.Midden.Core.Services.Metadata
                     QCApplied = CopyQCApplied(
                         variable.QCApplied, 
                         variable.IsQCSpecified),
-                    ProcessingLevel = variable.ProcessingLevel.ToString()
+                    ProcessingLevel = variable.ProcessingLevel.ToString(),
+                    VariableType = ""
                 };
 
                 // Get temporal extent

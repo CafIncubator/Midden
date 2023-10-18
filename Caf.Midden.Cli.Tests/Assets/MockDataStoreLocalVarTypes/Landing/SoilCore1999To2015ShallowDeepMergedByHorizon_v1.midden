@@ -1,0 +1,355 @@
+{
+  "schemaVersion": "v0.2",
+  "creationDate": "2020-12-29T00:00:00",
+  "modifiedDate": "2023-10-14T22:03:33.788Z",
+  "dataset": {
+    "zone": "Landing",
+    "project": "SoilsWG_BaselineDataCollection",
+    "name": "SoilCore1999To2015ShallowDeepMergedByHorizon_v1",
+    "description": "Data from soil cores collected at georeference points located in Cook East. The dataset is an aggregation of values from profile samples (1.5 m depth) subdivided by horizon and values from 30 cm depth soil cores subdivided by 10 cm depth increments. Samples were collected in 1998, 2008, and 2015.\n\n**2020-12-21**: Data updated. A copy/paste error was identified and fixed that affected bulk density data for ID2=189 for years 1998 and 2008. Also, some values of 0 were identified as null and set to NA; variables for pH and relating to C and N concentration were affected.\n\n**2023-10-14**: This data was copied from CAF LTAR: https://meta.cafltar.org/catalog/datasets/Production/CookEastSoilGridPointSurvey/SoilCore1999To2015ShallowDeepMergedByHorizon_v1",
+    "datasetPath": "[DataLakeProduction]CookEastSoilGridPointSurvey/SoilCore1999To2015ShallowDeepMergedByHorizon_v1",
+    "format": ".csv",
+    "filePathTemplate": "soilCore1998To2015ShallowDeepMergedByHorizon_{YYYYMMDD}.csv",
+    "filePathDescriptor": "{YYYYMMDD} where YYYY is four digit year the file was generated, MM is two digit month file was generated, DD is two digit day file was generated",
+    "structure": "Single",
+    "tags": [
+      "Soil",
+      "[LTARWG]Soils",
+      "[EPA]Land",
+      "[ISO]environment",
+	  "[LtarSite]CAF"
+    ],
+    "contacts": [
+      {
+        "name": "David Huggins",
+        "email": "david.huggins@usda.gov",
+        "role": "Principal investigator"
+      },
+      {
+        "name": "Bryan Carlson",
+        "email": "bryan.carlson@usda.gov",
+        "role": "Processor"
+      }
+    ],
+    "geometry": "{\"type\":\"Polygon\",\"coordinates\":[[[-117.08953857421874,46.778492009789424],[-117.07606315612793,46.778492009789424],[-117.07606315612793,46.783781826832346],[-117.08953857421874,46.783781826832346],[-117.08953857421874,46.778492009789424]]]}",
+    "methods": [
+      "https://github.com/cafltar/CookEastSoilGridPointSurvey_R_MergeDepthsAndYears"
+    ],
+    "temporalResolution": "0 year",
+    "temporalExtent": "1998/2015",
+    "spatialRepeats": 183,
+    "variables": [
+      {
+        "name": "Year",
+        "description": "Year sample was collected",
+        "units": "unitless",
+        "tags": [],
+        "methods": [],
+        "temporalExtent": "/",
+        "isQCSpecified": false,
+        "qcApplied": [
+          "Unknown"
+        ],
+        "processingLevel": "Unknown",
+        "variableType": "Dimension"
+      },
+      {
+        "name": "ID2",
+        "description": "Number ID of georeference point near sample collection",
+        "units": "unitless",
+        "tags": [],
+        "methods": [],
+        "temporalExtent": "/",
+        "isQCSpecified": false,
+        "qcApplied": [
+          "Unknown"
+        ],
+        "processingLevel": "Unknown",
+        "variableType": "Dimension"
+      },
+      {
+        "name": "Latitude",
+        "description": "Latitude of georeference point near where sample was collected",
+        "units": "dd",
+        "tags": [],
+        "methods": [],
+        "temporalExtent": "/",
+        "isQCSpecified": false,
+        "qcApplied": [
+          "Unknown"
+        ],
+        "processingLevel": "Unknown",
+        "variableType": "Dimension"
+      },
+      {
+        "name": "Longitude",
+        "description": "Longitude of georeference point near where sample was colelcted",
+        "units": "dd",
+        "tags": [],
+        "methods": [],
+        "temporalExtent": "/",
+        "isQCSpecified": false,
+        "qcApplied": [
+          "Unknown"
+        ],
+        "processingLevel": "Unknown",
+        "variableType": "Dimension"
+      },
+      {
+        "name": "TopDepth",
+        "description": "Top depth of subsample taken from soil core",
+        "units": "cm",
+        "tags": [],
+        "methods": [],
+        "temporalExtent": "/",
+        "isQCSpecified": false,
+        "qcApplied": [
+          "Unknown"
+        ],
+        "processingLevel": "Measured",
+        "variableType": "Dimension"
+      },
+      {
+        "name": "BottomDepth",
+        "description": "Bottom depth of subsample taken from soil core",
+        "units": "cm",
+        "tags": [],
+        "methods": [],
+        "temporalExtent": "/",
+        "isQCSpecified": false,
+        "qcApplied": [
+          "Unknown"
+        ],
+        "processingLevel": "Measured",
+        "variableType": "Dimension"
+      },
+      {
+        "name": "Horizon",
+        "description": "Horizon designation of the subsample",
+        "units": "unitless",
+        "tags": [],
+        "methods": [],
+        "temporalExtent": "/",
+        "isQCSpecified": false,
+        "qcApplied": [
+          "Unknown"
+        ],
+        "processingLevel": "Measured",
+        "variableType": "Dimension"
+      },
+      {
+        "name": "BulkDensity",
+        "description": "Bulk density of the subsample",
+        "units": "g/cm^3",
+        "tags": [
+          "[CV_SoilsWG]Bulk_Density"
+        ],
+        "methods": [],
+        "temporalExtent": "/",
+        "isQCSpecified": true,
+        "qcApplied": [
+          "Dataset",
+          "Review"
+        ],
+        "processingLevel": "Modeled",
+        "variableType": "Metric"
+      },
+      {
+        "name": "dC13",
+        "description": "Carbon isotopic composition of the subsample",
+        "units": "permille",
+        "tags": [
+          "[CV_SoilsWG]13C"
+        ],
+        "methods": [],
+        "temporalExtent": "/",
+        "isQCSpecified": false,
+        "qcApplied": [
+          "Unknown"
+        ],
+        "processingLevel": "Measured",
+        "variableType": "Metric"
+      },
+      {
+        "name": "dC13AcidWashed",
+        "description": "Carbon isotopic composition of the subsample after acid washed",
+        "units": "permille",
+        "tags": [
+          "[CV_SoilsWG]13C"
+        ],
+        "methods": [],
+        "temporalExtent": "/",
+        "isQCSpecified": false,
+        "qcApplied": [
+          "Unknown"
+        ],
+        "processingLevel": "Measured",
+        "variableType": "Metric"
+      },
+      {
+        "name": "TNConc",
+        "description": "Total nitrogen concentraion",
+        "units": "%",
+        "tags": [
+          "[CV_SoilsWG]Total_Soil_N"
+        ],
+        "methods": [],
+        "temporalExtent": "/",
+        "isQCSpecified": false,
+        "qcApplied": [
+          "Unknown"
+        ],
+        "processingLevel": "Measured",
+        "variableType": "Metric"
+      },
+      {
+        "name": "TNConcAcidWashed",
+        "description": "Total nitrogen concentration after acid washed",
+        "units": "%",
+        "tags": [
+          "[CV_SoilsWG]Total_Soil_N"
+        ],
+        "methods": [],
+        "temporalExtent": "/",
+        "isQCSpecified": false,
+        "qcApplied": [
+          "Unknown"
+        ],
+        "processingLevel": "Measured",
+        "variableType": "Metric"
+      },
+      {
+        "name": "TCConc",
+        "description": "Total carbon concentration",
+        "units": "%",
+        "tags": [
+          "[CV_SoilsWG]Total_Soil_C"
+        ],
+        "methods": [],
+        "temporalExtent": "/",
+        "isQCSpecified": false,
+        "qcApplied": [
+          "Unknown"
+        ],
+        "processingLevel": "Measured",
+        "variableType": "Metric"
+      },
+      {
+        "name": "TCConcAcidWashed",
+        "description": "Total carbon concentration after acid washed",
+        "units": "%",
+        "tags": [
+          "[CV_SoilsWG]Total_Soil_C"
+        ],
+        "methods": [],
+        "temporalExtent": "/",
+        "isQCSpecified": false,
+        "qcApplied": [
+          "Unknown"
+        ],
+        "processingLevel": "Measured",
+        "variableType": "Metric"
+      },
+      {
+        "name": "TocConc",
+        "description": "Total organic carbon concentration",
+        "units": "%",
+        "tags": [
+          "[CV_SoilsWG]Total_organic_C"
+        ],
+        "methods": [],
+        "temporalExtent": "/",
+        "isQCSpecified": false,
+        "qcApplied": [
+          "Unknown"
+        ],
+        "processingLevel": "Calculated",
+        "variableType": "Metric"
+      },
+      {
+        "name": "TocStock",
+        "description": "Total organic carbon stock",
+        "units": "Mg/ha",
+        "tags": [
+          "[CV_SoilsWG]Total_organic_C"
+        ],
+        "methods": [],
+        "temporalExtent": "/",
+        "isQCSpecified": true,
+        "qcApplied": [
+          "Review"
+        ],
+        "processingLevel": "Calculated",
+        "variableType": "Metric"
+      },
+      {
+        "name": "TicConc",
+        "description": "Total inorganic carbon concentration",
+        "units": "%",
+        "tags": [
+          "[CV_SoilsWG]Total_inorganic_C"
+        ],
+        "methods": [],
+        "temporalExtent": "/",
+        "isQCSpecified": false,
+        "qcApplied": [
+          "Unknown"
+        ],
+        "processingLevel": "Calculated",
+        "variableType": "Metric"
+      },
+      {
+        "name": "TicStock",
+        "description": "Total inorganic carbon stock",
+        "units": "Mg/ha",
+        "tags": [
+          "[CV_SoilsWG]Total_inorganic_C"
+        ],
+        "methods": [],
+        "temporalExtent": "/",
+        "isQCSpecified": false,
+        "qcApplied": [
+          "Unknown"
+        ],
+        "processingLevel": "Calculated",
+        "variableType": "Metric"
+      },
+      {
+        "name": "TNStock",
+        "description": "Total nitrogen stock",
+        "units": "Mg/ha",
+        "tags": [
+          "[CV_SoilsWG]Total_Soil_N"
+        ],
+        "methods": [],
+        "temporalExtent": "/",
+        "isQCSpecified": false,
+        "qcApplied": [
+          "Unknown"
+        ],
+        "processingLevel": "Calculated",
+        "variableType": "Metric"
+      },
+      {
+        "name": "pH",
+        "description": "pH of the subsample",
+        "units": "unitless",
+        "tags": [
+          "[CV_SoilsWG]pH"
+        ],
+        "methods": [],
+        "temporalExtent": "/",
+        "isQCSpecified": false,
+        "qcApplied": [
+          "Unknown"
+        ],
+        "processingLevel": "Measured",
+        "variableType": "Metric"
+      }
+    ],
+    "derivedWorks": [],
+    "parentDatasets": [
+      "https://meta.cafltar.org/catalog/datasets/Production/CookEastSoilGridPointSurvey/SoilCore1999To2015ShallowDeepMergedByHorizon_v1"
+    ]
+  }
+}
