@@ -39,6 +39,9 @@
     <None Update="Assets\CliConfigurationSecrets\middencli-1613753843824-7ab2426f841e.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Assets\MockDataStoreLocalVarTypes\Landing\SoilCore1999To2015ShallowDeepMergedByHorizon_v1.midden">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Assets\MockDataStoreLocal\Production\DESCRIPTION.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
