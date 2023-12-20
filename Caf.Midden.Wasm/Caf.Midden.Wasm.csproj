@@ -1,9 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
-    <Version>0.3</Version>
+    <Version>0.4.0</Version>
+    <InformationalVersion>0.4.0-dev.1</InformationalVersion>
+    
   </PropertyGroup>
 
   <ItemGroup>
