@@ -26,7 +26,7 @@
                    CollapsedWidth="0">
                 <Menu   Theme="MenuTheme.Light" 
                         DefaultSelectedKeys=@(new[]{"1"}) 
-                        DefaultOpenKeys=@(new[]{"2"})
+                        DefaultOpenKeys=@(new[]{"2", "3"})
                         Mode="MenuMode.Inline">
                     <MenuItem Key="1" RouterLink="" RouterMatch="NavLinkMatch.Prefix">
                         <Icon Type="home" Theme="outline" />
@@ -44,6 +44,10 @@
                         <MenuItem Key="2c" RouterLink="catalog/projects" RouterMatch="NavLinkMatch.Prefix">
                             <Icon Type="project" Theme="outline" />
                             <span>Projects</span>
+                        </MenuItem>
+                        <MenuItem Key="2d" RouterLink="catalog/tags" RouterMatch="NavLinkMatch.Prefix">
+                            <Icon Type="tag" Theme="outline" />
+                            <span>Tags</span>
                         </MenuItem>
                     </SubMenu>
                     <SubMenu Key="3" Title="Editor" TitleTemplate=@editorTitle>

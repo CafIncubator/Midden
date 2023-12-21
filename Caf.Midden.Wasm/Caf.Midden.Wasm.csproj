@@ -3,7 +3,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
     <Version>0.4.0</Version>
-    <InformationalVersion>0.4.0-dev.0</InformationalVersion>
+    <InformationalVersion>0.4.0-dev.1</InformationalVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="AntDesign" Version="0.16.3" />

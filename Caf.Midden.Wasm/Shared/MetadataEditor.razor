@@ -24,7 +24,7 @@
                     Layout="@FormLayout.Vertical"
                     ValidateMode="@FormValidateMode.Rules"
                     @ref="form">
-        <Tabs>
+        <Tabs Animated>
             <TabPane Key="1" Tab="Basic">
                 <EditorFormItemWithHelpPopup 
                     Label="Zone" 
@@ -151,7 +151,6 @@
                 </EditorFormItemWithHelpPopup>
 
             </TabPane>
-
             <TabPane Key="2" Tab="Variables">
 
                 <EditorFormItemWithHelpPopup Label="Variables" Id="variables" Tooltip="@VariablesTooltip" IsRequired=false>
