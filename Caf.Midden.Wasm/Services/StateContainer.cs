@@ -62,10 +62,16 @@ namespace Caf.Midden.Wasm.Services
 
         public StateContainer()
         {
-            this.AssemblyVersion = 
-                Assembly.GetExecutingAssembly()
+            var informationalVersion = 
+                Assembly.GetEntryAssembly()
                     .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
                     .InformationalVersion;
+
+            // Added because a GUID was appended to the end for unknown reasons
+            if (informationalVersion.Contains("+"))
+                informationalVersion = informationalVersion.Split("+")[0];
+
+            this.AssemblyVersion = informationalVersion;
         }
 
         public event Action<ComponentBase, string> StateChanged;
