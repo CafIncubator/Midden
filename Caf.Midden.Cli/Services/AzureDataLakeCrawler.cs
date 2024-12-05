@@ -99,26 +99,33 @@ namespace Caf.Midden.Cli.Services
             
             foreach (var fileName in fileNames)
             {
-                // Get file contents as json string
-                DataLakeFileClient fileClient = 
-                    fileSystemClient.GetFileClient(fileName);
-
-                Response<FileDownloadInfo> fileContents = fileClient.Read();
-
-                string json;
-                using (MemoryStream ms = new MemoryStream())
+                try
                 {
-                    fileContents.Value.Content.CopyTo(ms);
-                    json = Encoding.UTF8.GetString(ms.ToArray());
+                    // Get file contents as json string
+                    DataLakeFileClient fileClient =
+                        fileSystemClient.GetFileClient(fileName);
+
+                    Response<FileDownloadInfo> fileContents = fileClient.Read();
+
+                    string json;
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        fileContents.Value.Content.CopyTo(ms);
+                        json = Encoding.UTF8.GetString(ms.ToArray());
+                    }
+
+                    // Parse json string and add relative path to Dataset
+                    Metadata metadata = parser.Parse(json);
+
+                    string filePath = fileClient.Path.Replace(MIDDEN_FILE_EXTENSION, "");
+                    metadata.Dataset.DatasetPath = filePath;
+
+                    metadatas.Add(metadata);
                 }
-
-                // Parse json string and add relative path to Dataset
-                Metadata metadata = parser.Parse(json);
-
-                string filePath = fileClient.Path.Replace(MIDDEN_FILE_EXTENSION, "");
-                metadata.Dataset.DatasetPath = filePath;
-
-                metadatas.Add(metadata);
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error parsing file: {fileName}, reason: {ex}");
+                }
             }
 
             return metadatas;
