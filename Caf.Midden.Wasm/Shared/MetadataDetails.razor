@@ -74,6 +74,18 @@
                 </AntDesign.Col>
             </Row>
             <Row>
+                <AntDesign.Col Span="24" Style="padding:5px">
+                    <Card>
+                        <TitleTemplate>
+                            <Icon Type="partition" Theme="outline" Rotate="180" /> Lineage Diagram
+                        </TitleTemplate>
+                        <Body>
+                            <MetadataLineageDiagram />
+                        </Body>
+                    </Card>
+                </AntDesign.Col>
+            </Row>
+            <Row>
                 <AntDesign.Col Span="@((Metadata.Dataset.DerivedWorks == null) || (!Metadata.Dataset.DerivedWorks.Any()) ? 0 : 24)" Style="padding:5px">
                     <AntList Bordered DataSource="@Metadata.Dataset.DerivedWorks">
                         <Header>
