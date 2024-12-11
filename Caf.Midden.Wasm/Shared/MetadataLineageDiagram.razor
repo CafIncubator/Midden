@@ -5,51 +5,92 @@
 @using Blazor.Diagrams.Core.Routers;
 @using Blazor.Diagrams.Options;
 @using Blazor.Diagrams.Components;
+@using Caf.Midden.Wasm.Services
+@using Caf.Midden.Wasm.Shared.ViewModels;
+
+@inject Caf.Midden.Wasm.Services.StateContainer State
 
 <div style="width: 100%; height: 300px;">
-        <CascadingValue Value="Diagram" IsFixed="true">
-            <DiagramCanvas></DiagramCanvas>
-        </CascadingValue>
+    <CascadingValue Value="_Diagram" IsFixed="true">
+        <DiagramCanvas></DiagramCanvas>
+    </CascadingValue>
 </div>
 
 @code {
-    private BlazorDiagram Diagram { get; set; } = null!;
+    [Parameter]
+    public Dataset dataset { get; set; }
+
+    private MetadataLineageDiagramViewModel viewModel;
+
+
+    private BlazorDiagram _Diagram { get; set; } = null!;
 
     protected override void OnInitialized()
     {
+        // TODO: Create a component to style thoe nodes: https://blazor-diagrams.zhaytam.com/documentation/nodes-customization
+
+        viewModel =
+            new MetadataLineageDiagramViewModel(dataset, State.Catalog);
+
+        var node = viewModel.GetDatasetNode();
         var options = new BlazorDiagramOptions
         {
-            AllowMultiSelection = true,
+            AllowMultiSelection = false,
             Zoom =
             {
-                Enabled = false,
+                Enabled = true,
             },
             Links =
             {
                 DefaultRouter = new NormalRouter(),
                 DefaultPathGenerator = new SmoothPathGenerator()
-            },
+            }
         };
 
-        Diagram = new BlazorDiagram(options);
+        _Diagram = new BlazorDiagram(options);
 
-        var firstNode = Diagram.Nodes.Add(new NodeModel(position: new Blazor.Diagrams.Core.Geometry.Point(50, 50))
-            {
-                Title = "Node 1"
-            });
-        var secondNode = Diagram.Nodes.Add(new NodeModel(position: new Blazor.Diagrams.Core.Geometry.Point(200, 100))
-            {
-                Title = "Node 2"
-            });
-        var leftPort = secondNode.AddPort(PortAlignment.Left);
-        var rightPort = secondNode.AddPort(PortAlignment.Right);
+        CreateNodes(node);
 
-        // The connection point will be the intersection of
-        // a line going from the target to the center of the source
-        var sourceAnchor = new ShapeIntersectionAnchor(firstNode);
-        // The connection point will be the port's position
-        var targetAnchor = new SinglePortAnchor(leftPort);
-        var link = Diagram.Links.Add(new LinkModel(sourceAnchor, targetAnchor));
+        _Diagram.ZoomToFit();
+    }
+
+    private void CreateNodes(DatasetNode datasetNode, NodeModel thisNode = null)
+    {
+        // Create a new node if one wasn't passed through recursion
+        if(thisNode == null)
+        {
+            thisNode = _Diagram.Nodes.Add(
+                new NodeModel(
+                    position: new Blazor.Diagrams.Core.Geometry.Point(50, 50))
+                    {
+                        Title = $"{datasetNode.Name}"
+                    });
+        }
+
+        //var leftPortThisNode = thisNode.AddPort(PortAlignment.Left);
+
+        int currentRow = 1;
+        int rowHeight = 50;
+
+        foreach(var parent in datasetNode.Parents)
+        {
+            var parentNode = _Diagram.Nodes.Add(new NodeModel(position: new Blazor.Diagrams.Core.Geometry.Point(-50, (currentRow*rowHeight)))
+                {
+                    Title = $"{parent.Name}"
+                });
+            //var rightPortParentNode = parentNode.AddPort(PortAlignment.Right);
+            //var parentAnchor = new SinglePortAnchor(rightPortParentNode);
+            //var childAnchor = new SinglePortAnchor(leftPortThisNode);
+            var parentToChildLink = _Diagram.Links.Add(new LinkModel(parentNode, thisNode));
+            parentToChildLink.TargetMarker = LinkMarker.Arrow;
+
+            currentRow += 1;
+
+            if(parent.Parents.Count > 0)
+            {
+                CreateNodes(parent, parentNode);
+            }
+        }
     }
 
     

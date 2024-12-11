@@ -3582,6 +3582,97 @@
         ],
         "derivedWorks": []
       }
+    },
+    {
+      "schemaVersion": "v0.2",
+      "creationDate": "2024-12-11T01:00:00.757Z",
+      "modifiedDate": "2024-12-11T01:00:00.757Z",
+      "dataset": {
+        "zone": "Raw",
+        "project": "TestProject",
+        "name": "RawDataset",
+        "description": "This is raw data and a parent to all",
+        "tags": [],
+        "contacts": [
+          {
+            "name": "User1"
+          }
+        ],
+        "methods": [],
+        "variables": [],
+        "derivedWorks": [],
+        "parentDatasets": []
+      }
+    },
+    {
+      "schemaVersion": "v0.2",
+      "creationDate": "2024-12-11T01:00:00.757Z",
+      "modifiedDate": "2024-12-11T01:00:41.318Z",
+      "dataset": {
+        "zone": "Raw",
+        "project": "AnotherTestProject",
+        "name": "AnotherRawDataset",
+        "description": "This is raw data outside of TestProject",
+        "tags": [],
+        "contacts": [
+          {
+            "name": "User1"
+          }
+        ],
+        "methods": [],
+        "variables": [],
+        "derivedWorks": [],
+        "parentDatasets": []
+      }
+    },
+    {
+      "schemaVersion": "v0.2",
+      "creationDate": "2024-12-11T01:00:00.757Z",
+      "modifiedDate": "2024-12-11T01:03:11.813Z",
+      "dataset": {
+        "zone": "Work",
+        "project": "TestProject",
+        "name": "WorkingDataFromTwoRaw",
+        "description": "This dataset is created from two raw datasets",
+        "tags": [],
+        "contacts": [
+          {
+            "name": "User2"
+          }
+        ],
+        "methods": [],
+        "variables": [],
+        "derivedWorks": [],
+        "parentDatasets": [
+          "[Midden]https://localhost:5001/catalog/datasets/Raw/TestProject/RawDataset",
+          "[Midden]https://localhost:5001/catalog/datasets/Raw/AnotherTestProject/AnotherRawDataset"
+        ]
+      }
+    },
+    {
+      "schemaVersion": "v0.2",
+      "creationDate": "2024-12-11T01:00:00.757Z",
+      "modifiedDate": "2024-12-11T01:07:06.382Z",
+      "dataset": {
+        "zone": "Production",
+        "project": "TestProject",
+        "name": "ProductionFromWorkingAndExternal",
+        "description": "This dataset is created from working dataset and an external reference dataset",
+        "tags": [],
+        "contacts": [
+          {
+            "name": "User2"
+          }
+        ],
+        "methods": [],
+        "variables": [],
+        "derivedWorks": [],
+        "parentDatasets": [
+          "https://github.com/cafltar/Midden_AzureFunctionRunCollator/blob/main/README.md",
+          "Armendariz, Gerardo; Coffin, Alisa W.; Archer, David; Arthur, Dan; Bean, Alycia; Browning, Dawn; Carlson, Bryan; Clark, Pat; Flynn, Colton; Goslee, Sarah; Hall, Veronica; Holifield Collins, Chandra; Hsieh, Hsun-Yi; Johnson, Jane M. F.; Kaplan, Nicole; Kautz, Mark; Kettler, Tim; King, Kevin; Moglen, Glenn; Schmer, Marty; Sclater, Vivienne; Spiegal, Sheri; Stark, Patrick; Stinner, Jedediah; Sudduth, Ken; Teet, Stephen; Wagner, Steve; Yasarer, Lindsey (2021). The Long-Term Agroecosystem Research (LTAR) Network Standard GIS Data Layers, 2020 version. Ag Data Commons. https://doi.org/10.15482/USDA.ADC/1521161",
+          "[Midden]https://localhost:5001/catalog/datasets/Work/TestProject/WorkingDataFromTwoRaw"
+        ]
+      }
     }
   ]
 }

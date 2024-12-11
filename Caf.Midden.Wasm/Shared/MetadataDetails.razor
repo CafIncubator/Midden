@@ -74,13 +74,13 @@
                 </AntDesign.Col>
             </Row>
             <Row>
-                <AntDesign.Col Span="24" Style="padding:5px">
+                <AntDesign.Col Span="@((Metadata.Dataset.ParentDatasets == null) || (!Metadata.Dataset.ParentDatasets.Any()) ? 0 : 24)" Style="padding:5px">
                     <Card>
                         <TitleTemplate>
                             <Icon Type="partition" Theme="outline" Rotate="180" /> Lineage Diagram
                         </TitleTemplate>
                         <Body>
-                            <MetadataLineageDiagram />
+                            <MetadataLineageDiagram dataset="@Metadata.Dataset" />
                         </Body>
                     </Card>
                 </AntDesign.Col>
