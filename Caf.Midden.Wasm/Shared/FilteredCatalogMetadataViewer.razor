@@ -29,7 +29,9 @@
             <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(12,0)" Style="padding:5px">
             <Card Style="overflow:hidden">
                 <TitleTemplate>
-                    <a href="catalog/datasets/@metadata.Dataset.Zone/@metadata.Dataset.Project/@metadata.Dataset.Name">
+                    <Icon Type="file-text" Theme="outline" />
+
+                    <a class="dataset-header-color" href="catalog/datasets/@metadata.Dataset.Zone/@metadata.Dataset.Project/@metadata.Dataset.Name">
                         @metadata.Dataset.Name
                     </a>
                 </TitleTemplate>
@@ -40,11 +42,12 @@
                 </Extra>
                 <Body>
                     <Icon Type="folder" />
-                    <a href="catalog/datasets/@metadata.Dataset.Zone">
+                            <a href="catalog/datasets/@metadata.Dataset.Zone">
                         @metadata.Dataset.Zone
                     </a>
                     <Divider Type="DirectionVHType.Vertical" />
                     <Icon Type="project" />
+                           
                     <a href="catalog/projects/@metadata.Dataset.Project">
                         @metadata.Dataset.Project
                     </a>
@@ -79,3 +82,4 @@
 else {
     <Empty Simple />
 }
+

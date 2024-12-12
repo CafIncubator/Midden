@@ -1,7 +1,12 @@
 ﻿@page "/"
+@using AntDesign
 @inject Services.StateContainer State
 
 <div class="site-layout-background">
+    @* <Search Placeholder="Search Projects, Datasets, Variables" *@
+    @*         OnChange="SearchHandler" *@
+    @*         EnterButton="true" @bind-Value="SearchTerm" *@
+    @*         AllowClear="true" /> *@
     <CatalogLoader />
     @if (State?.AppConfig != null)
     {
@@ -171,19 +176,6 @@
 </div>
 
 
-@code{
-    private string DebugMsg { get; set; }
-
-    private async Task AppConfig_StateChanged(
-    ComponentBase source,
-    string appConfig)
-    {
-        if (source != this)
-        {
-            await InvokeAsync(StateHasChanged);
-            DebugMsg = "StateHasChanged";
-        }
-    }
 
     //protected override void OnInitialized()
     //{

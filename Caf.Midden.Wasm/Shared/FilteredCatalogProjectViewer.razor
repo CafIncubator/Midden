@@ -29,8 +29,8 @@
             <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(12,0)" Style="padding:5px">
             <Card Style="overflow:hidden">
                 <TitleTemplate>
-                    
-                    <a href="catalog/projects/@project.Name">
+                        <Icon Type="project" Theme="outline" />
+                        <a href="catalog/projects/@project.Name">
                         @project.Name
                     </a>
                     @if(!string.IsNullOrEmpty(project.ProjectStatus))
@@ -54,4 +54,24 @@
         </AntDesign.Col>
         }
     </Row>
+}
+
+@code {
+    [Parameter]
+    public string SearchQuery { get; set; }
+
+    // [Parameter]
+    // public bool ShowHeader { get; set; } = true;
+
+    // [Parameter]
+    // public bool ShowSearch { get; set; } = true;
+
+    private List<Project> FilteredCatalogProjects => State.Catalog.Projects
+        .Where(p => string.IsNullOrEmpty(SearchQuery) || p.Name.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase))
+        .ToList();
+
+    private void SearchHandler(ChangeEventArgs e)
+    {
+        SearchQuery = e.Value.ToString();
+    }
 }

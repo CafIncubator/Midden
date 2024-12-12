@@ -27,6 +27,11 @@ namespace Caf.Midden.Wasm.Pages
 
         DateTime CatalogLastUpdate { get; set; }
 
+        public string SearchTerm { get; set; }
+
+        public List<Metadata> BaseMetadatas { get; set; } = new List<Metadata>();
+        public List<Metadata> FilteredMetadata { get; set; } = new List<Metadata>();
+
         EmbeddedProperty Property(int span, int offset) => new() { Span = span, Offset = offset };
 
         IChartComponent MetadataPerZone = new Column();
@@ -166,6 +171,27 @@ namespace Caf.Midden.Wasm.Pages
             this.TotalContacts = UniqueContacts.Count;
         }
 
+        private void SearchHandler()
+        {
+            if (string.IsNullOrWhiteSpace(SearchTerm))
+            {
+                FilteredMetadata = this.BaseMetadatas;
+            }
+            else
+            {
+                FilteredMetadata = this.BaseMetadatas
+                    .Where(m =>
+                        (m.Dataset.Name.ToLower().Contains(
+                            SearchTerm.ToLower())) ||
+                        (m.Dataset.Description.ToLower().Contains(
+                            SearchTerm.ToLower())) ||
+                        (m.Dataset.Tags.Any(t => t.ToLower().Contains(
+                            SearchTerm.ToLower()))))
+                    .OrderByDescending(m => m.Dataset.LastUpdate)
+                    .ToList();
+            }
+        }
+
         private void CreateDatasetsPerZone()
         {
             List<object> objs = new List<object>();
@@ -188,6 +214,8 @@ namespace Caf.Midden.Wasm.Pages
 
             MetadataPerZone.ChangeData(MetadataPerZoneData);
         }
+
+        
 
         private void CreateProjectsPerStatus()
         {

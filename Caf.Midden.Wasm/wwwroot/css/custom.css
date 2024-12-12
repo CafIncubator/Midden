@@ -171,3 +171,10 @@
     -webkit-box-orient: vertical;
     max-height: 100px;
 }
+
+
+.dataset-header-color {
+    color: green; /* Set the text color to green */
+    font-weight: bold; /* Optional: Make the text bold */
+    text-decoration: none; /* Optional: Remove underline if applied to links */
+}
