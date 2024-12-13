@@ -3,11 +3,7 @@
 @inject Services.StateContainer State
 
 <div class="site-layout-background">
-    @* <Search Placeholder="Search Projects, Datasets, Variables" *@
-    @*         OnChange="SearchHandler" *@
-    @*         EnterButton="true" @bind-Value="SearchTerm" *@
-    @*         AllowClear="true" /> *@
-    <CatalogLoader />
+    
     @if (State?.AppConfig != null)
     {
         <PageHeader Class="site-page-header"
@@ -80,14 +76,21 @@
     </AntDesign.Row>
 
     <Divider />
-
-    <Title Level="2">Recent Projects <small><a href="catalog/projects"><Icon Type="double-right" Theme="outline" /></a></small></Title>
-    <FilteredCatalogProjectViewer ShowSearch=false ShowHeader=false ShowRecentNumber="2" />
+    <div style="padding-bottom:20px;">
+        <Search Placeholder="Search Projects, Datasets, Variables"
+                OnChange="SearchHandler"
+                EnterButton="true" @bind-Value="SearchTerm"
+                AllowClear="true" />
+    </div>
+    <CatalogLoader />    
+    <Title Level="2">Recent Datasets <small><a href="catalog/datasets"><Icon Type="double-right" Theme="outline" /></a></small></Title>
+    <FilteredCatalogMetadataViewer ShowSearch=false ShowHeader=false ShowRecentNumber="2" />
+    
     
     <Divider />
 
-    <Title Level="2">Recent Datasets <small><a href="catalog/datasets"><Icon Type="double-right" Theme="outline" /></a></small></Title>
-    <FilteredCatalogMetadataViewer ShowSearch=false ShowHeader=false ShowRecentNumber="2" />
+    <Title Level="2">Recent Projects <small><a href="catalog/projects"><Icon Type="double-right" Theme="outline" /></a></small></Title>
+    <FilteredCatalogProjectViewer ShowSearch=false ShowHeader=false ShowRecentNumber="2" />
     
     <Divider />
 
