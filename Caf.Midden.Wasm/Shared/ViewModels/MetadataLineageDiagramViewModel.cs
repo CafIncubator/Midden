@@ -29,12 +29,18 @@ namespace Caf.Midden.Wasm.Shared.ViewModels
         }
         private DatasetNode InitializeDatasetNode(Dataset dataset)
         {
-            var node = new DatasetNode(dataset.Name, GetRelativeUrlForDataset(dataset));
+            var node = new DatasetNode(
+                dataset.Name, 
+                dataset.Project,
+                dataset.Zone,
+                GetRelativeUrlForDataset(dataset));
 
             foreach (var parentDatasetString in dataset.ParentDatasets)
             {
                 var parentName = "";
                 var parentUrl = "";
+                var parentZone = "";
+                var parentProject = "";
 
                 if (parentDatasetString.StartsWith(MIDDEN_DATASET_FLAG))
                 {
@@ -66,20 +72,18 @@ namespace Caf.Midden.Wasm.Shared.ViewModels
                             // Failed to find the dataset in the catalog, so just set name as url
                             parentName = parentUrl;
 
-                            var parentNode = new DatasetNode(parentName, parentUrl);
+                            var parentNode = new DatasetNode(parentName, parentProject, parentZone, parentUrl);
                             _NumberConnections += 1;
                             node.AddParent(parentNode);     
                         }
-
-                        
-                        
+  
                     }
                     else
                     {
                         // It's not a valid url, so set the name to it and don't link anything
                         parentName = potentialUrl;
 
-                        var parentNode = new DatasetNode(parentName, parentUrl);
+                        var parentNode = new DatasetNode(parentName, parentProject, parentZone, parentUrl);
                         _NumberConnections += 1;
                         node.AddParent(parentNode);
                     }
@@ -93,7 +97,7 @@ namespace Caf.Midden.Wasm.Shared.ViewModels
                         parentUrl = parentDatasetString;
                     }
 
-                    var parentNode = new DatasetNode(parentName, parentUrl);
+                    var parentNode = new DatasetNode(parentName, parentProject, parentZone, parentUrl);
                     _NumberConnections += 1;
                     node.AddParent(parentNode);
                 }
@@ -104,7 +108,7 @@ namespace Caf.Midden.Wasm.Shared.ViewModels
 
         private string GetRelativeUrlForDataset(Dataset dataset)
         {
-            var result = $"/{dataset.Zone}/{dataset.Project}/{dataset.Name}";
+            var result = $"/catalog/datasets/{dataset.Zone}/{dataset.Project}/{dataset.Name}";
 
             return result;
         }
@@ -141,13 +145,19 @@ namespace Caf.Midden.Wasm.Shared.ViewModels
         private List<DatasetNode> _Parents = new List<DatasetNode>();
         //private List<Node> _Children = new List<Node>();
 
+       
+        public string Zone { get; set; }
+        public string Project { get; set; }
         public string Name { get; set; }
+
         public string Url { get; set; }
 
-        public DatasetNode(string name, string url)
+        public DatasetNode(string name, string project, string zone, string url)
         {
             this.Name = name;
             this.Url = url;
+            this.Zone = zone;
+            this.Project = project;
         }
 
         public IReadOnlyCollection<DatasetNode> Parents
