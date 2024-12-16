@@ -73,16 +73,6 @@
         }
     }
 
-    protected override void OnAfterRender(bool firstRender)
-    {
-        base.OnAfterRender(firstRender);
-
-        if(Diagram.Container != null)
-        {
-            //Diagram.ZoomToFit(0);
-        }
-    }
-
     private void OnContainerChanged()
     {
         if(Diagram.Container != null && _InitialResize == false)
@@ -90,9 +80,10 @@
             Diagram.SetZoom(0.7);
 
             // Centers base node -- derived from this: https://github.com/Blazor-Diagrams/Blazor.Diagrams/issues/269#issuecomment-1322025484
-            int margin = 10;
+            int margin = 0;
 
-            var width = COLUMN_WIDTH * Diagram.Zoom;
+            //var width = COLUMN_WIDTH * Diagram.Zoom; 
+            var width = Diagram.Zoom;
             var scaledMargin = margin * Diagram.Zoom;
             var deltaX = (Diagram.Container.Width / 2) - (width / 2) - scaledMargin;
             Diagram.UpdatePan(deltaX, 0);

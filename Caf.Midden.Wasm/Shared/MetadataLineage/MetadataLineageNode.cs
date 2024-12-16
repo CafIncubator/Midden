@@ -9,7 +9,6 @@ namespace Caf.Midden.Wasm.Shared.MetadataLineage
         public string Name { get; set; }
         public string Project { get; set; }
         public string Zone { get; set; }
-
         public string Url { get; set; }
     }
 }

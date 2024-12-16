@@ -149,7 +149,6 @@ namespace Caf.Midden.Wasm.Shared.ViewModels
         public string Zone { get; set; }
         public string Project { get; set; }
         public string Name { get; set; }
-
         public string Url { get; set; }
 
         public DatasetNode(string name, string project, string zone, string url)
