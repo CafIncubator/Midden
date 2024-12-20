@@ -76,12 +76,6 @@
     </AntDesign.Row>
 
     <Divider />
-    <div style="padding-bottom:20px;">
-        <Search Placeholder="Search Projects, Datasets, Variables"
-                OnChange="SearchHandler"
-                EnterButton="true" @bind-Value="SearchTerm"
-                AllowClear="true" />
-    </div>
     <CatalogLoader />    
     <Title Level="2">Recent Datasets <small><a href="catalog/datasets"><Icon Type="double-right" Theme="outline" /></a></small></Title>
     <FilteredCatalogMetadataViewer ShowSearch=false ShowHeader=false ShowRecentNumber="2" />
@@ -192,3 +186,6 @@
     //}
     
 }
+
+
+

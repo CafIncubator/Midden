@@ -1,6 +1,7 @@
 ﻿using AntDesign;
 using AntDesign.Charts;
 using Caf.Midden.Core.Models.v0_2;
+using Caf.Midden.Wasm.Shared.ViewModels;
 using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
@@ -27,7 +28,9 @@ namespace Caf.Midden.Wasm.Pages
 
         DateTime CatalogLastUpdate { get; set; }
 
-        public string SearchTerm { get; set; }
+        //public string SearchTerm { get; set; }
+
+        private List<string> Suggestions { get; set; } = new();
 
         public List<Metadata> BaseMetadatas { get; set; } = new List<Metadata>();
         public List<Metadata> FilteredMetadata { get; set; } = new List<Metadata>();
@@ -36,6 +39,17 @@ namespace Caf.Midden.Wasm.Pages
 
         IChartComponent MetadataPerZone = new Column();
         public object[] MetadataPerZoneData { get; set; }
+
+        public List<string> FilteredSuggestions { get; set; } = new();
+
+        public List<Dataset> BaseDatasets { get; set; } = new(); // All datasets
+        public List<CatalogProject> BaseProjects { get; set; } = new(); // All projects
+        public List<CatalogVariable> BaseVariables { get; set; } = new(); // All variables
+
+        public List<CatalogProject> FilteredCatalogProjects { get; set; } = new();
+        public List<Dataset> FilteredDatasets { get; set; } = new();
+        public List<CatalogVariable> FilteredCatalogVariables { get; set; } = new();
+
         ColumnConfig MetadataPerZoneConfig = new ColumnConfig
         {
             Title = new AntDesign.Charts.Title
@@ -171,26 +185,6 @@ namespace Caf.Midden.Wasm.Pages
             this.TotalContacts = UniqueContacts.Count;
         }
 
-        private void SearchHandler()
-        {
-            if (string.IsNullOrWhiteSpace(SearchTerm))
-            {
-                FilteredMetadata = this.BaseMetadatas;
-            }
-            else
-            {
-                FilteredMetadata = this.BaseMetadatas
-                    .Where(m =>
-                        (m.Dataset.Name.ToLower().Contains(
-                            SearchTerm.ToLower())) ||
-                        (m.Dataset.Description.ToLower().Contains(
-                            SearchTerm.ToLower())) ||
-                        (m.Dataset.Tags.Any(t => t.ToLower().Contains(
-                            SearchTerm.ToLower()))))
-                    .OrderByDescending(m => m.Dataset.LastUpdate)
-                    .ToList();
-            }
-        }
 
         private void CreateDatasetsPerZone()
         {
