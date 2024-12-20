@@ -59,23 +59,3 @@
         }
     </Row>
 }
-
-@code {
-    [Parameter]
-    public string SearchQuery { get; set; }
-
-    // [Parameter]
-    // public bool ShowHeader { get; set; } = true;
-
-    // [Parameter]
-    // public bool ShowSearch { get; set; } = true;
-
-    private List<Project> FilteredCatalogProjects => State.Catalog.Projects
-        .Where(p => string.IsNullOrEmpty(SearchQuery) || p.Name.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase))
-        .ToList();
-
-    private void SearchHandler(ChangeEventArgs e)
-    {
-        SearchQuery = e.Value.ToString();
-    }
-}
