@@ -27,17 +27,21 @@
         @foreach (var project in ViewModel.FilteredCatalogProjects)
         {
             <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(12,0)" Style="padding:5px">
-            <Card Style="overflow:hidden">
+             <Card Style="overflow:hidden">
                 <TitleTemplate>
-                    
-                    <a href="catalog/projects/@project.Name">
+                        <Icon Type="project" Theme="outline" />
+                        <a href="catalog/projects/@project.Name">
                         @project.Name
                     </a>
-                    @if(!string.IsNullOrEmpty(project.ProjectStatus))
-                        {
-                            <Tag>@project.ProjectStatus</Tag>
-                        }
+                    
                 </TitleTemplate>
+                <Extra>
+                    @if (!string.IsNullOrEmpty(project.ProjectStatus))
+                    {
+                        <Tag Style="background-color:white">@project.ProjectStatus</Tag>
+                    }
+
+                </Extra>
                 <Body>
                     <Icon Type="file-text" /> @project.DatasetCount
                     <Divider Type="DirectionVHType.Vertical" />
