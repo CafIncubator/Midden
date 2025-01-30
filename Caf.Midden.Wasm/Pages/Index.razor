@@ -1,9 +1,9 @@
 ﻿@page "/"
-@using AntDesign
+
 @inject Services.StateContainer State
 
 <div class="site-layout-background">
-    
+    <CatalogLoader />
     @if (State?.AppConfig != null)
     {
         <PageHeader Class="site-page-header"
@@ -76,7 +76,7 @@
     </AntDesign.Row>
 
     <Divider />
-    <CatalogLoader />    
+    
     <Title Level="2">Recent Datasets <small><a href="catalog/datasets"><Icon Type="double-right" Theme="outline" /></a></small></Title>
     <FilteredCatalogMetadataViewer ShowSearch=false ShowHeader=false ShowRecentNumber="2" />
     
