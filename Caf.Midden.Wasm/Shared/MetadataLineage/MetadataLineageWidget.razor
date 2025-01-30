@@ -1,0 +1,46 @@
+﻿@using Blazor.Diagrams.Components.Renderers;
+@using Caf.Midden.Wasm.Shared.MetadataLineage;
+
+<div class="dataset-node">
+    @foreach (var port in Node.Ports)
+    {
+        // In case you have any ports to show
+        // IMPORTANT: You are always in charge of rendering ports
+        <PortRenderer @key="port" Port="port" />
+    }
+    <Tooltip Title="@Node.Name" Placement="Placement.TopLeft">
+        <Card Size="small" Title="@Node.Name" Style="width:250px; text-overflow:ellipsis;">
+        <Extra>
+            @if (!String.IsNullOrEmpty(Node.Url))
+            {
+            <a href="@Node.Url" target="_blank"><Icon Type="link" Theme="outline" /></a>
+            }
+        </Extra>
+        <Body>
+            @if(!String.IsNullOrEmpty(Node.Zone))
+            {
+                    <p style="overflow: hidden; white-space:nowrap; width: 150px;  text-overflow: ellipsis;">
+                        <Icon Type="folder" />
+                        <a href="catalog/datasets/@Node.Zone" target="_blank">
+                            @Node.Zone
+                        </a>
+                    </p>
+            }
+            @if(!String.IsNullOrEmpty(Node.Project))
+            {
+                    <p style="overflow: hidden; white-space:nowrap; width: 150px; text-overflow: ellipsis;">
+                        <Icon Type="project" />
+                        <a href="catalog/projects/@Node.Project" target="_blank">
+                            @Node.Project
+                        </a>
+                    </p>
+            }
+        </Body>
+    </Card>
+    </Tooltip>
+
+</div>
+
+@code {
+    [Parameter] public MetadataLineageNode Node { get; set; } = null!;
+}

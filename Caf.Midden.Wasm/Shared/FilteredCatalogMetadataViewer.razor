@@ -27,24 +27,30 @@
         @foreach (var metadata in FilteredMetadata)
         {
             <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(12,0)" Style="padding:5px">
-            <Card Style="overflow:hidden">
+
+            <Card Class="dataset-card" Style="overflow:hidden">
                 <TitleTemplate>
-                    <a href="catalog/datasets/@metadata.Dataset.Zone/@metadata.Dataset.Project/@metadata.Dataset.Name">
+         
+                    <Icon Style="color: white;" Type="file-text" Theme="outline" />
+                            <a href="catalog/datasets/@metadata.Dataset.Zone/@metadata.Dataset.Project/@metadata.Dataset.Name" style="color: white;">
                         @metadata.Dataset.Name
                     </a>
+                    
                 </TitleTemplate>
                 <Extra>
                     <Button OnClick="() => OpenMetadataDetailsModalTemplate(metadata)">
                         <Icon Type="zoom-in" Theme="outline" />
                     </Button>
+                     
                 </Extra>
                 <Body>
                     <Icon Type="folder" />
-                    <a href="catalog/datasets/@metadata.Dataset.Zone">
+                            <a href="catalog/datasets/@metadata.Dataset.Zone">
                         @metadata.Dataset.Zone
                     </a>
                     <Divider Type="DirectionVHType.Vertical" />
                     <Icon Type="project" />
+                           
                     <a href="catalog/projects/@metadata.Dataset.Project">
                         @metadata.Dataset.Project
                     </a>
@@ -79,3 +85,4 @@
 else {
     <Empty Simple />
 }
+

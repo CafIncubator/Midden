@@ -2,7 +2,8 @@
     height: 40px;
     padding: 5px;
     line-height: 0px;
-    background: #40A9FF;
+    background: #1890ff;
+    //background: #40A9FF;
     position: relative;
     z-index: 10;
     -webkit-box-shadow: 0px 0px 5px 3px rgba(41,41,41,.25);
@@ -170,4 +171,35 @@
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     max-height: 100px;
+}
+
+
+.dataset-card .ant-card-head {
+    background-color: #1890ff; /* Dark gray for dataset heads */
+    color: white; /* White text for contrast */
+    /*padding: 10px;*/ /* Add spacing */
+}
+
+.dataset-card .ant-card-head-title {
+    color: rgb(0,0,0,0.85); /* Ensure title text is white */
+    font-weight: bold; /* Make text bold */
+}
+
+.dataset-card .ant-card-head-extra {
+    color: rgb(0,0,0,0.85); /* Style extra content if present */
+    background-color: darkgray; /* Dark gray for dataset heads */
+}
+
+.magnifying-button {
+    background-color: #abb2b9; /* Dark gray background */
+    color: black; /* White icon color */
+    border: none; /* Remove border */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Add pointer cursor */
+}
+
+.magnifying-button:hover {
+    background-color: #333; /* Slightly darker gray on hover */
+    color:white;
+    font-weight:bold;
 }

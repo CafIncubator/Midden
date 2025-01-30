@@ -8,6 +8,7 @@ using AntDesign;
 using Markdig;
 using Microsoft.JSInterop;
 using System.Text.Json;
+using Caf.Midden.Wasm.Shared.MetadataLineage;
 
 namespace Caf.Midden.Wasm.Shared
 {
