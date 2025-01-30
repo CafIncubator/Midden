@@ -67,6 +67,48 @@
                 document.body.removeChild(link);
             }
         }
+
+        window.downloadCSV = (filename, content) => {
+            console.log("JavaScript function downloadCSV called!");
+
+            if (!content) {
+                console.error("No content provided for CSV download.");
+                return;
+            }
+
+            console.log("Content preview:", content.substring(0, 200) + "...");
+
+            try {
+                // Encode content as UTF-8 with BOM to fix character encoding issues
+                const BOM = "\uFEFF"; // Byte Order Mark (UTF-8)
+                const blob = new Blob([BOM + content], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+
+                // Create a hidden <a> element for download
+                const link = document.createElement("a");
+                link.setAttribute("href", url);
+                link.setAttribute("download", filename);
+                link.style.visibility = "hidden";
+
+                console.log("Appending download link to document...");
+                document.body.appendChild(link);
+
+                // Trigger the download
+                console.log("Triggering download...");
+                link.click();
+
+                // Cleanup
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                console.log("Download should now be triggered!");
+            } catch (error) {
+                console.error("Error during CSV download:", error);
+            }
+        };
+
+
+
+
     </script>
     <script src="https://unpkg.com/@antv/g2plot@1.1.28/dist/g2plot.js"></script>
     <script src="_content/AntDesign.Charts/ant-design-charts-blazor.js"></script>
