@@ -173,16 +173,19 @@
     max-height: 100px;
 }
 
+.dataset-card.ant-card-bordered {
+    border: 1px solid #44a5ff;
+}
 
 .dataset-card .ant-card-head {
-    background-color: #1890ff; /* Dark gray for dataset heads */
+    background-color: #44a5ff; /* Dark gray for dataset heads */
     color: white; /* White text for contrast */
     /*padding: 10px;*/ /* Add spacing */
 }
 
 .dataset-card .ant-card-head-title {
     color: rgb(0,0,0,0.85); /* Ensure title text is white */
-    font-weight: bold; /* Make text bold */
+    /*font-weight: bold;  Make text bold */
 }
 
 .dataset-card .ant-card-head-extra {
