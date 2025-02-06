@@ -1,7 +1,6 @@
 ﻿using Caf.Midden.Cli.Services;
 using Caf.Midden.Core.Models.v0_2;
 using Caf.Midden.Core.Services.Metadata;
-using NuGet.Frameworks;
 using System;
 using System.Collections.Generic;
 using System.Linq;

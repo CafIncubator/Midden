@@ -1,0 +1,56 @@
+﻿@inject Caf.Midden.Wasm.Services.StateContainer State
+
+@if (this.ShowHeader)
+{
+    <Divider Orientation="center">Tags</Divider>
+}
+
+@if (State.Catalog != null && this.ShowSearch)
+{
+    <AntDesign.Row>
+        <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(8,8)">
+            <Search Placeholder="Search tags"
+                    OnChange="SearchHandler"
+                    EnterButton="true" @bind-Value="SearchTerm"
+                    AllowClear="true" />
+        </AntDesign.Col>
+    </AntDesign.Row>
+    
+    <Space />
+}
+
+@if (FilteredDatasetTags != null && FilteredVariableTags != null)
+{
+        <AntDesign.Row Gutter="16" Wrap="true">
+            <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(12,0)" Style="padding: 5px;">
+            <AntDesign.AntList DataSource="@FilteredDatasetTags"
+                                          Bordered>
+                 <Header>Dataset Tags</Header>
+                 <ChildContent Context="item">
+                     <a href="catalog/datasets/tags/@item.Key">
+                         <ListItem>
+
+                             <span><Tag>@item.Key</Tag></span> @item.Value
+                            </ListItem>
+                        </a>
+                    </ChildContent>
+                </AntDesign.AntList>
+            </AntDesign.Col>
+            <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(12,0)" Style="padding: 5px;">
+            <AntDesign.AntList DataSource="@FilteredVariableTags"
+                                          Bordered>
+                 <Header>Variable Tags</Header>
+                 <ChildContent Context="item">
+                     <a href="catalog/variables/tags/@item.Key" class="ListItemLink">
+                         <ListItem>
+                             <span><Tag>@item.Key</Tag></span> @item.Value
+                            </ListItem>
+                        </a>
+                    </ChildContent>
+                </AntDesign.AntList>
+            </AntDesign.Col>
+        </AntDesign.Row>
+}
+else {
+    <Empty Simple />
+}
