@@ -73,7 +73,7 @@ namespace Caf.Midden.Wasm.Shared
             if (State?.Catalog != null)
             {
                 SetBaseMetadatas();
-                SearchHandler();
+                FilteredMetadata = this.BaseMetadatas;
             }
         }
 
@@ -86,7 +86,7 @@ namespace Caf.Midden.Wasm.Shared
                 if (property == "UpdateCatalog" || property == "UpdateAppConfig")
                 {
                     SetBaseMetadatas();
-                    //ApplyZoneFilter();
+                    FilteredMetadata = this.BaseMetadatas;
                 }
 
                 await InvokeAsync(StateHasChanged); // Force UI to update after state changes
