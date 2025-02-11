@@ -37,6 +37,20 @@ namespace Caf.Midden.Wasm.Shared
         public List<Metadata> FilteredMetadata { get; set; } = new List<Metadata>();
 
         public string SearchTerm { get; set; }
+        private string _selectedZone;
+        private string SelectedZone
+        {
+            get => _selectedZone;
+            set
+            {
+                if (_selectedZone != value)
+                {
+                    _selectedZone = value;
+                    Console.WriteLine($"Zone selected: {_selectedZone}");  // Debug output
+                    ApplyZoneFilter();
+                }
+            }
+        }
 
         private MarkdownPipeline pipeline = new MarkdownPipelineBuilder()
             .UseAdvancedExtensions()
@@ -45,31 +59,40 @@ namespace Caf.Midden.Wasm.Shared
 
         protected override void OnInitialized()
         {
-            State.StateChanged += async (source, property)
-                => await StateChanged(source, property);
+            State.StateChanged += async (source, property) => await StateChanged(source, property);
+
+            if (State?.AppConfig?.Zones != null && State.AppConfig.Zones.Any())
+            {
+                Console.WriteLine($"Zones Loaded: {string.Join(", ", State.AppConfig.Zones)}");
+            }
+            else
+            {
+                Console.WriteLine("Zones are empty or AppConfig is null.");
+            }
 
             if (State?.Catalog != null)
             {
                 SetBaseMetadatas();
-                FilteredMetadata = this.BaseMetadatas;
+                ApplyZoneFilter();  // Apply initial zone filter if any
             }
         }
 
-        private async Task StateChanged(
-            ComponentBase source,
-            string property)
+
+
+        private async Task StateChanged(ComponentBase source, string property)
         {
             if (source != this)
             {
-                if (property == "UpdateCatalog")
+                if (property == "UpdateCatalog" || property == "UpdateAppConfig")
                 {
                     SetBaseMetadatas();
-                    FilteredMetadata = this.BaseMetadatas;
+                    ApplyZoneFilter();
                 }
 
-                await InvokeAsync(StateHasChanged);
+                await InvokeAsync(StateHasChanged); // Force UI to update after state changes
             }
         }
+
 
         private void SetBaseMetadatas()
         {
@@ -81,7 +104,9 @@ namespace Caf.Midden.Wasm.Shared
                 .OrderByDescending(m => m.Dataset.LastUpdate)
                 .ToList();
 
-            if(metas != null && metas.Count > 0 && ShowRecentNumber > 0)
+            Console.WriteLine($"Total datasets loaded: {metas.Count}");  // Debug statement
+
+            if (metas != null && metas.Count > 0 && ShowRecentNumber > 0)
             {
                 int toTake = ShowRecentNumber;
                 if (metas.Count < toTake) toTake = metas.Count;
@@ -93,8 +118,15 @@ namespace Caf.Midden.Wasm.Shared
                 this.BaseMetadatas = metas;
             }
 
-
+            // Debug to confirm dataset zones
+            foreach (var metadata in BaseMetadatas)
+            {
+                Console.WriteLine($"Dataset loaded: {metadata.Dataset.Name}, Zone: {metadata.Dataset.Zone}");
+            }
         }
+
+
+        
         private void SearchHandler()
         {
             if (string.IsNullOrWhiteSpace(SearchTerm))
@@ -115,6 +147,33 @@ namespace Caf.Midden.Wasm.Shared
                     .ToList();
             }
         }
+
+        private void ApplyZoneFilter()
+        {
+            Console.WriteLine($"Applying filter for zone: {SelectedZone}");  // Debug statement
+
+            if (string.IsNullOrEmpty(SelectedZone))
+            {
+                FilteredMetadata = BaseMetadatas;
+                Console.WriteLine("No zone selected. Showing all datasets.");
+            }
+            else
+            {
+                FilteredMetadata = BaseMetadatas
+                    .Where(m => m.Dataset.Zone.Equals(SelectedZone, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+
+                Console.WriteLine($"Datasets after filtering: {FilteredMetadata.Count}");  // Debug statement
+            }
+
+            // Force UI to refresh
+            InvokeAsync(() =>
+            {
+                StateHasChanged();
+                Console.WriteLine("UI refreshed after filtering.");
+            });
+        }
+
 
         private ModalRef metadataDetailsModalRef;
         private async Task OpenMetadataDetailsModalTemplate(Metadata metadata)
