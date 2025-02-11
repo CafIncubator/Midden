@@ -8,17 +8,39 @@
 
 @if (State.Catalog != null && this.ShowSearch)
 {
-    <AntDesign.Row>
-        <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(8,8)">
+    <AntDesign.Row Gutter="8" Align="middle">
+        @if (State.AppConfig?.Zones != null && State.AppConfig.Zones.Any())
+        {
+            <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(2,6)">
+                <SimpleSelect 
+                    Id="zone" 
+                    @bind-Value="SelectedZone" 
+                    Placeholder="Select Zone" 
+                    AllowClear="true"
+                    OnSelectedItemChanged="OnZoneFilterChange">
+                    <SelectOptions>
+                        @foreach (var zone in State.AppConfig.Zones)
+                        {
+                            <SimpleSelectOption Value="@zone" Label="@zone" />
+                        }
+                    </SelectOptions>
+                </SimpleSelect>
+            </AntDesign.Col>
+        }
+        <Divider Type="DirectionVHType.Vertical" />
+        <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(8,0)">
             <Search Placeholder="Search datasets"
                     OnChange="SearchHandler"
-                    EnterButton="true" @bind-Value="SearchTerm"
+                    EnterButton="true" 
+                    @bind-Value="SearchTerm"
                     AllowClear="true" />
         </AntDesign.Col>
     </AntDesign.Row>
-    
+
     <Space />
 }
+
+
 
 @if (FilteredMetadata != null)
 @if (FilteredMetadata.Count > 0)
