@@ -109,7 +109,14 @@
                     <Card>
                         <TitleTemplate>
                             <Icon Type="calculator" Theme="outline" /> Variables
+                            
                         </TitleTemplate>
+                        <Extra>
+                            <AntDesign.Button Type="primary" Size="small" Style="margin-right: 10px;" @onclick="DownloadVariables">
+                                <Icon Type="download" /> Download
+                            </AntDesign.Button>
+
+                        </Extra>
                         <Body>
                             @if (Metadata.Dataset.Variables?.Count > 0)
                             {

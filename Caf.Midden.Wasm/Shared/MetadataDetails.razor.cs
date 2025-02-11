@@ -6,6 +6,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using AntDesign;
 using Markdig;
+using Microsoft.JSInterop;
+using System.Text.Json;
 using Caf.Midden.Wasm.Shared.MetadataLineage;
 
 namespace Caf.Midden.Wasm.Shared
@@ -14,6 +16,9 @@ namespace Caf.Midden.Wasm.Shared
     {
         [Parameter]
         public Metadata Metadata { get; set; }
+
+        [Inject]
+        private IJSRuntime JSRuntime { get; set; } // Inject the IJSRuntime interface
 
         public bool VarsHaveMethods { get; set; }
 
@@ -114,5 +119,70 @@ namespace Caf.Midden.Wasm.Shared
             }
             this.FilterVariableType = variableTypes.ToArray();
         }
+
+        private async Task DownloadVariables()
+        {
+            if (Metadata?.Dataset?.Variables == null || string.IsNullOrEmpty(Metadata.Dataset.Name))
+            {
+                Console.WriteLine("No variables found to export or dataset name is missing.");
+                return;
+            }
+
+            string datasetName = Metadata.Dataset.Name.Replace(" ", "_"); // Replace spaces with underscores
+            string filename = $"{datasetName}_metadata.csv";
+
+            var csvData = ConvertToCSV(Metadata.Dataset.Variables);
+            Console.WriteLine($"Downloading file: {filename}");
+
+            await JSRuntime.InvokeVoidAsync("downloadCSV", filename, csvData);
+        }
+
+
+
+        private string ConvertToCSV<T>(IEnumerable<T> data)
+        {
+            if (!data.Any()) return string.Empty;
+
+            var properties = typeof(T).GetProperties();
+            var header = string.Join(",", properties.Select(p => $"\"{p.Name}\"")); // Ensure headers are enclosed in quotes
+
+            var rows = data.Select(row =>
+                string.Join(",", properties.Select(p =>
+                {
+                    var value = p.GetValue(row);
+                    if (value == null) return "\"\""; // Handle null values
+
+                    if (value is IEnumerable<object> collection)
+                    {
+                        // Convert lists to a single string, replacing "|" with ";"
+                        string listAsString = string.Join("; ", collection.Select(v => v.ToString()
+                            .Replace("\n", " ")  // Remove newlines
+                            .Replace("\r", " ")  // Remove carriage returns
+                            .Replace("\"", "\"\""))); // Escape existing double quotes
+
+                        return $"\"{listAsString}\""; // Enclose in double quotes
+                    }
+
+                    var strValue = value.ToString().Trim()
+                        .Replace("\r\n", " ") // Remove Windows-style newlines
+                        .Replace("\n", " ")   // Remove Unix-style newlines
+                        .Replace("\r", " ")   // Remove Mac-style newlines
+                        .Replace("  ", " ")   // Remove large spaces
+                        .Replace("\"", "\"\""); // Escape double quotes
+
+                    return $"\"{strValue}\""; // Enclose all values in double quotes
+                }))
+            );
+
+            return $"{header}\n{string.Join("\n", rows)}";
+        }
+
+
+
+
+
+
+
+
     }
 }
