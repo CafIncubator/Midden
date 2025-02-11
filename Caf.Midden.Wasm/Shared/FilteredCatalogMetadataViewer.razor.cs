@@ -161,10 +161,7 @@ namespace Caf.Midden.Wasm.Shared
         private void ApplyZoneFilter()
         {
             Console.WriteLine($"Applying filter for zone: {SelectedZone}");  // Debug statement
-            if (string.IsNullOrEmpty(SelectedZone) || SelectedZone == "none")
-            {
-                FilteredMetadata = BaseMetadatas;
-            }
+            
 
             if (string.IsNullOrEmpty(SelectedZone))
             {
