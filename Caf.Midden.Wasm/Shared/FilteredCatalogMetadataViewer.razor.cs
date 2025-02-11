@@ -126,31 +126,45 @@ namespace Caf.Midden.Wasm.Shared
         }
 
 
-        
+
         private void SearchHandler()
         {
-            if (string.IsNullOrWhiteSpace(SearchTerm))
+            Console.WriteLine($"Search initiated with term: {SearchTerm} and zone: {SelectedZone}");
+
+            var filtered = BaseMetadatas;
+
+            // Apply search filter
+            if (!string.IsNullOrWhiteSpace(SearchTerm))
             {
-                FilteredMetadata = this.BaseMetadatas;
-            }
-            else
-            {
-                FilteredMetadata = this.BaseMetadatas
+                filtered = filtered
                     .Where(m =>
-                        (m.Dataset.Name.ToLower().Contains(
-                            SearchTerm.ToLower())) ||
-                        (m.Dataset.Description.ToLower().Contains(
-                            SearchTerm.ToLower())) ||
-                        (m.Dataset.Tags.Any(t => t.ToLower().Contains(
-                            SearchTerm.ToLower()))))
-                    .OrderByDescending(m => m.Dataset.LastUpdate)
+                        m.Dataset.Name.ToLower().Contains(SearchTerm.ToLower()) ||
+                        m.Dataset.Description.ToLower().Contains(SearchTerm.ToLower()) ||
+                        m.Dataset.Tags.Any(t => t.ToLower().Contains(SearchTerm.ToLower())))
                     .ToList();
             }
+
+            // Apply zone filter
+            if (!string.IsNullOrEmpty(SelectedZone))
+            {
+                filtered = filtered
+                    .Where(m => m.Dataset.Zone.Equals(SelectedZone, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+
+            FilteredMetadata = filtered.OrderByDescending(m => m.Dataset.LastUpdate).ToList();
+
+            Console.WriteLine($"Total datasets after combined filtering: {FilteredMetadata.Count}");
+            InvokeAsync(StateHasChanged); // Ensure UI updates
         }
 
         private void ApplyZoneFilter()
         {
             Console.WriteLine($"Applying filter for zone: {SelectedZone}");  // Debug statement
+            if (string.IsNullOrEmpty(SelectedZone) || SelectedZone == "none")
+            {
+                FilteredMetadata = BaseMetadatas;
+            }
 
             if (string.IsNullOrEmpty(SelectedZone))
             {
