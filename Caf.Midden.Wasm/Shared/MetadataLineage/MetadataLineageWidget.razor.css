@@ -1,0 +1,20 @@
+﻿::deep .diagram-port {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    background-color: darkgray;
+    transform: translate(-50%, -50%);
+    top: 50%;
+}
+
+    ::deep .diagram-port.left {
+        left: 0;
+    }
+
+    ::deep .diagram-port.right {
+        left: 100%;
+    }
+
+div .dataset-node {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}

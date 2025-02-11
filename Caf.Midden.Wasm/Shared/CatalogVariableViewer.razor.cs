@@ -154,16 +154,11 @@ namespace Caf.Midden.Wasm.Shared
             {
                 ViewModel.FilteredCatalogVariables = ViewModel.CatalogVariables
                     .Where(c =>
-                        (c.DatasetName.ToLower().Contains(
-                            ViewModel.SearchTerm.ToLower())) ||
-                        (c.Name.ToLower().Contains(
-                            ViewModel.SearchTerm.ToLower())) ||
-                        (c.Description.ToLower().Contains(
-                            ViewModel.SearchTerm.ToLower())) ||
-                        (c.Units.ToLower().Contains(
-                            ViewModel.SearchTerm.ToLower())) ||
-                        (c.Tags.Any(t => t.ToLower().Contains(
-                            ViewModel.SearchTerm.ToLower()))))
+                        (c.DatasetName != null && c.DatasetName.ToLower().Contains(ViewModel.SearchTerm.ToLower())) ||
+                        (c.Name != null && c.Name.ToLower().Contains(ViewModel.SearchTerm.ToLower())) ||
+                        (c.Description != null && c.Description.ToLower().Contains(ViewModel.SearchTerm.ToLower())) ||
+                        (c.Units != null && c.Units.ToLower().Contains(ViewModel.SearchTerm.ToLower())) ||
+                        (c.Tags != null && c.Tags.Any(t => t != null && t.ToLower().Contains(ViewModel.SearchTerm.ToLower()))))
                     .ToList();
             }
         }

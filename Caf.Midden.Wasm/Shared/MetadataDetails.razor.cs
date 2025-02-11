@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AntDesign;
 using Markdig;
+using Caf.Midden.Wasm.Shared.MetadataLineage;
 
 namespace Caf.Midden.Wasm.Shared
 {

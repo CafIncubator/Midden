@@ -31,6 +31,8 @@ namespace Caf.Midden.Wasm.Pages
 
         IChartComponent MetadataPerZone = new Column();
         public object[] MetadataPerZoneData { get; set; }
+
+
         ColumnConfig MetadataPerZoneConfig = new ColumnConfig
         {
             Title = new AntDesign.Charts.Title
@@ -166,6 +168,7 @@ namespace Caf.Midden.Wasm.Pages
             this.TotalContacts = UniqueContacts.Count;
         }
 
+
         private void CreateDatasetsPerZone()
         {
             List<object> objs = new List<object>();
@@ -188,6 +191,8 @@ namespace Caf.Midden.Wasm.Pages
 
             MetadataPerZone.ChangeData(MetadataPerZoneData);
         }
+
+        
 
         private void CreateProjectsPerStatus()
         {

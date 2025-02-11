@@ -1,4 +1,5 @@
-﻿@inject Caf.Midden.Wasm.Services.StateContainer State
+﻿@using Caf.Midden.Wasm.Shared.MetadataLineage
+@inject Caf.Midden.Wasm.Services.StateContainer State
 
 @if (this.Metadata != null)
 {
@@ -59,18 +60,14 @@
             </Row>
             <Row>
                 <AntDesign.Col Span="@((Metadata.Dataset.ParentDatasets == null) || (!Metadata.Dataset.ParentDatasets.Any()) ? 0 : 24)" Style="padding:5px">
-                    <AntList Bordered DataSource="@Metadata.Dataset.ParentDatasets">
-                        <Header>
-                            <Icon Type="comment" Theme="outline" /> Parent Datasets
-                        </Header>
-                        <ChildContent Context="parentDataset">
-                            <ListItem Style="overflow:auto;">
-                                <textarea readonly
-                                          rows="@(string.IsNullOrEmpty(parentDataset) ? 1 : parentDataset.Split('\n').Length + 1)"
-                                          style="width:100%; border:none;">@parentDataset</textarea>
-                            </ListItem>
-                        </ChildContent>
-                    </AntList>
+                    <Card>
+                        <TitleTemplate>
+                            <Icon Type="partition" Theme="outline" Rotate="180" /> Lineage Diagram
+                        </TitleTemplate>
+                        <Body>
+                            <MetadataLineageDiagram dataset="@Metadata.Dataset" />
+                        </Body>
+                    </Card>
                 </AntDesign.Col>
             </Row>
             <Row>

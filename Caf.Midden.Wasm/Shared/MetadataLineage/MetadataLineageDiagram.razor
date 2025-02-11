@@ -1,0 +1,158 @@
+﻿@using Blazor.Diagrams
+@using Blazor.Diagrams.Core.Anchors
+@using Blazor.Diagrams.Core.Extensions
+@using Blazor.Diagrams.Core.Models
+@using Blazor.Diagrams.Core.PathGenerators;
+@using Blazor.Diagrams.Core.Routers;
+@using Blazor.Diagrams.Options;
+@using Blazor.Diagrams.Components;
+@using Caf.Midden.Wasm.Services
+@using Caf.Midden.Wasm.Shared.ViewModels;
+
+@inject Caf.Midden.Wasm.Services.StateContainer State
+
+<div id="diagramContainer" style="width: 100%; height: 300px;">
+
+    <CascadingValue Value="Diagram" IsFixed="true">
+        <DiagramCanvas></DiagramCanvas>
+    </CascadingValue>
+    <div style="position: absolute; bottom:20px; right: 20px">
+        <Button Icon="@IconType.Outline.PlusSquare" OnClick="ZoomIn" />
+        <Button Icon="@IconType.Outline.MinusSquare" OnClick="ZoomOut" />
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public Dataset dataset { get; set; }
+
+    private MetadataLineageDiagramViewModel viewModel;
+    private const int COLUMN_WIDTH = 400;
+    private const int ROW_HEIGHT = 200;
+    private const double ZOOM_INCREMENT = 0.2;
+
+    private bool _InitialResize = false;
+    private int _NumberCols = 1;
+    private int _NumberRows = 1;
+    private List<List<bool>> _CellTracker = new List<List<bool>>(); // Column<Row<>>
+
+    public BlazorDiagram Diagram { get; set; } = null!;
+
+    protected override void OnInitialized()
+    {
+        viewModel =
+            new MetadataLineageDiagramViewModel(dataset, State.Catalog);
+
+        var datasetNode = viewModel.GetDatasetNode();
+
+        Diagram = new BlazorDiagram();
+        Diagram.Options.Zoom.Enabled = true;
+        Diagram.RegisterComponent<Caf.Midden.Wasm.Shared.MetadataLineage.MetadataLineageNode, Caf.Midden.Wasm.Shared.MetadataLineage.MetadataLineageWidget>();
+        Diagram.ContainerChanged += OnContainerChanged;
+
+        CreateNodes(datasetNode, 0, 0);
+    }
+
+    private void ZoomIn()
+    {
+        var currentZoom = Diagram.Zoom;
+        var newZoom = currentZoom + ZOOM_INCREMENT;
+        if(newZoom > 0)
+        {
+            Diagram.SetZoom(newZoom);
+        }
+    }
+
+    private void ZoomOut()
+    {
+        var currentZoom = Diagram.Zoom;
+        var newZoom = currentZoom - ZOOM_INCREMENT;
+        if (newZoom > 0)
+        {
+            Diagram.SetZoom(newZoom);
+        }
+    }
+
+    private void OnContainerChanged()
+    {
+        if(Diagram.Container != null && _InitialResize == false)
+        {
+            Diagram.SetZoom(0.7);
+
+            // Centers base node -- derived from this: https://github.com/Blazor-Diagrams/Blazor.Diagrams/issues/269#issuecomment-1322025484
+            int margin = 0;
+
+            //var width = COLUMN_WIDTH * Diagram.Zoom; 
+            var width = Diagram.Zoom;
+            var scaledMargin = margin * Diagram.Zoom;
+            var deltaX = (Diagram.Container.Width / 2) - (width / 2) - scaledMargin;
+            Diagram.UpdatePan(deltaX, 0);
+
+            _InitialResize = true;
+        }
+    }
+
+    private void CreateNodes(DatasetNode datasetNode, int column, int row, NodeModel thisNode = null)
+    {
+        // Create a new node if one wasn't passed through recursion
+        if(thisNode == null)
+        {
+            thisNode = Diagram.Nodes.Add(
+                new MetadataLineageNode(
+                    position: new Blazor.Diagrams.Core.Geometry.Point((column * COLUMN_WIDTH), (row * ROW_HEIGHT)))
+                    {
+                        Name = $"{datasetNode.Name}",
+                        Project = $"{datasetNode.Project}",
+                        Zone = $"{datasetNode.Zone}",
+                        Url = $"{datasetNode.Url}"
+                    });
+
+            // Register this on the cell tracker
+            _CellTracker.Add(new List<bool>()
+            {
+                true
+            });
+        }
+
+        var leftPortThisNode = thisNode.AddPort(PortAlignment.Left);
+
+        // If there are parents, then we need to move over a column
+        if(datasetNode.Parents.Count > 0)
+        {
+            _CellTracker.Add(new List<bool>());
+            column += 1;
+        }
+
+        foreach (var parent in datasetNode.Parents.OrderByDescending(p => p.Parents.Count).ToList())
+        {
+            var diagramCol = column * -1;
+            var diagramRow = _CellTracker[column].Count;
+
+            var parentNode = Diagram.Nodes.Add(new MetadataLineageNode(position: new Blazor.Diagrams.Core.Geometry.Point((diagramCol * COLUMN_WIDTH), (diagramRow * ROW_HEIGHT)))
+                {
+                    Name = $"{parent.Name}",
+                    Project = $"{parent.Project}",
+                    Zone = $"{parent.Zone}",
+                    Url = $"{parent.Url}"
+                });
+            var rightPortParentNode = parentNode.AddPort(PortAlignment.Right);
+            var parentAnchor = new SinglePortAnchor(rightPortParentNode);
+            var childAnchor = new SinglePortAnchor(leftPortThisNode);
+            var parentToChildLink = Diagram.Links.Add(new LinkModel(parentAnchor, childAnchor)
+            {
+                PathGenerator = new SmoothPathGenerator(),
+                Router = new NormalRouter(),
+                TargetMarker = LinkMarker.Arrow
+            });
+
+            // Adds a row to current column
+            _CellTracker[column].Add(true);
+            
+            if(parent.Parents.Count > 0)
+            {
+                _CellTracker.Add(new List<bool>());
+                CreateNodes(parent, column, _CellTracker[column].Count, parentNode);
+            }
+        }
+    }
+}
