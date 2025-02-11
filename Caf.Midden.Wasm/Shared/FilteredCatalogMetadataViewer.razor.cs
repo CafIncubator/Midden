@@ -36,8 +36,8 @@ namespace Caf.Midden.Wasm.Shared
         public List<Metadata> BaseMetadatas { get; set; } = new List<Metadata>();
         public List<Metadata> FilteredMetadata { get; set; } = new List<Metadata>();
 
-        public string SearchTerm { get; set; }
-        private string _selectedZone;
+        public string SearchTerm { get; set; } = String.Empty;
+        private string _selectedZone = String.Empty;
         private string SelectedZone
         {
             get => _selectedZone;
@@ -47,7 +47,7 @@ namespace Caf.Midden.Wasm.Shared
                 {
                     _selectedZone = value;
                     Console.WriteLine($"Zone selected: {_selectedZone}");  // Debug output
-                    ApplyZoneFilter();
+                    //ApplyZoneFilter();
                 }
             }
         }
@@ -73,7 +73,7 @@ namespace Caf.Midden.Wasm.Shared
             if (State?.Catalog != null)
             {
                 SetBaseMetadatas();
-                ApplyZoneFilter();  // Apply initial zone filter if any
+                SearchHandler();
             }
         }
 
@@ -86,7 +86,7 @@ namespace Caf.Midden.Wasm.Shared
                 if (property == "UpdateCatalog" || property == "UpdateAppConfig")
                 {
                     SetBaseMetadatas();
-                    ApplyZoneFilter();
+                    //ApplyZoneFilter();
                 }
 
                 await InvokeAsync(StateHasChanged); // Force UI to update after state changes
@@ -134,7 +134,7 @@ namespace Caf.Midden.Wasm.Shared
             var filtered = BaseMetadatas;
 
             // Apply search filter
-            if (!string.IsNullOrWhiteSpace(SearchTerm))
+            if (!String.IsNullOrWhiteSpace(SearchTerm))
             {
                 filtered = filtered
                     .Where(m =>
@@ -145,7 +145,7 @@ namespace Caf.Midden.Wasm.Shared
             }
 
             // Apply zone filter
-            if (!string.IsNullOrEmpty(SelectedZone))
+            if (!String.IsNullOrEmpty(SelectedZone))
             {
                 filtered = filtered
                     .Where(m => m.Dataset.Zone.Equals(SelectedZone, StringComparison.OrdinalIgnoreCase))
@@ -158,9 +158,9 @@ namespace Caf.Midden.Wasm.Shared
             InvokeAsync(StateHasChanged); // Ensure UI updates
         }
 
-        private void ApplyZoneFilter()
+        private void OnZoneFilterChange()
         {
-            Console.WriteLine($"Applying filter for zone: {SelectedZone}");  // Debug statement
+            /*Console.WriteLine($"Applying filter for zone: {SelectedZone}");  // Debug statement
             
 
             if (string.IsNullOrEmpty(SelectedZone))
@@ -175,7 +175,9 @@ namespace Caf.Midden.Wasm.Shared
                     .ToList();
 
                 Console.WriteLine($"Datasets after filtering: {FilteredMetadata.Count}");  // Debug statement
-            }
+            }*/
+
+            SearchHandler();
 
             // Force UI to refresh
             InvokeAsync(() =>

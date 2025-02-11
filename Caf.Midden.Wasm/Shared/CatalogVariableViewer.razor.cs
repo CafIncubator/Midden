@@ -51,8 +51,6 @@ namespace Caf.Midden.Wasm.Shared
 
                 await InvokeAsync(StateHasChanged);
             }
-
-
         }
 
         private void SetFilters(Configuration appConfig)
