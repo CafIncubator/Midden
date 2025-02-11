@@ -2,8 +2,8 @@
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
-    <Version>0.4.0</Version>
-    <InformationalVersion>0.4.0</InformationalVersion>
+    <Version>1.0.0</Version>
+    <InformationalVersion>1.0.0-dev.1</InformationalVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="AntDesign" Version="1.0.1" />

@@ -160,23 +160,6 @@ namespace Caf.Midden.Wasm.Shared
 
         private void OnZoneFilterChange()
         {
-            /*Console.WriteLine($"Applying filter for zone: {SelectedZone}");  // Debug statement
-            
-
-            if (string.IsNullOrEmpty(SelectedZone))
-            {
-                FilteredMetadata = BaseMetadatas;
-                Console.WriteLine("No zone selected. Showing all datasets.");
-            }
-            else
-            {
-                FilteredMetadata = BaseMetadatas
-                    .Where(m => m.Dataset.Zone.Equals(SelectedZone, StringComparison.OrdinalIgnoreCase))
-                    .ToList();
-
-                Console.WriteLine($"Datasets after filtering: {FilteredMetadata.Count}");  // Debug statement
-            }*/
-
             SearchHandler();
 
             // Force UI to refresh
