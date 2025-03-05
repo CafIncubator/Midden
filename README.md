@@ -32,7 +32,7 @@ Midden has a cross-platform command-line interface with commands to crawl variou
 
 Midden supports viewing all metadata through a rich interactive interface that supports global search through datasets and variables.
 
-![screenshot of catalog](media/catalog.jpg)
+![screenshot of catalog](media/CatalogImage.PNG)
 
 ## The workflow
 
@@ -48,19 +48,19 @@ Midden supports viewing all metadata through a rich interactive interface that s
 
 **Insights Dashboard** shows interesting statistics of your data holdings.
 
-![screenshot of the Insights dashboard](media/ss-insights.jpg)
+![screenshot of the Insights dashboard](media/Insights.PNG)
 
 ---
 
 **Variable Data Catalog** allows searching for specific variables across all datasets.
 
-![screenshot of the variable catalog](media/ss-variable-catalog.jpg)
+![screenshot of the variable catalog](media/variable.PNG)
 
 ---
 
 **Dataset Details** shows all metadata of a given dataset.
 
-![screenshot of the dataset](media/ss-dataset-view.jpg)
+![screenshot of the dataset](media/datasetDetails.PNG)
 
 ---
 
