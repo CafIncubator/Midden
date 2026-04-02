@@ -126,86 +126,83 @@
                                                  ScrollX="@Convert.ToString(TableWidth)"
                                                  Bordered>
                                     <ChildContent Context="variable">
-                                        <AntDesign.Column TData="string"
-                                                          @bind-Field="variable.Name" 
-                                                          Width="200"
-                                                          Fixed="left"
-                                                          Filterable
-                                                          Sortable />
-                                        <AntDesign.Column @bind-Field="variable.Description"
-                                                          Width="400">
+                                        <AntDesign.PropertyColumn Property="@(item => item.Name)" 
+                                                                  Width="200"
+                                                                  Fixed="left"
+                                                                  Filterable
+                                                                  Sortable />
+                                        <AntDesign.PropertyColumn Property="@(item => item.Description)"
+                                                                  Width="400">
                                             <textarea readonly
                                                       rows="@(string.IsNullOrEmpty(variable.Description) ? 1 : variable.Description.Split('\n').Length + 1)"
                                                       style="width:100%; border:none;">@variable.Description</textarea>
-                                        </AntDesign.Column>
-                                        <AntDesign.Column @bind-Field="variable.Units" 
-                                                          Width="100" />
+                                        </AntDesign.PropertyColumn>
+                                        <AntDesign.PropertyColumn Property="@(item => item.Units)" 
+                                                                  Width="100" />
 
                                         @if (VarsHaveMethods)
                                         {
-                                            <AntDesign.Column @bind-Field="variable.Methods" 
-                                                              Width="400">
+                                            <AntDesign.PropertyColumn Property="@(item => item.Methods)" 
+                                                                      Width="400">
                                                 @foreach (var method in variable.Methods)
                                                             {
                                                     <textarea readonly
                                                               rows="@(string.IsNullOrEmpty(method) ? 1 :method.Split('\n').Length + 1)"
                                                               style="width:100%; border:none;">@method</textarea>
                                                             }
-                                            </AntDesign.Column>
+                                            </AntDesign.PropertyColumn>
                                         }
 
                                         @if (VarsHaveQCApplied)
                                         {
-                                            <AntDesign.Column @bind-Field="variable.QCApplied"
-                                                              Title="Quality Control" 
-                                                              Width="100">
+                                            <AntDesign.PropertyColumn Property="@(item => item.QCApplied)"
+                                                                      Title="Quality Control" 
+                                                                      Width="100">
                                                 @foreach (var qc in variable.QCApplied)
                                                             {
                                                     <Tag>@qc</Tag>
                                                             }
-                                            </AntDesign.Column>
+                                            </AntDesign.PropertyColumn>
                                         }
 
                                         @if (VarsHaveProcessingLevel)
                                         {
-                                            <AntDesign.Column @bind-Field="variable.ProcessingLevel"
-                                                              TData="string"
-                                                              Title="Processing" 
-                                                              Width="100"
-                                                              Filters="FilterProcessing"
-                                                              OnFilter="(value, processing)=>(string.IsNullOrEmpty(processing) ? false : processing.StartsWith(value))"
-                                                              FilterMultiple="true">
+                                            <AntDesign.PropertyColumn Property="@(item => item.ProcessingLevel)"
+                                                                      Title="Processing" 
+                                                                      Width="100"
+                                                                      Filters="FilterProcessing"
+                                                                      OnFilter="(value, processing)=>(string.IsNullOrEmpty(processing) ? false : processing.StartsWith(value))"
+                                                                      FilterMultiple="true">
                                                 <Tag>@variable.ProcessingLevel</Tag>
-                                            </AntDesign.Column>
+                                            </AntDesign.PropertyColumn>
                                         }
 
                                         @if (VarsHaveVariableType)
                                         {
-                                            <AntDesign.Column @bind-Field="variable.VariableType"
-                                                              TData="string"
-                                                              Title="Type"
-                                                              Width="100"
-                                                              Filters="FilterVariableType"
-                                                              OnFilter="(value, variableType)=>(string.IsNullOrEmpty(variableType) ? false : variableType.StartsWith(value))"
-                                                              FilterMultiple="true">
+                                            <AntDesign.PropertyColumn Property="@(item => item.VariableType)"
+                                                                      Title="Type"
+                                                                      Width="100"
+                                                                      Filters="FilterVariableType"
+                                                                      OnFilter="(value, variableType)=>(string.IsNullOrEmpty(variableType) ? false : variableType.StartsWith(value))"
+                                                                      FilterMultiple="true">
                                                 <Tag>@variable.VariableType</Tag>
-                                            </AntDesign.Column>
+                                            </AntDesign.PropertyColumn>
                                         }
 
                                         @if(VarsHaveTags)
                                         {
-                                            <AntDesign.Column @bind-Field="variable.Tags" 
-                                                              Width="100">
+                                            <AntDesign.PropertyColumn Property="@(item => item.Tags)" 
+                                                                      Width="100">
                                                 @foreach (var tag in variable.Tags)
                                                             {
                                                     <Tag>@tag</Tag>
                                                             }
-                                            </AntDesign.Column>
+                                            </AntDesign.PropertyColumn>
                                         }
 @* Depricated                           @if(VarsHaveHeight)
                                         {
-                                            <AntDesign.Column @bind-Field="variable.Height" 
-                                                              Width="50"/>
+                                            <AntDesign.PropertyColumn Property="@(item => item.Height)" 
+                                                                      Width="50"/>
                                         }*@
                                     </ChildContent>
                                 </AntDesign.Table>
@@ -256,10 +253,10 @@
                                              DataSource="@Metadata.Dataset.Contacts"
                                              HidePagination="@true">
                                 <ChildContent Context="contact">
-                                    <AntDesign.Column @bind-Field="contact.Name">
+                                    <AntDesign.PropertyColumn Property="@(item => item.Name)">
                                         <a href="mailto:@contact.Email">@contact.Name</a>
-                                    </AntDesign.Column>
-                                    <AntDesign.Column @bind-Field="contact.Role" />
+                                    </AntDesign.PropertyColumn>
+                                    <AntDesign.PropertyColumn Property="@(item => item.Role)" />
                                 </ChildContent>
                             </AntDesign.Table>
                         </Body>

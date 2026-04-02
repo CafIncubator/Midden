@@ -13,7 +13,8 @@
         </Popconfirm>
     </SpaceItem>
     <SpaceItem>
-        <MetadataLoaderFileSystem @bind-Metadata="State.MetadataEdit" />
+        <MetadataLoaderFileSystem Metadata="State.MetadataEdit"
+                      MetadataChanged="OnMetadataLoaded" />
     </SpaceItem>
 </Space>
 <AntDesign.Divider />
@@ -22,7 +23,6 @@
 {
     <AntDesign.Form Model="State.MetadataEdit"
                     Layout="@FormLayout.Vertical"
-                    ValidateMode="@FormValidateMode.Rules"
                     @ref="form">
         <Tabs Animated>
             <TabPane Key="1" Tab="Basic">
@@ -80,12 +80,12 @@
                                             DataSource="@context.Dataset.Contacts"
                                             HidePagination="@true">
                             <ChildContent Context="contact">
-                                <AntDesign.Column @bind-Field="contact.Name"
-                                                    Width="30%" />
-                                <AntDesign.Column @bind-Field="contact.Email"
-                                                    Width="30%" />
-                                <AntDesign.Column @bind-Field="contact.Role"
-                                                    Width="30%" />
+                                <AntDesign.PropertyColumn Property="@(item => item.Name)"
+                                                            Width="30%" />
+                                <AntDesign.PropertyColumn Property="@(item => item.Email)"
+                                                            Width="30%" />
+                                <AntDesign.PropertyColumn Property="@(item => item.Role)"
+                                                            Width="30%" />
                                 <ActionColumn Title="Action">
                                     <Space>
                                         <SpaceItem>
@@ -181,8 +181,8 @@
                             <ChildContent Context="variable">
 
                                 
-                                <AntDesign.Column @bind-Field="variable.Name"
-                                                    Fixed="left">
+                                <AntDesign.PropertyColumn Property="@(item => item.Name)"
+                                                            Fixed="left">
                                                     @if(VariableQuickEditRef == variable)
                                                     {
                                     <Input @bind-Value="QuickEditViewModel.Variable.Name" />
@@ -192,10 +192,10 @@
                                     <div>@variable.Name</div>
                                 }
 
-                                                    </AntDesign.Column>
-                                <AntDesign.Column @bind-Field="variable.Description"
-                                                    Ellipsis />
-                                <AntDesign.Column @bind-Field="variable.Units">
+                                                    </AntDesign.PropertyColumn>
+                                <AntDesign.PropertyColumn Property="@(item => item.Description)"
+                                                            Ellipsis />
+                                <AntDesign.PropertyColumn Property="@(item => item.Units)">
                                     @if(VariableQuickEditRef == variable)
                                     {
                                     <Input @bind-Value="QuickEditViewModel.Variable.Units" />
@@ -204,17 +204,17 @@
                                 {
                                     <div>@variable.Units</div>
                                 }
-                            </AntDesign.Column>
-                                <AntDesign.Column @bind-Field="variable.Methods"
-                                                    Ellipsis>
+                            </AntDesign.PropertyColumn>
+                                <AntDesign.PropertyColumn Property="@(item => item.Methods)"
+                                                            Ellipsis>
                                     @foreach (var method in variable.Methods)
                                         {
                                         <p>@method</p>
                                         }
-                                </AntDesign.Column>
+                                </AntDesign.PropertyColumn>
 
-                                <AntDesign.Column @bind-Field="variable.QCApplied"
-                                                    Title="Quality Control">
+                                <AntDesign.PropertyColumn Property="@(item => item.QCApplied)"
+                                                            Title="Quality Control">
                                 @if(VariableQuickEditRef == variable)
                                 {
                                     <Select Mode="multiple"
@@ -238,11 +238,11 @@
                                     }
                                 }
                                 
-                                </AntDesign.Column>
+                                </AntDesign.PropertyColumn>
 
 
-                                <AntDesign.Column @bind-Field="variable.ProcessingLevel"
-                                                    Title="Processing">
+                                <AntDesign.PropertyColumn Property="@(item => item.ProcessingLevel)"
+                                                            Title="Processing">
                                 @if(VariableQuickEditRef == variable)
                                 {
                                     <SimpleSelect Id="variable-processing" @bind-Value="@QuickEditViewModel.Variable.ProcessingLevel"
@@ -260,11 +260,11 @@
                                     <Tag>@variable.ProcessingLevel</Tag>
                                 }
                                 
-                                </AntDesign.Column>
+                                </AntDesign.PropertyColumn>
 
 
-                            <AntDesign.Column @bind-Field="variable.VariableType"
-                                              Title="Type">
+                            <AntDesign.PropertyColumn Property="@(item => item.VariableType)"
+                                                      Title="Type">
                                 @if(VariableQuickEditRef == variable)
                                 {
                                     <SimpleSelect Id="variable-type" @bind-Value="@QuickEditViewModel.Variable.VariableType"
@@ -282,14 +282,14 @@
                                     <Tag>@variable.VariableType</Tag>
                                 }
                                 
-                            </AntDesign.Column>
+                            </AntDesign.PropertyColumn>
 
-                                <AntDesign.Column @bind-Field="variable.Tags">
+                                <AntDesign.PropertyColumn Property="@(item => item.Tags)">
                                     @foreach (var tag in variable.Tags)
                                         {
                                         <Tag>@tag</Tag>
                                         }
-                                </AntDesign.Column>
+                                </AntDesign.PropertyColumn>
 <!-- Depricated                 <AntDesign.Column @bind-Field="variable.Height" /> -->
                                 <ActionColumn Title="Action"
                                                 Fixed="right">

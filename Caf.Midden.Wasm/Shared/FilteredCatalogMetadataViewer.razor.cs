@@ -1,6 +1,7 @@
 ﻿using AntDesign;
 using Caf.Midden.Core.Models.v0_2;
 using Caf.Midden.Wasm.Shared.Modals;
+using Caf.Midden.Wasm.Services;
 using Markdig;
 using Microsoft.AspNetCore.Components;
 using System;
@@ -12,6 +13,8 @@ namespace Caf.Midden.Wasm.Shared
 {
     public partial class FilteredCatalogMetadataViewer : IDisposable
     {
+        private IDisposable? _stateSubscription;
+
         [Parameter]
         public string Zone { get; set; }
 
@@ -59,7 +62,11 @@ namespace Caf.Midden.Wasm.Shared
 
         protected override void OnInitialized()
         {
-            State.StateChanged += async (source, property) => await StateChanged(source, property);
+            _stateSubscription = State.Subscribe(
+                this,
+                OnStateChanged,
+                AppStateChange.Catalog,
+                AppStateChange.AppConfig);
 
             if (State?.AppConfig?.Zones != null && State.AppConfig.Zones.Any())
             {
@@ -79,23 +86,23 @@ namespace Caf.Midden.Wasm.Shared
 
 
 
-        private async Task StateChanged(ComponentBase source, string property)
+        private async Task OnStateChanged(AppStateChangedEventArgs args)
         {
-            if (source != this)
-            {
-                if (property == "UpdateCatalog" || property == "UpdateAppConfig")
-                {
-                    SetBaseMetadatas();
-                    FilteredMetadata = this.BaseMetadatas;
-                }
+            SetBaseMetadatas();
+            FilteredMetadata = this.BaseMetadatas;
 
-                await InvokeAsync(StateHasChanged); // Force UI to update after state changes
-            }
+            await InvokeAsync(StateHasChanged); // Force UI to update after state changes
         }
 
 
         private void SetBaseMetadatas()
         {
+            if (State.Catalog?.Metadatas is null)
+            {
+                BaseMetadatas = new List<Metadata>();
+                return;
+            }
+
             List<Metadata> metas = State.Catalog.Metadatas
                 .Where(m =>
                     (String.IsNullOrEmpty(this.Zone) || m.Dataset.Zone.ToLower() == this.Zone.ToLower()) &&
@@ -199,15 +206,15 @@ namespace Caf.Midden.Wasm.Shared
                 return Task.CompletedTask;
             };
 
-            metadataDetailsModalRef = await ModalService
-                .CreateModalAsync<MetadataDetailsModal, ViewModels.MetadataDetailsViewModel>(
-                    modalConfig, templateOptions);
+            metadataDetailsModalRef = ModalService
+                .CreateModal<MetadataDetailsModal, ViewModels.MetadataDetailsViewModel>(
+                    modalConfig,
+                    templateOptions);
         }
 
         public void Dispose()
         {
-            State.StateChanged -= async (source, property)
-                => await StateChanged(source, property);
+            _stateSubscription?.Dispose();
         }
     }
 }

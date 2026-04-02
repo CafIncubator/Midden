@@ -1,58 +1,89 @@
 ﻿using Caf.Midden.Cli.Models;
-using System.Collections.Generic;
-using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Caf.Midden.Cli.Services
+namespace Caf.Midden.Cli.Services;
+
+public sealed class ConfigurationService
 {
-    public class ConfigurationService
+    public const string ConfigFileName = "configuration.json";
+
+    private static readonly JsonSerializerOptions JsonOptions = new()
     {
-        const string CONFIG_FILE = "configuration.json";
-        JsonSerializerOptions jsonOptions = new JsonSerializerOptions
+        Converters =
         {
-            Converters =
+            new JsonStringEnumConverter(),
+        },
+        PropertyNameCaseInsensitive = true,
+        WriteIndented = true,
+    };
+
+    public CliConfiguration? GetConfiguration(string? configPath = null)
+    {
+        foreach (var candidatePath in GetCandidateConfigurationPaths(configPath))
+        {
+            if (!File.Exists(candidatePath))
             {
-                new JsonStringEnumConverter()
-            },
-            WriteIndented = true
-        };
-        
-        public CliConfiguration? GetConfiguration(
-            string? configPath)
-        {
-            if (string.IsNullOrEmpty(configPath))
-                configPath = CONFIG_FILE;
+                continue;
+            }
 
-            if (!File.Exists(configPath))
-                return null;
-
-            string json = File.ReadAllText(configPath);
-            CliConfiguration? config = 
-                JsonSerializer.Deserialize<CliConfiguration>(json, jsonOptions);
-
-            return config;
+            var json = File.ReadAllText(candidatePath);
+            return JsonSerializer.Deserialize<CliConfiguration>(json, JsonOptions)
+                ?? throw new InvalidDataException($"Configuration file '{candidatePath}' is empty or invalid.");
         }
 
-        public void CreateConfiguration(
-            string configPath = CONFIG_FILE)
-        {
-            CliConfiguration config = new CliConfiguration()
-            {
-                DataStores = new List<DataStore>()
-                {
-                    new DataStore()
-                    {
-                        Name = "DataStoreName",
-                        Type = DataStoreTypes.LocalFileSystem,
-                        Path = @"C:\Path\To\Projects"
-                    }
-                }
-            };
+        return null;
+    }
 
-            File.WriteAllText(
-                configPath,
-                JsonSerializer.Serialize(config, jsonOptions));
+    public string CreateConfiguration(string? configPath = null)
+    {
+        var resolvedPath = ResolveConfigurationPath(configPath);
+        var directory = Path.GetDirectoryName(resolvedPath);
+
+        if (!string.IsNullOrWhiteSpace(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
+
+        using var stream = new FileStream(resolvedPath, FileMode.CreateNew, FileAccess.Write, FileShare.None);
+        JsonSerializer.Serialize(stream, CreateDefaultConfiguration(), JsonOptions);
+
+        return resolvedPath;
+    }
+
+    private static CliConfiguration CreateDefaultConfiguration() => new()
+    {
+        DataStores =
+        [
+            new DataStore
+            {
+                Name = "DataStoreName",
+                Type = DataStoreTypes.LocalFileSystem,
+                Path = @"C:\Path\To\Projects",
+            },
+        ],
+    };
+
+    private static IEnumerable<string> GetCandidateConfigurationPaths(string? configPath)
+    {
+        if (!string.IsNullOrWhiteSpace(configPath))
+        {
+            yield return Path.GetFullPath(configPath);
+            yield break;
+        }
+
+        var currentDirectoryPath = Path.Combine(Directory.GetCurrentDirectory(), ConfigFileName);
+        yield return currentDirectoryPath;
+
+        var appBasePath = Path.Combine(AppContext.BaseDirectory, ConfigFileName);
+        if (!string.Equals(currentDirectoryPath, appBasePath, StringComparison.OrdinalIgnoreCase))
+        {
+            yield return appBasePath;
         }
     }
+
+    private static string ResolveConfigurationPath(string? configPath) =>
+        Path.GetFullPath(string.IsNullOrWhiteSpace(configPath)
+            ? Path.Combine(Directory.GetCurrentDirectory(), ConfigFileName)
+            : configPath);
 }

@@ -2,87 +2,68 @@
 using Caf.Midden.Core.Models.v0_2;
 using Caf.Midden.Core.Services;
 using Caf.Midden.Core.Services.Metadata;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Caf.Midden.Cli.Services
+namespace Caf.Midden.Cli.Services;
+
+public sealed class LocalFileSystemCrawler : ICrawl
 {
-    public class LocalFileSystemCrawler: ICrawl
+    private const string MiddenFileExtension = ".midden";
+    private const string MippenFileSearchTerm = "DESCRIPTION.md";
+
+    private readonly string rootDirectory;
+
+    public LocalFileSystemCrawler(string rootDirectory)
     {
-        private const string MIDDEN_FILE_EXTENSION = ".midden";
-        private const string MIPPEN_FILE_SEARCH_TERM = "DESCRIPTION.md";
+        ArgumentException.ThrowIfNullOrWhiteSpace(rootDirectory);
 
-        private readonly string rootDirectory;
-        public LocalFileSystemCrawler(string rootDirectory)
+        if (!Directory.Exists(rootDirectory))
         {
-            if (string.IsNullOrEmpty(rootDirectory))
-                throw new ArgumentNullException("Directory not specified");
-
-            if(!Directory.Exists(rootDirectory))
-                throw new ArgumentNullException("Directory does not exist");
-
-            this.rootDirectory = rootDirectory;
-        }
-        public List<string> GetFileNames(string fileExtension)
-        {
-            string[] files = Directory.GetFiles(
-                rootDirectory, 
-                $"*{fileExtension}", 
-                SearchOption.AllDirectories);
-
-            Console.WriteLine($"Found a total of {files.Length} files");
-
-            return files.ToList();
+            throw new DirectoryNotFoundException($"Directory '{rootDirectory}' does not exist.");
         }
 
+        this.rootDirectory = rootDirectory;
+    }
 
-        public List<Metadata> GetMetadatas(
-            IMetadataParser parser)
+    public IReadOnlyList<string> GetFileNames(string fileExtension)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(fileExtension);
+
+        var files = Directory.EnumerateFiles(rootDirectory, $"*{fileExtension}", SearchOption.AllDirectories).ToList();
+        Console.WriteLine($"Found a total of {files.Count} files");
+        return files;
+    }
+
+    public IReadOnlyList<Metadata> GetMetadatas(IMetadataParser parser)
+    {
+        List<Metadata> metadatas = [];
+
+        foreach (var file in GetFileNames(MiddenFileExtension))
         {
-            var files = GetFileNames(MIDDEN_FILE_EXTENSION);
+            var metadata = parser.Parse(File.ReadAllText(file));
+            var relativePath = Path.GetRelativePath(rootDirectory, file);
 
-            List<Metadata> metadatas = new List<Metadata>();
+            metadata.Dataset.DatasetPath = relativePath.Replace(MiddenFileExtension, string.Empty, StringComparison.OrdinalIgnoreCase);
+            metadatas.Add(metadata);
+        }
 
-            foreach (var file in files)
+        return metadatas;
+    }
+
+    public IReadOnlyList<Project> GetProjects(ProjectReader reader)
+    {
+        List<Project> projects = [];
+
+        foreach (var file in GetFileNames(MippenFileSearchTerm))
+        {
+            using var stream = File.OpenRead(file);
+            var project = reader.Read(stream);
+
+            if (project is not null)
             {
-                string json = File.ReadAllText(file);
-
-                Metadata metadata = parser.Parse(json);
-
-                string relativePath = Path.GetRelativePath(this.rootDirectory, file);
-
-                metadata.Dataset.DatasetPath = relativePath.Replace(MIDDEN_FILE_EXTENSION, "");
-
-                metadatas.Add(metadata);
+                projects.Add(project);
             }
-
-            return metadatas;
         }
 
-        public List<Project> GetProjects(
-            ProjectReader reader)
-        {
-            var files = GetFileNames(MIPPEN_FILE_SEARCH_TERM);
-
-            List<Project> projects = new List<Project>();
-
-            foreach (var file in files)
-            {
-                Project project;
-                using(var stream = File.OpenRead(file))
-                {
-                    project = reader.Read(stream);
-                }
- 
-                if(project is not null)
-                    projects.Add(project);
-            }
-
-            return projects;
-        }
+        return projects;
     }
 }

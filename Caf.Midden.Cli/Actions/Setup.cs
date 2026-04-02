@@ -1,28 +1,29 @@
 ﻿using Caf.Midden.Cli.Services;
-using System;
-using System.Collections.Generic;
 using System.CommandLine;
-using System.CommandLine.Invocation;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Caf.Midden.Cli.Actions
+namespace Caf.Midden.Cli.Actions;
+
+public static class SetupCommand
 {
-    public class Setup : Command
+    public static Command Create(ConfigurationService configurationService)
     {
-        public Setup(
-            string name,
-            string description)
-            : base(name, description)
-        {
-            Handler = CommandHandler.Create(HandleSetup);
-        }
+        var command = new Command("setup", "Create a blank configuration.json file in the current directory.");
+        command.SetAction(_ => HandleSetup(configurationService));
+        return command;
+    }
 
-        public void HandleSetup()
+    private static int HandleSetup(ConfigurationService configurationService)
+    {
+        try
         {
-            ConfigurationService configService = new ConfigurationService();
-            configService.CreateConfiguration();
+            var configurationPath = configurationService.CreateConfiguration();
+            Console.WriteLine($"Created configuration template at {configurationPath}");
+            return 0;
+        }
+        catch (IOException exception)
+        {
+            Console.Error.WriteLine(exception.Message);
+            return 1;
         }
     }
 }

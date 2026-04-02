@@ -1,6 +1,7 @@
 ﻿using AntDesign;
 using Caf.Midden.Core.Models.v0_2;
 using Caf.Midden.Wasm.Shared.Modals;
+using Caf.Midden.Wasm.Services;
 using Markdig;
 using Microsoft.AspNetCore.Components;
 using System;
@@ -12,6 +13,8 @@ namespace Caf.Midden.Wasm.Shared
 {
     public partial class FilteredCatalogTagViewer : IDisposable
     {
+        private IDisposable? _stateSubscription;
+
         [Parameter]
         public bool ShowSearch { get; set; } = true;
 
@@ -30,8 +33,10 @@ namespace Caf.Midden.Wasm.Shared
 
         protected override void OnInitialized()
         {
-            State.StateChanged += async (source, property)
-                => await StateChanged(source, property);
+            _stateSubscription = State.Subscribe(
+                this,
+                OnStateChanged,
+                AppStateChange.Catalog);
 
             if (State?.Catalog != null)
             {
@@ -40,20 +45,11 @@ namespace Caf.Midden.Wasm.Shared
             }
         }
 
-        private async Task StateChanged(
-            ComponentBase source,
-            string property)
+        private async Task OnStateChanged(AppStateChangedEventArgs args)
         {
-            if (source != this)
-            {
-                if (property == "UpdateCatalog")
-                {
-                    SetBaseTags();
-                    InitializeFilteredTags();
-                }
-
-                await InvokeAsync(StateHasChanged);
-            }
+            SetBaseTags();
+            InitializeFilteredTags();
+            await InvokeAsync(StateHasChanged);
         }
 
         private void SetBaseTags()
@@ -107,8 +103,7 @@ namespace Caf.Midden.Wasm.Shared
 
         public void Dispose()
         {
-            State.StateChanged -= async (source, property)
-                => await StateChanged(source, property);
+            _stateSubscription?.Dispose();
         }
     }
 }

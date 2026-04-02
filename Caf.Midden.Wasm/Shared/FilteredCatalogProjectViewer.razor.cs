@@ -2,6 +2,7 @@
 using Caf.Midden.Core.Models.v0_2;
 using Caf.Midden.Wasm.Shared.Modals;
 using Caf.Midden.Wasm.Shared.ViewModels;
+using Caf.Midden.Wasm.Services;
 using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,8 @@ namespace Caf.Midden.Wasm.Shared
 {
     public partial class FilteredCatalogProjectViewer : IDisposable
     {
+        private IDisposable? _stateSubscription;
+
         [Parameter]
         public string Project { get; set; }
 
@@ -35,8 +38,10 @@ namespace Caf.Midden.Wasm.Shared
 
         protected override void OnInitialized()
         {
-            State.StateChanged += async (source, property)
-                => await StateChanged(source, property);
+            _stateSubscription = State.Subscribe(
+                this,
+                OnStateChanged,
+                AppStateChange.Catalog);
 
             if (State?.Catalog != null)
             {
@@ -46,21 +51,11 @@ namespace Caf.Midden.Wasm.Shared
             }
         }
 
-        private async Task StateChanged(
-            ComponentBase source,
-            string property)
+        private async Task OnStateChanged(AppStateChangedEventArgs args)
         {
-            if (source != this)
-            {
-                if (property == "UpdateCatalog")
-                {
-                    SetBaseCatalogProjects(State.Catalog);
-                    ViewModel.FilteredCatalogProjects = ViewModel.BaseCatalogProjects;
-                    //FilteredProjects = this.BaseProjects;
-                }
-
-                await InvokeAsync(StateHasChanged);
-            }
+            SetBaseCatalogProjects(State.Catalog);
+            ViewModel.FilteredCatalogProjects = ViewModel.BaseCatalogProjects;
+            await InvokeAsync(StateHasChanged);
         }
 
         private void SetBaseCatalogProjects(Catalog catalog)
@@ -176,8 +171,7 @@ namespace Caf.Midden.Wasm.Shared
 
         public void Dispose()
         {
-            State.StateChanged -= async (source, property)
-                => await StateChanged(source, property);
+            _stateSubscription?.Dispose();
         }
     }
 }

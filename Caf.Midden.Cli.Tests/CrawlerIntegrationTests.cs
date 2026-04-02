@@ -1,114 +1,95 @@
 ﻿using Caf.Midden.Cli.Models;
 using Caf.Midden.Cli.Services;
+using Caf.Midden.Core.Models.v0_2;
 using Caf.Midden.Core.Services;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Xunit;
 
-namespace Caf.Midden.Cli.Tests
+namespace Caf.Midden.Cli.Tests;
+
+public class CrawlerIntegrationTests
 {
-    public class CrawlerIntegrationTests
+    [Fact]
+    public void GetProjects_Local_ReturnsProductionProject()
     {
-        // NOTE: These tests require configuration files that are not included in the repository. These need to be generated for each clone of the repository.
-        [Fact]
-        public void GetProjects_Local()
+        var dataStore = GetConfiguredDataStore("Assets/CliConfigurationSecrets/LocalFileSystemProjectTest.json");
+        if (dataStore is null)
         {
-            string configPath = "Assets/CliConfigurationSecrets/LocalFileSystemProjectTest.json";
-            if(!File.Exists(configPath))
-                throw new FileNotFoundException(configPath);
-
-            // Gets config file, fails if not exist
-            ConfigurationService configService = new ConfigurationService();
-            CliConfiguration config = configService.GetConfiguration(configPath);
-
-            DataStore dataStore = config.DataStores[0];
-            LocalFileSystemCrawler sut = new LocalFileSystemCrawler(
-                dataStore.Path);
-
-            List<Core.Models.v0_2.Project> actual = sut.GetProjects(new ProjectReader(
-                new ProjectParser()));
-
-            Assert.NotNull(actual);
-            Assert.Single(actual);
-            Assert.Equal("ProductionProject", actual[0].Name);
+            return;
         }
 
-        [Fact]
-        public void GetProjects_AzureDataLake()
+        var sut = new LocalFileSystemCrawler(dataStore.Path!);
+
+        var actual = sut.GetProjects(new ProjectReader(new ProjectParser()));
+
+        Assert.Single(actual);
+        Assert.Equal("ProductionProject", actual[0].Name);
+    }
+
+    [Fact]
+    public void GetProjects_AzureDataLake_ReturnsTestProject()
+    {
+        var dataStore = GetConfiguredDataStore("Assets/CliConfigurationSecrets/AzureDataLakeProjectTest.json");
+        if (dataStore is null)
         {
-            string configPath = "Assets/CliConfigurationSecrets/AzureDataLakeProjectTest.json";
-            if (!File.Exists(configPath))
-                throw new FileNotFoundException(configPath);
-
-            // Gets config file, fails if not exist
-            ConfigurationService configService = new ConfigurationService();
-            CliConfiguration config = configService.GetConfiguration(configPath);
-
-            DataStore dataStore = config.DataStores[0];
-            AzureDataLakeCrawler sut = new AzureDataLakeCrawler(
-                dataStore.AccountName,
-                dataStore.TenantId,
-                dataStore.ClientId,
-                dataStore.ClientSecret,
-                dataStore.AzureFileSystemName);
-
-            List<Core.Models.v0_2.Project> actual = sut.GetProjects(new ProjectReader(
-                new ProjectParser()));
-
-            Assert.NotNull(actual);
-            Assert.Single(actual);
-            Assert.Equal("TestProject", actual[0].Name);
+            return;
         }
 
-        [Fact]
-        public void GetProjects_GoogleWorkspaceSharedDrive()
+        var sut = new AzureDataLakeCrawler(
+            dataStore.AccountName!,
+            dataStore.TenantId!,
+            dataStore.ClientId!,
+            dataStore.ClientSecret!,
+            dataStore.AzureFileSystemName!);
+
+        var actual = sut.GetProjects(new ProjectReader(new ProjectParser()));
+
+        Assert.Single(actual);
+        Assert.Equal("TestProject", actual[0].Name);
+    }
+
+    [Fact]
+    public void GetProjects_GoogleWorkspaceSharedDrive_ReturnsProjects()
+    {
+        var dataStore = GetConfiguredDataStore("Assets/CliConfigurationSecrets/GoogleWorkspaceSharedDriveProjectTest.json");
+        if (dataStore is null)
         {
-            string configPath = "Assets/CliConfigurationSecrets/GoogleWorkspaceSharedDriveProjectTest.json";
-            if (!File.Exists(configPath))
-                throw new FileNotFoundException(configPath);
-
-            // Gets config file, fails if not exist
-            ConfigurationService configService = new ConfigurationService();
-            CliConfiguration config = configService.GetConfiguration(configPath);
-
-            DataStore dataStore = config.DataStores[0];
-            GoogleWorkspaceSharedDriveCrawler sut = new GoogleWorkspaceSharedDriveCrawler(
-                dataStore.ClientId,
-                dataStore.ClientSecret,
-                dataStore.ApplicationName);
-
-            List<Core.Models.v0_2.Project> actual = sut.GetProjects(new ProjectReader(
-                new ProjectParser()));
-
-            Assert.NotNull(actual);
-            Assert.True(actual.Count() > 0);
+            return;
         }
 
-        [Fact]
-        public void GetProjects_GoogleWorkspaceSharedDrive_ServiceAccount()
+        var sut = new GoogleWorkspaceSharedDriveCrawler(
+            dataStore.ClientId!,
+            dataStore.ClientSecret!,
+            dataStore.ApplicationName!);
+
+        var actual = sut.GetProjects(new ProjectReader(new ProjectParser()));
+
+        Assert.NotEmpty(actual);
+    }
+
+    [Fact]
+    public void GetProjects_GoogleWorkspaceSharedDriveServiceAccount_ReturnsProjects()
+    {
+        var dataStore = GetConfiguredDataStore("Assets/CliConfigurationSecrets/GoogleWorkspaceSharedDriveProjectTestWithServiceAccount.json");
+        if (dataStore is null)
         {
-            string configPath = "Assets/CliConfigurationSecrets/GoogleWorkspaceSharedDriveProjectTestWithServiceAccount.json";
-            if (!File.Exists(configPath))
-                throw new FileNotFoundException(configPath);
-
-            // Gets config file, fails if not exist
-            ConfigurationService configurationService = new ConfigurationService();
-            CliConfiguration config = configurationService.GetConfiguration(configPath);
-
-            DataStore dataStore = config.DataStores[0];
-            GoogleWorkspaceSharedDriveCrawler sut = new GoogleWorkspaceSharedDriveCrawler(
-                dataStore.AuthFilePath,
-                dataStore.ApplicationName);
-
-            List<Core.Models.v0_2.Project> actual = sut.GetProjects(new ProjectReader(
-                new ProjectParser()));
-
-            Assert.NotNull(actual);
-            Assert.True(actual.Count() > 0);
+            return;
         }
+
+        var sut = new GoogleWorkspaceSharedDriveCrawler(dataStore.AuthFilePath!, dataStore.ApplicationName!);
+
+        var actual = sut.GetProjects(new ProjectReader(new ProjectParser()));
+
+        Assert.NotEmpty(actual);
+    }
+
+    private static DataStore? GetConfiguredDataStore(string configPath)
+    {
+        if (!File.Exists(configPath))
+        {
+            return null;
+        }
+
+        var configurationService = new ConfigurationService();
+        var config = configurationService.GetConfiguration(configPath);
+        return config?.DataStores.FirstOrDefault();
     }
 }

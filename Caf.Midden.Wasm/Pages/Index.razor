@@ -92,22 +92,28 @@
     <AntDesign.Row Gutter="16" Wrap="true">
         <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(12,0)" Style="padding: 5px;">
             <AntDesign.Card Bordered Title="Projects by Status" >
-                @if (ProjectsPerStatus != null)
+                @if (State.AppConfig != null && State.Catalog.Metadatas.Count > 0 && ProjectsPerStatusData.Length > 0)
                 {
-                    <AntDesign.Charts.Column @ref="ProjectsPerStatus"
-                                         Data="ProjectsPerStatusData"
-                                         Config="ProjectsPerStatusConfig" />
+                    <div style="display:flex; justify-content:center;">
+                        <AntDesign.Charts.Column @key="ProjectsPerStatusData"
+                                                 @ref="ProjectsPerStatus"
+                                                 Data="ProjectsPerStatusData"
+                                                 Config="ProjectsPerStatusConfig" />
+                    </div>
                 }
             </AntDesign.Card>
             
         </AntDesign.Col>
         <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(12,0)" Style="padding: 5px;">
             <AntDesign.Card Bordered Title="Datasets by Zone">
-                @if (MetadataPerZoneData != null)
+                @if (State.AppConfig != null && State.Catalog.Metadatas.Count > 0 && MetadataPerZoneData.Length > 0)
                 {
-                    <AntDesign.Charts.Column @ref="MetadataPerZone"
-                                         Data="MetadataPerZoneData"
-                                         Config="MetadataPerZoneConfig" />
+                    <div style="display:flex; justify-content:center;">
+                        <AntDesign.Charts.Column @key="MetadataPerZoneData"
+                                                 @ref="MetadataPerZone"
+                                                 Data="MetadataPerZoneData"
+                                                 Config="MetadataPerZoneConfig" />
+                    </div>
                 }
             </AntDesign.Card>
         </AntDesign.Col>
@@ -158,11 +164,13 @@
         </AntDesign.Col>
         <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(12,0)" Style="padding: 5px;">
             <AntDesign.Card Bordered Title="Dataset growth">
-                @if (DatasetsOverTimeData != null)
+                @if (DatasetsOverTimeData != null && DatasetsOverTimeData.Length > 0)
                 {
-                    <AntDesign.Charts.Area @ref="DatasetsOverTime"
-                                       Data="DatasetsOverTimeData"
-                                       Config="DatasetsOverTimeConfig" />
+                    <div style="display:flex; justify-content:center;">
+                        <AntDesign.Charts.Area @ref="DatasetsOverTime"
+                                               Data="DatasetsOverTimeData"
+                                               Config="DatasetsOverTimeConfig" />
+                    </div>
                 }
             </AntDesign.Card>
         </AntDesign.Col>

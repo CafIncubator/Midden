@@ -12,11 +12,14 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.IO;
 using Microsoft.JSInterop;
+using Caf.Midden.Wasm.Services;
 
 namespace Caf.Midden.Wasm.Shared
 {
     public partial class MetadataEditor : ComponentBase
     {
+        private IDisposable? _stateSubscription;
+
         string markdownDescriptionHtml = "";
 
         private string ZoneTooltip = @"This is the ""data zone"" that the dataset belongs to. Items in the dropdown menu are populated by information specified in the app configuration.";
@@ -41,15 +44,10 @@ namespace Caf.Midden.Wasm.Shared
 
         AntDesign.Form<Metadata> form;
 
-        private async Task LastUpdated_StateChanged(
-            ComponentBase source,
-            string lastUpdated)
+        private async Task OnStateChanged(AppStateChangedEventArgs args)
         {
-            if(source != this)
-            {
-                await InvokeAsync(StateHasChanged);
-                Console.WriteLine("LastUpdate_StateChanged");
-            }
+            await InvokeAsync(StateHasChanged);
+            Console.WriteLine("LastUpdate_StateChanged");
         }
 
         protected override void OnInitialized()
@@ -61,13 +59,23 @@ namespace Caf.Midden.Wasm.Shared
             markdownDescriptionHtml = Markdig.Markdown.ToHtml(
                 State.MetadataEdit.Dataset.Description ?? string.Empty);
 
-            State.StateChanged += async (source, property) =>
-                await LastUpdated_StateChanged(source, property);
+            _stateSubscription = State.Subscribe(
+                this,
+                OnStateChanged,
+                AppStateChange.MetadataEdit,
+                AppStateChange.LastUpdated,
+                AppStateChange.AppConfig);
         }
 
         Task OnMarkdownDescriptionValueHTMLChanged(string value)
         {
             markdownDescriptionHtml = value;
+            return Task.CompletedTask;
+        }
+
+        private Task OnMetadataLoaded(Metadata metadata)
+        {
+            State.SetMetadataEdit(metadata, this);
             return Task.CompletedTask;
         }
 
@@ -95,7 +103,7 @@ namespace Caf.Midden.Wasm.Shared
 
         #region Contact Functions
         private ModalRef personModalRef;
-        private async Task OpenPersonModalTemplate(Person contact)
+        private Task OpenPersonModalTemplate(Person contact)
         {
             var templateOptions = new ViewModels.PersonModalViewModel
             {
@@ -132,9 +140,12 @@ namespace Caf.Midden.Wasm.Shared
                 return Task.CompletedTask;
             };
 
-            personModalRef = await ModalService
-                .CreateModalAsync<PersonModal, ViewModels.PersonModalViewModel>(
-                    modalConfig, templateOptions);
+            personModalRef = ModalService
+                .CreateModal<PersonModal, ViewModels.PersonModalViewModel>(
+                    modalConfig,
+                    templateOptions);
+
+            return Task.CompletedTask;
         }
 
         private void RemoveBlankContacts()
@@ -307,7 +318,7 @@ namespace Caf.Midden.Wasm.Shared
         private Variable VariableQuickEditRef;
         private ViewModels.VariableModalViewModel QuickEditViewModel;
 
-        private async Task StartQuickEdit(Variable variable)
+        private Task StartQuickEdit(Variable variable)
         {
             VariableQuickEditRef = variable;
             if(QuickEditViewModel == null)
@@ -351,9 +362,10 @@ namespace Caf.Midden.Wasm.Shared
                 QuickEditViewModel.SelectedTags = variable.Tags ??= new List<string>();
                 QuickEditViewModel.SelectedQCApplied = variable.QCApplied ??= new List<string>();
             }
+            return Task.CompletedTask;
         }
 
-        private async Task EndQuickEdit()
+        private Task EndQuickEdit()
         {
             // TODO: Some validation checks
 
@@ -368,10 +380,11 @@ namespace Caf.Midden.Wasm.Shared
             VariableQuickEditRef.VariableType = QuickEditViewModel.Variable.VariableType;
 
             VariableQuickEditRef = null;
+            return Task.CompletedTask;
         }
 
         private ModalRef variableModalRef;
-        private async Task OpenVariableModalTemplate(Variable variable)
+        private Task OpenVariableModalTemplate(Variable variable)
         {
             var templateOptions = new ViewModels.VariableModalViewModel
             {
@@ -425,9 +438,12 @@ namespace Caf.Midden.Wasm.Shared
                 return Task.CompletedTask;
             };
 
-            variableModalRef = await ModalService
-                .CreateModalAsync<VariableModal, ViewModels.VariableModalViewModel>(
-                    modalConfig, templateOptions);
+            variableModalRef = ModalService
+                .CreateModal<VariableModal, ViewModels.VariableModalViewModel>(
+                    modalConfig,
+                    templateOptions);
+
+            return Task.CompletedTask;
         }
 
         private void RemoveBlankVariables()
@@ -474,8 +490,7 @@ namespace Caf.Midden.Wasm.Shared
         {
             //this.EditContext.OnFieldChanged -=
             //     EditContext_OnFieldChange;
-            State.StateChanged -= async (source, property) =>
-                 await LastUpdated_StateChanged(source, property);
+            _stateSubscription?.Dispose();
         }
         #endregion
 
@@ -513,7 +528,7 @@ namespace Caf.Midden.Wasm.Shared
         }
 
         private ModalRef metadataDetailsModalRef;
-        private async Task OpenMetadataDetailsModalTemplate(Metadata metadata)
+        private Task OpenMetadataDetailsModalTemplate(Metadata metadata)
         {
             var templateOptions = new ViewModels.MetadataDetailsViewModel
             {
@@ -540,9 +555,12 @@ namespace Caf.Midden.Wasm.Shared
                 return Task.CompletedTask;
             };
 
-            metadataDetailsModalRef = await ModalService
-                .CreateModalAsync<MetadataDetailsModal, ViewModels.MetadataDetailsViewModel>(
-                    modalConfig, templateOptions);
+            metadataDetailsModalRef = ModalService
+                .CreateModal<MetadataDetailsModal, ViewModels.MetadataDetailsViewModel>(
+                    modalConfig,
+                    templateOptions);
+
+            return Task.CompletedTask;
         }
     }
 }

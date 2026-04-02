@@ -14,11 +14,14 @@ using System.IO;
 using Microsoft.JSInterop;
 using System.ComponentModel.DataAnnotations;
 using Caf.Midden.Core.Services;
+using Caf.Midden.Wasm.Services;
 
 namespace Caf.Midden.Wasm.Shared
 {
-    public partial class ProjectEditor : ComponentBase//, IDisposable
+    public partial class ProjectEditor : ComponentBase, IDisposable
     {
+        private IDisposable? _stateSubscription;
+
         public Project Project { get; set; } = new Project();
 
         [Parameter]
@@ -26,15 +29,10 @@ namespace Caf.Midden.Wasm.Shared
 
         string markdownHtml = "";
 
-        private async Task LastUpdated_StateChanged(
-            ComponentBase source,
-            string lastUpdated)
+        private async Task OnStateChanged(AppStateChangedEventArgs args)
         {
-            if (source != this)
-            {
-                await InvokeAsync(StateHasChanged);
-                Console.WriteLine("LastUpdate_StateChanged");
-            }
+            await InvokeAsync(StateHasChanged);
+            Console.WriteLine("LastUpdate_StateChanged");
         }
 
         protected override void OnInitialized()
@@ -42,8 +40,11 @@ namespace Caf.Midden.Wasm.Shared
             markdownHtml = Markdig.Markdown.ToHtml(
                 State.ProjectEdit.Description ?? string.Empty);
 
-            State.StateChanged += async (source, property) =>
-                await LastUpdated_StateChanged(source, property);
+            _stateSubscription = State.Subscribe(
+                this,
+                OnStateChanged,
+                AppStateChange.ProjectEdit,
+                AppStateChange.LastUpdated);
         }
 
         Task OnMarkdownValueHTMLChanged(string value)
@@ -104,7 +105,10 @@ namespace Caf.Midden.Wasm.Shared
                 }
 
                 var project = projectReader.Read(fileString);
-                State.UpdateProjectEdit(this, project);
+                if (project is not null)
+                {
+                    State.UpdateProjectEdit(this, project);
+                }
                 //await ProjectChanged.InvokeAsync(this.Project);
             }
             catch
@@ -116,6 +120,11 @@ namespace Caf.Midden.Wasm.Shared
                 isLoading = false;
                 await InvokeAsync(StateHasChanged);
             }
+        }
+
+        public void Dispose()
+        {
+            _stateSubscription?.Dispose();
         }
     }
 }

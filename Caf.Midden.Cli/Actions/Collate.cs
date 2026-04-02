@@ -4,272 +4,226 @@ using Caf.Midden.Cli.Services;
 using Caf.Midden.Core.Models.v0_2;
 using Caf.Midden.Core.Services;
 using Caf.Midden.Core.Services.Metadata;
-using System;
-using System.Collections.Generic;
 using System.CommandLine;
-using System.CommandLine.Invocation;
-using System.IO;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
+using System.Text.Json.Serialization;
 
-namespace Caf.Midden.Cli.Actions
+namespace Caf.Midden.Cli.Actions;
+
+public static class CollateCommand
 {
-    public class Collate : Command
+    private static readonly JsonSerializerOptions CatalogJsonSerializerOptions = new()
     {
-        private readonly CliConfiguration config;
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        WriteIndented = true,
+    };
 
-        public Collate(
-            string name, 
-            string description,
-            CliConfiguration? configuration) 
-            : base(name, description)
+    public static Command Create(ConfigurationService configurationService)
+    {
+        var datastoresOption = new Option<string[]>("--datastores", ["-d"])
         {
-            this.config = configuration;
+            Description = "List of names of data stores to crawl.",
+            AllowMultipleArgumentsPerToken = true,
+        };
 
-            Add(new Option<List<string>>(
-                new[] { "--datastores", "-d" },
-                "List of names of data stores to crawl"));
-            Add(new Option<bool>(
-                new[] { "--silent", "-s" },
-                "Runs in silent mode without user prompt."));
-            Add(new Option<string?>(
-                new[] { "--outdir", "-o" },
-                "Directory to write the catalog.json file."));
-            
-            Handler = CommandHandler
-                .Create<List<string>, bool, string?, IConsole>(HandleCollate);
+        var silentOption = new Option<bool>("--silent", ["-s"])
+        {
+            Description = "Run without prompting for confirmation.",
+        };
+
+        var outdirOption = new Option<string?>("--outdir", ["-o"])
+        {
+            Description = "Path to write the generated catalog JSON file.",
+        };
+
+        var command = new Command("collate", "Create a Midden catalog file from one or more data stores.");
+        command.Add(datastoresOption);
+        command.Add(silentOption);
+        command.Add(outdirOption);
+        command.SetAction(parseResult =>
+        {
+            CliConfiguration? configuration;
+
+            try
+            {
+                configuration = configurationService.GetConfiguration();
+            }
+            catch (Exception exception)
+            {
+                Console.Error.WriteLine($"Unable to read '{ConfigurationService.ConfigFileName}': {exception.Message}");
+                return 1;
+            }
+
+            return HandleCollate(
+                configuration,
+                parseResult.GetValue(datastoresOption) ?? [],
+                parseResult.GetValue(silentOption),
+                parseResult.GetValue(outdirOption));
+        });
+
+        return command;
+    }
+
+    private static int HandleCollate(
+        CliConfiguration? configuration,
+        IReadOnlyList<string> requestedDatastores,
+        bool silent,
+        string? outputPath)
+    {
+        if (configuration is null)
+        {
+            Console.Error.WriteLine("Unable to find 'configuration.json'. Run the 'setup' command to create one in the current directory.");
+            return 1;
         }
 
-        private void Add(Option<string?> option, object getDefaultValue)
+        if (configuration.DataStores.Count == 0)
         {
-            throw new NotImplementedException();
+            Console.Error.WriteLine("The configuration file does not contain any configured data stores.");
+            return 1;
         }
 
-        public void HandleCollate(
-            List<string> datastores,
-            bool silent,
-            string? outdir,
-            IConsole console)
+        var datastoresToCrawl = requestedDatastores.Count > 0
+            ? requestedDatastores.ToList()
+            : configuration.DataStores.Select(dataStore => dataStore.Name).ToList();
+
+        Console.WriteLine($"Planning to crawl: {string.Join(", ", datastoresToCrawl)}");
+
+        if (!silent && !ShouldContinue())
         {
-            // Abort if not configuration found
-            if (this.config == null)
-            {
-                Console.WriteLine("Unable to read 'configuration.json' file. To create a configuration file, use the 'setup' action");
-                return;
-            }
-
-            //bool silentMode = silent ??= false;
-            bool silentMode = silent;
-
-            // Set output directory if none specified
-            outdir ??= Path.Combine(
-                Directory.GetCurrentDirectory(), "catalog.json");
-            Console.WriteLine($"Will write output to {outdir}");
-
-            // If no store specified then crawl them all
-            if (datastores.Count == 0)
-                datastores = config.DataStores.Select(ds => ds.Name).ToList();
-
-            Console.Write($"Plannig to crawl: ");
-            foreach (var datastore in datastores) Console.Write($"{datastore} ");
-
-            // Confirm crawl should continue
-            char shouldCont = 'Y';
-            
-            if(!silentMode)
-            {
-                Console.WriteLine();
-                Console.WriteLine("Continue? (Y|N)");
-                shouldCont = Convert.ToChar(Console.Read());
-            }
-
-            if (shouldCont != 'Y')
-            {
-                Console.WriteLine("Aborting...");
-                return;
-            }
-               
-            // Start crawling all specified data stores
-            List<Metadata> middenMetadatas = new List<Metadata>();
-            List<Project> mippenProjects = new List<Project>();
-
-            foreach (string store in datastores)
-            {
-                var currStore = config
-                    .DataStores
-                    .FirstOrDefault(s => s.Name == store);
-
-                if (currStore == null)
-                {
-                    Console.WriteLine($"No data store with name {store} in config file");
-                    continue;
-                }
-
-                Console.WriteLine($"Crawling Data Store: {currStore.Name}");
-
-                ICrawl? crawler = null;
-                switch (currStore.Type)
-                {
-                    case DataStoreTypes.LocalFileSystem:
-                        if(currStore.Path is not null)
-                        {
-                            crawler = new LocalFileSystemCrawler(
-                                currStore.Path);
-                        }
-                        else
-                        {
-                            Console.WriteLine(
-                                $"Not enough information provided to crawl {currStore.Name}");
-                        }
-
-                        break;
-
-                    case DataStoreTypes.AzureDataLakeGen2:
-                        if(
-                            currStore.AccountName is not null &&
-                            currStore.TenantId is not null &&
-                            currStore.ClientId is not null &&
-                            currStore.ClientSecret is not null &&
-                            currStore.AzureFileSystemName is not null)
-                        {
-
-                            crawler = new AzureDataLakeCrawler(
-                                currStore.AccountName,
-                                currStore.TenantId,
-                                currStore.ClientId,
-                                currStore.ClientSecret,
-                                currStore.AzureFileSystemName);
-                        }
-                        else
-                        {
-                            Console.WriteLine(
-                                $"Not enough information provided to crawl {currStore.Name}");
-                        }
-
-                        break;
-
-                    case DataStoreTypes.GoogleDrive:
-                        if (
-                            currStore.ClientId is not null &&
-                            currStore.ClientSecret is not null &&
-                            currStore.ApplicationName is not null)
-                        {
-                            crawler = new GoogleDriveCrawler(
-                                currStore.ClientId,
-                                currStore.ClientSecret,
-                                currStore.ApplicationName);
-                        }
-                        else
-                        {
-                            Console.WriteLine(
-                                $"Not enough information provided to crawl {currStore.Name}");
-                        }
-
-                        break;
-
-                    case DataStoreTypes.GoogleWorkspaceSharedDrive:
-                        if(
-                            currStore.ClientId is not null &&
-                            currStore.ClientSecret is not null &&
-                            currStore.ApplicationName is not null)
-                        {
-                            crawler = new GoogleWorkspaceSharedDriveCrawler(
-                                currStore.ClientId,
-                                currStore.ClientSecret,
-                                currStore.ApplicationName);
-                        }
-                        else if(
-                            currStore.AuthFilePath is not null &&
-                            currStore.ApplicationName is not null)
-                        {
-                            crawler = new GoogleWorkspaceSharedDriveCrawler(
-                                currStore.AuthFilePath,
-                                currStore.ApplicationName);
-                        }
-                        else
-                        {
-                            Console.WriteLine(
-                                $"Not enough information provided to crawl {currStore.Name}");
-                        }
-
-                        break;
-
-                    case DataStoreTypes.AzureFileShares:
-                        if(
-                            currStore.Uri is not null &&
-                            currStore.Path is not null &&
-                            currStore.SharedAccessSignature is not null)
-                        {
-                            crawler = new AzureFileShareCrawler(
-                                currStore.Uri,
-                                currStore.Path,
-                                currStore.SharedAccessSignature);
-                        }
-                        else
-                        {
-                            Console.WriteLine(
-                                $"Not enough information provided to crawl {currStore.Name}");
-                        }
-
-                        break;
-
-                    default:
-                        break;
-                }
-
-                var metadatas = crawler?.GetMetadatas(
-                    new MetadataParser(
-                        new MetadataConverter()));
-
-                List<Project>? projects = new List<Project>();
-                if(currStore.ShouldCollateProjects is true)
-                {
-                    projects = crawler?.GetProjects(
-                        new ProjectReader(
-                            new ProjectParser()));
-                }
-
-                if(metadatas != null)
-                {
-                    AppendDataStoreNameToPath(metadatas, currStore.Name);
-
-                    if (middenMetadatas != null) middenMetadatas.AddRange(metadatas);
-                }
-
-                if(projects?.Count > 0)
-                {
-                    if (mippenProjects != null) mippenProjects.AddRange(projects);
-                }
-            }
-
-            Catalog catalog = new Catalog()
-            {
-                CreationDate = DateTime.UtcNow,
-                Metadatas = middenMetadatas,
-                Projects = mippenProjects
-            };
-
-            Console.WriteLine($"Writing output to {outdir}");
-            JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions()
-            {
-                DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
-            };
-            File.WriteAllText(outdir, JsonSerializer.Serialize(catalog, jsonSerializerOptions));
+            Console.WriteLine("Aborting...");
+            return 0;
         }
-    
-        private void AppendDataStoreNameToPath(
-            List<Metadata> metadatas,
-            string dataStoreName)
-        {
-            string prependString = $"[{dataStoreName}]";
 
-            foreach(Metadata metadata in metadatas)
+        var metadataParser = new MetadataParser(new MetadataConverter());
+        var projectReader = new ProjectReader(new ProjectParser());
+        List<Metadata> middenMetadatas = [];
+        List<Project> middenProjects = [];
+
+        foreach (var storeName in datastoresToCrawl)
+        {
+            var currentStore = configuration.DataStores.FirstOrDefault(
+                store => string.Equals(store.Name, storeName, StringComparison.OrdinalIgnoreCase));
+
+            if (currentStore is null)
             {
-                string newPath = $"{prependString}{metadata.Dataset.DatasetPath}";
-                metadata.Dataset.DatasetPath = newPath;
+                Console.Error.WriteLine($"No data store with name '{storeName}' exists in the configuration file.");
+                continue;
             }
+
+            if (!TryCreateCrawler(currentStore, out var crawler))
+            {
+                continue;
+            }
+
+            Console.WriteLine($"Crawling data store: {currentStore.Name}");
+
+            var metadatas = crawler.GetMetadatas(metadataParser);
+            AppendDataStoreNameToPath(metadatas, currentStore.Name);
+            middenMetadatas.AddRange(metadatas);
+
+            if (currentStore.ShouldCollateProjects)
+            {
+                middenProjects.AddRange(crawler.GetProjects(projectReader));
+            }
+        }
+
+        var resolvedOutputPath = Path.GetFullPath(outputPath ?? Path.Combine(Directory.GetCurrentDirectory(), "catalog.json"));
+        var outputDirectory = Path.GetDirectoryName(resolvedOutputPath);
+
+        if (!string.IsNullOrWhiteSpace(outputDirectory))
+        {
+            Directory.CreateDirectory(outputDirectory);
+        }
+
+        var catalog = new Catalog
+        {
+            CreationDate = DateTime.UtcNow,
+            Metadatas = middenMetadatas,
+            Projects = middenProjects,
+        };
+
+        File.WriteAllText(resolvedOutputPath, JsonSerializer.Serialize(catalog, CatalogJsonSerializerOptions));
+        Console.WriteLine($"Wrote catalog to {resolvedOutputPath}");
+
+        return 0;
+    }
+
+    private static bool ShouldContinue()
+    {
+        Console.Write("Continue? [y/N]: ");
+        var response = Console.ReadLine();
+
+        return string.Equals(response, "y", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(response, "yes", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool TryCreateCrawler(DataStore dataStore, out ICrawl crawler)
+    {
+        crawler = dataStore.Type switch
+        {
+            DataStoreTypes.LocalFileSystem when !string.IsNullOrWhiteSpace(dataStore.Path) =>
+                new LocalFileSystemCrawler(dataStore.Path),
+            DataStoreTypes.AzureDataLakeGen2
+                when !string.IsNullOrWhiteSpace(dataStore.AccountName)
+                && !string.IsNullOrWhiteSpace(dataStore.TenantId)
+                && !string.IsNullOrWhiteSpace(dataStore.ClientId)
+                && !string.IsNullOrWhiteSpace(dataStore.ClientSecret)
+                && !string.IsNullOrWhiteSpace(dataStore.AzureFileSystemName) =>
+                new AzureDataLakeCrawler(
+                    dataStore.AccountName,
+                    dataStore.TenantId,
+                    dataStore.ClientId,
+                    dataStore.ClientSecret,
+                    dataStore.AzureFileSystemName),
+            DataStoreTypes.GoogleDrive
+                when !string.IsNullOrWhiteSpace(dataStore.ClientId)
+                && !string.IsNullOrWhiteSpace(dataStore.ClientSecret)
+                && !string.IsNullOrWhiteSpace(dataStore.ApplicationName) =>
+                new GoogleDriveCrawler(
+                    dataStore.ClientId,
+                    dataStore.ClientSecret,
+                    dataStore.ApplicationName),
+            DataStoreTypes.GoogleWorkspaceSharedDrive
+                when !string.IsNullOrWhiteSpace(dataStore.ClientId)
+                && !string.IsNullOrWhiteSpace(dataStore.ClientSecret)
+                && !string.IsNullOrWhiteSpace(dataStore.ApplicationName) =>
+                new GoogleWorkspaceSharedDriveCrawler(
+                    dataStore.ClientId,
+                    dataStore.ClientSecret,
+                    dataStore.ApplicationName),
+            DataStoreTypes.GoogleWorkspaceSharedDrive
+                when !string.IsNullOrWhiteSpace(dataStore.AuthFilePath)
+                && !string.IsNullOrWhiteSpace(dataStore.ApplicationName) =>
+                new GoogleWorkspaceSharedDriveCrawler(
+                    dataStore.AuthFilePath,
+                    dataStore.ApplicationName),
+            DataStoreTypes.AzureFileShares
+                when !string.IsNullOrWhiteSpace(dataStore.Uri)
+                && !string.IsNullOrWhiteSpace(dataStore.Path)
+                && !string.IsNullOrWhiteSpace(dataStore.SharedAccessSignature) =>
+                new AzureFileShareCrawler(
+                    dataStore.Uri,
+                    dataStore.Path,
+                    dataStore.SharedAccessSignature),
+            _ => null!,
+        };
+
+        if (crawler is not null)
+        {
+            return true;
+        }
+
+        Console.Error.WriteLine($"The data store '{dataStore.Name}' does not have enough configuration to crawl type '{dataStore.Type}'.");
+        return false;
+    }
+
+    private static void AppendDataStoreNameToPath(IEnumerable<Metadata> metadatas, string dataStoreName)
+    {
+        var prependString = $"[{dataStoreName}]";
+
+        foreach (var metadata in metadatas)
+        {
+            metadata.Dataset.DatasetPath = $"{prependString}{metadata.Dataset.DatasetPath}";
         }
     }
 }

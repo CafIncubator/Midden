@@ -30,72 +30,66 @@ if(ViewModel?.FilteredCatalogVariables.Count > 0)
                          Bordered
                         Responsive>
             <ChildContent Context="cv">
-                <AntDesign.Column TData="string"
-                                  @bind-Field="cv.Name"
-                                  Fixed="left"
-                                  Sortable
-                                  Filterable />
-                <AntDesign.Column TData="string"
-                                  @bind-Field="cv.Description"
-                                  Width="600">
+                <AntDesign.PropertyColumn Property="@(item => item.Name)"
+                                          Fixed="left"
+                                          Sortable
+                                          Filterable />
+                <AntDesign.PropertyColumn Property="@(item => item.Description)"
+                                          Width="600">
                     <textarea readonly
                               rows="@(string.IsNullOrEmpty(cv.Description) ? 1 : cv.Description.Split('\n').Length + 1)"
                               style="width:100%; border:none;">@cv.Description</textarea>
-                </AntDesign.Column>
-                <AntDesign.Column @bind-Field="cv.Units" />
-                <AntDesign.Column @bind-Field="cv.Methods"
-                        Width="500">
+                </AntDesign.PropertyColumn>
+                <AntDesign.PropertyColumn Property="@(item => item.Units)" />
+                <AntDesign.PropertyColumn Property="@(item => item.Methods)"
+                                          Width="500">
                     @foreach (var method in cv.Methods)
                         {
                     <textarea readonly
                               rows="@(string.IsNullOrEmpty(method) ? 1 :method.Split('\n').Length + 1)"
                               style="width:100%; border:none;">@method</textarea>
                         }
-                </AntDesign.Column>
+                </AntDesign.PropertyColumn>
 
-                <AntDesign.Column @bind-Field="cv.QCApplied"
-                                  Title="Quality Control">
+                <AntDesign.PropertyColumn Property="@(item => item.QCApplied)"
+                                          Title="Quality Control">
                     @foreach (var qc in cv.QCApplied)
                         {
                         <Tag>@qc</Tag>
                         }
-                </AntDesign.Column>
-                <AntDesign.Column @bind-Field="cv.ProcessingLevel"
-                                  TData="string"
-                                  Title="Processing"
-                                  Filters="FilterProcessing"
-                                  OnFilter="(value, processing)=>(string.IsNullOrEmpty(processing) ? false : processing.StartsWith(value))"
-                                  FilterMultiple="true">
+                </AntDesign.PropertyColumn>
+                <AntDesign.PropertyColumn Property="@(item => item.ProcessingLevel)"
+                                          Title="Processing"
+                                          Filters="FilterProcessing"
+                                          OnFilter="(value, processing)=>(string.IsNullOrEmpty(processing) ? false : processing.StartsWith(value))"
+                                          FilterMultiple="true">
                     <Tag>@cv.ProcessingLevel</Tag>
-                </AntDesign.Column>
-                <AntDesign.Column @bind-Field="cv.VariableType"
-                                TData="string"
-                                Title="Type"
-                                Filters="FilterVariableType"
-                                OnFilter="(value, variableType)=>(string.IsNullOrEmpty(variableType) ? false : variableType.StartsWith(value))"
-                                FilterMultiple="true">
+                </AntDesign.PropertyColumn>
+                <AntDesign.PropertyColumn Property="@(item => item.VariableType)"
+                                          Title="Type"
+                                          Filters="FilterVariableType"
+                                          OnFilter="(value, variableType)=>(string.IsNullOrEmpty(variableType) ? false : variableType.StartsWith(value))"
+                                          FilterMultiple="true">
                     <Tag>@cv.VariableType</Tag>
-                </AntDesign.Column>
+                </AntDesign.PropertyColumn>
 
-                <AntDesign.Column @bind-Field="cv.Tags">
+                <AntDesign.PropertyColumn Property="@(item => item.Tags)">
                     @foreach (var tag in cv.Tags)
                         {
                                 <Tag><a href="catalog/variables/tags/@tag">@tag</a></Tag>
                         }
-                </AntDesign.Column>
+                </AntDesign.PropertyColumn>
 
-                <AntDesign.Column TData="string"
-                                  @bind-Field="cv.Zone"
-                                  Filters="FilterZone"
-                                  OnFilter="(value, zone)=>(string.IsNullOrEmpty(zone) ? false : zone.StartsWith(value))"
-                                  FilterMultiple="true" />
+                <AntDesign.PropertyColumn Property="@(item => item.Zone)"
+                                          Filters="FilterZone"
+                                          OnFilter="(value, zone)=>(string.IsNullOrEmpty(zone) ? false : zone.StartsWith(value))"
+                                          FilterMultiple="true" />
 
-                <AntDesign.Column @bind-Field="cv.ProjectName"
-                                  Title="Project"/>
-                <AntDesign.Column TData="string"
-                                  @bind-Field="cv.DatasetName"
-                                  Title="Dataset"
-                                  Sortable />
+                <AntDesign.PropertyColumn Property="@(item => item.ProjectName)"
+                                          Title="Project"/>
+                <AntDesign.PropertyColumn Property="@(item => item.DatasetName)"
+                                          Title="Dataset"
+                                          Sortable />
                 <ActionColumn Title="Action"
                               Fixed="right">
                     <Space>

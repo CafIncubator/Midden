@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Caf.Midden.Cli.Models;
 
-namespace Caf.Midden.Cli.Models
+public sealed class CliConfiguration
 {
-    public class CliConfiguration
-    {
-        public List<DataStore> DataStores { get; set; } = new List<DataStore>();
-    }
+    public List<DataStore> DataStores { get; init; } = [];
 }

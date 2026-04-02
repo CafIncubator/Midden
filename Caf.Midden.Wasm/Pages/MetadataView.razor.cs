@@ -1,4 +1,5 @@
 ﻿using Caf.Midden.Core.Models.v0_2;
+using Caf.Midden.Wasm.Services;
 using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
@@ -9,6 +10,8 @@ namespace Caf.Midden.Wasm.Pages
 {
     public partial class MetadataView : IDisposable
     {
+        private IDisposable? _stateSubscription;
+
         [Parameter]
         public string ZoneName { get; set; }
 
@@ -22,26 +25,19 @@ namespace Caf.Midden.Wasm.Pages
 
         protected override void OnInitialized()
         {
-            State.StateChanged += async (source, property)
-                => await StateChanged(source, property);
+            _stateSubscription = State.Subscribe(
+                this,
+                OnStateChanged,
+                AppStateChange.Catalog);
 
             if (State?.Catalog != null)
                 SetMetadata();
         }
 
-        private async Task StateChanged(
-            ComponentBase source,
-            string property)
+        private async Task OnStateChanged(AppStateChangedEventArgs args)
         {
-            if (source != this)
-            {
-                if (property == "UpdateCatalog")
-                {
-                    SetMetadata();
-                }
-
-                await InvokeAsync(StateHasChanged);
-            }
+            SetMetadata();
+            await InvokeAsync(StateHasChanged);
         }
 
         private void SetMetadata()
@@ -61,13 +57,12 @@ namespace Caf.Midden.Wasm.Pages
 
         public void Dispose()
         {
-            State.StateChanged -= async (source, property)
-                => await StateChanged(source, property);
+            _stateSubscription?.Dispose();
         }
 
         public void EditMetadata()
         {
-            State.MetadataEdit = this.Metadata;
+            State.SetMetadataEdit(this.Metadata, this);
             NavManager.NavigateTo("editor/dataset");
         }
     }

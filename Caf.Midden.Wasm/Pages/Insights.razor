@@ -59,15 +59,16 @@
 
     <AntDesign.Row Gutter="16">
         <AntDesign.Col Span="12" Style="padding: 5px;">
-            @if (MetadataPerZoneData != null)
+            @if (State.AppConfig != null && State.Catalog.Metadatas.Count > 0 && MetadataPerZoneData != null && MetadataPerZoneData.Length > 0)
             {
-                <AntDesign.Charts.Column @ref="MetadataPerZone"
+                <AntDesign.Charts.Column @key="MetadataPerZoneData"
+                                         @ref="MetadataPerZone"
                                          Data="MetadataPerZoneData"
                                          Config="MetadataPerZoneConfig" />
             }
         </AntDesign.Col>
         <AntDesign.Col Span="12" Style="padding: 5px;">
-            @if (DatasetsOverTimeData != null)
+            @if (DatasetsOverTimeData != null && DatasetsOverTimeData.Length > 0)
             {
                 <AntDesign.Charts.Area @ref="DatasetsOverTime"
                                        Data="DatasetsOverTimeData"
