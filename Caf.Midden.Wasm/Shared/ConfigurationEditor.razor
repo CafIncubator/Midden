@@ -1,0 +1,123 @@
+@using AntDesign
+@using Caf.Midden.Core.Models.v0_2
+@using System.Collections.Generic
+@using System.Linq
+@inject Caf.Midden.Wasm.Services.StateContainer State
+@inject IJSRuntime JS
+
+<Space>
+    <SpaceItem>
+        <Popconfirm Title="Confirm reset"
+                    OkText="Reset"
+                    CancelText="Cancel"
+                    OnConfirm="NewConfigurationEdit">
+            <Button><Icon Type="plus" Theme="outline" /> New</Button>
+        </Popconfirm>
+    </SpaceItem>
+    <SpaceItem>
+        <div class="file-input-zone">
+            <InputFile id="inputFileAppConfiguration"
+                       OnChange="OnInputFileConfigurationChange" />
+            @if (isLoading)
+            {
+                <span><Icon Type="loading" /> Uploading..</span>
+            }
+            else
+            {
+                <span><Icon Type="upload" /> Upload</span>
+            }
+        </div>
+    </SpaceItem>
+</Space>
+<AntDesign.Divider />
+@if (ConfigurationEdit != null)
+{
+    <AntDesign.Form Model="ConfigurationEdit"
+                    Layout="@FormLayout.Vertical">
+        <FormItem Label="Organization Name">
+            <AntDesign.Input @bind-Value="@context.OrganizationName"
+                              Placeholder="Name of your organization" />
+        </FormItem>
+        <FormItem Label="Tool Name">
+            <AntDesign.Input @bind-Value="@context.ToolName"
+                              Placeholder="Name of the tool as displayed to users" />
+        </FormItem>
+        <FormItem Label="Catalog Path">
+            <AntDesign.Input @bind-Value="@context.CatalogPath"
+                              Placeholder="Relative path to the catalog.json file" />
+        </FormItem>
+        <FormItem Label="Zones">
+            <StringListEditor Items="context.Zones" ItemsChanged="@((List<string> v) => context.Zones = v)" Placeholder="Zone name" ItemLabel="Zone" />
+        </FormItem>
+        <FormItem Label="Roles">
+            <StringListEditor Items="context.Roles" ItemsChanged="@((List<string> v) => context.Roles = v)" Placeholder="Role name" ItemLabel="Role" />
+        </FormItem>
+        <FormItem Label="Project Statuses">
+            <StringListEditor Items="context.ProjectStatuses" ItemsChanged="@((List<string> v) => context.ProjectStatuses = v)" Placeholder="Status name" ItemLabel="Project Status" />
+        </FormItem>
+        <FormItem Label="Processing Levels">
+            <StringListEditor Items="context.ProcessingLevels" ItemsChanged="@((List<string> v) => context.ProcessingLevels = v)" Placeholder="Processing level name" ItemLabel="Processing Level" />
+        </FormItem>
+        <FormItem Label="Variable Types">
+            <StringListEditor Items="context.VariableTypes" ItemsChanged="@((List<string> v) => context.VariableTypes = v)" Placeholder="Variable type name" ItemLabel="Variable Type" />
+        </FormItem>
+        <FormItem Label="Dataset Structures">
+            <StringListEditor Items="context.DatasetStructures" ItemsChanged="@((List<string> v) => context.DatasetStructures = v)" Placeholder="Dataset structure name" ItemLabel="Dataset Structure" />
+        </FormItem>
+        <FormItem Label="Quality Control Tags">
+            <StringListEditor Items="context.QCTags" ItemsChanged="@((List<string> v) => context.QCTags = v)" Placeholder="Quality control tag" ItemLabel="Quality Control Tag" />
+        </FormItem>
+        <FormItem Label="Tags">
+            <StringListEditor Items="context.Tags" ItemsChanged="@((List<string> v) => context.Tags = v)" Placeholder="Tag name" ItemLabel="Tag" />
+        </FormItem>
+        <FormItem Label="Geometries">
+            @for (int i = 0; i < context.Geometries.Count; i++)
+            {
+                var geometryIndex = i;
+                var geometry = context.Geometries[geometryIndex];
+                <div class="string-list-editor-drop-indicator @(_dragOverGeometryIndex == geometryIndex ? "string-list-editor-drop-indicator-visible" : string.Empty)"></div>
+                <div draggable="true"
+                     class="string-list-editor-row"
+                     @ondragstart="@(() => OnGeometryDragStart(geometryIndex))"
+                     @ondragenter="@(() => OnGeometryDragEnter(geometryIndex))"
+                     @ondragover:preventDefault
+                     @ondragover="@(() => { })"
+                     @ondrop="@(() => OnGeometryDrop(geometryIndex))"
+                     @ondragend="@OnGeometryDragEnd">
+                    <span class="string-list-editor-handle" title="Drag to reorder" aria-hidden="true">⋮⋮</span>
+                    <div style="flex: 0 0 20%;">
+                        <AntDesign.Input @bind-Value="geometry.Name"
+                                          Placeholder="Name" />
+                    </div>
+                    <div class="string-list-editor-input">
+                        <AntDesign.TextArea @bind-Value="geometry.GeoJson"
+                                             Placeholder="GeoJSON"
+                                             Rows="1" />
+                    </div>
+                    <Button Danger
+                            Icon="delete"
+                            OnClick="@(() => RemoveGeometry(geometry))" />
+                </div>
+            }
+            <div class="string-list-editor-drop-indicator @(_dragOverGeometryIndex == context.Geometries.Count ? "string-list-editor-drop-indicator-visible" : string.Empty)"
+                 @ondragenter="@(() => OnGeometryDragEnter(context.Geometries.Count))"
+                 @ondragover:preventDefault
+                 @ondragover="@(() => { })"
+                 @ondrop="@(() => OnGeometryDrop(context.Geometries.Count))"></div>
+            <Button Type="@ButtonType.Dashed" OnClick="AddGeometry">
+                <Icon Type="plus" Theme="outline" /> Add Geometry
+            </Button>
+        </FormItem>
+    </AntDesign.Form>
+    <Divider />
+    <AntDesign.Row Justify="end">
+        <Button Type="primary" OnClick="SaveConfiguration">
+            <Icon Type="download" />
+            Download
+        </Button>
+    </AntDesign.Row>
+}
+else
+{
+    <p>Loading...</p>
+}

@@ -48,3 +48,46 @@ a, .btn-link {
         right: 0.75rem;
         top: 0.5rem;
     }
+
+.string-list-editor-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+    cursor: grab;
+}
+
+    .string-list-editor-row:active {
+        cursor: grabbing;
+    }
+
+.string-list-editor-handle {
+    cursor: inherit;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 16px;
+    width: 16px;
+    color: rgba(0, 0, 0, 0.45);
+    font-size: 14px;
+    line-height: 1;
+    user-select: none;
+}
+
+.string-list-editor-input {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.string-list-editor-drop-indicator {
+    height: 8px;
+    margin: -4px 0;
+}
+
+.string-list-editor-drop-indicator-visible::before {
+    content: "";
+    display: block;
+    height: 2px;
+    background-color: #1890ff;
+    margin: 3px 0;
+}

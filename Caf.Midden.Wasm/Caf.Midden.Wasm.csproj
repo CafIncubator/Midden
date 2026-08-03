@@ -6,7 +6,7 @@
 	<ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
 	
 	<Version>1.0.0</Version>
-	<InformationalVersion>1.0.0-dev.2</InformationalVersion>
+	<InformationalVersion>1.0.0-dev.3</InformationalVersion>
 
   </PropertyGroup>
 
