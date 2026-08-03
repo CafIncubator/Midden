@@ -1,31 +1,40 @@
 ﻿@inject IJSRuntime JS
 @implements IAsyncDisposable
 
-<div @ref="map" id="map" style="height: 300px; width: 300px;"></div>
+<div @ref="map" id="@_mapId" style="height: 300px; width: 300px;"></div>
 
 @code {
+    private readonly string _mapId = $"map-{Guid.NewGuid():N}";
+
     ElementReference map;
-    IJSObjectReference mapModule;
-    IJSObjectReference mapInstance;
+    IJSObjectReference? mapModule;
+    IJSObjectReference? mapInstance;
 
     [Parameter]
-    public string Geometry { get; set; }
+    public string? Geometry { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        // Creates the map DOM element if it's not alreay created
-        if(mapModule == null && Geometry != null)
+        // Creates the map DOM element if it's not already created
+        if (mapModule == null && !string.IsNullOrWhiteSpace(Geometry))
         {
             mapModule = await JS.InvokeAsync<IJSObjectReference>(
                 "import", "./geojsonMap.js");
             mapInstance = await mapModule.InvokeAsync<IJSObjectReference>(
-                "create", map, this.Geometry);
+                "create", map, Geometry);
         }
     }
 
     async ValueTask IAsyncDisposable.DisposeAsync()
     {
-        await mapInstance.DisposeAsync();
-        await mapModule.DisposeAsync();
+        if (mapInstance != null)
+        {
+            await mapInstance.DisposeAsync();
+        }
+
+        if (mapModule != null)
+        {
+            await mapModule.DisposeAsync();
+        }
     }
 }

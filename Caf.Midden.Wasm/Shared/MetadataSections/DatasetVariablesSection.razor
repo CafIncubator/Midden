@@ -1,0 +1,145 @@
+
+@if (VariableRows != null && VariableRows.Count > 0)
+{
+    <AntDesign.Row Justify="RowJustify.End" Style="margin-bottom:8px;">
+        <AntDesign.Col>
+            <AntDesign.Button Type="primary" Size="small" @onclick="@(() => OnDownload.InvokeAsync())">
+                <Icon Type="download" /> Download
+            </AntDesign.Button>
+        </AntDesign.Col>
+    </AntDesign.Row>
+
+    <AntDesign.Table TItem="MetadataDetails.VariableRowItem"
+                     DataSource="@VariableRows"
+                     Size="@TableSize.Small"
+                     ScrollX="@Convert.ToString(TableWidth)"
+                     PageSize="@VariablePageSize"
+                     Bordered>
+        <ChildContent Context="row">
+            <AntDesign.PropertyColumn Property="@(item => item.Variable.Name)"
+                                      Width="220"
+                                      Fixed="left"
+                                      Filterable
+                                      Sortable />
+            <AntDesign.PropertyColumn Property="@(item => item.DescriptionText)"
+                                      Title="Description"
+                                      Width="420">
+                <div class="@(row.IsDescriptionExpanded ? "details-preserve-lines" : "truncate details-preserve-lines")">@row.DescriptionText</div>
+                @if (row.CanExpandDescription)
+                {
+                    <span class="catalog-read-more" @onclick="@(() => OnToggleDescription.InvokeAsync(row))">@(row.IsDescriptionExpanded ? "Show less" : "Read more")</span>
+                }
+            </AntDesign.PropertyColumn>
+            <AntDesign.PropertyColumn Property="@(item => item.Variable.Units)" Width="120" />
+
+            @if (VarsHaveMethods)
+            {
+                <AntDesign.PropertyColumn Property="@(item => item.MethodsText)"
+                                          Title="Methods"
+                                          Width="360">
+                    <div class="@(row.IsMethodsExpanded ? "details-preserve-lines" : "truncate details-preserve-lines")">@row.MethodsText</div>
+                    @if (row.CanExpandMethods)
+                    {
+                        <span class="catalog-read-more" @onclick="@(() => OnToggleMethods.InvokeAsync(row))">@(row.IsMethodsExpanded ? "Show less" : "Read more")</span>
+                    }
+                </AntDesign.PropertyColumn>
+            }
+
+            @if (VarsHaveQCApplied)
+            {
+                <AntDesign.PropertyColumn Property="@(item => item.Variable.QCApplied)"
+                                          Title="Quality Control"
+                                          Width="140">
+                    @foreach (var qc in row.Variable.QCApplied ?? new List<string>())
+                    {
+                        <Tag>@qc</Tag>
+                    }
+                </AntDesign.PropertyColumn>
+            }
+
+            @if (VarsHaveProcessingLevel)
+            {
+                <AntDesign.PropertyColumn Property="@(item => item.Variable.ProcessingLevel)"
+                                          Title="Processing"
+                                          Width="130"
+                                          Filters="FilterProcessing"
+                                          OnFilter="@((value, processing) => FilterByPrefix(value, processing))"
+                                          FilterMultiple="true">
+                    <Tag>@row.Variable.ProcessingLevel</Tag>
+                </AntDesign.PropertyColumn>
+            }
+
+            @if (VarsHaveVariableType)
+            {
+                <AntDesign.PropertyColumn Property="@(item => item.Variable.VariableType)"
+                                          Title="Type"
+                                          Width="130"
+                                          Filters="FilterVariableType"
+                                          OnFilter="@((value, variableType) => FilterByPrefix(value, variableType))"
+                                          FilterMultiple="true">
+                    <Tag>@row.Variable.VariableType</Tag>
+                </AntDesign.PropertyColumn>
+            }
+
+            @if (VarsHaveTags)
+            {
+                <AntDesign.PropertyColumn Property="@(item => item.Variable.Tags)"
+                                          Title="Tags"
+                                          Width="180">
+                    @foreach (var tag in row.Variable.Tags ?? new List<string>())
+                    {
+                        <Tag>@tag</Tag>
+                    }
+                </AntDesign.PropertyColumn>
+            }
+        </ChildContent>
+    </AntDesign.Table>
+}
+else
+{
+    <Empty Simple />
+}
+
+@code {
+    [Parameter]
+    public List<MetadataDetails.VariableRowItem> VariableRows { get; set; } = new();
+
+    [Parameter]
+    public int TableWidth { get; set; }
+
+    [Parameter]
+    public int VariablePageSize { get; set; }
+
+    [Parameter]
+    public bool VarsHaveMethods { get; set; }
+
+    [Parameter]
+    public bool VarsHaveQCApplied { get; set; }
+
+    [Parameter]
+    public bool VarsHaveProcessingLevel { get; set; }
+
+    [Parameter]
+    public bool VarsHaveVariableType { get; set; }
+
+    [Parameter]
+    public bool VarsHaveTags { get; set; }
+
+    [Parameter]
+    public TableFilter<string>[] FilterProcessing { get; set; } = Array.Empty<TableFilter<string>>();
+
+    [Parameter]
+    public TableFilter<string>[] FilterVariableType { get; set; } = Array.Empty<TableFilter<string>>();
+
+    [Parameter]
+    public EventCallback<MetadataDetails.VariableRowItem> OnToggleDescription { get; set; }
+
+    [Parameter]
+    public EventCallback<MetadataDetails.VariableRowItem> OnToggleMethods { get; set; }
+
+    [Parameter]
+    public EventCallback OnDownload { get; set; }
+
+    private static bool FilterByPrefix(string expectedPrefix, string? actualValue)
+        => !string.IsNullOrWhiteSpace(actualValue) && actualValue.StartsWith(expectedPrefix, StringComparison.OrdinalIgnoreCase);
+}

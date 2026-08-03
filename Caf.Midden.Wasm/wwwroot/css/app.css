@@ -131,3 +131,25 @@ tr.midden-drop-above > td {
 tr.midden-drop-below > td {
     box-shadow: inset 0 -2px 0 #1890ff;
 }
+
+/*
+ * The Lineage Diagram modal disables the default AntDesign zoom-in/out open
+ * animation. Blazor.Diagrams sizes its canvas via a ResizeObserver that calls
+ * getBoundingClientRect(), which reflects any *in-progress* CSS transform. If
+ * the modal is still mid-animation when that first measurement happens, the
+ * diagram permanently locks onto a scaled-down size and never corrects itself
+ * because ResizeObserver does not fire again for transform-only changes.
+ * Disabling the transform/animation guarantees the diagram measures its real,
+ * final size on the very first check.
+ */
+.lineage-diagram-modal-wrap .ant-modal {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+}
+
+.lineage-diagram-modal-wrap .ant-modal-content {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+}

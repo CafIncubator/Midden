@@ -1,28 +1,40 @@
 ﻿using AntDesign;
 using Caf.Midden.Core.Models.v0_2;
-using Caf.Midden.Wasm.Shared.Modals;
 using Caf.Midden.Wasm.Services;
+using Caf.Midden.Wasm.Shared.Modals;
 using Markdig;
 using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Caf.Midden.Wasm.Shared
 {
     public partial class FilteredCatalogMetadataViewer : IDisposable
     {
+        private const int MaxVisibleTags = 4;
+        private const int DefaultPageSize = 12;
+        private const int DescriptionPreviewCharacterThreshold = 240;
+        private const int DescriptionPreviewLineThreshold = 3;
+
+        private static readonly MarkdownPipeline MarkdownPipeline = new MarkdownPipelineBuilder()
+            .UseAdvancedExtensions()
+            .UseYamlFrontMatter()
+            .Build();
+
         private IDisposable? _stateSubscription;
+        private CancellationTokenSource? _filterDebounceCts;
 
         [Parameter]
-        public string Zone { get; set; }
+        public string Zone { get; set; } = string.Empty;
 
         [Parameter]
-        public string Project { get; set; }
+        public string Project { get; set; } = string.Empty;
 
         [Parameter]
-        public string Tag { get; set; }
+        public string Tag { get; set; } = string.Empty;
 
         [Parameter]
         public bool ShowSearch { get; set; } = true;
@@ -31,34 +43,33 @@ namespace Caf.Midden.Wasm.Shared
         public bool ShowHeader { get; set; } = true;
 
         [Parameter]
-        public int ShowRecentNumber { get; set; } = 0;
+        public int ShowRecentNumber { get; set; }
 
         EmbeddedProperty Property(int span, int offset) => new() { Span = span, Offset = offset };
 
+        public List<MetadataCardItem> BaseMetadataCards { get; set; } = new();
+        public List<MetadataCardItem> FilteredMetadata { get; set; } = new();
+        public List<MetadataCardItem> PagedMetadata { get; set; } = new();
 
-        public List<Metadata> BaseMetadatas { get; set; } = new List<Metadata>();
-        public List<Metadata> FilteredMetadata { get; set; } = new List<Metadata>();
+        public List<string> ZoneOptions { get; set; } = new();
+        public List<string> ProjectOptions { get; set; } = new();
 
-        public string SearchTerm { get; set; } = String.Empty;
-        private string _selectedZone = String.Empty;
-        private string SelectedZone
+        public string SearchTerm { get; set; } = string.Empty;
+        public string SelectedZone { get; set; } = string.Empty;
+        public string SelectedProject { get; set; } = string.Empty;
+        public string SelectedSort { get; set; } = DatasetSortOptions.Recent;
+
+        public int CurrentPage { get; set; } = 1;
+        public int PageSize { get; set; } = DefaultPageSize;
+        public int TotalPages => Math.Max(1, (int)Math.Ceiling((double)FilteredMetadata.Count / PageSize));
+
+        private static class DatasetSortOptions
         {
-            get => _selectedZone;
-            set
-            {
-                if (_selectedZone != value)
-                {
-                    _selectedZone = value;
-                    Console.WriteLine($"Zone selected: {_selectedZone}");  // Debug output
-                    //ApplyZoneFilter();
-                }
-            }
+            public const string Recent = "recent";
+            public const string Oldest = "oldest";
+            public const string NameAz = "name-az";
+            public const string VariableCount = "vars-desc";
         }
-
-        private MarkdownPipeline pipeline = new MarkdownPipelineBuilder()
-            .UseAdvancedExtensions()
-            .UseYamlFrontMatter()
-            .Build();
 
         protected override void OnInitialized()
         {
@@ -68,117 +79,201 @@ namespace Caf.Midden.Wasm.Shared
                 AppStateChange.Catalog,
                 AppStateChange.AppConfig);
 
-            if (State?.AppConfig?.Zones != null && State.AppConfig.Zones.Any())
-            {
-                Console.WriteLine($"Zones Loaded: {string.Join(", ", State.AppConfig.Zones)}");
-            }
-            else
-            {
-                Console.WriteLine("Zones are empty or AppConfig is null.");
-            }
-
             if (State?.Catalog != null)
             {
-                SetBaseMetadatas();
-                FilteredMetadata = this.BaseMetadatas;
+                RebuildCatalogCards();
             }
         }
-
-
 
         private async Task OnStateChanged(AppStateChangedEventArgs args)
         {
-            SetBaseMetadatas();
-            FilteredMetadata = this.BaseMetadatas;
-
-            await InvokeAsync(StateHasChanged); // Force UI to update after state changes
+            RebuildCatalogCards();
+            await InvokeAsync(StateHasChanged);
         }
 
-
-        private void SetBaseMetadatas()
+        private void RebuildCatalogCards()
         {
             if (State.Catalog?.Metadatas is null)
             {
-                BaseMetadatas = new List<Metadata>();
+                BaseMetadataCards = new();
+                FilteredMetadata = new();
+                PagedMetadata = new();
                 return;
             }
 
-            List<Metadata> metas = State.Catalog.Metadatas
-                .Where(m =>
-                    (String.IsNullOrEmpty(this.Zone) || m.Dataset.Zone.ToLower() == this.Zone.ToLower()) &&
-                    (String.IsNullOrEmpty(this.Project) || m.Dataset.Project.ToLower() == this.Project.ToLower()) &&
-                    (String.IsNullOrEmpty(this.Tag) || m.Dataset.Tags.Any(t => t.ToLower() == this.Tag.ToLower())))
-                .OrderByDescending(m => m.Dataset.LastUpdate)
+            List<Metadata> routeFilteredMetadatas = State.Catalog.Metadatas
+                .Where(metadata =>
+                    (string.IsNullOrWhiteSpace(Zone) || string.Equals(metadata.Dataset.Zone, Zone, StringComparison.OrdinalIgnoreCase)) &&
+                    (string.IsNullOrWhiteSpace(Project) || string.Equals(metadata.Dataset.Project, Project, StringComparison.OrdinalIgnoreCase)) &&
+                    (string.IsNullOrWhiteSpace(Tag) || metadata.Dataset.Tags.Any(t => string.Equals(t, Tag, StringComparison.OrdinalIgnoreCase))))
                 .ToList();
 
-            Console.WriteLine($"Total datasets loaded: {metas.Count}");  // Debug statement
-
-            if (metas != null && metas.Count > 0 && ShowRecentNumber > 0)
+            if (routeFilteredMetadatas.Count > 0 && ShowRecentNumber > 0)
             {
-                int toTake = ShowRecentNumber;
-                if (metas.Count < toTake) toTake = metas.Count;
-
-                this.BaseMetadatas = metas.GetRange(0, toTake);
-            }
-            else
-            {
-                this.BaseMetadatas = metas;
-            }
-
-            // Debug to confirm dataset zones
-            foreach (var metadata in BaseMetadatas)
-            {
-                Console.WriteLine($"Dataset loaded: {metadata.Dataset.Name}, Zone: {metadata.Dataset.Zone}");
-            }
-        }
-
-
-
-        private void SearchHandler()
-        {
-            Console.WriteLine($"Search initiated with term: {SearchTerm} and zone: {SelectedZone}");
-
-            var filtered = BaseMetadatas;
-
-            // Apply search filter
-            if (!String.IsNullOrWhiteSpace(SearchTerm))
-            {
-                filtered = filtered
-                    .Where(m =>
-                        m.Dataset.Name.ToLower().Contains(SearchTerm.ToLower()) ||
-                        m.Dataset.Description.ToLower().Contains(SearchTerm.ToLower()) ||
-                        m.Dataset.Tags.Any(t => t.ToLower().Contains(SearchTerm.ToLower())))
+                routeFilteredMetadatas = routeFilteredMetadatas
+                    .OrderByDescending(metadata => GetSortDate(metadata))
+                    .Take(ShowRecentNumber)
                     .ToList();
             }
 
-            // Apply zone filter
-            if (!String.IsNullOrEmpty(SelectedZone))
+            BaseMetadataCards = routeFilteredMetadatas
+                .Select(metadata => new MetadataCardItem(
+                    metadata,
+                    GetMarkdown(metadata.Dataset.Description),
+                    metadata.Dataset.Description,
+                    MaxVisibleTags,
+                    DescriptionPreviewCharacterThreshold,
+                    DescriptionPreviewLineThreshold))
+                .ToList();
+
+            ZoneOptions = BaseMetadataCards
+                .Select(item => item.Metadata.Dataset.Zone)
+                .Where(zone => !string.IsNullOrWhiteSpace(zone))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(zone => zone, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            ProjectOptions = BaseMetadataCards
+                .Select(item => item.Metadata.Dataset.Project)
+                .Where(project => !string.IsNullOrWhiteSpace(project))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(project => project, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            ApplyFilters(resetPage: true);
+        }
+
+        private static string GetMarkdown(string? value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
             {
-                filtered = filtered
-                    .Where(m => m.Dataset.Zone.Equals(SelectedZone, StringComparison.OrdinalIgnoreCase))
-                    .ToList();
+                return string.Empty;
             }
 
-            FilteredMetadata = filtered.OrderByDescending(m => m.Dataset.LastUpdate).ToList();
-
-            Console.WriteLine($"Total datasets after combined filtering: {FilteredMetadata.Count}");
-            InvokeAsync(StateHasChanged); // Ensure UI updates
+            return Markdown.ToHtml(value, MarkdownPipeline);
         }
 
-        private void OnZoneFilterChange()
+        private static DateTime GetSortDate(Metadata metadata)
+            => metadata.Dataset.LastUpdate ?? metadata.ModifiedDate;
+
+        private async Task QueueFilterApplyAsync(bool resetPage = true)
         {
-            SearchHandler();
+            _filterDebounceCts?.Cancel();
+            _filterDebounceCts?.Dispose();
+            _filterDebounceCts = new CancellationTokenSource();
 
-            // Force UI to refresh
-            InvokeAsync(() =>
+            try
             {
-                StateHasChanged();
-                Console.WriteLine("UI refreshed after filtering.");
-            });
+                await Task.Delay(250, _filterDebounceCts.Token);
+                ApplyFilters(resetPage);
+                await InvokeAsync(StateHasChanged);
+            }
+            catch (TaskCanceledException)
+            {
+            }
         }
 
+        private void ApplyFilters(bool resetPage)
+        {
+            IEnumerable<MetadataCardItem> query = BaseMetadataCards;
 
-        private ModalRef metadataDetailsModalRef;
+            if (!string.IsNullOrWhiteSpace(SearchTerm))
+            {
+                string term = SearchTerm.Trim();
+                query = query.Where(item =>
+                    item.Metadata.Dataset.Name.Contains(term, StringComparison.OrdinalIgnoreCase) ||
+                    (item.Metadata.Dataset.Description?.Contains(term, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                    item.Metadata.Dataset.Tags.Any(tag => tag.Contains(term, StringComparison.OrdinalIgnoreCase)) ||
+                    item.Metadata.Dataset.Project.Contains(term, StringComparison.OrdinalIgnoreCase) ||
+                    item.Metadata.Dataset.Zone.Contains(term, StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (!string.IsNullOrWhiteSpace(SelectedZone))
+            {
+                query = query.Where(item => string.Equals(item.Metadata.Dataset.Zone, SelectedZone, StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (!string.IsNullOrWhiteSpace(SelectedProject))
+            {
+                query = query.Where(item => string.Equals(item.Metadata.Dataset.Project, SelectedProject, StringComparison.OrdinalIgnoreCase));
+            }
+
+            query = SelectedSort switch
+            {
+                DatasetSortOptions.Oldest => query.OrderBy(item => GetSortDate(item.Metadata)),
+                DatasetSortOptions.NameAz => query.OrderBy(item => item.Metadata.Dataset.Name, StringComparer.OrdinalIgnoreCase),
+                DatasetSortOptions.VariableCount => query.OrderByDescending(item => item.Metadata.Dataset.Variables.Count),
+                _ => query.OrderByDescending(item => GetSortDate(item.Metadata))
+            };
+
+            FilteredMetadata = query.ToList();
+
+            if (resetPage)
+            {
+                CurrentPage = 1;
+            }
+
+            UpdatePagedMetadata();
+        }
+
+        private void UpdatePagedMetadata()
+        {
+            if (CurrentPage > TotalPages)
+            {
+                CurrentPage = TotalPages;
+            }
+
+            if (CurrentPage < 1)
+            {
+                CurrentPage = 1;
+            }
+
+            PagedMetadata = FilteredMetadata
+                .Skip((CurrentPage - 1) * PageSize)
+                .Take(PageSize)
+                .ToList();
+        }
+
+        private Task SearchHandler() => QueueFilterApplyAsync();
+
+        private Task OnZoneFilterChange() => QueueFilterApplyAsync();
+
+        private Task OnProjectFilterChange() => QueueFilterApplyAsync();
+
+        private Task OnSortChange() => QueueFilterApplyAsync(resetPage: false);
+
+        private Task MoveToPage(int nextPage)
+        {
+            if (nextPage < 1 || nextPage > TotalPages)
+            {
+                return Task.CompletedTask;
+            }
+
+            CurrentPage = nextPage;
+            UpdatePagedMetadata();
+            return InvokeAsync(StateHasChanged);
+        }
+
+        private void ToggleDescription(MetadataCardItem card)
+        {
+            card.IsDescriptionExpanded = !card.IsDescriptionExpanded;
+        }
+
+        private int GetCurrentRangeStart()
+        {
+            if (FilteredMetadata.Count == 0)
+            {
+                return 0;
+            }
+
+            return ((CurrentPage - 1) * PageSize) + 1;
+        }
+
+        private int GetCurrentRangeEnd()
+            => Math.Min(CurrentPage * PageSize, FilteredMetadata.Count);
+
+        private ModalRef metadataDetailsModalRef = default!;
+
         private async Task OpenMetadataDetailsModalTemplate(Metadata metadata)
         {
             var templateOptions = new ViewModels.MetadataDetailsViewModel
@@ -186,24 +281,18 @@ namespace Caf.Midden.Wasm.Shared
                 Metadata = metadata
             };
 
-            var modalConfig = new ModalOptions();
-            modalConfig.Title = "Metadata Preview";
-            modalConfig.Width = "90%";
-            modalConfig.DestroyOnClose = true;
-            modalConfig.OnCancel = async (e) =>
+            ModalOptions modalConfig = new()
             {
-                await metadataDetailsModalRef.CloseAsync();
-            };
-            modalConfig.OnOk = async (e) =>
-            {
-                await metadataDetailsModalRef.CloseAsync();
-            };
-
-            modalConfig.AfterClose = () =>
-            {
-                InvokeAsync(StateHasChanged);
-
-                return Task.CompletedTask;
+                Title = "Metadata Preview",
+                Width = "90%",
+                DestroyOnClose = true,
+                OnCancel = async _ => await metadataDetailsModalRef.CloseAsync(),
+                OnOk = async _ => await metadataDetailsModalRef.CloseAsync(),
+                AfterClose = () =>
+                {
+                    InvokeAsync(StateHasChanged);
+                    return Task.CompletedTask;
+                }
             };
 
             metadataDetailsModalRef = ModalService
@@ -214,7 +303,39 @@ namespace Caf.Midden.Wasm.Shared
 
         public void Dispose()
         {
+            _filterDebounceCts?.Cancel();
+            _filterDebounceCts?.Dispose();
             _stateSubscription?.Dispose();
+        }
+
+        public sealed class MetadataCardItem
+        {
+            public MetadataCardItem(
+                Metadata metadata,
+                string descriptionHtml,
+                string? rawDescription,
+                int maxVisibleTags,
+                int characterThreshold,
+                int lineThreshold)
+            {
+                Metadata = metadata;
+                DescriptionHtml = descriptionHtml;
+
+                List<string> tags = metadata.Dataset.Tags ?? new List<string>();
+                VisibleTags = tags.Take(maxVisibleTags).ToList();
+                HiddenTagCount = Math.Max(0, tags.Count - VisibleTags.Count);
+
+                string description = rawDescription ?? string.Empty;
+                int lineCount = description.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None).Length;
+                CanExpandDescription = description.Length > characterThreshold || lineCount > lineThreshold;
+            }
+
+            public Metadata Metadata { get; }
+            public string DescriptionHtml { get; }
+            public List<string> VisibleTags { get; }
+            public int HiddenTagCount { get; }
+            public bool CanExpandDescription { get; }
+            public bool IsDescriptionExpanded { get; set; }
         }
     }
 }

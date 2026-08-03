@@ -1,0 +1,29 @@
+@using Caf.Midden.Wasm.Shared.MetadataLineage
+@if (Dataset?.ParentDatasets != null && Dataset.ParentDatasets.Any())
+{
+    <MetadataLineageDiagram @ref="_diagram" dataset="@Dataset" Height="@DiagramHeight" />
+}
+else
+{
+    <Empty Simple />
+}
+
+@code {
+    [Parameter]
+    public Caf.Midden.Core.Models.v0_2.Dataset? Dataset { get; set; }
+
+    [Parameter]
+    public int DiagramHeight { get; set; } = 300;
+
+    private MetadataLineageDiagram? _diagram;
+
+    /// <summary>
+    /// Forces the underlying lineage diagram to re-measure its container and
+    /// re-fit/center itself. Intended to be called once a hosting container
+    /// (e.g. a Modal) has fully finished opening.
+    /// </summary>
+    public void RefitDiagram()
+    {
+        _diagram?.RefitDiagram();
+    }
+}

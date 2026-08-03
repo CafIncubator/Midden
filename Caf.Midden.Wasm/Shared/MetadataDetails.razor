@@ -1,27 +1,44 @@
-﻿@using Caf.Midden.Wasm.Shared.MetadataLineage
+@using Caf.Midden.Wasm.Shared.MetadataLineage
+@using Caf.Midden.Wasm.Shared.MetadataSections
 @inject Caf.Midden.Wasm.Services.StateContainer State
 
-@if (this.Metadata != null)
+@if (Metadata != null)
 {
-    <PageHeader Class="site-page-header" Title="@Metadata.Dataset.Name" Subtitle="@($"Last updated: {Metadata.ModifiedDate}")">
-        
-    </PageHeader>
-    
+    <PageHeader Class="site-page-header" Title="@Metadata.Dataset.Name" Subtitle="@($"Last updated: {Metadata.ModifiedDate}")" />
+
     <Row>
         <AntDesign.Col Span="24" Style="padding:5px">
             <Icon Type="folder" />
-            <a href="catalog/datasets/@Metadata.Dataset.Zone">
-                @Metadata.Dataset.Zone
-            </a>
+            <a href="catalog/datasets/@Metadata.Dataset.Zone">@Metadata.Dataset.Zone</a>
             <Divider Type="DirectionVHType.Vertical" />
             <Icon Type="project" />
-            <a href="catalog/projects/@Metadata.Dataset.Project">
-                @Metadata.Dataset.Project
-            </a>
+            <a href="catalog/projects/@Metadata.Dataset.Project">@Metadata.Dataset.Project</a>
         </AntDesign.Col>
     </Row>
+
     <Divider />
-    <Row Wrap="true">
+
+    <div class="details-quick-peek-wrap">
+        <div class="details-quick-peek-header">
+            <span class="details-quick-peek-title">Quick Peek</span>
+            <span class="details-quick-peek-subtitle">Open any section in a focused modal preview.</span>
+        </div>
+
+        <div class="details-quick-peek">
+            <AntDesign.Button Size="small" Disabled="@(!HasDescription)" @onclick="@(() => ShowDescription = true)"><Icon Type="read" Theme="outline" /> Description</AntDesign.Button>
+            <AntDesign.Button Size="small" Disabled="@(!HasMethods)" @onclick="@(() => ShowDatasetMethods = true)"><Icon Type="experiment" Theme="outline" /> Methods</AntDesign.Button>
+            <AntDesign.Button Size="small" Disabled="@(!HasLineage)" @onclick="@(() => ShowLineage = true)"><Icon Type="partition" Theme="outline" Rotate="180" /> Lineage Diagram</AntDesign.Button>
+            <AntDesign.Button Size="small" Disabled="@(!HasDerivedWorks)" @onclick="@(() => ShowDerivedWorks = true)"><Icon Type="comment" Theme="outline" /> Derived Works</AntDesign.Button>
+            <AntDesign.Button Size="small" Disabled="@(!HasFileInformation)" @onclick="@(() => ShowFileInformation = true)"><Icon Type="database" Theme="outline" /> File Information</AntDesign.Button>
+            <AntDesign.Button Size="small" Disabled="@(!HasVariables)" @onclick="@(() => ShowVariables = true)"><Icon Type="calculator" Theme="outline" /> Variables</AntDesign.Button>
+            <AntDesign.Button Size="small" Disabled="@(!HasSpatialInformation)" @onclick="@(() => ShowSpatialInformation = true)"><Icon Type="environment" Theme="outline" /> Spatial Information</AntDesign.Button>
+            <AntDesign.Button Size="small" Disabled="@(!HasTemporalInformation)" @onclick="@(() => ShowTemporalInformation = true)"><Icon Type="clock-circle" Theme="outline" /> Temporal Information</AntDesign.Button>
+            <AntDesign.Button Size="small" Disabled="@(!HasContacts)" @onclick="@(() => ShowContacts = true)"><Icon Type="user" Theme="outline" /> Contacts</AntDesign.Button>
+            <AntDesign.Button Size="small" Disabled="@(!HasTags)" @onclick="@(() => ShowTags = true)"><Icon Type="tags" Theme="outline" /> Tags</AntDesign.Button>
+        </div>
+    </div>
+
+    <Row>
         <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(17,0)">
             <Row>
                 <AntDesign.Col Span="24" Style="padding:5px">
@@ -30,218 +47,120 @@
                             <Icon Type="read" Theme="outline" /> Description
                         </TitleTemplate>
                         <Body>
-                        @if (!String.IsNullOrEmpty(Metadata.Dataset.Description))
-                        {
-                            @((MarkupString)(Markdig.Markdown.ToHtml(Metadata.Dataset.Description, pipeline)))
-                        }
-                        else
-                        {
-                            <Empty Simple />
-                        }
+                            <DatasetDescriptionSection DescriptionHtml="@DescriptionHtml" CanExpand="@CanExpandDescription" IsExpanded="@IsDescriptionExpanded" OnToggle="@ToggleDescription" />
                         </Body>
                     </Card>
                 </AntDesign.Col>
             </Row>
+
             <Row>
-                <AntDesign.Col Span="@((Metadata.Dataset.Methods == null) || (!Metadata.Dataset.Methods.Any()) ? 0 : 24)" Style="padding:5px">
-                    <AntList Bordered DataSource="@Metadata.Dataset.Methods">
-                        <Header>
-                            <Icon Type="experiment" Theme="outline" /> Methods
-                        </Header>
-                        <ChildContent Context="method">
-                            <ListItem Style="overflow:auto;">
-                                <textarea readonly
-                                          rows="@(string.IsNullOrEmpty(method) ? 1 : method.Split('\n').Length + 1)"
-                                          style="width:100%; border:none;">@method</textarea>
-                            </ListItem>
-                        </ChildContent>
-                    </AntList>
-                </AntDesign.Col>
-            </Row>
-            <Row>
-                <AntDesign.Col Span="@((Metadata.Dataset.ParentDatasets == null) || (!Metadata.Dataset.ParentDatasets.Any()) ? 0 : 24)" Style="padding:5px">
+                <AntDesign.Col Span="24" Style="padding:5px">
                     <Card>
                         <TitleTemplate>
-                            <Icon Type="partition" Theme="outline" Rotate="180" /> Lineage Diagram
+                            <Icon Type="experiment" Theme="outline" /> Methods
                         </TitleTemplate>
                         <Body>
-                            <MetadataLineageDiagram dataset="@Metadata.Dataset" />
+                            <ExpandableTextListSection Items="@DatasetMethodItems" OnToggle="@ToggleExpandableText" />
                         </Body>
                     </Card>
                 </AntDesign.Col>
             </Row>
+
+            @if (Metadata.Dataset.ParentDatasets != null && Metadata.Dataset.ParentDatasets.Any())
+            {
+                <Row>
+                    <AntDesign.Col Span="24" Style="padding:5px">
+                        <Card>
+                            <TitleTemplate>
+                                <Icon Type="partition" Theme="outline" Rotate="180" /> Lineage Diagram
+                            </TitleTemplate>
+                            <Body>
+                                <DatasetLineageSection Dataset="@Metadata.Dataset" />
+                            </Body>
+                        </Card>
+                    </AntDesign.Col>
+                </Row>
+            }
+
             <Row>
-                <AntDesign.Col Span="@((Metadata.Dataset.DerivedWorks == null) || (!Metadata.Dataset.DerivedWorks.Any()) ? 0 : 24)" Style="padding:5px">
-                    <AntList Bordered DataSource="@Metadata.Dataset.DerivedWorks">
-                        <Header>
+                <AntDesign.Col Span="24" Style="padding:5px">
+                    <Card>
+                        <TitleTemplate>
                             <Icon Type="comment" Theme="outline" /> Derived Works
-                        </Header>
-                        <ChildContent Context="derived">
-                            <ListItem Style="overflow:auto;">
-                                <textarea readonly
-                                          rows="@(string.IsNullOrEmpty(derived) ? 1 : derived.Split('\n').Length + 1)"
-                                          style="width:100%; border:none;">@derived</textarea>
-                            </ListItem>
-                        </ChildContent>
-                    </AntList>
+                        </TitleTemplate>
+                        <Body>
+                            <ExpandableTextListSection Items="@DerivedWorkItems" OnToggle="@ToggleExpandableText" />
+                        </Body>
+                    </Card>
                 </AntDesign.Col>
             </Row>
+
             <Row>
-                <AntDesign.Col Span="@((string.IsNullOrEmpty(Metadata.Dataset.DatasetPath) && string.IsNullOrEmpty(Metadata.Dataset.Format) && string.IsNullOrEmpty(Metadata.Dataset.FilePathTemplate) && string.IsNullOrEmpty(Metadata.Dataset.FilePathDescriptor))  ? 0 : 24)" Style="padding:5px">
+                <AntDesign.Col Span="24" Style="padding:5px">
                     <Card>
                         <TitleTemplate>
                             <Icon Type="database" Theme="outline" /> File Information
                         </TitleTemplate>
                         <Body>
-                            @if (!string.IsNullOrEmpty(Metadata.Dataset.DatasetPath))
-                            {
-                                <p><strong>Dataset Path</strong>: @Metadata.Dataset.DatasetPath</p>
-                            }
-                            <p><strong>Format</strong>: @Metadata.Dataset.Format</p>
-                            <p><strong>Path Template</strong>: @Metadata.Dataset.FilePathTemplate</p>
-                            <p><strong>Path Description</strong>: @Metadata.Dataset.FilePathDescriptor</p>
+                            <DatasetFileInformationSection Dataset="@Metadata.Dataset" />
                         </Body>
                     </Card>
                 </AntDesign.Col>
             </Row>
+
             <Row>
-                <AntDesign.Col Span="@((Metadata.Dataset.Variables == null) || (!Metadata.Dataset.Variables.Any()) ? 0 : 24)" Style="padding:5px;">
+                <AntDesign.Col Span="24" Style="padding:5px;">
                     <Card>
                         <TitleTemplate>
                             <Icon Type="calculator" Theme="outline" /> Variables
-                            
                         </TitleTemplate>
-                        <Extra>
-                            <AntDesign.Button Type="primary" Size="small" Style="margin-right: 10px;" @onclick="DownloadVariables">
-                                <Icon Type="download" /> Download
-                            </AntDesign.Button>
-
-                        </Extra>
                         <Body>
-                            @if (Metadata.Dataset.Variables?.Count > 0)
-                            {
-                                <AntDesign.Table TItem="Caf.Midden.Core.Models.v0_2.Variable"
-                                                 DataSource="@Metadata.Dataset.Variables"
-                                                 Size="@TableSize.Small"
-                                                 ScrollX="@Convert.ToString(TableWidth)"
-                                                 Bordered>
-                                    <ChildContent Context="variable">
-                                        <AntDesign.PropertyColumn Property="@(item => item.Name)" 
-                                                                  Width="200"
-                                                                  Fixed="left"
-                                                                  Filterable
-                                                                  Sortable />
-                                        <AntDesign.PropertyColumn Property="@(item => item.Description)"
-                                                                  Width="400">
-                                            <textarea readonly
-                                                      rows="@(string.IsNullOrEmpty(variable.Description) ? 1 : variable.Description.Split('\n').Length + 1)"
-                                                      style="width:100%; border:none;">@variable.Description</textarea>
-                                        </AntDesign.PropertyColumn>
-                                        <AntDesign.PropertyColumn Property="@(item => item.Units)" 
-                                                                  Width="100" />
-
-                                        @if (VarsHaveMethods)
-                                        {
-                                            <AntDesign.PropertyColumn Property="@(item => item.Methods)" 
-                                                                      Width="400">
-                                                @foreach (var method in variable.Methods)
-                                                            {
-                                                    <textarea readonly
-                                                              rows="@(string.IsNullOrEmpty(method) ? 1 :method.Split('\n').Length + 1)"
-                                                              style="width:100%; border:none;">@method</textarea>
-                                                            }
-                                            </AntDesign.PropertyColumn>
-                                        }
-
-                                        @if (VarsHaveQCApplied)
-                                        {
-                                            <AntDesign.PropertyColumn Property="@(item => item.QCApplied)"
-                                                                      Title="Quality Control" 
-                                                                      Width="100">
-                                                @foreach (var qc in variable.QCApplied)
-                                                            {
-                                                    <Tag>@qc</Tag>
-                                                            }
-                                            </AntDesign.PropertyColumn>
-                                        }
-
-                                        @if (VarsHaveProcessingLevel)
-                                        {
-                                            <AntDesign.PropertyColumn Property="@(item => item.ProcessingLevel)"
-                                                                      Title="Processing" 
-                                                                      Width="100"
-                                                                      Filters="FilterProcessing"
-                                                                      OnFilter="(value, processing)=>(string.IsNullOrEmpty(processing) ? false : processing.StartsWith(value))"
-                                                                      FilterMultiple="true">
-                                                <Tag>@variable.ProcessingLevel</Tag>
-                                            </AntDesign.PropertyColumn>
-                                        }
-
-                                        @if (VarsHaveVariableType)
-                                        {
-                                            <AntDesign.PropertyColumn Property="@(item => item.VariableType)"
-                                                                      Title="Type"
-                                                                      Width="100"
-                                                                      Filters="FilterVariableType"
-                                                                      OnFilter="(value, variableType)=>(string.IsNullOrEmpty(variableType) ? false : variableType.StartsWith(value))"
-                                                                      FilterMultiple="true">
-                                                <Tag>@variable.VariableType</Tag>
-                                            </AntDesign.PropertyColumn>
-                                        }
-
-                                        @if(VarsHaveTags)
-                                        {
-                                            <AntDesign.PropertyColumn Property="@(item => item.Tags)" 
-                                                                      Width="100">
-                                                @foreach (var tag in variable.Tags)
-                                                            {
-                                                    <Tag>@tag</Tag>
-                                                            }
-                                            </AntDesign.PropertyColumn>
-                                        }
-@* Depricated                           @if(VarsHaveHeight)
-                                        {
-                                            <AntDesign.PropertyColumn Property="@(item => item.Height)" 
-                                                                      Width="50"/>
-                                        }*@
-                                    </ChildContent>
-                                </AntDesign.Table>
-                            }
+                            <DatasetVariablesSection VariableRows="@VariableRows"
+                                                      TableWidth="@TableWidth"
+                                                      VariablePageSize="@VariablePageSize"
+                                                      VarsHaveMethods="@VarsHaveMethods"
+                                                      VarsHaveQCApplied="@VarsHaveQCApplied"
+                                                      VarsHaveProcessingLevel="@VarsHaveProcessingLevel"
+                                                      VarsHaveVariableType="@VarsHaveVariableType"
+                                                      VarsHaveTags="@VarsHaveTags"
+                                                      FilterProcessing="@FilterProcessing"
+                                                      FilterVariableType="@FilterVariableType"
+                                                      OnToggleDescription="@ToggleVariableDescription"
+                                                      OnToggleMethods="@ToggleVariableMethods"
+                                                      OnDownload="@DownloadVariables" />
                         </Body>
                     </Card>
                 </AntDesign.Col>
             </Row>
         </AntDesign.Col>
+
         <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(7,0)">
             <Row>
-                <AntDesign.Col Span="@(string.IsNullOrEmpty(Metadata.Dataset.Geometry) ? 0 : 24)" Style="padding:5px">
+                <AntDesign.Col Span="24" Style="padding:5px">
                     <Card>
                         <TitleTemplate>
                             <Icon Type="environment" Theme="outline" /> Spatial Information
                         </TitleTemplate>
                         <Body>
-                            @if (Metadata.Dataset.Geometry != null)
-                            {
-                                <GeoJsonMap Geometry="@Metadata.Dataset.Geometry" />
-                            }
-                            <p><strong>Resolution</strong>: @Metadata.Dataset.SpatialRepeats</p>
+                            <DatasetSpatialSection Dataset="@Metadata.Dataset" />
                         </Body>
                     </Card>
                 </AntDesign.Col>
             </Row>
+
             <Row>
-                <AntDesign.Col Span="@((string.IsNullOrEmpty(Metadata.Dataset.TemporalExtent) && string.IsNullOrEmpty(Metadata.Dataset.TemporalResolution)) ? 0 : 24)" Style="padding:5px;">
+                <AntDesign.Col Span="24" Style="padding:5px;">
                     <Card>
                         <TitleTemplate>
                             <Icon Type="clock-circle" Theme="outline" /> Temporal Information
                         </TitleTemplate>
                         <Body>
-                            <p><strong>Start/End</strong>: @Metadata.Dataset.TemporalExtent</p>
-                            <p><strong>Resolution</strong>: @Metadata.Dataset.TemporalResolution</p>
+                            <DatasetTemporalSection Dataset="@Metadata.Dataset" />
                         </Body>
                     </Card>
                 </AntDesign.Col>
             </Row>
+
             <Row>
                 <AntDesign.Col Span="24" Style="padding:5px">
                     <Card>
@@ -249,35 +168,136 @@
                             <Icon Type="user" Theme="outline" /> Contacts
                         </TitleTemplate>
                         <Body>
-                            <AntDesign.Table TItem="Caf.Midden.Core.Models.v0_2.Person"
-                                             DataSource="@Metadata.Dataset.Contacts"
-                                             HidePagination="@true">
-                                <ChildContent Context="contact">
-                                    <AntDesign.PropertyColumn Property="@(item => item.Name)">
-                                        <a href="mailto:@contact.Email">@contact.Name</a>
-                                    </AntDesign.PropertyColumn>
-                                    <AntDesign.PropertyColumn Property="@(item => item.Role)" />
-                                </ChildContent>
-                            </AntDesign.Table>
+                            <DatasetContactsSection Dataset="@Metadata.Dataset" />
                         </Body>
                     </Card>
                 </AntDesign.Col>
             </Row>
+
             <Row>
-                <AntDesign.Col Span="@((Metadata.Dataset.Tags == null) || (!Metadata.Dataset.Tags.Any()) ? 0 : 24)" Style="padding:5px">
-                    <Card Title="Tags">
+                <AntDesign.Col Span="24" Style="padding:5px">
+                    <Card>
                         <TitleTemplate>
                             <Icon Type="tags" Theme="outline" /> Tags
                         </TitleTemplate>
                         <Body>
-                            @foreach (var tag in Metadata.Dataset.Tags)
-                            {
-                            <Tag><a href="catalog/datasets/tags/@tag">@tag</a></Tag>
-                            }
+                            <DatasetTagsSection Dataset="@Metadata.Dataset" />
                         </Body>
                     </Card>
                 </AntDesign.Col>
             </Row>
         </AntDesign.Col>
     </Row>
+
+    <AntDesign.Modal Title="Description" Visible="@ShowDescription" DestroyOnClose="true" Width="1200" OnCancel="@CloseDescription" Footer="@null">
+        @if (ShowDescription)
+        {
+            <DatasetDescriptionSection DescriptionHtml="@DescriptionHtml" CanExpand="@CanExpandDescription" IsExpanded="@IsDescriptionExpanded" OnToggle="@ToggleDescription" />
+            <div class="details-modal-footer">
+                <AntDesign.Button @onclick="CloseDescription">Close</AntDesign.Button>
+            </div>
+        }
+    </AntDesign.Modal>
+
+    <AntDesign.Modal Title="Methods" Visible="@ShowDatasetMethods" DestroyOnClose="true" Width="1200" OnCancel="@CloseDatasetMethods" Footer="@null">
+        @if (ShowDatasetMethods)
+        {
+            <ExpandableTextListSection Items="@DatasetMethodItems" OnToggle="@ToggleExpandableText" />
+            <div class="details-modal-footer">
+                <AntDesign.Button @onclick="CloseDatasetMethods">Close</AntDesign.Button>
+            </div>
+        }
+    </AntDesign.Modal>
+
+    <AntDesign.Modal Title="Lineage Diagram" Visible="@ShowLineage" DestroyOnClose="true" Width="1200" OnCancel="@CloseLineage" Footer="@null" WrapClassName="lineage-diagram-modal-wrap">
+        @if (ShowLineage)
+        {
+            <DatasetLineageSection @ref="_lineageSection" Dataset="@Metadata.Dataset" DiagramHeight="460" />
+            <div class="details-modal-footer">
+                <AntDesign.Button @onclick="CloseLineage">Close</AntDesign.Button>
+            </div>
+        }
+    </AntDesign.Modal>
+
+    <AntDesign.Modal Title="Derived Works" Visible="@ShowDerivedWorks" DestroyOnClose="true" Width="1200" OnCancel="@CloseDerivedWorks" Footer="@null">
+        @if (ShowDerivedWorks)
+        {
+            <ExpandableTextListSection Items="@DerivedWorkItems" OnToggle="@ToggleExpandableText" />
+            <div class="details-modal-footer">
+                <AntDesign.Button @onclick="CloseDerivedWorks">Close</AntDesign.Button>
+            </div>
+        }
+    </AntDesign.Modal>
+
+    <AntDesign.Modal Title="File Information" Visible="@ShowFileInformation" DestroyOnClose="true" Width="1200" OnCancel="@CloseFileInformation" Footer="@null">
+        @if (ShowFileInformation)
+        {
+            <DatasetFileInformationSection Dataset="@Metadata.Dataset" />
+            <div class="details-modal-footer">
+                <AntDesign.Button @onclick="CloseFileInformation">Close</AntDesign.Button>
+            </div>
+        }
+    </AntDesign.Modal>
+
+    <AntDesign.Modal Title="Variables" Visible="@ShowVariables" DestroyOnClose="true" Width="1200" OnCancel="@CloseVariables" Footer="@null">
+        @if (ShowVariables)
+        {
+            <DatasetVariablesSection VariableRows="@VariableRows"
+                                      TableWidth="@TableWidth"
+                                      VariablePageSize="@VariablePageSize"
+                                      VarsHaveMethods="@VarsHaveMethods"
+                                      VarsHaveQCApplied="@VarsHaveQCApplied"
+                                      VarsHaveProcessingLevel="@VarsHaveProcessingLevel"
+                                      VarsHaveVariableType="@VarsHaveVariableType"
+                                      VarsHaveTags="@VarsHaveTags"
+                                      FilterProcessing="@FilterProcessing"
+                                      FilterVariableType="@FilterVariableType"
+                                      OnToggleDescription="@ToggleVariableDescription"
+                                      OnToggleMethods="@ToggleVariableMethods"
+                                      OnDownload="@DownloadVariables" />
+            <div class="details-modal-footer">
+                <AntDesign.Button @onclick="CloseVariables">Close</AntDesign.Button>
+            </div>
+        }
+    </AntDesign.Modal>
+
+    <AntDesign.Modal Title="Spatial Information" Visible="@ShowSpatialInformation" DestroyOnClose="true" Width="1200" OnCancel="@CloseSpatialInformation" Footer="@null">
+        @if (ShowSpatialInformation)
+        {
+            <DatasetSpatialSection Dataset="@Metadata.Dataset" />
+            <div class="details-modal-footer">
+                <AntDesign.Button @onclick="CloseSpatialInformation">Close</AntDesign.Button>
+            </div>
+        }
+    </AntDesign.Modal>
+
+    <AntDesign.Modal Title="Temporal Information" Visible="@ShowTemporalInformation" DestroyOnClose="true" Width="1200" OnCancel="@CloseTemporalInformation" Footer="@null">
+        @if (ShowTemporalInformation)
+        {
+            <DatasetTemporalSection Dataset="@Metadata.Dataset" />
+            <div class="details-modal-footer">
+                <AntDesign.Button @onclick="CloseTemporalInformation">Close</AntDesign.Button>
+            </div>
+        }
+    </AntDesign.Modal>
+
+    <AntDesign.Modal Title="Contacts" Visible="@ShowContacts" DestroyOnClose="true" Width="1200" OnCancel="@CloseContacts" Footer="@null">
+        @if (ShowContacts)
+        {
+            <DatasetContactsSection Dataset="@Metadata.Dataset" />
+            <div class="details-modal-footer">
+                <AntDesign.Button @onclick="CloseContacts">Close</AntDesign.Button>
+            </div>
+        }
+    </AntDesign.Modal>
+
+    <AntDesign.Modal Title="Tags" Visible="@ShowTags" DestroyOnClose="true" Width="1200" OnCancel="@CloseTags" Footer="@null">
+        @if (ShowTags)
+        {
+            <DatasetTagsSection Dataset="@Metadata.Dataset" />
+            <div class="details-modal-footer">
+                <AntDesign.Button @onclick="CloseTags">Close</AntDesign.Button>
+            </div>
+        }
+    </AntDesign.Modal>
 }

@@ -1,0 +1,26 @@
+@if (!string.IsNullOrWhiteSpace(DescriptionHtml))
+{
+    <div class="@(IsExpanded ? string.Empty : "truncate")">@((MarkupString)DescriptionHtml)</div>
+    @if (CanExpand)
+    {
+        <span class="catalog-read-more" @onclick="@(() => OnToggle.InvokeAsync())">@(IsExpanded ? "Show less" : "Read more")</span>
+    }
+}
+else
+{
+    <Empty Simple />
+}
+
+@code {
+    [Parameter]
+    public string DescriptionHtml { get; set; } = string.Empty;
+
+    [Parameter]
+    public bool CanExpand { get; set; }
+
+    [Parameter]
+    public bool IsExpanded { get; set; }
+
+    [Parameter]
+    public EventCallback OnToggle { get; set; }
+}

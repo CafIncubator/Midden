@@ -1,0 +1,14 @@
+@if (!string.IsNullOrWhiteSpace(Dataset?.Geometry))
+{
+    <GeoJsonMap Geometry="@Dataset.Geometry" />
+}
+else
+{
+    <Empty Simple />
+}
+<p><strong>Resolution</strong>: @Dataset?.SpatialRepeats</p>
+
+@code {
+    [Parameter]
+    public Caf.Midden.Core.Models.v0_2.Dataset? Dataset { get; set; }
+}

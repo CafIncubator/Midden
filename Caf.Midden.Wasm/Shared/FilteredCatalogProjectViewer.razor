@@ -1,61 +1,114 @@
 ﻿@inject Caf.Midden.Wasm.Services.StateContainer State
 @inject ModalService ModalService
 
-@if(ShowHeader)
+@if (ShowHeader)
 {
     <Divider Orientation="center">Projects</Divider>
 }
 
-
 @if (State.Catalog != null && ShowSearch)
 {
-    <AntDesign.Row>
-        <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(8,8)">
-            <Search Placeholder="Search projects"
-                    OnChange="SearchHandler"
-                    EnterButton="true" @bind-Value="ViewModel.SearchTerm"
-                    AllowClear="true" />
-        </AntDesign.Col>
-    </AntDesign.Row>
-    
-    <Space />
+    <div class="catalog-controls">
+        <AntDesign.Row Gutter="8" Align="middle">
+            <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(6,0)">
+                <Search Placeholder="Search projects"
+                        OnChange="SearchHandler"
+                        EnterButton="true"
+                        @bind-Value="ViewModel.SearchTerm"
+                        AllowClear="true" />
+            </AntDesign.Col>
+            <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(4,0)">
+                <SimpleSelect Id="status"
+                              @bind-Value="SelectedStatus"
+                              Placeholder="Status"
+                              AllowClear="true"
+                              OnSelectedItemChanged="OnStatusFilterChanged">
+                    <SelectOptions>
+                        @foreach (var status in StatusOptions)
+                        {
+                            <SimpleSelectOption Value="@status" Label="@status" />
+                        }
+                    </SelectOptions>
+                </SimpleSelect>
+            </AntDesign.Col>
+
+            <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(5,0)">
+                <SimpleSelect Id="sort-projects"
+                              @bind-Value="SelectedSort"
+                              Placeholder="Sort"
+                              OnSelectedItemChanged="OnSortChanged">
+                    <SelectOptions>
+                        <SimpleSelectOption Value="recent" Label="Most recent" />
+                        <SimpleSelectOption Value="name-az" Label="Name A-Z" />
+                        <SimpleSelectOption Value="datasets-desc" Label="Most datasets" />
+                        <SimpleSelectOption Value="variables-desc" Label="Most variables" />
+                    </SelectOptions>
+                </SimpleSelect>
+            </AntDesign.Col>
+
+        </AntDesign.Row>
+    </div>
 }
 
-@if (ViewModel.FilteredCatalogProjects != null)
+@if (ViewModel.FilteredCatalogProjects.Count > 0)
 {
-    <Row Gutter="16" Wrap="true">
-        @foreach (var project in ViewModel.FilteredCatalogProjects)
-        {
-            <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(12,0)" Style="padding:5px">
-             <Card Style="overflow:hidden">
-                <TitleTemplate>
-                        <Icon Type="project" Theme="outline" />
-                        <a href="catalog/projects/@project.Name">
-                        @project.Name
-                    </a>
-                    
-                </TitleTemplate>
-                <Extra>
-                    @if (!string.IsNullOrEmpty(project.ProjectStatus))
-                    {
-                        <Tag Style="background-color:white">@project.ProjectStatus</Tag>
-                    }
+    <div class="catalog-summary-bar">
+        <div><strong>@ViewModel.FilteredCatalogProjects.Count</strong> projects</div>
+        <div>Showing @GetCurrentRangeStart()-@GetCurrentRangeEnd() of @ViewModel.FilteredCatalogProjects.Count</div>
+    </div>
 
-                </Extra>
-                <Body>
-                    <Icon Type="file-text" /> @project.DatasetCount
-                    <Divider Type="DirectionVHType.Vertical" />
-                    <Icon Type="calculator" /> @project.VariableCount 
-                    @if(project.LastModified is not null)
-                    {
-                        <Divider Type="DirectionVHType.Vertical" />
-                        <Icon Type="calendar" /> @project.LastModified?.ToString("d")
-                    }
-                    <Divider />
-                        <div class="truncate">@((MarkupString)project.MarkdownDescription)</div>
+    <Row Gutter="16" Wrap="true">
+        @foreach (var project in ViewModel.PagedCatalogProjects)
+        {
+            <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(12,0)" Style="padding:5px" @key="project.Name">
+                <Card Class="catalog-card" Style="overflow:hidden">
+                    <TitleTemplate>
+                        <Icon Type="project" Theme="outline" />
+                        <a href="catalog/projects/@project.Name" class="catalog-card-title-link">@project.Name</a>
+                    </TitleTemplate>
+                    <Extra>
+                        @if (!string.IsNullOrWhiteSpace(project.ProjectStatus))
+                        {
+                            <Tag>@project.ProjectStatus</Tag>
+                        }
+                    </Extra>
+                    <Body>
+                        <div class="catalog-meta-line">
+                            <span><Icon Type="file-text" /> Datasets: @project.DatasetCount</span>
+                            <span><Icon Type="calculator" /> Vars: @project.VariableCount</span>
+                            @if (project.LastModified is not null)
+                            {
+                                <span><Icon Type="calendar" /> Updated: @project.LastModified?.ToString("d")</span>
+                            }
+                        </div>
+
+                        <Divider />
+                        @if (!string.IsNullOrWhiteSpace(project.MarkdownDescription))
+                        {
+                            <div class="@(project.IsDescriptionExpanded ? string.Empty : "truncate")">@((MarkupString)project.MarkdownDescription)</div>
+                            @if (project.CanExpandDescription)
+                            {
+                                <span class="catalog-read-more" @onclick="() => ToggleDescription(project)">@(project.IsDescriptionExpanded ? "Show less" : "Read more")</span>
+                            }
+                        }
+                        else
+                        {
+                            <Empty Simple />
+                        }
                     </Body>
-            </Card>
-        </AntDesign.Col>
+                </Card>
+            </AntDesign.Col>
         }
     </Row>
+
+    <div class="catalog-pagination-bar">
+        <Button Disabled="@(CurrentPage <= 1)" OnClick="() => MoveToPage(CurrentPage - 1)">Previous</Button>
+        <span>Page @CurrentPage of @TotalPages</span>
+        <Button Disabled="@(CurrentPage >= TotalPages)" OnClick="() => MoveToPage(CurrentPage + 1)">Next</Button>
+    </div>
+}
+else
+{
+    <Empty Simple />
+    <div class="catalog-summary-bar">No projects match the current filters.</div>
 }
