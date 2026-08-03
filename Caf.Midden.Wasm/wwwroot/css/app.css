@@ -91,3 +91,11 @@ a, .btn-link {
     background-color: #1890ff;
     margin: 3px 0;
 }
+
+tr.midden-drop-above > td {
+    box-shadow: inset 0 2px 0 #1890ff;
+}
+
+tr.midden-drop-below > td {
+    box-shadow: inset 0 -2px 0 #1890ff;
+}

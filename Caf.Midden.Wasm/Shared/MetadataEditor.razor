@@ -78,8 +78,17 @@
                     {
                         <AntDesign.Table TItem="Caf.Midden.Core.Models.v0_2.Person"
                                             DataSource="@context.Dataset.Contacts"
+                                            OnRow="@GetContactRowAttributes"
+                                            RowClassName="@GetContactRowClassName"
                                             HidePagination="@true">
                             <ChildContent Context="contact">
+                                <AntDesign.PropertyColumn Property="@(item => item.Name)" Title="" Width="4%">
+                                    <span draggable="true"
+                                          class="string-list-editor-handle"
+                                          title="Drag to reorder"
+                                          @ondragstart="@(() => OnContactDragStart(contact))"
+                                          @ondragend="@OnContactDragEnd">⋮⋮</span>
+                                </AntDesign.PropertyColumn>
                                 <AntDesign.PropertyColumn Property="@(item => item.Name)"
                                                             Width="30%" />
                                 <AntDesign.PropertyColumn Property="@(item => item.Email)"
@@ -137,16 +146,31 @@
 
                     @if (context.Dataset.Tags.Count > 0)
                     {
-                        <AntList DataSource="@context.Dataset.Tags">
-                            <ChildContent Context="tag">
-                                <ListItem>
-                                    <span><Tag>@tag</Tag></span>
+                        <div class="string-list-editor">
+                            @for (int i = 0; i < context.Dataset.Tags.Count; i++)
+                            {
+                                var index = i;
+                                var tag = context.Dataset.Tags[index];
+                                <div class="string-list-editor-drop-indicator @(IsStringDragOver(DatasetStringListKind.Tags, index) ? "string-list-editor-drop-indicator-visible" : string.Empty)"></div>
+                                <div draggable="true"
+                                     class="string-list-editor-row"
+                                     @ondragstart="@(() => OnStringDragStart(DatasetStringListKind.Tags, index))"
+                                     @ondragenter="@(() => OnStringDragEnter(DatasetStringListKind.Tags, index))"
+                                     @ondragover:preventDefault
+                                     @ondrop="@(() => OnStringDrop(DatasetStringListKind.Tags, index))"
+                                     @ondragend="@OnStringDragEnd">
+                                    <span class="string-list-editor-handle" title="Drag to reorder" aria-hidden="true">⋮⋮</span>
+                                    <div class="string-list-editor-input"><Tag>@tag</Tag></div>
                                     <Button Danger OnClick="() => DeleteDatasetTagHandler(tag)">
                                         <Icon Type="delete" />
                                     </Button>
-                                </ListItem>
-                            </ChildContent>
-                        </AntList>
+                                </div>
+                            }
+                            <div class="string-list-editor-drop-indicator @(IsStringDragOver(DatasetStringListKind.Tags, context.Dataset.Tags.Count) ? "string-list-editor-drop-indicator-visible" : string.Empty)"
+                                 @ondragenter="@(() => OnStringDragEnter(DatasetStringListKind.Tags, context.Dataset.Tags.Count))"
+                                 @ondragover:preventDefault
+                                 @ondrop="@(() => OnStringDrop(DatasetStringListKind.Tags, context.Dataset.Tags.Count))"></div>
+                        </div>
                     }
                 </EditorFormItemWithHelpPopup>
 
@@ -175,12 +199,19 @@
                     {
                         <AntDesign.Table TItem="Caf.Midden.Core.Models.v0_2.Variable"
                                             DataSource="@context.Dataset.Variables"
+                                            OnRow="@GetVariableRowAttributes"
+                                            RowClassName="@GetVariableRowClassName"
                                             Size="@TableSize.Small"
                                             ScrollX="1400"
                                             PageSize="50">
                             <ChildContent Context="variable">
-
-                                
+                                <AntDesign.PropertyColumn Property="@(item => item.Name)" Title="" Width="45px" Fixed="left">
+                                    <span draggable="true"
+                                          class="string-list-editor-handle"
+                                          title="Drag to reorder"
+                                          @ondragstart="@(() => OnVariableDragStart(variable))"
+                                          @ondragend="@OnVariableDragEnd">⋮⋮</span>
+                                </AntDesign.PropertyColumn>
                                 <AntDesign.PropertyColumn Property="@(item => item.Name)"
                                                             Fixed="left">
                                                     @if(VariableQuickEditRef == variable)
@@ -414,17 +445,31 @@
                     <br />
                     @if (context.Dataset.Methods.Count > 0)
                     {
-                        <AntList DataSource="@context.Dataset.Methods"
-                                    Size="small">
-                            <ChildContent Context="method">
-                                <ListItem>
-                                    <span><Text>@method</Text></span>
+                        <div class="string-list-editor">
+                            @for (int i = 0; i < context.Dataset.Methods.Count; i++)
+                            {
+                                var index = i;
+                                var method = context.Dataset.Methods[index];
+                                <div class="string-list-editor-drop-indicator @(IsStringDragOver(DatasetStringListKind.Methods, index) ? "string-list-editor-drop-indicator-visible" : string.Empty)"></div>
+                                <div draggable="true"
+                                     class="string-list-editor-row"
+                                     @ondragstart="@(() => OnStringDragStart(DatasetStringListKind.Methods, index))"
+                                     @ondragenter="@(() => OnStringDragEnter(DatasetStringListKind.Methods, index))"
+                                     @ondragover:preventDefault
+                                     @ondrop="@(() => OnStringDrop(DatasetStringListKind.Methods, index))"
+                                     @ondragend="@OnStringDragEnd">
+                                    <span class="string-list-editor-handle" title="Drag to reorder" aria-hidden="true">⋮⋮</span>
+                                    <div class="string-list-editor-input"><Text>@method</Text></div>
                                     <Button Danger OnClick="() => DeleteDatasetMethodHandler(method)">
                                         <Icon Type="delete" />
                                     </Button>
-                                </ListItem>
-                            </ChildContent>
-                        </AntList>
+                                </div>
+                            }
+                            <div class="string-list-editor-drop-indicator @(IsStringDragOver(DatasetStringListKind.Methods, context.Dataset.Methods.Count) ? "string-list-editor-drop-indicator-visible" : string.Empty)"
+                                 @ondragenter="@(() => OnStringDragEnter(DatasetStringListKind.Methods, context.Dataset.Methods.Count))"
+                                 @ondragover:preventDefault
+                                 @ondrop="@(() => OnStringDrop(DatasetStringListKind.Methods, context.Dataset.Methods.Count))"></div>
+                        </div>
                     }
                 </EditorFormItemWithHelpPopup>
 
@@ -443,16 +488,31 @@
                     <br />
                     @if (context.Dataset.ParentDatasets.Count > 0)
                     {
-                        <AntList DataSource="@context.Dataset.ParentDatasets">
-                            <ChildContent Context="parentDataset">
-                                <ListItem>
-                                    <span><Text>@parentDataset</Text></span>
+                        <div class="string-list-editor">
+                            @for (int i = 0; i < context.Dataset.ParentDatasets.Count; i++)
+                            {
+                                var index = i;
+                                var parentDataset = context.Dataset.ParentDatasets[index];
+                                <div class="string-list-editor-drop-indicator @(IsStringDragOver(DatasetStringListKind.ParentDatasets, index) ? "string-list-editor-drop-indicator-visible" : string.Empty)"></div>
+                                <div draggable="true"
+                                     class="string-list-editor-row"
+                                     @ondragstart="@(() => OnStringDragStart(DatasetStringListKind.ParentDatasets, index))"
+                                     @ondragenter="@(() => OnStringDragEnter(DatasetStringListKind.ParentDatasets, index))"
+                                     @ondragover:preventDefault
+                                     @ondrop="@(() => OnStringDrop(DatasetStringListKind.ParentDatasets, index))"
+                                     @ondragend="@OnStringDragEnd">
+                                    <span class="string-list-editor-handle" title="Drag to reorder" aria-hidden="true">⋮⋮</span>
+                                    <div class="string-list-editor-input"><Text>@parentDataset</Text></div>
                                     <Button Danger OnClick="() => DeleteParentDatasetHandler(parentDataset)">
                                         <Icon Type="delete" />
                                     </Button>
-                                </ListItem>
-                            </ChildContent>
-                        </AntList>
+                                </div>
+                            }
+                            <div class="string-list-editor-drop-indicator @(IsStringDragOver(DatasetStringListKind.ParentDatasets, context.Dataset.ParentDatasets.Count) ? "string-list-editor-drop-indicator-visible" : string.Empty)"
+                                 @ondragenter="@(() => OnStringDragEnter(DatasetStringListKind.ParentDatasets, context.Dataset.ParentDatasets.Count))"
+                                 @ondragover:preventDefault
+                                 @ondrop="@(() => OnStringDrop(DatasetStringListKind.ParentDatasets, context.Dataset.ParentDatasets.Count))"></div>
+                        </div>
                     }
                 </EditorFormItemWithHelpPopup>
 
@@ -470,16 +530,31 @@
                     <br />
                     @if (context.Dataset.DerivedWorks.Count > 0)
                     {
-                        <AntList DataSource="@context.Dataset.DerivedWorks">
-                            <ChildContent Context="derived">
-                                <ListItem>
-                                    <span><Text>@derived</Text></span>
+                        <div class="string-list-editor">
+                            @for (int i = 0; i < context.Dataset.DerivedWorks.Count; i++)
+                            {
+                                var index = i;
+                                var derived = context.Dataset.DerivedWorks[index];
+                                <div class="string-list-editor-drop-indicator @(IsStringDragOver(DatasetStringListKind.DerivedWorks, index) ? "string-list-editor-drop-indicator-visible" : string.Empty)"></div>
+                                <div draggable="true"
+                                     class="string-list-editor-row"
+                                     @ondragstart="@(() => OnStringDragStart(DatasetStringListKind.DerivedWorks, index))"
+                                     @ondragenter="@(() => OnStringDragEnter(DatasetStringListKind.DerivedWorks, index))"
+                                     @ondragover:preventDefault
+                                     @ondrop="@(() => OnStringDrop(DatasetStringListKind.DerivedWorks, index))"
+                                     @ondragend="@OnStringDragEnd">
+                                    <span class="string-list-editor-handle" title="Drag to reorder" aria-hidden="true">⋮⋮</span>
+                                    <div class="string-list-editor-input"><Text>@derived</Text></div>
                                     <Button Danger OnClick="() => DeleteDerivedWorkHandler(derived)">
                                         <Icon Type="delete" />
                                     </Button>
-                                </ListItem>
-                            </ChildContent>
-                        </AntList>
+                                </div>
+                            }
+                            <div class="string-list-editor-drop-indicator @(IsStringDragOver(DatasetStringListKind.DerivedWorks, context.Dataset.DerivedWorks.Count) ? "string-list-editor-drop-indicator-visible" : string.Empty)"
+                                 @ondragenter="@(() => OnStringDragEnter(DatasetStringListKind.DerivedWorks, context.Dataset.DerivedWorks.Count))"
+                                 @ondragover:preventDefault
+                                 @ondrop="@(() => OnStringDrop(DatasetStringListKind.DerivedWorks, context.Dataset.DerivedWorks.Count))"></div>
+                        </div>
                     }
                 </EditorFormItemWithHelpPopup>
 

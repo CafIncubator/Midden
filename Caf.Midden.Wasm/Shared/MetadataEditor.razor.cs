@@ -6,7 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Components.Web;
 using AntDesign;
+using AntDesign.TableModels;
 using Caf.Midden.Wasm.Shared.Modals;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -43,6 +45,16 @@ namespace Caf.Midden.Wasm.Shared
         private string DerivedWorksTooltip = @"This is used to indicate related products that use the dataset (e.g. published papers, presentations, decision support tools). Values are expected to be linked resources (URL) but a citation/reference is fine. This field is not intended for derived datasets, see the field “Parent Datasets” for that.";
 
         AntDesign.Form<Metadata> form;
+
+        private Person? _dragContactSource;
+        private int? _dragContactSourceIndex;
+        private int? _dragContactOverIndex;
+        private Variable? _dragVariableSource;
+        private int? _dragVariableSourceIndex;
+        private int? _dragVariableOverIndex;
+        private DatasetStringListKind? _dragStringListKind;
+        private int? _dragStringSourceIndex;
+        private int? _dragStringOverIndex;
 
         private async Task OnStateChanged(AppStateChangedEventArgs args)
         {
@@ -182,6 +194,85 @@ namespace Caf.Midden.Wasm.Shared
         {
             State.MetadataEdit.Dataset.Contacts.Remove(person);
         }
+
+        private void OnContactDragStart(Person contact)
+        {
+            _dragContactSource = contact;
+            _dragContactSourceIndex = State.MetadataEdit.Dataset.Contacts.IndexOf(contact);
+            _dragContactOverIndex = _dragContactSourceIndex;
+        }
+
+        private void OnContactDragEnter(Person targetContact)
+        {
+            if (_dragContactSourceIndex is null) return;
+
+            var targetIndex = State.MetadataEdit.Dataset.Contacts.IndexOf(targetContact);
+            if (targetIndex < 0 || _dragContactOverIndex == targetIndex) return;
+
+            _dragContactOverIndex = targetIndex;
+            StateHasChanged();
+        }
+
+        private Dictionary<string, object> GetContactRowAttributes(RowData<Person> row)
+        {
+            var contact = row.Data;
+
+            return new Dictionary<string, object>
+            {
+                ["ondragenter"] = EventCallback.Factory.Create<DragEventArgs>(
+                    this, () => OnContactDragEnter(contact)),
+                ["ondrop"] = EventCallback.Factory.Create<DragEventArgs>(
+                    this, () => OnContactDrop(contact))
+            };
+        }
+
+        private string GetContactRowClassName(RowData<Person> row)
+        {
+            return DropRowClassName(
+                State.MetadataEdit.Dataset.Contacts.IndexOf(row.Data),
+                _dragContactSourceIndex,
+                _dragContactOverIndex);
+        }
+
+        private void OnContactDrop(Person targetContact)
+        {
+            if (_dragContactSource == null || _dragContactSourceIndex is null)
+            {
+                ClearContactDragState();
+                return;
+            }
+
+            var contacts = State.MetadataEdit.Dataset.Contacts;
+            var sourceIndex = _dragContactSourceIndex.Value;
+            var targetIndex = contacts.IndexOf(targetContact);
+
+            if (targetIndex < 0 ||
+                sourceIndex < 0 ||
+                sourceIndex >= contacts.Count ||
+                sourceIndex == targetIndex)
+            {
+                ClearContactDragState();
+                return;
+            }
+
+            var item = _dragContactSource;
+            contacts.RemoveAt(sourceIndex);
+            contacts.Insert(targetIndex, item);
+
+            ClearContactDragState();
+        }
+
+        private void OnContactDragEnd()
+        {
+            ClearContactDragState();
+        }
+
+        private void ClearContactDragState()
+        {
+            _dragContactSource = null;
+            _dragContactSourceIndex = null;
+            _dragContactOverIndex = null;
+        }
         #endregion
 
         #region DatasetTag
@@ -310,6 +401,88 @@ namespace Caf.Midden.Wasm.Shared
         private void DeleteDerivedWorkHandler(string derived)
         {
             State.MetadataEdit.Dataset.DerivedWorks.Remove(derived);
+        }
+
+        private enum DatasetStringListKind
+        {
+            Tags,
+            Methods,
+            ParentDatasets,
+            DerivedWorks
+        }
+
+        private void OnStringDragStart(DatasetStringListKind listKind, int index)
+        {
+            _dragStringListKind = listKind;
+            _dragStringSourceIndex = index;
+            _dragStringOverIndex = index;
+        }
+
+        private void OnStringDragEnter(DatasetStringListKind listKind, int index)
+        {
+            if (_dragStringListKind != listKind || _dragStringOverIndex == index) return;
+            _dragStringOverIndex = index;
+        }
+
+        private bool IsStringDragOver(DatasetStringListKind listKind, int index)
+        {
+            return _dragStringListKind == listKind && _dragStringOverIndex == index;
+        }
+
+        private void OnStringDrop(DatasetStringListKind listKind, int index)
+        {
+            if (_dragStringListKind != listKind || _dragStringSourceIndex is null)
+            {
+                ClearStringDragState();
+                return;
+            }
+
+            var list = GetStringList(listKind);
+            var sourceIndex = _dragStringSourceIndex.Value;
+
+            if (sourceIndex < 0 || sourceIndex >= list.Count || index < 0 || index > list.Count)
+            {
+                ClearStringDragState();
+                return;
+            }
+
+            if (sourceIndex == index)
+            {
+                ClearStringDragState();
+                return;
+            }
+
+            var item = list[sourceIndex];
+            list.RemoveAt(sourceIndex);
+
+            var insertAt = sourceIndex < index ? index - 1 : index;
+            list.Insert(insertAt, item);
+
+            ClearStringDragState();
+        }
+
+        private void OnStringDragEnd()
+        {
+            ClearStringDragState();
+        }
+
+        private void ClearStringDragState()
+        {
+            _dragStringListKind = null;
+            _dragStringSourceIndex = null;
+            _dragStringOverIndex = null;
+        }
+
+        private List<string> GetStringList(DatasetStringListKind listKind)
+        {
+            return listKind switch
+            {
+                DatasetStringListKind.Tags => State.MetadataEdit.Dataset.Tags,
+                DatasetStringListKind.Methods => State.MetadataEdit.Dataset.Methods,
+                DatasetStringListKind.ParentDatasets => State.MetadataEdit.Dataset.ParentDatasets,
+                DatasetStringListKind.DerivedWorks => State.MetadataEdit.Dataset.DerivedWorks,
+                _ => throw new ArgumentOutOfRangeException(nameof(listKind), listKind, null)
+            };
         }
         #endregion
 
@@ -476,6 +649,100 @@ namespace Caf.Midden.Wasm.Shared
         private void DeleteVariableHandler(Variable variable)
         {
             State.MetadataEdit.Dataset.Variables.Remove(variable);
+        }
+
+        private void OnVariableDragStart(Variable variable)
+        {
+            _dragVariableSource = variable;
+            _dragVariableSourceIndex = State.MetadataEdit.Dataset.Variables.IndexOf(variable);
+            _dragVariableOverIndex = _dragVariableSourceIndex;
+        }
+
+        private void OnVariableDragEnter(Variable targetVariable)
+        {
+            if (_dragVariableSourceIndex is null) return;
+
+            var targetIndex = State.MetadataEdit.Dataset.Variables.IndexOf(targetVariable);
+            if (targetIndex < 0 || _dragVariableOverIndex == targetIndex) return;
+
+            _dragVariableOverIndex = targetIndex;
+            StateHasChanged();
+        }
+
+        private Dictionary<string, object> GetVariableRowAttributes(RowData<Variable> row)
+        {
+            var variable = row.Data;
+
+            return new Dictionary<string, object>
+            {
+                ["ondragenter"] = EventCallback.Factory.Create<DragEventArgs>(
+                    this, () => OnVariableDragEnter(variable)),
+                ["ondrop"] = EventCallback.Factory.Create<DragEventArgs>(
+                    this, () => OnVariableDrop(variable))
+            };
+        }
+
+        private string GetVariableRowClassName(RowData<Variable> row)
+        {
+            return DropRowClassName(
+                State.MetadataEdit.Dataset.Variables.IndexOf(row.Data),
+                _dragVariableSourceIndex,
+                _dragVariableOverIndex);
+        }
+
+        private void OnVariableDrop(Variable targetVariable)
+        {
+            if (_dragVariableSource == null || _dragVariableSourceIndex is null)
+            {
+                ClearVariableDragState();
+                return;
+            }
+
+            var variables = State.MetadataEdit.Dataset.Variables;
+            var sourceIndex = _dragVariableSourceIndex.Value;
+            var targetIndex = variables.IndexOf(targetVariable);
+
+            if (targetIndex < 0 ||
+                sourceIndex < 0 ||
+                sourceIndex >= variables.Count ||
+                sourceIndex == targetIndex)
+            {
+                ClearVariableDragState();
+                return;
+            }
+
+            var item = _dragVariableSource;
+            variables.RemoveAt(sourceIndex);
+            variables.Insert(targetIndex, item);
+
+            ClearVariableDragState();
+        }
+
+        private void OnVariableDragEnd()
+        {
+            ClearVariableDragState();
+        }
+
+        private void ClearVariableDragState()
+        {
+            _dragVariableSource = null;
+            _dragVariableSourceIndex = null;
+            _dragVariableOverIndex = null;
+        }
+
+        private static string DropRowClassName(int rowIndex, int? sourceIndex, int? overIndex)
+        {
+            const string droppable = "midden-droppable-row";
+
+            if (rowIndex < 0 || sourceIndex is null || overIndex is null)
+                return droppable;
+
+            if (rowIndex != overIndex.Value || overIndex.Value == sourceIndex.Value)
+                return droppable;
+
+            return sourceIndex.Value > overIndex.Value
+                ? $"{droppable} midden-drop-above"
+                : $"{droppable} midden-drop-below";
         }
         #endregion
 
