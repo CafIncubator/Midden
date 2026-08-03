@@ -753,6 +753,17 @@ namespace Caf.Midden.Wasm.Shared
             State.MetadataEdit.Dataset.Geometry = value;
         }
 
+        // Drawing/editing on the map no longer matches the selected saved geometry
+        private void OnMapGeometryChanged(Dataset dataset, string value)
+        {
+            dataset.Geometry = value;
+
+            if (!string.Equals(GeometryTemplate, value, StringComparison.Ordinal))
+            {
+                GeometryTemplate = null;
+            }
+        }
+
         public void Dispose()
         {
             //this.EditContext.OnFieldChanged -=

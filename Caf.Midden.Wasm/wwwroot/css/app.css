@@ -79,6 +79,38 @@ a, .btn-link {
     min-width: 0;
 }
 
+/* Rows that host a map grow to fit it, and only the handle initiates a drag */
+.string-list-editor-row-map {
+    align-items: flex-start;
+    cursor: default;
+    margin-bottom: 12px;
+}
+
+    .string-list-editor-row-map:active {
+        cursor: default;
+    }
+
+    .string-list-editor-row-map .string-list-editor-handle {
+        cursor: grab;
+        margin-top: 6px;
+    }
+
+        .string-list-editor-row-map .string-list-editor-handle:active {
+            cursor: grabbing;
+        }
+
+.geojson-editor-map .geojson-editor-map-warning {
+    margin-top: 8px;
+}
+
+/* Raw GeoJSON toolbar button */
+.geojson-raw-control a {
+    font-weight: bold;
+    font-size: 14px;
+    line-height: 26px;
+    text-align: center;
+}
+
 .string-list-editor-drop-indicator {
     height: 8px;
     margin: -4px 0;

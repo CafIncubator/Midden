@@ -378,8 +378,8 @@
                         </SimpleSelect>
                     </FormItem>
                     <FormItem>
-                        <AntDesign.TextArea @bind-Value="context.Dataset.Geometry"
-                                            Placeholder="Valid geojson" />
+                        <GeoJsonEditorMap Value="@context.Dataset.Geometry"
+                                          ValueChanged="@((string v) => OnMapGeometryChanged(context.Dataset, v))" />
                     </FormItem>
                 </EditorFormItemWithHelpPopup>
 

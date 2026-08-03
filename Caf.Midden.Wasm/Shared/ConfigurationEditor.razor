@@ -76,23 +76,23 @@
                 var geometryIndex = i;
                 var geometry = context.Geometries[geometryIndex];
                 <div class="string-list-editor-drop-indicator @(_dragOverGeometryIndex == geometryIndex ? "string-list-editor-drop-indicator-visible" : string.Empty)"></div>
-                <div draggable="true"
-                     class="string-list-editor-row"
-                     @ondragstart="@(() => OnGeometryDragStart(geometryIndex))"
+                <div class="string-list-editor-row string-list-editor-row-map"
                      @ondragenter="@(() => OnGeometryDragEnter(geometryIndex))"
                      @ondragover:preventDefault
                      @ondragover="@(() => { })"
                      @ondrop="@(() => OnGeometryDrop(geometryIndex))"
                      @ondragend="@OnGeometryDragEnd">
-                    <span class="string-list-editor-handle" title="Drag to reorder" aria-hidden="true">⋮⋮</span>
+                    <span class="string-list-editor-handle" title="Drag to reorder" aria-hidden="true"
+                          draggable="true"
+                          @ondragstart="@(() => OnGeometryDragStart(geometryIndex))">⋮⋮</span>
                     <div style="flex: 0 0 20%;">
                         <AntDesign.Input @bind-Value="geometry.Name"
                                           Placeholder="Name" />
                     </div>
                     <div class="string-list-editor-input">
-                        <AntDesign.TextArea @bind-Value="geometry.GeoJson"
-                                             Placeholder="GeoJSON"
-                                             Rows="1" />
+                        <GeoJsonEditorMap Height="180px"
+                                          Value="@geometry.GeoJson"
+                                          ValueChanged="@((string v) => geometry.GeoJson = v)" />
                     </div>
                     <Button Danger
                             Icon="delete"
