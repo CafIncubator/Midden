@@ -242,6 +242,30 @@
     text-decoration: underline;
 }
 
+.catalog-empty-value {
+    color: rgba(0, 0, 0, 0.35);
+}
+
+.catalog-name-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.catalog-name-view-btn {
+    flex: 0 0 auto;
+    padding: 0 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.catalog-name-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .magnifying-button {
     background-color: #e6f4ff;
     color: #0050b3;

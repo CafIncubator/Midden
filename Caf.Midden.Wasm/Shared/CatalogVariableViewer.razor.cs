@@ -1,4 +1,4 @@
-﻿using AntDesign;
+using AntDesign;
 using Caf.Midden.Core.Models.v0_2;
 using Caf.Midden.Wasm.Shared.Modals;
 using Caf.Midden.Wasm.Shared.ViewModels;
@@ -7,13 +7,40 @@ using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Caf.Midden.Wasm.Shared
 {
     public partial class CatalogVariableViewer : IDisposable
     {
+        private const int DefaultPageSize = 20;
+        private const int DescriptionPreviewCharacterThreshold = 240;
+        private const int DescriptionPreviewLineThreshold = 3;
+        private const int MethodsPreviewCharacterThreshold = 240;
+        private const int MethodsPreviewLineThreshold = 3;
+
         private IDisposable? _stateSubscription;
+        private CancellationTokenSource? _filterDebounceCts;
+
+        private Dictionary<(string Zone, string Project, string Dataset), Metadata> _metadataIndex = new();
+
+        public static readonly IReadOnlyList<(string Key, string Label)> ToggleableColumns = new List<(string, string)>
+        {
+            ("Description", "Description"),
+            ("Units", "Units"),
+            ("Methods", "Methods"),
+            ("QualityControl", "Quality Control"),
+            ("Processing", "Processing"),
+            ("Type", "Type"),
+            ("Tags", "Tags"),
+            ("Zone", "Zone"),
+            ("Project", "Project"),
+            ("Dataset", "Dataset")
+        };
+
+        public Dictionary<string, bool> ColumnVisibility { get; set; } =
+            ToggleableColumns.ToDictionary(c => c.Key, _ => true);
 
         [Parameter]
         public string Project { get; set; }
@@ -22,11 +49,31 @@ namespace Caf.Midden.Wasm.Shared
         public string TagName { get; set; }
 
         CatalogVariableViewerViewModel ViewModel { get; set; } = new CatalogVariableViewerViewModel();
-        public TableFilter<string>[] FilterProcessing;
-        public TableFilter<string>[] FilterVariableType;
-        public TableFilter<string>[] FilterZone;
+
+        public List<string> ZoneOptions { get; set; } = new();
+        public List<string> ProjectOptions { get; set; } = new();
+        public List<string> ProcessingOptions { get; set; } = new();
+        public List<string> VariableTypeOptions { get; set; } = new();
+
+        public string SelectedZone { get; set; } = string.Empty;
+        public string SelectedProject { get; set; } = string.Empty;
+        public string SelectedProcessing { get; set; } = string.Empty;
+        public string SelectedVariableType { get; set; } = string.Empty;
+        public string SelectedSort { get; set; } = VariableSortOptions.NameAz;
+
+        public int CurrentPage { get; set; } = 1;
+        public int PageSize { get; set; } = DefaultPageSize;
+        public int TotalPages => Math.Max(1, (int)Math.Ceiling((double)ViewModel.FilteredCatalogVariables.Count / PageSize));
 
         EmbeddedProperty Property(int span, int offset) => new() { Span = span, Offset = offset };
+
+        private static class VariableSortOptions
+        {
+            public const string NameAz = "name-az";
+            public const string DatasetAz = "dataset-az";
+            public const string ProjectAz = "project-az";
+            public const string ZoneAz = "zone-az";
+        }
 
         protected override void OnInitialized()
         {
@@ -38,9 +85,6 @@ namespace Caf.Midden.Wasm.Shared
 
             if (State?.Catalog != null)
                 SetCatalogVariables(State?.Catalog?.Metadatas);
-
-            if (State?.AppConfig != null)
-                SetFilters(State?.AppConfig);
         }
 
         private async Task OnStateChanged(AppStateChangedEventArgs args)
@@ -50,35 +94,7 @@ namespace Caf.Midden.Wasm.Shared
                 SetCatalogVariables(State?.Catalog?.Metadatas);
             }
 
-            SetFilters(State?.AppConfig);
             await InvokeAsync(StateHasChanged);
-        }
-
-        private void SetFilters(Configuration appConfig)
-        {
-            if (appConfig == null)
-                return;
-
-            List<TableFilter<string>> processings = new List<TableFilter<string>>();
-            foreach(var processing in appConfig.ProcessingLevels)
-            {
-                processings.Add(new TableFilter<string> { Text = processing, Value = processing });
-            }
-            this.FilterProcessing = processings.ToArray();
-
-            List<TableFilter<string>> variableTypes = new List<TableFilter<string>>();
-            foreach (var variableType in appConfig.VariableTypes)
-            {
-                variableTypes.Add(new TableFilter<string> { Text = variableType, Value = variableType });
-            }
-            this.FilterVariableType = variableTypes.ToArray();
-
-            List<TableFilter<string>> zones = new List<TableFilter<string>>();
-            foreach(var zone in appConfig.Zones)
-            {
-                zones.Add(new TableFilter<string> { Text = zone, Value = zone });
-            }
-            this.FilterZone = zones.ToArray();
         }
 
         private void SetCatalogVariables(List<Metadata> metadatas)
@@ -87,91 +103,254 @@ namespace Caf.Midden.Wasm.Shared
                 return;
 
             List<CatalogVariable> catalogVariables = new List<CatalogVariable>();
+            _metadataIndex = new Dictionary<(string, string, string), Metadata>();
 
-            foreach(var metadata in metadatas)
+            foreach (var metadata in metadatas)
             {
-                if ((metadata.Dataset != null) && 
-                    (metadata.Dataset.Variables != null) && 
-                    (string.IsNullOrEmpty(this.Project) || 
-                        metadata.Dataset.Project.ToLower().Trim() == this.Project.ToLower().Trim()))
+                if ((metadata.Dataset != null) &&
+                    (metadata.Dataset.Variables != null) &&
+                    (string.IsNullOrEmpty(this.Project) ||
+                        string.Equals(metadata.Dataset.Project?.Trim(), this.Project?.Trim(), StringComparison.OrdinalIgnoreCase)))
                 {
+                    _metadataIndex[(metadata.Dataset.Zone, metadata.Dataset.Project, metadata.Dataset.Name)] = metadata;
+
                     foreach (var variable in metadata.Dataset.Variables)
                     {
-                        if (string.IsNullOrEmpty(this.TagName))
-                        {
-                            catalogVariables.Add(new CatalogVariable()
-                            {
-                                Name = variable.Name,
-                                Description = variable.Description,
-                                Units = variable.Units,
-                                Tags = new List<string>(variable.Tags),
-                                Methods = new List<string>(variable.Methods),
-                                TemporalResolution = variable.TemporalResolution,
-                                TemporalExtent = variable.TemporalExtent,
-                                QCApplied = variable.QCApplied,
-                                ProcessingLevel = variable.ProcessingLevel,
-                                VariableType = variable.VariableType,
-                                Zone = metadata.Dataset.Zone,
-                                ProjectName = metadata.Dataset.Project,
-                                DatasetName = metadata.Dataset.Name
-                            });
-                        }
-                        else if (!string.IsNullOrEmpty(this.TagName) && variable.Tags.Contains(this.TagName))
-                        {
-                            catalogVariables.Add(new CatalogVariable()
-                            {
-                                Name = variable.Name,
-                                Description = variable.Description,
-                                Units = variable.Units,
-                                Tags = new List<string>(variable.Tags),
-                                Methods = new List<string>(variable.Methods),
-                                TemporalResolution = variable.TemporalResolution,
-                                TemporalExtent = variable.TemporalExtent,
-                                QCApplied = variable.QCApplied,
-                                ProcessingLevel = variable.ProcessingLevel,
-                                VariableType = variable.VariableType,
-                                Zone = metadata.Dataset.Zone,
-                                ProjectName = metadata.Dataset.Project,
-                                DatasetName = metadata.Dataset.Name
-                            });
-                        }
+                        bool matchesTag = string.IsNullOrEmpty(this.TagName) ||
+                            (variable.Tags != null && variable.Tags.Contains(this.TagName));
+
+                        if (!matchesTag)
+                            continue;
+
+                        catalogVariables.Add(BuildCatalogVariable(variable, metadata));
                     }
                 }
             }
 
-            ViewModel.CatalogVariables = new List<CatalogVariable>(catalogVariables);
-            ViewModel.FilteredCatalogVariables = ViewModel.CatalogVariables;
+            ViewModel.CatalogVariables = catalogVariables;
+
+            ZoneOptions = BuildDistinctOptions(catalogVariables.Select(c => c.Zone));
+            ProjectOptions = BuildDistinctOptions(catalogVariables.Select(c => c.ProjectName));
+            ProcessingOptions = BuildDistinctOptions(catalogVariables.Select(c => c.ProcessingLevel));
+            VariableTypeOptions = BuildDistinctOptions(catalogVariables.Select(c => c.VariableType));
+
+            ApplyFilters(resetPage: true);
         }
 
-        private void SearchHandler()
+        private static List<string> BuildDistinctOptions(IEnumerable<string> values)
+            => values
+                .Where(value => !string.IsNullOrWhiteSpace(value))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(value => value, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+        private static CatalogVariable BuildCatalogVariable(Variable variable, Metadata metadata)
         {
-            if (string.IsNullOrWhiteSpace(ViewModel.SearchTerm))
+            string description = variable.Description ?? string.Empty;
+
+            var catalogVariable = new CatalogVariable()
             {
-                ViewModel.FilteredCatalogVariables = ViewModel.CatalogVariables;
+                Name = variable.Name,
+                Description = description,
+                Units = variable.Units,
+                Tags = new List<string>(variable.Tags ?? new List<string>()),
+                Methods = new List<string>(variable.Methods ?? new List<string>()),
+                TemporalResolution = variable.TemporalResolution,
+                TemporalExtent = variable.TemporalExtent,
+                QCApplied = variable.QCApplied,
+                ProcessingLevel = variable.ProcessingLevel,
+                VariableType = variable.VariableType,
+                Zone = metadata.Dataset.Zone,
+                ProjectName = metadata.Dataset.Project,
+                DatasetName = metadata.Dataset.Name,
+                CanExpandDescription = ShouldAllowDescriptionExpand(description),
+                CanExpandMethods = ShouldAllowMethodsExpand(variable.Methods)
+            };
+
+            catalogVariable.SearchText = BuildSearchText(catalogVariable);
+
+            return catalogVariable;
+        }
+
+        private static string BuildSearchText(CatalogVariable variable)
+        {
+            return string.Join(
+                " ",
+                new[]
+                {
+                    variable.Name,
+                    variable.Description,
+                    variable.Units,
+                    variable.DatasetName,
+                    variable.ProjectName,
+                    variable.Zone
+                }
+                .Concat(variable.Tags ?? new List<string>())
+                .Where(value => !string.IsNullOrWhiteSpace(value)));
+        }
+
+        private static bool ShouldAllowDescriptionExpand(string description)
+        {
+            string content = description ?? string.Empty;
+            int lineCount = content.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None).Length;
+
+            return content.Length > DescriptionPreviewCharacterThreshold || lineCount > DescriptionPreviewLineThreshold;
+        }
+
+        private static bool ShouldAllowMethodsExpand(List<string> methods)
+        {
+            if (methods == null || methods.Count == 0)
+                return false;
+
+            string content = string.Join("\n", methods);
+
+            return content.Length > MethodsPreviewCharacterThreshold || methods.Count > MethodsPreviewLineThreshold;
+        }
+
+        private async Task QueueFilterApplyAsync(bool resetPage = true)
+        {
+            _filterDebounceCts?.Cancel();
+            _filterDebounceCts?.Dispose();
+            _filterDebounceCts = new CancellationTokenSource();
+
+            try
+            {
+                await Task.Delay(250, _filterDebounceCts.Token);
+                ApplyFilters(resetPage);
+                await InvokeAsync(StateHasChanged);
             }
-            else
+            catch (TaskCanceledException)
             {
-                ViewModel.FilteredCatalogVariables = ViewModel.CatalogVariables
-                    .Where(c =>
-                        (c.DatasetName != null && c.DatasetName.ToLower().Contains(ViewModel.SearchTerm.ToLower())) ||
-                        (c.Name != null && c.Name.ToLower().Contains(ViewModel.SearchTerm.ToLower())) ||
-                        (c.Description != null && c.Description.ToLower().Contains(ViewModel.SearchTerm.ToLower())) ||
-                        (c.Units != null && c.Units.ToLower().Contains(ViewModel.SearchTerm.ToLower())) ||
-                        (c.Tags != null && c.Tags.Any(t => t != null && t.ToLower().Contains(ViewModel.SearchTerm.ToLower()))))
-                    .ToList();
             }
         }
+
+        private void ApplyFilters(bool resetPage)
+        {
+            IEnumerable<CatalogVariable> query = ViewModel.CatalogVariables;
+
+            if (!string.IsNullOrWhiteSpace(ViewModel.SearchTerm))
+            {
+                string term = ViewModel.SearchTerm.Trim();
+                query = query.Where(c => c.SearchText.Contains(term, StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (!string.IsNullOrWhiteSpace(SelectedZone))
+            {
+                query = query.Where(c => string.Equals(c.Zone, SelectedZone, StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (!string.IsNullOrWhiteSpace(SelectedProject))
+            {
+                query = query.Where(c => string.Equals(c.ProjectName, SelectedProject, StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (!string.IsNullOrWhiteSpace(SelectedProcessing))
+            {
+                query = query.Where(c => string.Equals(c.ProcessingLevel, SelectedProcessing, StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (!string.IsNullOrWhiteSpace(SelectedVariableType))
+            {
+                query = query.Where(c => string.Equals(c.VariableType, SelectedVariableType, StringComparison.OrdinalIgnoreCase));
+            }
+
+            query = SelectedSort switch
+            {
+                VariableSortOptions.DatasetAz => query.OrderBy(c => c.DatasetName, StringComparer.OrdinalIgnoreCase),
+                VariableSortOptions.ProjectAz => query.OrderBy(c => c.ProjectName, StringComparer.OrdinalIgnoreCase),
+                VariableSortOptions.ZoneAz => query.OrderBy(c => c.Zone, StringComparer.OrdinalIgnoreCase),
+                _ => query.OrderBy(c => c.Name, StringComparer.OrdinalIgnoreCase)
+            };
+
+            ViewModel.FilteredCatalogVariables = query.ToList();
+
+            if (resetPage)
+            {
+                CurrentPage = 1;
+            }
+
+            UpdatePagedVariables();
+        }
+
+        private void UpdatePagedVariables()
+        {
+            if (CurrentPage > TotalPages)
+            {
+                CurrentPage = TotalPages;
+            }
+
+            if (CurrentPage < 1)
+            {
+                CurrentPage = 1;
+            }
+
+            ViewModel.PagedCatalogVariables = ViewModel.FilteredCatalogVariables
+                .Skip((CurrentPage - 1) * PageSize)
+                .Take(PageSize)
+                .ToList();
+        }
+
+        private Task SearchHandler() => QueueFilterApplyAsync();
+
+        private Task OnZoneFilterChanged() => QueueFilterApplyAsync();
+
+        private Task OnProjectFilterChanged() => QueueFilterApplyAsync();
+
+        private Task OnProcessingFilterChanged() => QueueFilterApplyAsync();
+
+        private Task OnVariableTypeFilterChanged() => QueueFilterApplyAsync();
+
+        private Task OnSortChanged() => QueueFilterApplyAsync(resetPage: false);
+
+        private void ToggleDescription(CatalogVariable variable)
+        {
+            variable.IsDescriptionExpanded = !variable.IsDescriptionExpanded;
+        }
+
+        private void ToggleMethods(CatalogVariable variable)
+        {
+            variable.IsMethodsExpanded = !variable.IsMethodsExpanded;
+        }
+
+        private void SetColumnVisible(string key, bool visible)
+        {
+            ColumnVisibility[key] = visible;
+        }
+
+        private Task MoveToPage(int nextPage)
+        {
+            if (nextPage < 1 || nextPage > TotalPages)
+            {
+                return Task.CompletedTask;
+            }
+
+            CurrentPage = nextPage;
+            UpdatePagedVariables();
+            return InvokeAsync(StateHasChanged);
+        }
+
+        private int GetCurrentRangeStart()
+        {
+            if (ViewModel.FilteredCatalogVariables.Count == 0)
+            {
+                return 0;
+            }
+
+            return ((CurrentPage - 1) * PageSize) + 1;
+        }
+
+        private int GetCurrentRangeEnd()
+            => Math.Min(CurrentPage * PageSize, ViewModel.FilteredCatalogVariables.Count);
 
         private ModalRef metadataDetailsModalRef;
         private async Task OpenMetadataDetailsModalTemplate(CatalogVariable catalogVariable)
         {
-            var metadata = State.Catalog.Metadatas.FirstOrDefault(m =>
-                (m.Dataset.Zone == catalogVariable.Zone) &&
-                (m.Dataset.Project == catalogVariable.ProjectName) &&
-                (m.Dataset.Name == catalogVariable.DatasetName));
-
-            if (metadata == null)
+            if (!_metadataIndex.TryGetValue(
+                (catalogVariable.Zone, catalogVariable.ProjectName, catalogVariable.DatasetName),
+                out var metadata))
+            {
                 return;
+            }
 
             var templateOptions = new ViewModels.MetadataDetailsViewModel
             {
@@ -206,6 +385,8 @@ namespace Caf.Midden.Wasm.Shared
 
         public void Dispose()
         {
+            _filterDebounceCts?.Cancel();
+            _filterDebounceCts?.Dispose();
             _stateSubscription?.Dispose();
         }
 
