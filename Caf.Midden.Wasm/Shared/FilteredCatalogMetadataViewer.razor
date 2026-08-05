@@ -17,7 +17,7 @@
                         @bind-Value="SearchTerm"
                         AllowClear="true" />
             </AntDesign.Col>
-            <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(4,0)">
+            <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(3,0)">
                 <SimpleSelect Id="zone"
                               @bind-Value="SelectedZone"
                               Placeholder="Zone"
@@ -31,7 +31,7 @@
                     </SelectOptions>
                 </SimpleSelect>
             </AntDesign.Col>
-            <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(5,0)">
+            <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(4,0)">
                 <SimpleSelect Id="project"
                               @bind-Value="SelectedProject"
                               Placeholder="Project"
@@ -45,18 +45,101 @@
                     </SelectOptions>
                 </SimpleSelect>
             </AntDesign.Col>
-            <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(4,0)">
-                <SimpleSelect Id="sort"
-                              @bind-Value="SelectedSort"
-                              Placeholder="Sort"
-                              OnSelectedItemChanged="OnSortChange">
+            <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(6,0)">
+                <Select Mode="multiple"
+                        Class="catalog-tag-select"
+                        Placeholder="Tag"
+                        Values="@SelectedTags"
+                        ValuesChanged="OnTagFilterChange"
+                        MaxTagCount="2"
+                        TItemValue="string"
+                        TItem="string">
                     <SelectOptions>
-                        <SimpleSelectOption Value="recent" Label="Most recent" />
-                        <SimpleSelectOption Value="oldest" Label="Oldest" />
-                        <SimpleSelectOption Value="name-az" Label="Name A-Z" />
-                        <SimpleSelectOption Value="vars-desc" Label="Most variables" />
+                        @foreach (var tag in TagOptions)
+                        {
+                            <SelectOption TItemValue="string" TItem="string" Value="@tag" Label="@tag" />
+                        }
                     </SelectOptions>
-                </SimpleSelect>
+                </Select>
+            </AntDesign.Col>
+            <AntDesign.Col Xs="@Property(12,0)" Lg="@Property(3,0)">
+                <div class="catalog-filter-sort-actions">
+                    <Popover Trigger="@(new Trigger[]{ Trigger.Click })" Placement="Placement.BottomLeft">
+                        <ChildContent>
+                            <Button>
+                                <Icon Type="tags" Theme="outline" /> @(SelectedTags.Count > 0 ? $"({SelectedTags.Count}) " : string.Empty)@TagMatchModeLabel
+                            </Button>
+                        </ChildContent>
+                        <ContentTemplate>
+                            <div style="width:260px;">
+                                <Search Placeholder="Search tags"
+                                        @bind-Value="TagBrowseSearchTerm"
+                                        OnChange="OnTagBrowseSearchChanged"
+                                        AllowClear="true" />
+                                <div style="display:flex; gap:4px; margin:8px 0; align-items:center;">
+                                    <span class="catalog-empty-value">Match</span>
+                                    <Button Size="@AntDesign.ButtonSize.Small"
+                                            Type="@(TagMatchAll ? AntDesign.ButtonType.Default : AntDesign.ButtonType.Primary)"
+                                            OnClick="@(() => SetTagMatchMode(false))">Any</Button>
+                                    <Button Size="@AntDesign.ButtonSize.Small"
+                                            Type="@(TagMatchAll ? AntDesign.ButtonType.Primary : AntDesign.ButtonType.Default)"
+                                            OnClick="@(() => SetTagMatchMode(true))">All</Button>
+                                </div>
+                                <div style="display:flex; gap:4px; margin:8px 0;">
+                                    <Button Size="@AntDesign.ButtonSize.Small"
+                                            Type="@(TagBrowseSortByPopularity ? AntDesign.ButtonType.Default : AntDesign.ButtonType.Primary)"
+                                            OnClick="@(() => SetTagBrowseSort(false))">A-Z</Button>
+                                    <Button Size="@AntDesign.ButtonSize.Small"
+                                            Type="@(TagBrowseSortByPopularity ? AntDesign.ButtonType.Primary : AntDesign.ButtonType.Default)"
+                                            OnClick="@(() => SetTagBrowseSort(true))">Most used</Button>
+                                </div>
+                                <div style="max-height:280px; overflow-y:auto;">
+                                    @{ var tagBrowseList = GetTagBrowseList(); }
+                                    @if (tagBrowseList.Count == 0)
+                                    {
+                                        <Empty Simple />
+                                    }
+                                    else
+                                    {
+                                        @foreach (var item in tagBrowseList)
+                                        {
+                                            <div style="padding:2px 0;" @key="item.Tag">
+                                                <Checkbox Checked="@SelectedTags.Contains(item.Tag)"
+                                                          CheckedChanged="@((bool v) => ToggleTagSelection(item.Tag, v))">
+                                                    @item.Tag <span class="catalog-empty-value">(@item.Count)</span>
+                                                </Checkbox>
+                                            </div>
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        </ContentTemplate>
+                    </Popover>
+                    <Divider Type="DirectionVHType.Vertical" />
+                    <Popover Trigger="@(new Trigger[]{ Trigger.Click })" Placement="Placement.BottomRight">
+                        <ChildContent>
+                            <Button>
+                                <Icon Type="sort-ascending" Theme="outline" />
+                            </Button>
+                        </ChildContent>
+                        <ContentTemplate>
+                            <div style="display:flex; flex-direction:column; gap:4px; min-width:160px;">
+                                <Button Size="@AntDesign.ButtonSize.Small"
+                                        Type="@(SelectedSort == DatasetSortOptions.Recent ? AntDesign.ButtonType.Primary : AntDesign.ButtonType.Default)"
+                                        OnClick="@(() => SetSort(DatasetSortOptions.Recent))">Most recent</Button>
+                                <Button Size="@AntDesign.ButtonSize.Small"
+                                        Type="@(SelectedSort == DatasetSortOptions.Oldest ? AntDesign.ButtonType.Primary : AntDesign.ButtonType.Default)"
+                                        OnClick="@(() => SetSort(DatasetSortOptions.Oldest))">Oldest</Button>
+                                <Button Size="@AntDesign.ButtonSize.Small"
+                                        Type="@(SelectedSort == DatasetSortOptions.NameAz ? AntDesign.ButtonType.Primary : AntDesign.ButtonType.Default)"
+                                        OnClick="@(() => SetSort(DatasetSortOptions.NameAz))">Name A-Z</Button>
+                                <Button Size="@AntDesign.ButtonSize.Small"
+                                        Type="@(SelectedSort == DatasetSortOptions.VariableCount ? AntDesign.ButtonType.Primary : AntDesign.ButtonType.Default)"
+                                        OnClick="@(() => SetSort(DatasetSortOptions.VariableCount))">Most variables</Button>
+                            </div>
+                        </ContentTemplate>
+                    </Popover>
+                </div>
             </AntDesign.Col>
 
         </AntDesign.Row>

@@ -53,10 +53,18 @@ namespace Caf.Midden.Wasm.Shared
 
         public List<string> ZoneOptions { get; set; } = new();
         public List<string> ProjectOptions { get; set; } = new();
+        public List<string> TagOptions { get; set; } = new();
+        public Dictionary<string, int> TagCounts { get; set; } = new();
+
+        public string TagBrowseSearchTerm { get; set; } = string.Empty;
+        public bool TagBrowseSortByPopularity { get; set; }
+        public bool TagMatchAll { get; set; }
+        public string TagMatchModeLabel => TagMatchAll ? "All" : "Any";
 
         public string SearchTerm { get; set; } = string.Empty;
         public string SelectedZone { get; set; } = string.Empty;
         public string SelectedProject { get; set; } = string.Empty;
+        public List<string> SelectedTags { get; set; } = new();
         public string SelectedSort { get; set; } = DatasetSortOptions.Recent;
 
         public int CurrentPage { get; set; } = 1;
@@ -78,6 +86,8 @@ namespace Caf.Midden.Wasm.Shared
                 OnStateChanged,
                 AppStateChange.Catalog,
                 AppStateChange.AppConfig);
+
+            SelectedTags = string.IsNullOrWhiteSpace(Tag) ? new List<string>() : new List<string> { Tag };
 
             if (State?.Catalog != null)
             {
@@ -104,8 +114,7 @@ namespace Caf.Midden.Wasm.Shared
             List<Metadata> routeFilteredMetadatas = State.Catalog.Metadatas
                 .Where(metadata =>
                     (string.IsNullOrWhiteSpace(Zone) || string.Equals(metadata.Dataset.Zone, Zone, StringComparison.OrdinalIgnoreCase)) &&
-                    (string.IsNullOrWhiteSpace(Project) || string.Equals(metadata.Dataset.Project, Project, StringComparison.OrdinalIgnoreCase)) &&
-                    (string.IsNullOrWhiteSpace(Tag) || metadata.Dataset.Tags.Any(t => string.Equals(t, Tag, StringComparison.OrdinalIgnoreCase))))
+                    (string.IsNullOrWhiteSpace(Project) || string.Equals(metadata.Dataset.Project, Project, StringComparison.OrdinalIgnoreCase)))
                 .ToList();
 
             if (routeFilteredMetadatas.Count > 0 && ShowRecentNumber > 0)
@@ -139,6 +148,19 @@ namespace Caf.Midden.Wasm.Shared
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .OrderBy(project => project, StringComparer.OrdinalIgnoreCase)
                 .ToList();
+
+            TagOptions = BaseMetadataCards
+                .SelectMany(item => item.Metadata.Dataset.Tags ?? new List<string>())
+                .Where(tag => !string.IsNullOrWhiteSpace(tag))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(tag => tag, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            TagCounts = BaseMetadataCards
+                .SelectMany(item => item.Metadata.Dataset.Tags ?? new List<string>())
+                .Where(tag => !string.IsNullOrWhiteSpace(tag))
+                .GroupBy(tag => tag, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(g => g.Key, g => g.Count(), StringComparer.OrdinalIgnoreCase);
 
             ApplyFilters(resetPage: true);
         }
@@ -198,6 +220,13 @@ namespace Caf.Midden.Wasm.Shared
                 query = query.Where(item => string.Equals(item.Metadata.Dataset.Project, SelectedProject, StringComparison.OrdinalIgnoreCase));
             }
 
+            if (SelectedTags.Count > 0)
+            {
+                query = TagMatchAll
+                    ? query.Where(item => SelectedTags.All(selectedTag => item.Metadata.Dataset.Tags.Any(tag => string.Equals(tag, selectedTag, StringComparison.OrdinalIgnoreCase))))
+                    : query.Where(item => item.Metadata.Dataset.Tags.Any(tag => SelectedTags.Contains(tag, StringComparer.OrdinalIgnoreCase)));
+            }
+
             query = SelectedSort switch
             {
                 DatasetSortOptions.Oldest => query.OrderBy(item => GetSortDate(item.Metadata)),
@@ -240,7 +269,65 @@ namespace Caf.Midden.Wasm.Shared
 
         private Task OnProjectFilterChange() => QueueFilterApplyAsync();
 
-        private Task OnSortChange() => QueueFilterApplyAsync(resetPage: false);
+        private Task OnTagFilterChange(IEnumerable<string> values)
+        {
+            SelectedTags = values?.ToList() ?? new List<string>();
+            return QueueFilterApplyAsync();
+        }
+
+        private Task OnTagBrowseSearchChanged() => Task.CompletedTask;
+
+        private Task SetTagMatchMode(bool matchAll)
+        {
+            TagMatchAll = matchAll;
+            return QueueFilterApplyAsync();
+        }
+
+        private void SetTagBrowseSort(bool sortByPopularity)
+        {
+            TagBrowseSortByPopularity = sortByPopularity;
+        }
+
+        private List<(string Tag, int Count)> GetTagBrowseList()
+        {
+            IEnumerable<string> tags = TagOptions;
+
+            if (!string.IsNullOrWhiteSpace(TagBrowseSearchTerm))
+            {
+                string term = TagBrowseSearchTerm.Trim();
+                tags = tags.Where(tag => tag.Contains(term, StringComparison.OrdinalIgnoreCase));
+            }
+
+            IEnumerable<(string Tag, int Count)> list = tags
+                .Select(tag => (Tag: tag, Count: TagCounts.TryGetValue(tag, out int count) ? count : 0));
+
+            return TagBrowseSortByPopularity
+                ? list.OrderByDescending(item => item.Count).ThenBy(item => item.Tag, StringComparer.OrdinalIgnoreCase).ToList()
+                : list.OrderBy(item => item.Tag, StringComparer.OrdinalIgnoreCase).ToList();
+        }
+
+        private Task ToggleTagSelection(string tag, bool isChecked)
+        {
+            if (isChecked)
+            {
+                if (!SelectedTags.Contains(tag, StringComparer.OrdinalIgnoreCase))
+                {
+                    SelectedTags.Add(tag);
+                }
+            }
+            else
+            {
+                SelectedTags.RemoveAll(t => string.Equals(t, tag, StringComparison.OrdinalIgnoreCase));
+            }
+
+            return QueueFilterApplyAsync();
+        }
+
+        private Task SetSort(string sort)
+        {
+            SelectedSort = sort;
+            return QueueFilterApplyAsync(resetPage: false);
+        }
 
         private Task MoveToPage(int nextPage)
         {

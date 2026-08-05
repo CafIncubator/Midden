@@ -54,11 +54,19 @@ namespace Caf.Midden.Wasm.Shared
         public List<string> ProjectOptions { get; set; } = new();
         public List<string> ProcessingOptions { get; set; } = new();
         public List<string> VariableTypeOptions { get; set; } = new();
+        public List<string> TagOptions { get; set; } = new();
+        public Dictionary<string, int> TagCounts { get; set; } = new();
+
+        public string TagBrowseSearchTerm { get; set; } = string.Empty;
+        public bool TagBrowseSortByPopularity { get; set; }
+        public bool TagMatchAll { get; set; }
+        public string TagMatchModeLabel => TagMatchAll ? "All" : "Any";
 
         public string SelectedZone { get; set; } = string.Empty;
         public string SelectedProject { get; set; } = string.Empty;
         public string SelectedProcessing { get; set; } = string.Empty;
         public string SelectedVariableType { get; set; } = string.Empty;
+        public List<string> SelectedTags { get; set; } = new();
         public string SelectedSort { get; set; } = VariableSortOptions.NameAz;
 
         public int CurrentPage { get; set; } = 1;
@@ -82,6 +90,8 @@ namespace Caf.Midden.Wasm.Shared
                 OnStateChanged,
                 AppStateChange.Catalog,
                 AppStateChange.AppConfig);
+
+            SelectedTags = string.IsNullOrWhiteSpace(TagName) ? new List<string>() : new List<string> { TagName };
 
             if (State?.Catalog != null)
                 SetCatalogVariables(State?.Catalog?.Metadatas);
@@ -116,12 +126,6 @@ namespace Caf.Midden.Wasm.Shared
 
                     foreach (var variable in metadata.Dataset.Variables)
                     {
-                        bool matchesTag = string.IsNullOrEmpty(this.TagName) ||
-                            (variable.Tags != null && variable.Tags.Contains(this.TagName));
-
-                        if (!matchesTag)
-                            continue;
-
                         catalogVariables.Add(BuildCatalogVariable(variable, metadata));
                     }
                 }
@@ -133,6 +137,13 @@ namespace Caf.Midden.Wasm.Shared
             ProjectOptions = BuildDistinctOptions(catalogVariables.Select(c => c.ProjectName));
             ProcessingOptions = BuildDistinctOptions(catalogVariables.Select(c => c.ProcessingLevel));
             VariableTypeOptions = BuildDistinctOptions(catalogVariables.Select(c => c.VariableType));
+            TagOptions = BuildDistinctOptions(catalogVariables.SelectMany(c => c.Tags ?? new List<string>()));
+
+            TagCounts = catalogVariables
+                .SelectMany(c => c.Tags ?? new List<string>())
+                .Where(tag => !string.IsNullOrWhiteSpace(tag))
+                .GroupBy(tag => tag, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(g => g.Key, g => g.Count(), StringComparer.OrdinalIgnoreCase);
 
             ApplyFilters(resetPage: true);
         }
@@ -254,6 +265,13 @@ namespace Caf.Midden.Wasm.Shared
                 query = query.Where(c => string.Equals(c.VariableType, SelectedVariableType, StringComparison.OrdinalIgnoreCase));
             }
 
+            if (SelectedTags.Count > 0)
+            {
+                query = TagMatchAll
+                    ? query.Where(c => c.Tags != null && SelectedTags.All(selectedTag => c.Tags.Any(tag => string.Equals(tag, selectedTag, StringComparison.OrdinalIgnoreCase))))
+                    : query.Where(c => c.Tags != null && c.Tags.Any(tag => SelectedTags.Contains(tag, StringComparer.OrdinalIgnoreCase)));
+            }
+
             query = SelectedSort switch
             {
                 VariableSortOptions.DatasetAz => query.OrderBy(c => c.DatasetName, StringComparer.OrdinalIgnoreCase),
@@ -298,9 +316,68 @@ namespace Caf.Midden.Wasm.Shared
 
         private Task OnProcessingFilterChanged() => QueueFilterApplyAsync();
 
+        private Task OnTagFilterChanged(IEnumerable<string> values)
+        {
+            SelectedTags = values?.ToList() ?? new List<string>();
+            return QueueFilterApplyAsync();
+        }
+
+        private Task OnTagBrowseSearchChanged() => Task.CompletedTask;
+
+        private Task SetTagMatchMode(bool matchAll)
+        {
+            TagMatchAll = matchAll;
+            return QueueFilterApplyAsync();
+        }
+
+        private void SetTagBrowseSort(bool sortByPopularity)
+        {
+            TagBrowseSortByPopularity = sortByPopularity;
+        }
+
+        private List<(string Tag, int Count)> GetTagBrowseList()
+        {
+            IEnumerable<string> tags = TagOptions;
+
+            if (!string.IsNullOrWhiteSpace(TagBrowseSearchTerm))
+            {
+                string term = TagBrowseSearchTerm.Trim();
+                tags = tags.Where(tag => tag.Contains(term, StringComparison.OrdinalIgnoreCase));
+            }
+
+            IEnumerable<(string Tag, int Count)> list = tags
+                .Select(tag => (Tag: tag, Count: TagCounts.TryGetValue(tag, out int count) ? count : 0));
+
+            return TagBrowseSortByPopularity
+                ? list.OrderByDescending(item => item.Count).ThenBy(item => item.Tag, StringComparer.OrdinalIgnoreCase).ToList()
+                : list.OrderBy(item => item.Tag, StringComparer.OrdinalIgnoreCase).ToList();
+        }
+
+        private Task ToggleTagSelection(string tag, bool isChecked)
+        {
+            if (isChecked)
+            {
+                if (!SelectedTags.Contains(tag, StringComparer.OrdinalIgnoreCase))
+                {
+                    SelectedTags.Add(tag);
+                }
+            }
+            else
+            {
+                SelectedTags.RemoveAll(t => string.Equals(t, tag, StringComparison.OrdinalIgnoreCase));
+            }
+
+            return QueueFilterApplyAsync();
+        }
+
+        private Task SetSort(string sort)
+        {
+            SelectedSort = sort;
+            return QueueFilterApplyAsync(resetPage: false);
+        }
+
         private Task OnVariableTypeFilterChanged() => QueueFilterApplyAsync();
 
-        private Task OnSortChanged() => QueueFilterApplyAsync(resetPage: false);
 
         private void ToggleDescription(CatalogVariable variable)
         {
