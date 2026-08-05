@@ -15,6 +15,14 @@ public sealed class DataStore
     public string? Uri { get; init; }
     public bool ShouldCollateProjects { get; init; }
 
+    // Overrides the default "dfs.core.windows.net" Azure Data Lake endpoint suffix, for
+    // Azure Government, Azure China, or other sovereign clouds.
+    public string? AzureEndpointSuffix { get; init; }
+
+    // Overrides the default Azure AD authority host used when signing in, for Azure
+    // Government, Azure China, or other sovereign clouds.
+    public string? AzureAuthorityHost { get; init; }
+
     // Used for authentication methods that can be configured using a file, like a json file.
     public string? AuthFilePath { get; init; }
 }

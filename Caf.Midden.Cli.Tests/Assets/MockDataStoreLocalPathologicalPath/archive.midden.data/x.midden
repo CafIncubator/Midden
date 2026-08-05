@@ -1,0 +1,12 @@
+{
+	"file": {
+		"schema-version": "v0.1.0-alpha2",
+		"creation-date": "2020-07-29"
+	},
+	"dataset": {
+		"zone": "Raw",
+		"project": "CafMeteorologyECTower",
+		"name": "PathologicalPathFile",
+		"description": "Used to verify that trimming the .midden suffix does not mangle a directory named archive.midden.data."
+	}
+}

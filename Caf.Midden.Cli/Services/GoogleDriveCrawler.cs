@@ -1,11 +1,10 @@
 ﻿using Caf.Midden.Cli.Common;
+using Caf.Midden.Cli.Security;
 using Caf.Midden.Core.Models.v0_2;
 using Caf.Midden.Core.Services;
 using Caf.Midden.Core.Services.Metadata;
-using Google.Apis.Auth.OAuth2;
 using Google.Apis.Drive.v3;
 using Google.Apis.Services;
-using Google.Apis.Util.Store;
 using System.Text;
 using DriveFile = Google.Apis.Drive.v3.Data.File;
 
@@ -13,48 +12,46 @@ namespace Caf.Midden.Cli.Services;
 
 public sealed class GoogleDriveCrawler : ICrawl
 {
-    private const string MiddenFileExtension = ".midden";
-    private const string MippenFileSearchTerm = "DESCRIPTION.md";
-
     private static readonly string[] Scopes = [DriveService.Scope.DriveReadonly];
 
     private readonly DriveService service;
+    private readonly ICrawlLogger logger;
 
-    public GoogleDriveCrawler(string clientId, string clientSecret, string applicationName)
+    public GoogleDriveCrawler(
+        string clientId,
+        string clientSecret,
+        string applicationName,
+        string? tokenStorePath = null,
+        ICrawlLogger? logger = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(clientId);
         ArgumentException.ThrowIfNullOrWhiteSpace(clientSecret);
         ArgumentException.ThrowIfNullOrWhiteSpace(applicationName);
 
-        var clientSecrets = new ClientSecrets
-        {
-            ClientId = clientId,
-            ClientSecret = clientSecret,
-        };
-
-        var credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
-                clientSecrets,
-                Scopes,
-                "user",
-                CancellationToken.None,
-                new FileDataStore("token.json", true))
-            .GetAwaiter()
-            .GetResult();
+        var credential = GoogleCredentialFactory.Authorize(clientId, clientSecret, tokenStorePath);
 
         service = new DriveService(new BaseClientService.Initializer
         {
             HttpClientInitializer = credential,
             ApplicationName = applicationName,
         });
+
+        GoogleDriveServiceFactory.ConfigureRetry(service.HttpClient);
+        this.logger = logger ?? ConsoleCrawlLogger.Instance;
     }
 
-    public IReadOnlyList<string> GetFileNames(string fileNameContains)
+    public void Dispose()
+    {
+        service.Dispose();
+    }
+
+    internal IReadOnlyList<string> GetFileNames(string fileNameContains)
     {
         var names = GetFiles(fileNameContains, false, fileNameContains)
             .Select(file => file.Id)
             .ToList();
 
-        Console.WriteLine($"Found a total of {names.Count} files");
+        logger.Info($"Found a total of {names.Count} files");
         return names;
     }
 
@@ -62,18 +59,24 @@ public sealed class GoogleDriveCrawler : ICrawl
     {
         List<Metadata> metadatas = [];
 
-        foreach (var file in GetFiles(MiddenFileExtension, false, MiddenFileExtension))
+        foreach (var file in GetFiles(MiddenFileConventions.MiddenFileExtension, false, MiddenFileConventions.MiddenFileExtension))
         {
             try
             {
                 var metadata = parser.Parse(DownloadFileText(file.Id));
-                metadata.Dataset.DatasetPath = GetAbsolutePath(file)
-                    .Replace(MiddenFileExtension, string.Empty, StringComparison.OrdinalIgnoreCase);
+
+                if (metadata.Dataset is null)
+                {
+                    logger.Warning($"Skipping file '{file.Name}': the file has no 'Dataset' section.");
+                    continue;
+                }
+
+                metadata.Dataset.DatasetPath = MiddenFileConventions.TrimSuffix(GetAbsolutePath(file), MiddenFileConventions.MiddenFileExtension);
                 metadatas.Add(metadata);
             }
             catch (Exception exception)
             {
-                Console.Error.WriteLine($"Skipping file '{file.Name}': {exception.Message}");
+                logger.Warning($"Skipping file '{file.Name}': {exception.Message}");
             }
         }
 
@@ -84,7 +87,7 @@ public sealed class GoogleDriveCrawler : ICrawl
     {
         List<Project> projects = [];
 
-        foreach (var file in GetFiles(MippenFileSearchTerm, true, ".md"))
+        foreach (var file in GetFiles(MiddenFileConventions.MippenFileSearchTerm, true, ".md"))
         {
             var fileString = DownloadFileText(file.Id);
             using var stream = new MemoryStream(Encoding.UTF8.GetBytes(fileString));
@@ -100,29 +103,48 @@ public sealed class GoogleDriveCrawler : ICrawl
     }
 
     private List<DriveFile> GetFiles(
-        string fileNameContains = MiddenFileExtension,
+        string fileNameContains = MiddenFileConventions.MiddenFileExtension,
         bool fileNameContainsIsExactMatch = false,
         string? fileNameEndsWith = null)
     {
-        var listRequest = service.Files.List();
-        listRequest.PageSize = 100;
-        listRequest.Fields = "nextPageToken, files(id, name, parents, driveId, trashed)";
-        listRequest.Q = fileNameContainsIsExactMatch
-            ? $"name = '{fileNameContains}'"
-            : $"name contains '{fileNameContains}'";
+        List<DriveFile> results = [];
+        string? pageToken = null;
 
-        var driveFiles = listRequest.Execute().Files ?? [];
+        do
+        {
+            var listRequest = service.Files.List();
+            listRequest.PageSize = 100;
+            listRequest.Fields = "nextPageToken, files(id, name, parents, driveId, trashed)";
+            listRequest.SupportsAllDrives = true;
+            listRequest.IncludeItemsFromAllDrives = true;
+            listRequest.PageToken = pageToken;
+            listRequest.Q = fileNameContainsIsExactMatch
+                ? $"name = '{GoogleDriveQuery.EscapeTerm(fileNameContains)}'"
+                : $"name contains '{GoogleDriveQuery.EscapeTerm(fileNameContains)}'";
 
-        return driveFiles
-            .Where(file => file.Trashed != true)
-            .Where(file => string.IsNullOrWhiteSpace(fileNameEndsWith)
-                || file.Name.EndsWith(fileNameEndsWith, StringComparison.OrdinalIgnoreCase))
-            .Select(file =>
+            var response = listRequest.Execute();
+
+            foreach (var file in response.Files ?? [])
             {
-                Console.WriteLine($"  Found {file.Name}");
-                return file;
-            })
-            .ToList();
+                if (file.Trashed == true)
+                {
+                    continue;
+                }
+
+                if (!string.IsNullOrWhiteSpace(fileNameEndsWith)
+                    && !file.Name.EndsWith(fileNameEndsWith, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                logger.Info($"  Found {file.Name}");
+                results.Add(file);
+            }
+
+            pageToken = response.NextPageToken;
+        } while (!string.IsNullOrEmpty(pageToken));
+
+        return results;
     }
 
     private string DownloadFileText(string fileId)
@@ -131,7 +153,13 @@ public sealed class GoogleDriveCrawler : ICrawl
         var fileRequest = service.Files.Get(fileId);
         fileRequest.SupportsAllDrives = true;
         fileRequest.Download(memoryStream);
-        return Encoding.UTF8.GetString(memoryStream.ToArray());
+        memoryStream.Position = 0;
+
+        // Reading from the stream directly, rather than ToArray() + GetString, avoids a second
+        // full-file allocation and correctly strips a UTF-8 BOM instead of leaving it as a stray
+        // character in the parsed JSON.
+        using var reader = new StreamReader(memoryStream, Encoding.UTF8, detectEncodingFromByteOrderMarks: true);
+        return reader.ReadToEnd();
     }
 
     private string GetAbsolutePath(DriveFile file)

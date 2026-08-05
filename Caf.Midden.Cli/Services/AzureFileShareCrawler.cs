@@ -11,13 +11,12 @@ namespace Caf.Midden.Cli.Services;
 
 public sealed class AzureFileShareCrawler : ICrawl
 {
-    private const string MiddenFileExtension = ".midden";
-    private const string MippenFileSearchTerm = "DESCRIPTION.md";
-
     private readonly string path;
     private readonly ShareClient shareClient;
+    private readonly ICrawlLogger logger;
+    private List<(ShareDirectoryClient Directory, ShareFileItem Item)>? cachedFiles;
 
-    public AzureFileShareCrawler(string uri, string path, string sharedAccessSignature)
+    public AzureFileShareCrawler(string uri, string path, string sharedAccessSignature, ICrawlLogger? logger = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(uri);
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
@@ -25,9 +24,15 @@ public sealed class AzureFileShareCrawler : ICrawl
 
         this.path = path;
         shareClient = new ShareClient(new Uri(uri), new AzureSasCredential(sharedAccessSignature));
+        this.logger = logger ?? ConsoleCrawlLogger.Instance;
     }
 
-    public IReadOnlyList<string> GetFileNames(string fileExtension)
+    public void Dispose()
+    {
+        // ShareClient holds no unmanaged resources requiring explicit disposal.
+    }
+
+    internal IReadOnlyList<string> GetFileNames(string fileExtension)
     {
         List<string> names = [];
 
@@ -35,20 +40,20 @@ public sealed class AzureFileShareCrawler : ICrawl
         {
             foreach (var (directory, item) in EnumerateFiles())
             {
-                if (!item.Name.Contains(fileExtension, StringComparison.OrdinalIgnoreCase))
+                if (!item.Name.EndsWith(fileExtension, StringComparison.OrdinalIgnoreCase))
                 {
                     continue;
                 }
 
-                Console.WriteLine($"  In {directory.Name} found {item.Name}");
+                logger.Info($"  In {directory.Name} found {item.Name}");
                 names.Add(item.Name);
             }
 
-            Console.WriteLine($"Found a total of {names.Count} files");
+            logger.Info($"Found a total of {names.Count} files");
         }
         catch (Exception exception)
         {
-            Console.Error.WriteLine($"An error occurred while listing files: {exception.Message}");
+            logger.Warning($"An error occurred while listing files: {exception.Message}");
         }
 
         return names;
@@ -62,33 +67,41 @@ public sealed class AzureFileShareCrawler : ICrawl
         {
             foreach (var (directory, item) in EnumerateFiles())
             {
-                if (!item.Name.Contains(MiddenFileExtension, StringComparison.OrdinalIgnoreCase))
+                if (!item.Name.EndsWith(MiddenFileConventions.MiddenFileExtension, StringComparison.OrdinalIgnoreCase))
                 {
                     continue;
                 }
 
-                Console.WriteLine($"  In {directory.Uri.AbsolutePath} found {item.Name}");
+                logger.Info($"  In {directory.Uri.AbsolutePath} found {item.Name}");
                 var file = directory.GetFileClient(item.Name);
                 var fileContents = file.Download();
 
                 string json;
-                using (var memoryStream = new MemoryStream())
+                using (var stream = fileContents.Value.Content)
+                using (var reader = new StreamReader(stream, Encoding.UTF8, detectEncodingFromByteOrderMarks: true))
                 {
-                    fileContents.Value.Content.CopyTo(memoryStream);
-                    json = Encoding.UTF8.GetString(memoryStream.ToArray());
+                    json = reader.ReadToEnd();
                 }
 
                 var metadata = parser.Parse(json);
-                metadata.Dataset.DatasetPath = Path.GetRelativePath(path, file.Path)
-                    .Replace(MiddenFileExtension, string.Empty, StringComparison.OrdinalIgnoreCase);
+
+                if (metadata.Dataset is null)
+                {
+                    logger.Warning($"Skipping file '{item.Name}': the file has no 'Dataset' section.");
+                    continue;
+                }
+
+                metadata.Dataset.DatasetPath = MiddenFileConventions.TrimSuffix(
+                    Path.GetRelativePath(path, file.Path),
+                    MiddenFileConventions.MiddenFileExtension);
                 metadatas.Add(metadata);
             }
 
-            Console.WriteLine($"Found a total of {metadatas.Count} files");
+            logger.Info($"Found a total of {metadatas.Count} files");
         }
         catch (Exception exception)
         {
-            Console.Error.WriteLine($"An error occurred while reading metadata: {exception.Message}");
+            logger.Warning($"An error occurred while reading metadata: {exception.Message}");
         }
 
         return metadatas;
@@ -102,12 +115,12 @@ public sealed class AzureFileShareCrawler : ICrawl
         {
             foreach (var (directory, item) in EnumerateFiles())
             {
-                if (!item.Name.Contains(MippenFileSearchTerm, StringComparison.OrdinalIgnoreCase))
+                if (!item.Name.EndsWith(MiddenFileConventions.MippenFileSearchTerm, StringComparison.OrdinalIgnoreCase))
                 {
                     continue;
                 }
 
-                Console.WriteLine($"  In {directory.Uri.AbsolutePath} found {item.Name}");
+                logger.Info($"  In {directory.Uri.AbsolutePath} found {item.Name}");
                 var file = directory.GetFileClient(item.Name);
                 var fileContents = file.Download();
 
@@ -120,11 +133,11 @@ public sealed class AzureFileShareCrawler : ICrawl
                 }
             }
 
-            Console.WriteLine($"Found a total of {projects.Count} files");
+            logger.Info($"Found a total of {projects.Count} files");
         }
         catch (Exception exception)
         {
-            Console.Error.WriteLine($"An error occurred while reading projects: {exception.Message}");
+            logger.Warning($"An error occurred while reading projects: {exception.Message}");
         }
 
         return projects;
@@ -132,6 +145,12 @@ public sealed class AzureFileShareCrawler : ICrawl
 
     private IEnumerable<(ShareDirectoryClient Directory, ShareFileItem Item)> EnumerateFiles()
     {
+        if (cachedFiles is not null)
+        {
+            return cachedFiles;
+        }
+
+        cachedFiles = [];
         var remaining = new Queue<ShareDirectoryClient>();
         remaining.Enqueue(shareClient.GetDirectoryClient(path));
 
@@ -147,8 +166,10 @@ public sealed class AzureFileShareCrawler : ICrawl
                     continue;
                 }
 
-                yield return (directory, item);
+                cachedFiles.Add((directory, item));
             }
         }
+
+        return cachedFiles;
     }
 }

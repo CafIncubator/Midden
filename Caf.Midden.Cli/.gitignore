@@ -1,2 +1,20 @@
+# Contains data store credentials (client secrets, SAS tokens) in plain text.
 configuration.json
+
+# Encrypted secret store created by 'midden secret set'.
+secrets.midden
+secrets.midden.tmp
+
+# Google OAuth token cache.
+.midden-google-tokens/
+token.json/
+token.json
+
+# Service account / OAuth key files referenced by DataStore.AuthFilePath.
+*.auth.json
+credentials.json
+
+# Generated catalog output.
+catalog.json
+
 Publish

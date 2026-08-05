@@ -18,6 +18,9 @@ public static class SetupCommand
         {
             var configurationPath = configurationService.CreateConfiguration();
             Console.WriteLine($"Created configuration template at {configurationPath}");
+            Console.WriteLine(
+                "Note: 'configuration.json' can hold secret values in plain text. Prefer 'secret:<name>' "
+                + "references resolved from the environment or the encrypted secret store (see 'midden secret --help').");
             return 0;
         }
         catch (IOException exception)

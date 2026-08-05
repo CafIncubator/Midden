@@ -68,7 +68,9 @@ public class GoogleDriveCrawlerTests
         var actual = sut.GetProjects(reader);
 
         Assert.NotEmpty(actual);
-        Assert.Equal("ProductionProject", actual[0].Name);
+        // Google Drive does not guarantee result ordering, and the live test account can
+        // accumulate other projects over time, so assert presence rather than position.
+        Assert.Contains(actual, project => project.Name == "ProductionProject");
     }
 
     private DataStore? GetConfiguredDataStore() => config?.DataStores.FirstOrDefault();
