@@ -9,7 +9,7 @@
                     OkText="Reset"
                     CancelText="Cancel"
                     OnConfirm="NewMetadata">
-            <Button><Icon Type="plus" Theme="outline" /> New</Button>
+            <Button><Icon Type="plus" Theme="@IconThemeType.Outline" /> New</Button>
         </Popconfirm>
     </SpaceItem>
     <SpaceItem>
@@ -123,7 +123,7 @@
                         <SpaceItem>
                             <Button OnClick="AddDatasetTagHandler">Add</Button>
                         </SpaceItem>
-                        <SpaceItem><Divider Type="DirectionVHType.Vertical" /></SpaceItem>
+                        <SpaceItem><Divider Type="@DividerType.Vertical" /></SpaceItem>
                         <div style="width: 100%;">
                             <SpaceItem>
                                 <SimpleSelect Placeholder="Add saved tag"
@@ -187,7 +187,7 @@
                         </SpaceItem>
                         <SpaceItem>
                             <AntDesign.Tooltip Title="@("WARNING: Uploading will replace all current variables. The uploaded file must be a CSV with the following column headers: FieldName, Units, Description")">
-                                <Icon Type="info-circle" Theme="fill" />
+                                <Icon Type="info-circle" Theme="@IconThemeType.Fill" />
                             </AntDesign.Tooltip>
                         </SpaceItem>
                     </Space>
@@ -205,7 +205,7 @@
                                             ScrollX="1400"
                                             PageSize="50">
                             <ChildContent Context="variable">
-                                <AntDesign.PropertyColumn Property="@(item => item.Name)" Title="" Width="45px" Fixed="left">
+                                <AntDesign.PropertyColumn Property="@(item => item.Name)" Title="" Width="45px" Fixed="@AntDesign.ColumnFixPlacement.Left">
                                     <span draggable="true"
                                           class="string-list-editor-handle"
                                           title="Drag to reorder"
@@ -213,7 +213,7 @@
                                           @ondragend="@OnVariableDragEnd">⋮⋮</span>
                                 </AntDesign.PropertyColumn>
                                 <AntDesign.PropertyColumn Property="@(item => item.Name)"
-                                                            Fixed="left">
+                                                            Fixed="@AntDesign.ColumnFixPlacement.Left">
                                                     @if(VariableQuickEditRef == variable)
                                                     {
                                     <Input @bind-Value="QuickEditViewModel.Variable.Name" />
@@ -248,7 +248,7 @@
                                                             Title="Quality Control">
                                 @if(VariableQuickEditRef == variable)
                                 {
-                                    <Select Mode="multiple"
+                                    <Select Mode="@SelectMode.Multiple"
                                             Placeholder="Select Quality Control"
                                             @bind-Values="QuickEditViewModel.SelectedQCApplied"
                                             TItemValue="string"
@@ -323,7 +323,7 @@
                                 </AntDesign.PropertyColumn>
 <!-- Depricated                 <AntDesign.Column @bind-Field="variable.Height" /> -->
                                 <ActionColumn Title="Action"
-                                                Fixed="right">
+                                                Fixed="@AntDesign.ColumnFixPlacement.Right">
                                     <Space>
                                     <SpaceItem>
                                         @if(VariableQuickEditRef == variable)
@@ -432,7 +432,7 @@
 
                 <EditorFormItemWithHelpPopup Label="Methods" Id="methods" Tooltip="@DatasetMethodsTooltip" IsRequired=false>
                     <InputGroup>
-                        <Row Justify="space-between">
+                        <Row Justify="@RowJustify.SpaceBetween">
                             <AntDesign.Col Span="20">
                                 <Input Id="methods" @bind-Value="NewDatasetMethod"
                                     Placeholder="Enter URL, text, or markdown"/>
@@ -475,7 +475,7 @@
 
                 <EditorFormItemWithHelpPopup Label="Parent Datasets" Id="parent-datasets" Tooltip="@ParentDatasetsTooltip" IsRequired=false>
                     <InputGroup>
-                        <Row Justify="space-between">
+                        <Row Justify="@RowJustify.Start">
                             <AntDesign.Col Span="20">
                                 <Input Id="parent-datasets" @bind-Value="NewParentDataset"
                                    Placeholder="Enter URL" />
@@ -518,7 +518,7 @@
 
                 <EditorFormItemWithHelpPopup Label="Derived Works" Id="derived-works" Tooltip="@DerivedWorksTooltip" IsRequired=false>
                     <InputGroup>
-                        <Row Justify="space-between">
+                        <Row Justify="@RowJustify.Start">
                             <AntDesign.Col Span="20">
                                 <Input Id="derived-works" @bind-Value="NewDerivedWork" />
                             </AntDesign.Col>
@@ -562,12 +562,12 @@
         </Tabs>
     </AntDesign.Form>
     <Divider />
-    <Row Justify="end">
+    <Row Justify="@RowJustify.End">
         <Button Type="default" OnClick="() => OpenMetadataDetailsModalTemplate(State.MetadataEdit)">
             <Icon Type="eye" />
             Preview
         </Button>
-        <Button Type="primary" OnClick="SaveDataset">
+        <Button Type="@ButtonType.Primary" OnClick="SaveDataset">
             <Icon Type="download" />
             Download
         </Button>

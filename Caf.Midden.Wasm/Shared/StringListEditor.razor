@@ -28,6 +28,6 @@
          @ondragover:preventDefault
          @ondrop="@(() => OnDrop(Items.Count))"></div>
     <Button Type="@ButtonType.Primary" OnClick="AddItem">
-        <Icon Type="plus" Theme="outline" /> Add @ItemLabel
+        <Icon Type="plus" Theme="@IconThemeType.Outline" /> Add @ItemLabel
     </Button>
 </div>

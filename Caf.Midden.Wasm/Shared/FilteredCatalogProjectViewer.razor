@@ -3,13 +3,13 @@
 
 @if (ShowHeader)
 {
-    <Divider Orientation="center">Projects</Divider>
+    <Divider Orientation="@DividerOrientation.Center">Projects</Divider>
 }
 
 @if (State.Catalog != null && ShowSearch)
 {
     <div class="catalog-controls">
-        <AntDesign.Row Gutter="8" Align="middle">
+        <AntDesign.Row Gutter="8" Align="@RowAlign.Middle">
             <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(6,0)">
                 <Search Placeholder="Search projects"
                         OnChange="SearchHandler"
@@ -63,7 +63,7 @@
             <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(12,0)" Style="padding:5px" @key="project.Name">
                 <Card Class="catalog-card" Style="overflow:hidden">
                     <TitleTemplate>
-                        <Icon Type="project" Theme="outline" />
+                        <Icon Type="project" Theme="@IconThemeType.Outline" />
                         <a href="catalog/projects/@project.Name" class="catalog-card-title-link">@project.Name</a>
                     </TitleTemplate>
                     <Extra>

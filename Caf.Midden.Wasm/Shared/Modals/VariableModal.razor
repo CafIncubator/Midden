@@ -29,7 +29,7 @@
 
     <EditorFormItemWithHelpPopup Label="Methods" Id="variable-methods" Tooltip="@VariableMethodsTooltip" IsRequired=false>
         <InputGroup>
-            <Row Justify="space-between">
+            <Row Justify="@RowJustify.SpaceBetween">
                 <AntDesign.Col Span="20">
                     <Input Id="variable-methods" @bind-Value="NewVariableMethod" />
                 </AntDesign.Col>
@@ -42,7 +42,7 @@
         @if (context.Variable.Methods.Count > 0)
         {
             <AntList DataSource="@context.Variable.Methods"
-                     Size="small">
+                     Size="@ListSize.Small">
                 <ChildContent Context="method">
                     <ListItem>
                         <span><Text>@method</Text></span>
@@ -56,7 +56,7 @@
     </EditorFormItemWithHelpPopup>
 
     <EditorFormItemWithHelpPopup Label="Quality Control" Id="variable-quality-control" Tooltip="@VariableQualityControlsTooltip" IsRequired=false>
-        <Select Mode="multiple"
+        <Select Mode="@SelectMode.Multiple"
                     Placeholder="Select Quality Control"
                     @bind-Values="@context.SelectedQCApplied"
                     TItemValue="string"
@@ -120,7 +120,7 @@
             <SpaceItem>
                 <Button OnClick="AddVariableTagHandler">Add</Button>
             </SpaceItem>
-            <SpaceItem><Divider Type="DirectionVHType.Vertical" /></SpaceItem>
+            <SpaceItem><Divider Type="@DividerType.Vertical" /></SpaceItem>
             <div style="width:100%;">
                 <SpaceItem>
                     <SimpleSelect Placeholder="Add saved tag"

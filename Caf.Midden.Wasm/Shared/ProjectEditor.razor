@@ -9,7 +9,7 @@
                     OkText="Reset"
                     CancelText="Cancel"
                     OnConfirm="NewProjectEdit">
-            <Button><Icon Type="plus" Theme="outline" /> New</Button>
+            <Button><Icon Type="plus" Theme="@IconThemeType.Outline" /> New</Button>
         </Popconfirm>
     </SpaceItem>
     <SpaceItem>
@@ -53,8 +53,8 @@
                 </FormItem>
     </AntDesign.Form>
     <Divider />
-    <Row Justify="end">
-        <Button Type="primary" OnClick="SaveProject">
+    <Row Justify="@RowJustify.End">
+        <Button Type="@ButtonType.Primary" OnClick="SaveProject">
             <Icon Type="download" />
             Download
         </Button>

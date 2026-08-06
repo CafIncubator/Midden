@@ -97,16 +97,18 @@ namespace Caf.Midden.Wasm.Shared
         /// Stores the displaced geometry and shows a brief toast with an Undo action.
         /// </summary>
         [JSInvokable]
-        public async Task OnShapeReplaced(string displaced)
+        public Task OnShapeReplaced(string displaced)
         {
             previousGeometry = displaced;
 
-            await MessageService.Info(new MessageConfig
+            MessageService.Info(new MessageConfig
             {
                 Content = BuildUndoContent(),
                 Duration = 5,
                 Key = "geojson-shape-replaced"
             });
+
+            return Task.CompletedTask;
         }
 
         private RenderFragment BuildUndoContent() => builder =>

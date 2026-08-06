@@ -1,9 +1,9 @@
 
 @if (VariableRows != null && VariableRows.Count > 0)
 {
-    <AntDesign.Row Justify="RowJustify.End" Style="margin-bottom:8px;">
+    <AntDesign.Row Justify="@RowJustify.End" Style="margin-bottom:8px;">
         <AntDesign.Col>
-            <AntDesign.Button Type="primary" Size="small" @onclick="@(() => OnDownload.InvokeAsync())">
+            <AntDesign.Button Type="@ButtonType.Primary" Size="@ButtonSize.Small" @onclick="@(() => OnDownload.InvokeAsync())">
                 <Icon Type="download" /> Download
             </AntDesign.Button>
         </AntDesign.Col>
@@ -18,7 +18,7 @@
         <ChildContent Context="row">
             <AntDesign.PropertyColumn Property="@(item => item.Variable.Name)"
                                       Width="220"
-                                      Fixed="left"
+                                      Fixed="@AntDesign.ColumnFixPlacement.Left"
                                       Filterable
                                       Sortable />
             <AntDesign.PropertyColumn Property="@(item => item.DescriptionText)"

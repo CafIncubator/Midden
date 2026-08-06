@@ -11,7 +11,7 @@
                     OkText="Reset"
                     CancelText="Cancel"
                     OnConfirm="NewConfigurationEdit">
-            <Button><Icon Type="plus" Theme="outline" /> New</Button>
+            <Button><Icon Type="plus" Theme="@IconThemeType.Outline" /> New</Button>
         </Popconfirm>
     </SpaceItem>
     <SpaceItem>
@@ -105,13 +105,13 @@
                  @ondragover="@(() => { })"
                  @ondrop="@(() => OnGeometryDrop(context.Geometries.Count))"></div>
             <Button Type="@ButtonType.Dashed" OnClick="AddGeometry">
-                <Icon Type="plus" Theme="outline" /> Add Geometry
+                <Icon Type="plus" Theme="@IconThemeType.Outline" /> Add Geometry
             </Button>
         </FormItem>
     </AntDesign.Form>
     <Divider />
-    <AntDesign.Row Justify="end">
-        <Button Type="primary" OnClick="SaveConfiguration">
+    <AntDesign.Row Justify="@RowJustify.End">
+        <Button Type="@ButtonType.Primary" OnClick="SaveConfiguration">
             <Icon Type="download" />
             Download
         </Button>

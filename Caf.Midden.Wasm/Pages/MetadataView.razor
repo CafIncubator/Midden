@@ -10,14 +10,14 @@
     <CatalogLoader />
     @if (this.Metadata != null)
     {
-        <AntDesign.Row Justify="end">
+        <AntDesign.Row Justify="@RowJustify.End">
             <AntDesign.Col Span="2">
                 <Button OnClick="EditMetadata">
                     <Icon Type="edit" /> Edit
                 </Button>
             </AntDesign.Col>
         </AntDesign.Row>
-        <AntDesign.Row Justify="center">
+        <AntDesign.Row Justify="@RowJustify.Center">
             <AntDesign.Col Span="24">
                 <MetadataDetails Metadata="this.Metadata" />
             </AntDesign.Col>

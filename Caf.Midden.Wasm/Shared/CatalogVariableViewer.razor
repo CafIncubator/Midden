@@ -1,12 +1,12 @@
 ﻿@inject Caf.Midden.Wasm.Services.StateContainer State
 @inject ModalService ModalService
 
-<Divider Orientation="center">Variables</Divider>
+<Divider Orientation="@DividerOrientation.Center">Variables</Divider>
 
 @if (State.Catalog != null)
 {
     <div class="catalog-controls">
-        <AntDesign.Row Gutter="8" Align="middle">
+        <AntDesign.Row Gutter="8" Align="@RowAlign.Middle">
             <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(5,0)">
                 <Search Placeholder="Search variables"
                         OnChange="SearchHandler"
@@ -70,7 +70,7 @@
                 </SimpleSelect>
             </AntDesign.Col>
             <AntDesign.Col Xs="@Property(12,0)" Lg="@Property(4,0)">
-                <Select Mode="multiple"
+                <Select Mode="@SelectMode.Multiple"
                         Class="catalog-tag-select"
                         Placeholder="Tag"
                         Values="@SelectedTags"
@@ -91,7 +91,7 @@
                     <Popover Trigger="@(new Trigger[]{ Trigger.Click })" Placement="Placement.BottomLeft">
                         <ChildContent>
                             <Button>
-                                <Icon Type="tags" Theme="outline" /> @(SelectedTags.Count > 0 ? $"({SelectedTags.Count}) " : string.Empty)@TagMatchModeLabel
+                                <Icon Type="tags" Theme="@IconThemeType.Outline" /> @(SelectedTags.Count > 0 ? $"({SelectedTags.Count}) " : string.Empty)@TagMatchModeLabel
                             </Button>
                         </ChildContent>
                         <ContentTemplate>
@@ -139,11 +139,11 @@
                             </div>
                         </ContentTemplate>
                     </Popover>
-                    <Divider Type="DirectionVHType.Vertical" />
+                    <Divider Type="@DividerType.Vertical" />
                     <Popover Trigger="@(new Trigger[]{ Trigger.Click })" Placement="Placement.BottomRight">
                         <ChildContent>
                             <Button>
-                                <Icon Type="sort-ascending" Theme="outline" />
+                                <Icon Type="sort-ascending" Theme="@IconThemeType.Outline" />
                             </Button>
                         </ChildContent>
                         <ContentTemplate>
@@ -179,7 +179,7 @@ if(ViewModel.FilteredCatalogVariables.Count > 0)
         <Popover Trigger="@(new Trigger[]{ Trigger.Click })" Placement="Placement.BottomRight">
             <ChildContent>
                 <Button Size="@AntDesign.ButtonSize.Small">
-                    <Icon Type="setting" Theme="outline" /> Columns
+                    <Icon Type="setting" Theme="@IconThemeType.Outline" /> Columns
                 </Button>
             </ChildContent>
             <ContentTemplate>
@@ -209,14 +209,14 @@ if(ViewModel.FilteredCatalogVariables.Count > 0)
             <ChildContent Context="cv">
                 <AntDesign.PropertyColumn Property="@(item => item.Name)"
                                           Title="Name"
-                                          Fixed="left"
+                                          Fixed="@AntDesign.ColumnFixPlacement.Left"
                                           Width="260">
                     <div class="catalog-name-cell">
                         <span title="View metadata">
                             <Button Class="magnifying-button catalog-name-view-btn"
                                     Size="@AntDesign.ButtonSize.Small"
                                     OnClick="() => OpenMetadataDetailsModalTemplate(cv)">
-                                <Icon Type="zoom-in" Theme="outline" />
+                                <Icon Type="zoom-in" Theme="@IconThemeType.Outline" />
                             </Button>
                         </span>
                         <span class="catalog-name-text">@cv.Name</span>
