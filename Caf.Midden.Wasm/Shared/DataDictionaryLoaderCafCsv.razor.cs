@@ -18,6 +18,9 @@ namespace Caf.Midden.Wasm.Shared
         [Parameter]
         public bool isLoading { get; set; } = false;
 
+        [Inject]
+        private IMessageService MessageService { get; set; } = default!;
+
         private async Task OnInputFileDataDictionaryCafCsvChange(
             InputFileChangeEventArgs e)
         {
@@ -48,9 +51,21 @@ namespace Caf.Midden.Wasm.Shared
 
                 this.State.UpdateMetadataEdit(this, this.State.MetadataEdit);
             }
-            catch
+            catch (DataDictionaryReadException ex)
             {
-                // Indicate error
+                MessageService.Error(new MessageConfig
+                {
+                    Content = string.Join(" ", ex.RowErrors),
+                    Duration = 8
+                });
+            }
+            catch (Exception)
+            {
+                MessageService.Error(new MessageConfig
+                {
+                    Content = "The data dictionary CSV could not be read. Please check that it has the expected columns and try again.",
+                    Duration = 8
+                });
             }
             finally
             {

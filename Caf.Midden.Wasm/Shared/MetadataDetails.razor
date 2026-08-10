@@ -60,7 +60,7 @@
                             <Icon Type="experiment" Theme="@IconThemeType.Outline" /> Methods
                         </TitleTemplate>
                         <Body>
-                            <ExpandableTextListSection Items="@DatasetMethodItems" OnToggle="@ToggleExpandableText" />
+                            <ExpandableTextListSection Items="@DatasetMethodItems" OnToggle="@ToggleExpandableText" Bordered="false" />
                         </Body>
                     </Card>
                 </AntDesign.Col>
@@ -114,6 +114,11 @@
                         <TitleTemplate>
                             <Icon Type="calculator" Theme="@IconThemeType.Outline" /> Variables
                         </TitleTemplate>
+                        <Extra>
+                            <AntDesign.Button Type="@ButtonType.Primary" Size="@ButtonSize.Small" Disabled="@(!HasVariables)" @onclick="@DownloadVariables">
+                                <Icon Type="download" /> Download
+                            </AntDesign.Button>
+                        </Extra>
                         <Body>
                             <DatasetVariablesSection VariableRows="@VariableRows"
                                                       TableWidth="@TableWidth"
@@ -126,8 +131,7 @@
                                                       FilterProcessing="@FilterProcessing"
                                                       FilterVariableType="@FilterVariableType"
                                                       OnToggleDescription="@ToggleVariableDescription"
-                                                      OnToggleMethods="@ToggleVariableMethods"
-                                                      OnDownload="@DownloadVariables" />
+                                                      OnToggleMethods="@ToggleVariableMethods" />
                         </Body>
                     </Card>
                 </AntDesign.Col>
@@ -202,7 +206,7 @@
     <AntDesign.Modal Title="Methods" Visible="@ShowDatasetMethods" DestroyOnClose="true" Width="1200" OnCancel="@CloseDatasetMethods" Footer="@null">
         @if (ShowDatasetMethods)
         {
-            <ExpandableTextListSection Items="@DatasetMethodItems" OnToggle="@ToggleExpandableText" />
+            <ExpandableTextListSection Items="@DatasetMethodItems" OnToggle="@ToggleExpandableText" Bordered="false" />
             <div class="details-modal-footer">
                 <AntDesign.Button @onclick="CloseDatasetMethods">Close</AntDesign.Button>
             </div>
@@ -253,9 +257,11 @@
                                       FilterProcessing="@FilterProcessing"
                                       FilterVariableType="@FilterVariableType"
                                       OnToggleDescription="@ToggleVariableDescription"
-                                      OnToggleMethods="@ToggleVariableMethods"
-                                      OnDownload="@DownloadVariables" />
+                                      OnToggleMethods="@ToggleVariableMethods" />
             <div class="details-modal-footer">
+                <AntDesign.Button Type="@ButtonType.Primary" Disabled="@(!HasVariables)" @onclick="@DownloadVariables">
+                    <Icon Type="download" /> Download
+                </AntDesign.Button>
                 <AntDesign.Button @onclick="CloseVariables">Close</AntDesign.Button>
             </div>
         }

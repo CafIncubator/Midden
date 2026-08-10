@@ -1,5 +1,6 @@
 using AntDesign;
 using Caf.Midden.Core.Models.v0_2;
+using Caf.Midden.Core.Services;
 using Caf.Midden.Wasm.Shared.MetadataSections;
 using Markdig;
 using Microsoft.AspNetCore.Components;
@@ -24,7 +25,31 @@ namespace Caf.Midden.Wasm.Shared
             .UseYamlFrontMatter()
             .Build();
 
-        private static readonly PropertyInfo[] VariableCsvProperties = typeof(Variable).GetProperties();
+        /// <summary>
+        /// The set of Variable properties included in the downloadable CSV, and the
+        /// order they appear in. This must stay in sync with the columns supported
+        /// by <see cref="DataDictionaryReaderCafCsv"/> so downloaded data dictionaries
+        /// can be re-uploaded without modification.
+        /// </summary>
+        private static readonly string[] VariableCsvPropertyNames = new[]
+        {
+            nameof(Variable.Name),
+            nameof(Variable.Description),
+            nameof(Variable.Units),
+            nameof(Variable.Tags),
+            nameof(Variable.Methods),
+            nameof(Variable.TemporalResolution),
+            nameof(Variable.TemporalExtent),
+            nameof(Variable.SpatialRepeats),
+            nameof(Variable.IsQCSpecified),
+            nameof(Variable.QCApplied),
+            nameof(Variable.ProcessingLevel),
+            nameof(Variable.VariableType)
+        };
+
+        private static readonly PropertyInfo[] VariableCsvProperties = VariableCsvPropertyNames
+            .Select(name => typeof(Variable).GetProperty(name)!)
+            .ToArray();
 
         private string _metadataIdentity = string.Empty;
 
@@ -328,7 +353,7 @@ namespace Caf.Midden.Wasm.Shared
             }
 
             string datasetName = Metadata.Dataset.Name.Replace(" ", "_");
-            string filename = $"{datasetName}_metadata.csv";
+            string filename = $"{datasetName}_datadictionary.csv";
             string csvData = ConvertToCSV(Metadata.Dataset.Variables);
 
             await JSRuntime.InvokeVoidAsync("downloadCSV", filename, csvData);
@@ -364,7 +389,7 @@ namespace Caf.Midden.Wasm.Shared
                     values.Add(NormalizeCsvText(item?.ToString() ?? string.Empty));
                 }
 
-                return $"\"{string.Join("; ", values)}\"";
+                return $"\"{string.Join(DataDictionaryReaderCafCsv.ListValueDelimiter + " ", values)}\"";
             }
 
             return $"\"{NormalizeCsvText(value.ToString() ?? string.Empty)}\"";

@@ -1,6 +1,6 @@
 @if (Items != null && Items.Count > 0)
 {
-    <AntList Bordered DataSource="@Items">
+    <AntList Bordered="@Bordered" DataSource="@Items">
         <ChildContent Context="item">
             <ListItem Style="overflow:auto;">
                 <div class="@(item.IsExpanded ? "details-preserve-lines" : "truncate details-preserve-lines")">@item.Content</div>
@@ -20,6 +20,9 @@ else
 @code {
     [Parameter]
     public List<MetadataDetails.ExpandableTextItem> Items { get; set; } = new();
+
+    [Parameter]
+    public bool Bordered { get; set; } = true;
 
     [Parameter]
     public EventCallback<MetadataDetails.ExpandableTextItem> OnToggle { get; set; }

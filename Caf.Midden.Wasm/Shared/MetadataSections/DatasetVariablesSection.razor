@@ -1,14 +1,6 @@
 
 @if (VariableRows != null && VariableRows.Count > 0)
 {
-    <AntDesign.Row Justify="@RowJustify.End" Style="margin-bottom:8px;">
-        <AntDesign.Col>
-            <AntDesign.Button Type="@ButtonType.Primary" Size="@ButtonSize.Small" @onclick="@(() => OnDownload.InvokeAsync())">
-                <Icon Type="download" /> Download
-            </AntDesign.Button>
-        </AntDesign.Col>
-    </AntDesign.Row>
-
     <AntDesign.Table TItem="MetadataDetails.VariableRowItem"
                      DataSource="@VariableRows"
                      Size="@TableSize.Small"
@@ -136,9 +128,6 @@ else
 
     [Parameter]
     public EventCallback<MetadataDetails.VariableRowItem> OnToggleMethods { get; set; }
-
-    [Parameter]
-    public EventCallback OnDownload { get; set; }
 
     private static bool FilterByPrefix(string expectedPrefix, string? actualValue)
         => !string.IsNullOrWhiteSpace(actualValue) && actualValue.StartsWith(expectedPrefix, StringComparison.OrdinalIgnoreCase);

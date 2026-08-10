@@ -186,7 +186,7 @@
                             <DataDictionaryLoaderCafCsv />
                         </SpaceItem>
                         <SpaceItem>
-                            <AntDesign.Tooltip Title="@("WARNING: Uploading will replace all current variables. The uploaded file must be a CSV with the following column headers: FieldName, Units, Description")">
+                            <AntDesign.Tooltip Title="@("WARNING: Uploading will replace all current variables. The uploaded file must be a CSV with a Name, Description, and Units column; those three are the only ones required, so a minimal 3-column CSV is accepted. Optional columns: Tags, Methods, TemporalResolution, TemporalExtent, SpatialRepeats, IsQCSpecified, QCApplied, ProcessingLevel, VariableType. Tags, Methods, and QCApplied support multiple values within a cell, separated by a semicolon (;). If any value contains a comma, wrap it in double quotes so it isn't mistaken for a column separator. This is the same format produced by the \"Download\" button in the dataset preview, so a downloaded data dictionary can be edited and re-uploaded as-is.")">
                                 <Icon Type="info-circle" Theme="@IconThemeType.Fill" />
                             </AntDesign.Tooltip>
                         </SpaceItem>
