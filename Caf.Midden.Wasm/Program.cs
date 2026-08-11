@@ -17,6 +17,7 @@ builder.Services.AddScoped(sp =>
 // App services
 builder.Services.AddScoped<StateContainer>();
 builder.Services.AddScoped<AppBootstrapService>();
+builder.Services.AddScoped<AutosaveService>();
 builder.Services.AddSingleton<CatalogInsightsService>();
 
 builder.Services.AddScoped<IReadConfiguration>(sp =>

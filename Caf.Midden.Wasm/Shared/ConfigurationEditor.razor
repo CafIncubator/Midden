@@ -3,6 +3,7 @@
 @using System.Collections.Generic
 @using System.Linq
 @inject Caf.Midden.Wasm.Services.StateContainer State
+@inject Caf.Midden.Wasm.Services.AutosaveService Autosave
 @inject IJSRuntime JS
 
 <Space>
@@ -28,12 +29,31 @@
             }
         </div>
     </SpaceItem>
+    <SpaceItem>
+        <span class="autosave-status">@AutosaveStatusText</span>
+    </SpaceItem>
 </Space>
 <AntDesign.Divider />
+
+@* Rendered declaratively (rather than via ConfirmService) so the prompt is owned by this
+   component's own render tree. The shared AntContainer resets its imperative dialog state on
+   NavigationManager.LocationChanged, which silently discarded confirm dialogs requested during
+   the navigation that creates this editor. *@
+<Modal Title="@("Resume Draft?")"
+       Visible="_draftRestorePromptVisible"
+       OkText="@("Yes")"
+       CancelText="@("No")"
+       OnOk="@(_ => OnDraftRestoreAccepted())"
+       OnCancel="@(_ => OnDraftRestoreDeclined())"
+       MaskClosable="false"
+       Closable="false">
+    <p>@DraftRestorePromptText</p>
+</Modal>
 @if (ConfigurationEdit != null)
 {
     <AntDesign.Form Model="ConfigurationEdit"
-                    Layout="@FormLayout.Vertical">
+                    Layout="@FormLayout.Vertical"
+                    OnFieldChanged="OnFormFieldChanged">
         <FormItem Label="Organization Name">
             <AntDesign.Input @bind-Value="@context.OrganizationName"
                               Placeholder="Name of your organization" />
@@ -47,28 +67,28 @@
                               Placeholder="Relative path to the catalog.json file" />
         </FormItem>
         <FormItem Label="Zones">
-            <StringListEditor Items="context.Zones" ItemsChanged="@((List<string> v) => context.Zones = v)" Placeholder="Zone name" ItemLabel="Zone" />
+            <StringListEditor Items="context.Zones" ItemsChanged="@((List<string> v) => { context.Zones = v; Autosave_NotifyChanged(); })" Placeholder="Zone name" ItemLabel="Zone" />
         </FormItem>
         <FormItem Label="Roles">
-            <StringListEditor Items="context.Roles" ItemsChanged="@((List<string> v) => context.Roles = v)" Placeholder="Role name" ItemLabel="Role" />
+            <StringListEditor Items="context.Roles" ItemsChanged="@((List<string> v) => { context.Roles = v; Autosave_NotifyChanged(); })" Placeholder="Role name" ItemLabel="Role" />
         </FormItem>
         <FormItem Label="Project Statuses">
-            <StringListEditor Items="context.ProjectStatuses" ItemsChanged="@((List<string> v) => context.ProjectStatuses = v)" Placeholder="Status name" ItemLabel="Project Status" />
+            <StringListEditor Items="context.ProjectStatuses" ItemsChanged="@((List<string> v) => { context.ProjectStatuses = v; Autosave_NotifyChanged(); })" Placeholder="Status name" ItemLabel="Project Status" />
         </FormItem>
         <FormItem Label="Processing Levels">
-            <StringListEditor Items="context.ProcessingLevels" ItemsChanged="@((List<string> v) => context.ProcessingLevels = v)" Placeholder="Processing level name" ItemLabel="Processing Level" />
+            <StringListEditor Items="context.ProcessingLevels" ItemsChanged="@((List<string> v) => { context.ProcessingLevels = v; Autosave_NotifyChanged(); })" Placeholder="Processing level name" ItemLabel="Processing Level" />
         </FormItem>
         <FormItem Label="Variable Types">
-            <StringListEditor Items="context.VariableTypes" ItemsChanged="@((List<string> v) => context.VariableTypes = v)" Placeholder="Variable type name" ItemLabel="Variable Type" />
+            <StringListEditor Items="context.VariableTypes" ItemsChanged="@((List<string> v) => { context.VariableTypes = v; Autosave_NotifyChanged(); })" Placeholder="Variable type name" ItemLabel="Variable Type" />
         </FormItem>
         <FormItem Label="Dataset Structures">
-            <StringListEditor Items="context.DatasetStructures" ItemsChanged="@((List<string> v) => context.DatasetStructures = v)" Placeholder="Dataset structure name" ItemLabel="Dataset Structure" />
+            <StringListEditor Items="context.DatasetStructures" ItemsChanged="@((List<string> v) => { context.DatasetStructures = v; Autosave_NotifyChanged(); })" Placeholder="Dataset structure name" ItemLabel="Dataset Structure" />
         </FormItem>
         <FormItem Label="Quality Control Tags">
-            <StringListEditor Items="context.QCTags" ItemsChanged="@((List<string> v) => context.QCTags = v)" Placeholder="Quality control tag" ItemLabel="Quality Control Tag" />
+            <StringListEditor Items="context.QCTags" ItemsChanged="@((List<string> v) => { context.QCTags = v; Autosave_NotifyChanged(); })" Placeholder="Quality control tag" ItemLabel="Quality Control Tag" />
         </FormItem>
         <FormItem Label="Tags">
-            <StringListEditor Items="context.Tags" ItemsChanged="@((List<string> v) => context.Tags = v)" Placeholder="Tag name" ItemLabel="Tag" />
+            <StringListEditor Items="context.Tags" ItemsChanged="@((List<string> v) => { context.Tags = v; Autosave_NotifyChanged(); })" Placeholder="Tag name" ItemLabel="Tag" />
         </FormItem>
         <FormItem Label="Geometries">
             @for (int i = 0; i < context.Geometries.Count; i++)
@@ -87,12 +107,13 @@
                           @ondragstart="@(() => OnGeometryDragStart(geometryIndex))">⋮⋮</span>
                     <div style="flex: 0 0 20%;">
                         <AntDesign.Input @bind-Value="geometry.Name"
+                                          @bind-Value:after="Autosave_NotifyChanged"
                                           Placeholder="Name" />
                     </div>
                     <div class="string-list-editor-input">
                         <GeoJsonEditorMap Height="180px"
                                           Value="@geometry.GeoJson"
-                                          ValueChanged="@((string v) => geometry.GeoJson = v)" />
+                                          ValueChanged="@((string v) => { geometry.GeoJson = v; Autosave_NotifyChanged(); })" />
                     </div>
                     <Button Danger
                             Icon="delete"

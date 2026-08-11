@@ -1,4 +1,6 @@
-﻿using Caf.Midden.Core.Models.v0_2;
+﻿using AntDesign;
+using Caf.Midden.Core.Models.v0_2;
+using Caf.Midden.Wasm.Services;
 using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
@@ -6,7 +8,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.Forms;
-using AntDesign;
 using Caf.Midden.Wasm.Shared.Modals;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -14,13 +15,24 @@ using System.IO;
 using Microsoft.JSInterop;
 using System.ComponentModel.DataAnnotations;
 using Caf.Midden.Core.Services;
-using Caf.Midden.Wasm.Services;
 
 namespace Caf.Midden.Wasm.Shared
 {
     public partial class ProjectEditor : ComponentBase, IDisposable
     {
+        private const string DraftKeyPrefix = "midden.draft.project.v1";
+
+        private static readonly JsonSerializerOptions DraftPayloadJsonOptions = new()
+        {
+            Converters = { new JsonStringEnumConverter() }
+        };
+
         private IDisposable? _stateSubscription;
+        private IAutosaveRegistration? _autosaveRegistration;
+        private DateTime? _lastSavedUtc;
+        private string _draftKey = DraftKeyPrefix;
+        private DraftEnvelope<Project>? _pendingDraft;
+        private bool _draftRestorePromptVisible;
 
         public Project Project { get; set; } = new Project();
 
@@ -28,6 +40,14 @@ namespace Caf.Midden.Wasm.Shared
         public bool isLoading { get; set; } = false;
 
         string markdownHtml = "";
+
+        private string AutosaveStatusText => _lastSavedUtc is null
+            ? string.Empty
+            : $"All changes saved \u00b7 {FormatRelativeTime(_lastSavedUtc.Value)}";
+
+        private string DraftRestorePromptText => _pendingDraft is null
+            ? string.Empty
+            : $"A saved draft from {FormatRelativeTime(_pendingDraft.SavedAtUtc)} was found. Resume editing it?";
 
         private async Task OnStateChanged(AppStateChangedEventArgs args)
         {
@@ -47,6 +67,150 @@ namespace Caf.Midden.Wasm.Shared
                 AppStateChange.LastUpdated);
         }
 
+        protected override async Task OnInitializedAsync()
+        {
+            await Autosave.EnsureUnloadFlushRegisteredAsync();
+
+            _autosaveRegistration = Autosave.RegisterAutosave(
+                _draftKey,
+                BuildDraftSnapshotJson,
+                TimeSpan.FromMilliseconds(400),
+                TimeSpan.FromSeconds(20));
+
+            Autosave.Saved += OnAutosaveSaved;
+
+            // The restore prompt is a declarative <Modal> in this component's own markup,
+            // driven purely by component state, so it can be decided here without depending
+            // on render/navigation timing.
+            TryOfferDraftRestore();
+        }
+
+        private void OnAutosaveSaved(string key, DateTime savedAtUtc)
+        {
+            if (key != _draftKey)
+            {
+                return;
+            }
+
+            _lastSavedUtc = savedAtUtc;
+            InvokeAsync(StateHasChanged);
+        }
+
+        private void OnFormFieldChanged(FieldChangedEventArgs e)
+        {
+            Autosave_NotifyChanged();
+        }
+
+        private void Autosave_NotifyChanged()
+        {
+            _autosaveRegistration?.NotifyChanged();
+        }
+
+        private static string GetIdentityFingerprint(Project project)
+            => project.Name ?? string.Empty;
+
+        private string? BuildDraftSnapshotJson()
+        {
+            // While the restore prompt is open the current state is still the pre-restore
+            // snapshot. Skip autosaving in this window - including the periodic fallback
+            // timer - so an unanswered prompt can't clobber the real cached draft with it.
+            if (_draftRestorePromptVisible)
+            {
+                return null;
+            }
+
+            if (State.ProjectEdit is null)
+            {
+                return null;
+            }
+
+            var envelope = new DraftEnvelope<Project>
+            {
+                SavedAtUtc = DateTime.UtcNow,
+                IdentityFingerprint = GetIdentityFingerprint(State.ProjectEdit),
+                Payload = State.ProjectEdit
+            };
+
+            return AutosaveService.SerializeEnvelope(envelope, DraftPayloadJsonOptions);
+        }
+
+        private void TryOfferDraftRestore()
+        {
+            if (Autosave.HasBeenPrompted(_draftKey))
+            {
+                return;
+            }
+
+            var draft = Autosave.TryGetDraft<Project>(_draftKey);
+            if (draft?.Payload is null)
+            {
+                return;
+            }
+
+            // Only offer to restore if the draft matches the currently loaded project
+            // (or the editor is still in its blank "new" state), so a stale draft from
+            // editing a different project isn't offered while editing this one.
+            var currentFingerprint = GetIdentityFingerprint(State.ProjectEdit);
+            var isBlankCurrent = string.IsNullOrEmpty(currentFingerprint);
+            if (!isBlankCurrent && draft.IdentityFingerprint != currentFingerprint)
+            {
+                return;
+            }
+
+            Autosave.TryMarkPrompted(_draftKey);
+
+            _pendingDraft = draft;
+            _draftRestorePromptVisible = true;
+        }
+
+        private void OnDraftRestoreAccepted()
+        {
+            var payload = _pendingDraft?.Payload;
+
+            _draftRestorePromptVisible = false;
+            _pendingDraft = null;
+
+            if (payload is null)
+            {
+                return;
+            }
+
+            State.UpdateProjectEdit(this, payload);
+        }
+
+        private void OnDraftRestoreDeclined()
+        {
+            _draftRestorePromptVisible = false;
+            _pendingDraft = null;
+
+            Autosave.RemoveDraft(_draftKey);
+        }
+
+        private static string FormatRelativeTime(DateTime savedAtUtc)
+        {
+            var elapsed = DateTime.UtcNow - savedAtUtc;
+
+            if (elapsed < TimeSpan.FromMinutes(1))
+            {
+                return "just now";
+            }
+
+            if (elapsed < TimeSpan.FromHours(1))
+            {
+                var minutes = (int)elapsed.TotalMinutes;
+                return $"{minutes} minute{(minutes == 1 ? string.Empty : "s")} ago";
+            }
+
+            if (elapsed < TimeSpan.FromDays(1))
+            {
+                var hours = (int)elapsed.TotalHours;
+                return $"{hours} hour{(hours == 1 ? string.Empty : "s")} ago";
+            }
+
+            var days = (int)elapsed.TotalDays;
+            return $"{days} day{(days == 1 ? string.Empty : "s")} ago";
+        }
+
         Task OnMarkdownValueHTMLChanged(string value)
         {
             markdownHtml = value;
@@ -58,6 +222,7 @@ namespace Caf.Midden.Wasm.Shared
             //DateTime dt = DateTime.UtcNow;
 
             State.UpdateProjectEdit(this, new Project());
+            Autosave.RemoveDraft(_draftKey);
         }
 
         private async Task<string> SaveProject()
@@ -72,11 +237,13 @@ namespace Caf.Midden.Wasm.Shared
             var buffer = Encoding.UTF8.GetBytes(fileString);
             var stream = new MemoryStream(buffer);
             var fileBytes = stream.ToArray();
-            
+
             await JS.InvokeAsync<string>(
                 "saveAsFile", 
                 $"DESCRIPTION.md",
                 Convert.ToBase64String(fileBytes));
+
+            Autosave.RemoveDraft(_draftKey);
 
             return fileString;
         }
@@ -108,6 +275,7 @@ namespace Caf.Midden.Wasm.Shared
                 if (project is not null)
                 {
                     State.UpdateProjectEdit(this, project);
+                    Autosave.RemoveDraft(_draftKey);
                 }
                 //await ProjectChanged.InvokeAsync(this.Project);
             }
@@ -124,6 +292,8 @@ namespace Caf.Midden.Wasm.Shared
 
         public void Dispose()
         {
+            Autosave.Saved -= OnAutosaveSaved;
+            _autosaveRegistration?.Dispose();
             _stateSubscription?.Dispose();
         }
     }

@@ -1,5 +1,6 @@
 ﻿@using AntDesign
 @inject Caf.Midden.Wasm.Services.StateContainer State
+@inject Caf.Midden.Wasm.Services.AutosaveService Autosave
 @inject ModalService ModalService
 @inject IJSRuntime JS
 
@@ -16,13 +17,32 @@
         <MetadataLoaderFileSystem Metadata="State.MetadataEdit"
                       MetadataChanged="OnMetadataLoaded" />
     </SpaceItem>
+    <SpaceItem>
+        <span class="autosave-status">@AutosaveStatusText</span>
+    </SpaceItem>
 </Space>
 <AntDesign.Divider />
+
+@* Rendered declaratively (rather than via ConfirmService) so the prompt is owned by this
+   component's own render tree. The shared AntContainer resets its imperative dialog state on
+   NavigationManager.LocationChanged, which silently discarded confirm dialogs requested during
+   the navigation that creates this editor. *@
+<Modal Title="@("Resume Draft?")"
+       Visible="_draftRestorePromptVisible"
+       OkText="@("Yes")"
+       CancelText="@("No")"
+       OnOk="@(_ => OnDraftRestoreAccepted())"
+       OnCancel="@(_ => OnDraftRestoreDeclined())"
+       MaskClosable="false"
+       Closable="false">
+    <p>@DraftRestorePromptText</p>
+</Modal>
 
 @if (State?.MetadataEdit != null && State?.AppConfig != null)
 {
     <AntDesign.Form Model="State.MetadataEdit"
                     Layout="@FormLayout.Vertical"
+                    OnFieldChanged="OnFormFieldChanged"
                     @ref="form">
         <Tabs Animated>
             <TabPane Key="1" Tab="Basic">
