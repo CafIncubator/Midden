@@ -335,6 +335,13 @@
     color: rgba(0, 0, 0, 0.35);
 }
 
+/* Used in place of a normal value Tag to signal "no value set" without
+   looking like a selectable/real option (no border, no fill, muted + italic). */
+.variable-not-specified {
+    color: rgba(0, 0, 0, 0.35);
+    font-style: italic;
+}
+
 .catalog-name-cell {
     display: flex;
     align-items: center;

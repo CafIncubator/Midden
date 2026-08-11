@@ -293,14 +293,18 @@
                                         </SelectOptions>
                                     </Select>
                                 }
-                                else
+                                else if (variable.QCApplied is { Count: > 0 })
                                 {
                                     @foreach (var qc in variable.QCApplied)
                                     {
                                         <Tag>@qc</Tag>
                                     }
                                 }
-                                
+                                else
+                                {
+                                    <span class="variable-not-specified">Not specified</span>
+                                }
+
                                 </AntDesign.PropertyColumn>
 
 
@@ -318,11 +322,15 @@
                                         </SelectOptions>
                                     </SimpleSelect>
                                 }
-                                else
+                                else if (!string.IsNullOrWhiteSpace(variable.ProcessingLevel))
                                 {
                                     <Tag>@variable.ProcessingLevel</Tag>
                                 }
-                                
+                                else
+                                {
+                                    <span class="variable-not-specified">Not specified</span>
+                                }
+
                                 </AntDesign.PropertyColumn>
 
 
@@ -340,11 +348,15 @@
                                         </SelectOptions>
                                     </SimpleSelect>
                                 }
-                                else
+                                else if (!string.IsNullOrWhiteSpace(variable.VariableType))
                                 {
                                     <Tag>@variable.VariableType</Tag>
                                 }
-                                
+                                else
+                                {
+                                    <span class="variable-not-specified">Not specified</span>
+                                }
+
                             </AntDesign.PropertyColumn>
 
                                 <AntDesign.PropertyColumn Property="@(item => item.Tags)">

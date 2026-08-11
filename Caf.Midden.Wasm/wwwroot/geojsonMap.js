@@ -23,7 +23,7 @@ export function createBaseLayers() {
     });
 
     return {
-        layers: [usgsTopo],
+        layers: [usgsSat],
         baseMaps: {
             'USGS Topo': usgsTopo,
             'USGS Imagery Topo': usgsSat,
@@ -60,6 +60,48 @@ export function create(mapElement, geometry) {
     document.getElementById(mapElement.id).style.width = "100%";
 
     leafletMap.fitBounds(spatialExtent.getBounds());
+
+    return leafletMap;
+}
+
+// Creates a leaflet map showing the extents of many datasets at once, for the catalog-wide
+// spatial coverage view. Boxes are pre-computed server-side as west/south/east/north, so there
+// is no geometry to parse here and each dataset costs exactly one shape.
+//
+// Boxes flagged isPoint have no area (point geometries, axis-aligned lines) and would render as
+// an invisible zero-size rectangle, so they are drawn as circle markers instead. Markers keep a
+// constant screen size at any zoom, which is the honest representation: the dataset claims a
+// location, not a region.
+export function createBoxes(mapElement, boxes) {
+    var baseLayers = createBaseLayers();
+
+    var leafletMap = L.map(mapElement.id, { layers: baseLayers.layers });
+
+    L.control.layers(baseLayers.baseMaps).addTo(leafletMap);
+
+    var group = L.featureGroup().addTo(leafletMap);
+
+    (boxes || []).forEach(function (box) {
+        if (box.isPoint) {
+            L.circleMarker(
+                [box.centerLatitude, box.centerLongitude],
+                { radius: 4, color: '#1890ff', weight: 1, fillOpacity: 0.6 })
+                .addTo(group);
+        } else {
+            L.rectangle(
+                [[box.south, box.west], [box.north, box.east]],
+                { color: '#1890ff', weight: 1, fillOpacity: 0.15 })
+                .addTo(group);
+        }
+    });
+
+    document.getElementById(mapElement.id).style.width = "100%";
+
+    if (group.getLayers().length > 0) {
+        leafletMap.fitBounds(group.getBounds(), { padding: [12, 12] });
+    } else {
+        leafletMap.setView([0, 0], 1);
+    }
 
     return leafletMap;
 }

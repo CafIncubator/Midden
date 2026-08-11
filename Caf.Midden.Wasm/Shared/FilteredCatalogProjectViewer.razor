@@ -52,10 +52,13 @@
 
 @if (ViewModel.FilteredCatalogProjects.Count > 0)
 {
-    <div class="catalog-summary-bar">
-        <div><strong>@ViewModel.FilteredCatalogProjects.Count</strong> projects</div>
-        <div>Showing @GetCurrentRangeStart()-@GetCurrentRangeEnd() of @ViewModel.FilteredCatalogProjects.Count</div>
-    </div>
+    @if (ShowResultCount)
+    {
+        <div class="catalog-summary-bar">
+            <div><strong>@ViewModel.FilteredCatalogProjects.Count</strong> projects</div>
+            <div>Showing @GetCurrentRangeStart()-@GetCurrentRangeEnd() of @ViewModel.FilteredCatalogProjects.Count</div>
+        </div>
+    }
 
     <Row Gutter="16" Wrap="true">
         @foreach (var project in ViewModel.PagedCatalogProjects)
@@ -101,11 +104,14 @@
         }
     </Row>
 
-    <div class="catalog-pagination-bar">
-        <Button Disabled="@(CurrentPage <= 1)" OnClick="() => MoveToPage(CurrentPage - 1)">Previous</Button>
-        <span>Page @CurrentPage of @TotalPages</span>
-        <Button Disabled="@(CurrentPage >= TotalPages)" OnClick="() => MoveToPage(CurrentPage + 1)">Next</Button>
-    </div>
+    @if (ShowPager)
+    {
+        <div class="catalog-pagination-bar">
+            <Button Disabled="@(CurrentPage <= 1)" OnClick="() => MoveToPage(CurrentPage - 1)">Previous</Button>
+            <span>Page @CurrentPage of @TotalPages</span>
+            <Button Disabled="@(CurrentPage >= TotalPages)" OnClick="() => MoveToPage(CurrentPage + 1)">Next</Button>
+        </div>
+    }
 }
 else
 {

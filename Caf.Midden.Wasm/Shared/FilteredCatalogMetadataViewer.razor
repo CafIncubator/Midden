@@ -148,10 +148,13 @@
 
 @if (FilteredMetadata.Count > 0)
 {
-    <div class="catalog-summary-bar">
-        <div><strong>@FilteredMetadata.Count</strong> datasets</div>
-        <div>Showing @GetCurrentRangeStart()-@GetCurrentRangeEnd() of @FilteredMetadata.Count</div>
-    </div>
+    @if (ShowResultCount)
+    {
+        <div class="catalog-summary-bar">
+            <div><strong>@FilteredMetadata.Count</strong> datasets</div>
+            <div>Showing @GetCurrentRangeStart()-@GetCurrentRangeEnd() of @FilteredMetadata.Count</div>
+        </div>
+    }
 
     <Row Gutter="16" Wrap="true">
         @foreach (var card in PagedMetadata)
@@ -208,11 +211,14 @@
         }
     </Row>
 
-    <div class="catalog-pagination-bar">
-        <Button Disabled="@(CurrentPage <= 1)" OnClick="() => MoveToPage(CurrentPage - 1)">Previous</Button>
-        <span>Page @CurrentPage of @TotalPages</span>
-        <Button Disabled="@(CurrentPage >= TotalPages)" OnClick="() => MoveToPage(CurrentPage + 1)">Next</Button>
-    </div>
+    @if (ShowPager)
+    {
+        <div class="catalog-pagination-bar">
+            <Button Disabled="@(CurrentPage <= 1)" OnClick="() => MoveToPage(CurrentPage - 1)">Previous</Button>
+            <span>Page @CurrentPage of @TotalPages</span>
+            <Button Disabled="@(CurrentPage >= TotalPages)" OnClick="() => MoveToPage(CurrentPage + 1)">Next</Button>
+        </div>
+    }
 }
 else
 {

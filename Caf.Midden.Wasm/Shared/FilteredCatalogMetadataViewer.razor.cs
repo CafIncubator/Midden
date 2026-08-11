@@ -45,6 +45,12 @@ namespace Caf.Midden.Wasm.Shared
         [Parameter]
         public int ShowRecentNumber { get; set; }
 
+        [Parameter]
+        public bool ShowResultCount { get; set; } = true;
+
+        [Parameter]
+        public bool ShowPager { get; set; } = true;
+
         EmbeddedProperty Property(int span, int offset) => new() { Span = span, Offset = offset };
 
         public List<MetadataCardItem> BaseMetadataCards { get; set; } = new();

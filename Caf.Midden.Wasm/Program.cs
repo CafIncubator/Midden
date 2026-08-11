@@ -4,6 +4,7 @@ using Caf.Midden.Wasm;
 using Caf.Midden.Core.Services;
 using Caf.Midden.Core.Services.Configuration;
 using Caf.Midden.Wasm.Services;
+using Radzen;
 
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -19,6 +20,7 @@ builder.Services.AddScoped<StateContainer>();
 builder.Services.AddScoped<AppBootstrapService>();
 builder.Services.AddScoped<AutosaveService>();
 builder.Services.AddSingleton<CatalogInsightsService>();
+builder.Services.AddSingleton<CatalogSearchService>();
 
 builder.Services.AddScoped<IReadConfiguration>(sp =>
     new ConfigurationReaderHttp(
@@ -31,6 +33,10 @@ builder.Services.AddScoped<IReadCatalog>(sp =>
 
 // UI framework
 builder.Services.AddAntDesign();
+
+// Radzen supplies the dashboard charts: it renders SVG directly from Blazor, so axis
+// formatting is plain C# and the plot tracks its container without a JS measurement step.
+builder.Services.AddRadzenComponents();
 
 await builder.Build().RunAsync();
 

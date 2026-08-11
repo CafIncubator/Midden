@@ -1,0 +1,40 @@
+@using Caf.Midden.Wasm.Services
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+
+<div @ref="map" id="@_mapId" class="catalog-coverage-map"></div>
+
+@code {
+    private readonly string _mapId = $"coverage-map-{Guid.NewGuid():N}";
+
+    ElementReference map;
+    IJSObjectReference? mapModule;
+    IJSObjectReference? mapInstance;
+
+    [Parameter]
+    public IReadOnlyList<SpatialBoundingBox> Boxes { get; set; } = Array.Empty<SpatialBoundingBox>();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (mapModule == null && Boxes.Count > 0)
+        {
+            mapModule = await JS.InvokeAsync<IJSObjectReference>(
+                "import", "./geojsonMap.js");
+            mapInstance = await mapModule.InvokeAsync<IJSObjectReference>(
+                "createBoxes", map, Boxes);
+        }
+    }
+
+    async ValueTask IAsyncDisposable.DisposeAsync()
+    {
+        if (mapInstance != null)
+        {
+            await mapInstance.DisposeAsync();
+        }
+
+        if (mapModule != null)
+        {
+            await mapModule.DisposeAsync();
+        }
+    }
+}

@@ -42,9 +42,16 @@
                 <AntDesign.PropertyColumn Property="@(item => item.Variable.QCApplied)"
                                           Title="Quality Control"
                                           Width="140">
-                    @foreach (var qc in row.Variable.QCApplied ?? new List<string>())
+                    @if (row.Variable.QCApplied is { Count: > 0 })
                     {
-                        <Tag>@qc</Tag>
+                        @foreach (var qc in row.Variable.QCApplied)
+                        {
+                            <Tag>@qc</Tag>
+                        }
+                    }
+                    else
+                    {
+                        <span class="variable-not-specified">Not specified</span>
                     }
                 </AntDesign.PropertyColumn>
             }
@@ -57,7 +64,14 @@
                                           Filters="FilterProcessing"
                                           OnFilter="@((value, processing) => FilterByPrefix(value, processing))"
                                           FilterMultiple="true">
-                    <Tag>@row.Variable.ProcessingLevel</Tag>
+                    @if (!string.IsNullOrWhiteSpace(row.Variable.ProcessingLevel))
+                    {
+                        <Tag>@row.Variable.ProcessingLevel</Tag>
+                    }
+                    else
+                    {
+                        <span class="variable-not-specified">Not specified</span>
+                    }
                 </AntDesign.PropertyColumn>
             }
 
@@ -69,7 +83,14 @@
                                           Filters="FilterVariableType"
                                           OnFilter="@((value, variableType) => FilterByPrefix(value, variableType))"
                                           FilterMultiple="true">
-                    <Tag>@row.Variable.VariableType</Tag>
+                    @if (!string.IsNullOrWhiteSpace(row.Variable.VariableType))
+                    {
+                        <Tag>@row.Variable.VariableType</Tag>
+                    }
+                    else
+                    {
+                        <span class="variable-not-specified">Not specified</span>
+                    }
                 </AntDesign.PropertyColumn>
             }
 

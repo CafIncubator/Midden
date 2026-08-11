@@ -40,6 +40,12 @@ namespace Caf.Midden.Wasm.Shared
         [Parameter]
         public int ShowRecentNumber { get; set; }
 
+        [Parameter]
+        public bool ShowResultCount { get; set; } = true;
+
+        [Parameter]
+        public bool ShowPager { get; set; } = true;
+
         public List<string> StatusOptions { get; set; } = new();
 
         public string SelectedStatus { get; set; } = string.Empty;
