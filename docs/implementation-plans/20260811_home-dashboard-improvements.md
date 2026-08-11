@@ -1,8 +1,10 @@
 # Implementation Plan: Home Dashboard Improvements
 
-> Status: Active. Written after a design review of `Pages/Index.razor`, `Pages/Index.razor.cs`,
-> `Services/CatalogInsightsService.cs`, the two `FilteredCatalog*Viewer` components, and the
-> `Caf.Midden.Core.Models.v0_2` model surface.
+> Status: Shipped. Rollout steps 1-7 have landed. Written after a design review of
+> `Pages/Index.razor`, `Pages/Index.razor.cs`, `Services/CatalogInsightsService.cs`, the two
+> `FilteredCatalog*Viewer` components, and the `Caf.Midden.Core.Models.v0_2` model surface. See
+> "Post-implementation notes" at the end of this document for where the shipped code diverged
+> from the original plan.
 
 ## Goal
 
@@ -132,7 +134,7 @@ contributor work queue is real but secondary, so it goes last.
 
 1. `PageHeader` (organization name)
 2. **Universal search** (new)
-3. KPI strip (5 tiles: Catalog Collated, Projects, Datasets, Variables, Contributors)
+3. KPI strip (6 tiles: Catalog Collated, Projects, Datasets, Variables, Tags, Contributors)
 4. Recent Datasets / Recent Projects (no counts, no pager)
 5. Stats for Nerds — charts and top-N lists
 6. **Needs Attention** (new) — completeness, orphaned projects, validation. Bottom of the page
@@ -146,8 +148,9 @@ contributor work queue is real but secondary, so it goes last.
 | **Orphaned projects** | D1 | List of referenced-but-undocumented project names with dataset counts; CTA to `editor/project` |
 | **Datasets per project** | `Dataset.Project` grouped | Horizontal `Bar`, top 8 — handles long names like `CafModelingRegionalSoilConditioningIndex` far better than a vertical column |
 | **Project coverage** | `Project` × dataset counts | Projects with ≥1 dataset vs. none; status split weighted by dataset count rather than raw project count |
-| **Spatial coverage** | `Dataset.Geometry` (GeoJSON) | Small Leaflet map of dataset extents, reusing the existing `geojsonMap.js` interop and `GeoJsonMap.razor` |
+| **Spatial coverage** | `Dataset.Geometry` (GeoJSON) | Small map of dataset extents (see "Post-implementation notes" — shipped as bounding boxes via a new `CatalogCoverageMap` component rather than reusing `GeoJsonMap.razor`) |
 | **Temporal coverage** | `Dataset.TemporalExtent` (`{start}/{end}` ISO-8601) | Year-bucketed coverage strip showing which periods are covered and where the gaps are |
+| **Undocumented variables** | `Variable.Description` / `Variable.Units` across all metadata | Count of variables missing a description and/or units, plus the datasets with the most affected variables, each linking to `editor/dataset` |
 | **Validation health** | `MetadataValidator.Validate` over all metadata | Count of datasets with errors / with warnings / clean, linking to the offending datasets |
 
 Temporal parsing reuses the `TemporalExtentValidator` helper from the validation work rather
@@ -198,6 +201,11 @@ than a second hand-rolled parser; unparseable extents are counted as "unknown" a
 Home page will now do better. Recommendation: **delete it** along with `Insights.razor.cs` once
 step 6 lands. Flagged rather than assumed, since it may be linked externally.
 
+**Status: still unresolved.** Step 6 has landed but `Pages/Insights.razor` and
+`Insights.razor.cs` are still present in the workspace and still unreferenced from
+`MainLayout.razor`. This should be revisited: either delete the files now, or record an explicit
+decision (e.g. an external link depends on it) for why they remain.
+
 ## Out of Scope
 
 - A dedicated Tags page or Contributors page (would unlock the two remaining KPI links).
@@ -207,3 +215,23 @@ step 6 lands. Flagged rather than assumed, since it may be linked externally.
 - Trend deltas on the KPI tiles ("+3 this month") — cheap once `DatasetGrowth` is reused, but
   deferred so the KPI strip rework stays a single concern.
 - Any change to how the catalog is crawled, collated, or loaded.
+
+## Post-implementation notes
+
+Added after reviewing the shipped code against this plan:
+
+- **Spatial coverage** did not reuse `GeoJsonMap.razor` / `geojsonMap.js`. Instead,
+  `CatalogInsightsService` collapses each dataset's geometry server-side into a
+  `SpatialBoundingBox` (min/max envelope, degenerate boxes rendered as point markers), and
+  `Index.razor` renders those through a new `CatalogCoverageMap` component. This keeps the
+  catalog-wide map cheap in WASM (no full-geometry parsing in the browser) and is the preferred
+  approach going forward; this document has been updated to match.
+- **Undocumented variables** shipped as an additional Needs Attention insight
+  (`UndocumentedVariableSummary` in `CatalogInsightsService`, surfaced in `Index.razor` and
+  factored into `HasAttentionItems`) even though it was never called out in the original "New
+  Insights" table. It has now been added above.
+- **KPI strip** ships with 6 tiles (Catalog Collated, Projects, Datasets, Variables, Tags,
+  Contributors), consistent with D6 ("Tags and Contributors do not link") but the original
+  "Page Order" section undercounted it as 5; corrected above.
+- `Pages/Insights.razor` / `Insights.razor.cs` were **not** deleted; the Open Question above is
+  still outstanding.

@@ -10,14 +10,19 @@
     ElementReference map;
     IJSObjectReference? mapModule;
     IJSObjectReference? mapInstance;
+    bool initializing;
 
     [Parameter]
     public IReadOnlyList<SpatialBoundingBox> Boxes { get; set; } = Array.Empty<SpatialBoundingBox>();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (mapModule == null && Boxes.Count > 0)
+        // The flag is set synchronously: mapModule is only assigned after two awaits, so a
+        // second render pass would otherwise initialize Leaflet on the same container again.
+        if (!initializing && mapModule == null && Boxes.Count > 0)
         {
+            initializing = true;
+
             mapModule = await JS.InvokeAsync<IJSObjectReference>(
                 "import", "./geojsonMap.js");
             mapInstance = await mapModule.InvokeAsync<IJSObjectReference>(
@@ -27,14 +32,25 @@
 
     async ValueTask IAsyncDisposable.DisposeAsync()
     {
-        if (mapInstance != null)
+        try
         {
-            await mapInstance.DisposeAsync();
-        }
+            if (mapModule != null && mapInstance != null)
+            {
+                await mapModule.InvokeVoidAsync("destroy", mapInstance);
+            }
 
-        if (mapModule != null)
+            if (mapInstance != null)
+            {
+                await mapInstance.DisposeAsync();
+            }
+
+            if (mapModule != null)
+            {
+                await mapModule.DisposeAsync();
+            }
+        }
+        catch (JSDisconnectedException)
         {
-            await mapModule.DisposeAsync();
         }
     }
 }

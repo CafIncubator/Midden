@@ -161,11 +161,14 @@
 
     <Divider />
 
-    <Title Level="2">Catalog statistics</Title>
-    <Text Type="@TextElementType.Secondary">Stats for nerds</Text>
+    <Title Level="2">Catalog insights</Title>
     <AntDesign.Row Gutter="16" Wrap="true">
         <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(12,0)" Class="home-stats-col">
-            <AntDesign.Card Bordered Title="Projects by status" >
+            <AntDesign.Card Bordered Title="Projects by status">
+                <Extra>
+                    <CardInfo Text="How many projects sit in each project status defined by your catalog. Use it to see where documentation effort is concentrated and what is still in progress." />
+                </Extra>
+                <Body>
                 @if (State.AppConfig != null && State.Catalog.Metadatas.Count > 0 && ProjectsPerStatusData.Length > 0)
                 {
                     <div class="home-chart-wrapper-fill">
@@ -190,10 +193,15 @@
                         </RadzenChart>
                     </div>
                 }
+                </Body>
             </AntDesign.Card>
         </AntDesign.Col>
         <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(12,0)" Class="home-stats-col">
             <AntDesign.Card Bordered Title="Datasets by zone">
+                <Extra>
+                    <CardInfo Text="How many datasets are published to each storage zone. Use it to check that data is landing in the zones you expect." />
+                </Extra>
+                <Body>
                 @if (State.AppConfig != null && State.Catalog.Metadatas.Count > 0 && MetadataPerZoneData.Length > 0)
                 {
                     <div class="home-chart-wrapper-fill">
@@ -218,6 +226,7 @@
                         </RadzenChart>
                     </div>
                 }
+                </Body>
             </AntDesign.Card>
         </AntDesign.Col>
     </AntDesign.Row>
@@ -226,7 +235,12 @@
         <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(12,0)" Class="home-stats-col">
             <AntDesign.AntList DataSource="@TopDatasetTags"
                                Bordered>
-                <Header>Top dataset tags</Header>
+                <Header>
+                    <div class="home-list-header">
+                        <span>Top dataset tags</span>
+                        <CardInfo Text="The most frequently applied dataset-level keywords, with the number of datasets using each. Select a tag to browse those datasets." />
+                    </div>
+                </Header>
                 <ChildContent Context="item">
                     <a href="catalog/datasets/tags/@item.Key">
                         <ListItem>
@@ -240,7 +254,12 @@
         <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(12,0)" Class="home-stats-col">
             <AntDesign.AntList DataSource="@TopVariableTags"
                                Bordered>
-                <Header>Top variable tags</Header>
+                <Header>
+                    <div class="home-list-header">
+                        <span>Top variable tags</span>
+                        <CardInfo Text="The most frequently applied keywords on variables inside datasets, with the number of variables using each. Select a tag to browse those variables." />
+                    </div>
+                </Header>
                 <ChildContent Context="item">
                     <a href="catalog/variables/tags/@item.Key" class="ListItemLink">
                         <ListItem>
@@ -257,7 +276,12 @@
         <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(12,0)" Class="home-stats-col">
             <AntDesign.AntList DataSource="@TopContacts"
                                Bordered>
-                <Header>Top contributors</Header>
+                <Header>
+                    <div class="home-list-header">
+                        <span>Top contributors</span>
+                        <CardInfo Text="The people listed as contacts on the most datasets. Use it to find who to ask about the data in this catalog." />
+                    </div>
+                </Header>
                 <ChildContent Context="item">
                     <ListItem>
                         <span><Text>@item.Key</Text></span> @item.Value
@@ -267,6 +291,10 @@
         </AntDesign.Col>
         <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(12,0)" Class="home-stats-col">
             <AntDesign.Card Bordered Title="Dataset growth">
+                <Extra>
+                    <CardInfo Text="The running total of documented datasets over time, by the month each was created. A rising line means the catalog is still growing; a flat stretch means nothing new was documented." />
+                </Extra>
+                <Body>
                 @if (DatasetGrowthPoints.Length > 0)
                 {
                     <div class="home-chart-wrapper-fill">
@@ -292,6 +320,7 @@
                         </RadzenChart>
                     </div>
                 }
+                </Body>
             </AntDesign.Card>
         </AntDesign.Col>
     </AntDesign.Row>
@@ -299,6 +328,10 @@
     <AntDesign.Row Gutter="16" Wrap="true">
         <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(12,0)" Class="home-stats-col">
             <AntDesign.Card Bordered Title="Datasets per project">
+                <Extra>
+                    <CardInfo Text="The projects with the most documented datasets. Use it to compare the size of each project's catalog and spot projects with little documentation." />
+                </Extra>
+                <Body>
                 @if (DatasetsPerProjectData.Length > 0)
                 {
                     <div class="home-chart-wrapper-fill">
@@ -333,11 +366,16 @@
                 {
                     <Empty Simple Description="@("No datasets are assigned to a project")" />
                 }
+                </Body>
             </AntDesign.Card>
         </AntDesign.Col>
 
         <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(12,0)" Class="home-stats-col">
             <AntDesign.Card Bordered Title="Project coverage">
+                <Extra>
+                    <CardInfo Text="How many projects already have datasets documented versus none at all, plus how the documented datasets break down by project status. Projects with no datasets are the gaps to fill." />
+                </Extra>
+                <Body>
                 @if (TotalProjects > 0)
                 {
                     <div class="home-coverage-split">
@@ -369,6 +407,7 @@
                 {
                     <Empty Simple Description="@("No projects are documented")" />
                 }
+                </Body>
             </AntDesign.Card>
         </AntDesign.Col>
     </AntDesign.Row>
@@ -376,6 +415,10 @@
     <AntDesign.Row Gutter="16" Wrap="true">
         <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(12,0)" Class="home-stats-col">
             <AntDesign.Card Bordered Title="Temporal coverage">
+                <Extra>
+                    <CardInfo Text="The number of datasets whose declared time extent covers each year. Taller bars are well-documented periods and gaps are years the catalog does not describe." />
+                </Extra>
+                <Body>
                 @if (TemporalCoverage.Count > 0)
                 {
                     <div class="home-attention-caption">
@@ -398,11 +441,16 @@
                 {
                     <Empty Simple Description="@("No datasets declare a temporal extent")" />
                 }
+                </Body>
             </AntDesign.Card>
         </AntDesign.Col>
 
         <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(12,0)" Class="home-stats-col">
             <AntDesign.Card Bordered Title="Spatial coverage">
+                <Extra>
+                    <CardInfo Text="A map of the geographic extents declared by datasets in the catalog. Datasets with only a location and no area are drawn as points." />
+                </Extra>
+                <Body>
                 @if (SpatialCoverage.Shown > 0)
                 {
                     <CatalogCoverageMap Boxes="@SpatialCoverage.Boxes" />
@@ -425,6 +473,7 @@
                 {
                     <Empty Simple Description="@("No datasets declare a spatial extent")" />
                 }
+                </Body>
             </AntDesign.Card>
         </AntDesign.Col>
     </AntDesign.Row>
@@ -487,7 +536,7 @@
         </AntDesign.Row>
 
         <AntDesign.Row Gutter="16" Wrap="true">
-            <AntDesign.Col Xs="@Property(24,0)" Class="home-stats-col">
+            <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(12,0)" Class="home-stats-col">
                 <AntDesign.Card Bordered Title="Orphaned projects">
                     @if (OrphanedProjects.Count > 0)
                     {
@@ -508,6 +557,50 @@
                     else
                     {
                         <Empty Simple Description="@("Every referenced project is documented")" />
+                    }
+                </AntDesign.Card>
+            </AntDesign.Col>
+
+            <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(12,0)" Class="home-stats-col">
+                <AntDesign.Card Bordered Title="Undocumented variables">
+                    @if (UndocumentedVariables.AffectedVariables > 0)
+                    {
+                        <div class="home-attention-caption">
+                            Variables missing a description or units cannot be interpreted by a data user.
+                        </div>
+                        <div class="home-attention-validation">
+                            <div class="home-attention-validation-item">
+                                <Icon Type="file-text" Theme="@IconThemeType.Fill" Style="color:#faad14;" />
+                                <span class="home-attention-validation-count">@UndocumentedVariables.MissingDescription</span>
+                                <span class="home-attention-caption">No description</span>
+                            </div>
+                            <div class="home-attention-validation-item">
+                                <Icon Type="calculator" Theme="@IconThemeType.Fill" Style="color:#ff4d4f;" />
+                                <span class="home-attention-validation-count">@UndocumentedVariables.MissingUnits</span>
+                                <span class="home-attention-caption">No units</span>
+                            </div>
+                            <div class="home-attention-validation-item">
+                                <Icon Type="check-circle" Theme="@IconThemeType.Fill" Style="color:#52c41a;" />
+                                <span class="home-attention-validation-count">@UndocumentedVariables.DocumentedPercent%</span>
+                                <span class="home-attention-caption">Documented</span>
+                            </div>
+                        </div>
+
+                        @if (UndocumentedVariables.TopDatasets.Count > 0)
+                        {
+                            <div class="home-attention-subhead">Most affected datasets</div>
+                            @foreach (var item in UndocumentedVariables.TopDatasets)
+                            {
+                                <a class="home-attention-row" href="@DatasetUrl(item.Zone, item.Project, item.Name)">
+                                    <span class="home-attention-row-title">@item.Name</span>
+                                    <span class="home-attention-badge">@item.MissingCount of @item.VariableCount</span>
+                                </a>
+                            }
+                        }
+                    }
+                    else
+                    {
+                        <Empty Simple Description="@("Every variable declares a description and units")" />
                     }
                 </AntDesign.Card>
             </AntDesign.Col>

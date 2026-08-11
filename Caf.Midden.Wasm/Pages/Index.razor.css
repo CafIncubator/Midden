@@ -22,6 +22,14 @@
     height: 100%;
 }
 
+/* Lists have no Extra slot like Card does, so the header itself carries the alignment. */
+::deep .home-list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
 ::deep .home-chart-wrapper {
     display: flex;
     justify-content: center;

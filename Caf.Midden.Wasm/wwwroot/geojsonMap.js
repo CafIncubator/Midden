@@ -64,7 +64,16 @@ export function create(mapElement, geometry) {
     return leafletMap;
 }
 
-// Creates a leaflet map showing the extents of many datasets at once, for the catalog-wide
+// Tears a map down so Leaflet clears the "already initialized" marker it puts on the
+// container element. Without this, navigating back to a page that reuses the same
+// container throws "Map container is already initialized".
+export function destroy(leafletMap) {
+    if (leafletMap) {
+        leafletMap.remove();
+    }
+}
+
+// Creates a leaflet map showing the extents
 // spatial coverage view. Boxes are pre-computed server-side as west/south/east/north, so there
 // is no geometry to parse here and each dataset costs exactly one shape.
 //

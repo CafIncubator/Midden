@@ -51,6 +51,40 @@ public sealed record ValidationHealthSummary(int Clean, int WithWarnings, int Wi
 }
 
 /// <summary>
+/// A dataset carrying variables that are missing a description and/or units, with the count of
+/// deficient variables so the worst offenders can be fixed first.
+/// </summary>
+public sealed record UndocumentedVariableDataset(
+    string Name,
+    string Zone,
+    string Project,
+    int MissingCount,
+    int VariableCount);
+
+/// <summary>
+/// Catalog-wide rollup of variables missing the description and units that make a variable
+/// interpretable. Units are tracked separately because an unitless measurement is unusable even
+/// when everything else about it is documented.
+/// </summary>
+public sealed record UndocumentedVariableSummary(
+    int TotalVariables,
+    int MissingDescription,
+    int MissingUnits,
+    int AffectedVariables,
+    IReadOnlyList<UndocumentedVariableDataset> TopDatasets)
+{
+    public static UndocumentedVariableSummary Empty { get; } =
+        new(0, 0, 0, 0, Array.Empty<UndocumentedVariableDataset>());
+
+    /// <summary>Share of variables that document both a description and units.</summary>
+    public int DocumentedPercent => TotalVariables == 0
+        ? 100
+        : (int)Math.Round(
+            (TotalVariables - AffectedVariables) * 100d / TotalVariables,
+            MidpointRounding.AwayFromZero);
+}
+
+/// <summary>
 /// Whether documented projects actually have datasets, and how project status breaks down by
 /// the amount of dataset activity behind it rather than by raw project count.
 /// </summary>
@@ -131,6 +165,7 @@ public sealed record CatalogInsightsSnapshot(
     IReadOnlyList<OrphanedProject> OrphanedProjects,
     CompletenessSummary Completeness,
     ValidationHealthSummary ValidationHealth,
+    UndocumentedVariableSummary UndocumentedVariables,
     IReadOnlyList<KeyCount> DatasetsPerProject,
     int DatasetsPerProjectTotal,
     ProjectCoverageSummary ProjectCoverage,
@@ -154,6 +189,7 @@ public sealed record CatalogInsightsSnapshot(
         Array.Empty<OrphanedProject>(),
         CompletenessSummary.Empty,
         ValidationHealthSummary.Empty,
+        UndocumentedVariableSummary.Empty,
         Array.Empty<KeyCount>(),
         0,
         ProjectCoverageSummary.Empty,
@@ -165,6 +201,7 @@ public sealed class CatalogInsightsService
 {
     private const int TopCountLimit = 5;
     private const int LowestCompletenessLimit = 5;
+    private const int UndocumentedVariablesLimit = 5;
     private const int DatasetsPerProjectLimit = 12;
     private const int SpatialCoverageLimit = 250;
 
@@ -239,6 +276,7 @@ public sealed class CatalogInsightsService
             OrphanedProjects: BuildOrphanedProjects(projects, datasetCountByNormalizedProject),
             Completeness: BuildCompletenessSummary(metadatas),
             ValidationHealth: BuildValidationHealth(metadatas, configuration),
+            UndocumentedVariables: BuildUndocumentedVariables(metadatas),
             DatasetsPerProject: BuildDatasetsPerProject(datasetCountByNormalizedProject),
             DatasetsPerProjectTotal: datasetCountByNormalizedProject.Count,
             ProjectCoverage: BuildProjectCoverage(projects, datasetCountByNormalizedProject),
@@ -401,6 +439,76 @@ public sealed class CatalogInsightsService
         }
 
         return new ValidationHealthSummary(clean, withWarnings, withErrors);
+    }
+
+    private static UndocumentedVariableSummary BuildUndocumentedVariables(IReadOnlyList<Metadata> metadatas)
+    {
+        int totalVariables = 0;
+        int missingDescription = 0;
+        int missingUnits = 0;
+        int affectedVariables = 0;
+
+        List<UndocumentedVariableDataset> datasets = new();
+
+        foreach (Metadata metadata in metadatas)
+        {
+            Dataset dataset = metadata.Dataset ?? new Dataset();
+            List<Variable> variables = dataset.Variables ?? new List<Variable>();
+
+            int datasetMissing = 0;
+
+            foreach (Variable variable in variables)
+            {
+                totalVariables++;
+
+                bool lacksDescription = string.IsNullOrWhiteSpace(variable.Description);
+                bool lacksUnits = string.IsNullOrWhiteSpace(variable.Units);
+
+                if (lacksDescription)
+                {
+                    missingDescription++;
+                }
+
+                if (lacksUnits)
+                {
+                    missingUnits++;
+                }
+
+                if (lacksDescription || lacksUnits)
+                {
+                    affectedVariables++;
+                    datasetMissing++;
+                }
+            }
+
+            if (datasetMissing > 0)
+            {
+                datasets.Add(new UndocumentedVariableDataset(
+                    dataset.Name ?? string.Empty,
+                    dataset.Zone ?? string.Empty,
+                    dataset.Project ?? string.Empty,
+                    datasetMissing,
+                    variables.Count));
+            }
+        }
+
+        if (affectedVariables == 0)
+        {
+            return new UndocumentedVariableSummary(totalVariables, 0, 0, 0, Array.Empty<UndocumentedVariableDataset>());
+        }
+
+        List<UndocumentedVariableDataset> topDatasets = datasets
+            .OrderByDescending(item => item.MissingCount)
+            .ThenBy(item => item.Name, StringComparer.OrdinalIgnoreCase)
+            .Take(UndocumentedVariablesLimit)
+            .ToList();
+
+        return new UndocumentedVariableSummary(
+            totalVariables,
+            missingDescription,
+            missingUnits,
+            affectedVariables,
+            topDatasets);
     }
 
     private static IReadOnlyList<KeyCount> BuildDatasetsPerProject(

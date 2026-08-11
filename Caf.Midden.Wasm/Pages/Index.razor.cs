@@ -46,6 +46,7 @@ namespace Caf.Midden.Wasm.Pages
         CompletenessSummary Completeness { get; set; } = CompletenessSummary.Empty;
         ValidationHealthSummary ValidationHealth { get; set; } = ValidationHealthSummary.Empty;
         IReadOnlyList<OrphanedProject> OrphanedProjects { get; set; } = Array.Empty<OrphanedProject>();
+        UndocumentedVariableSummary UndocumentedVariables { get; set; } = UndocumentedVariableSummary.Empty;
 
         ProjectCoverageSummary ProjectCoverage { get; set; } = ProjectCoverageSummary.Empty;
         IReadOnlyList<TemporalCoverageYear> TemporalCoverage { get; set; } = Array.Empty<TemporalCoverageYear>();
@@ -58,7 +59,8 @@ namespace Caf.Midden.Wasm.Pages
             Completeness.LowestScoring.Count > 0
             || OrphanedProjects.Count > 0
             || ValidationHealth.WithErrors > 0
-            || ValidationHealth.WithWarnings > 0;
+            || ValidationHealth.WithWarnings > 0
+            || UndocumentedVariables.AffectedVariables > 0;
 
         EmbeddedProperty Property(int span, int offset) => new() { Span = span, Offset = offset };
 
@@ -179,6 +181,7 @@ namespace Caf.Midden.Wasm.Pages
             Completeness = snapshot.Completeness;
             ValidationHealth = snapshot.ValidationHealth;
             OrphanedProjects = snapshot.OrphanedProjects;
+            UndocumentedVariables = snapshot.UndocumentedVariables;
             ProjectCoverage = snapshot.ProjectCoverage;
             TemporalCoverage = snapshot.TemporalCoverage;
             SpatialCoverage = snapshot.SpatialCoverage;

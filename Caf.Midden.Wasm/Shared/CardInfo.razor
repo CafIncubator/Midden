@@ -1,0 +1,17 @@
+@* Info affordance for a statistics card header. Rendered into Card's Extra fragment so it sits
+   right-aligned on the same baseline as the card title. *@
+
+<Tooltip Title="@Text" Placement="@Placement.TopRight">
+    <span class="card-info" role="note" tabindex="0" aria-label="@Text">
+        <Icon Type="info-circle" Theme="@IconThemeType.Outline" />
+    </span>
+</Tooltip>
+
+@code {
+    /// <summary>
+    /// Plain-language description of what the card conveys.
+    /// </summary>
+    [Parameter]
+    [EditorRequired]
+    public string Text { get; set; } = string.Empty;
+}
