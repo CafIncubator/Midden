@@ -1,4 +1,8 @@
 ﻿@page "/insights"
+
+@using Radzen.Blazor
+@using Caf.Midden.Wasm.Services
+
 @inject Services.StateContainer State
 
 <div class="site-layout-background">
@@ -59,19 +63,52 @@
 
     <AntDesign.Row Gutter="16">
         <AntDesign.Col Span="12" Style="padding: 5px;">
-            @if (MetadataPerZoneData != null)
+            @if (State.AppConfig != null && State.Catalog.Metadatas.Count > 0 && MetadataPerZoneData.Length > 0)
             {
-                <AntDesign.Charts.Column @ref="MetadataPerZone"
-                                         Data="MetadataPerZoneData"
-                                         Config="MetadataPerZoneConfig" />
+                <RadzenChart Style="width:100%;height:260px" MarginLeft="16" MarginRight="16"
+                             aria-label="Bar chart of datasets grouped by zone">
+                    <RadzenColumnSeries TItem="ZoneCount"
+                                        Data="@MetadataPerZoneData"
+                                        CategoryProperty="@nameof(ZoneCount.Zone)"
+                                        ValueProperty="@nameof(ZoneCount.Count)"
+                                        Title="Datasets"
+                                        Fill="#1890ff">
+                        <RadzenSeriesDataLabels Visible="true" />
+                    </RadzenColumnSeries>
+                    <RadzenColumnOptions MaxWidth="36" />
+                    <RadzenCategoryAxis Stroke="transparent" LabelAutoRotation="-45">
+                        <RadzenGridLines Visible="false" />
+                    </RadzenCategoryAxis>
+                    <RadzenValueAxis Visible="false" Min="0" Max="@MetadataPerZoneAxisMax">
+                        <RadzenGridLines Visible="false" />
+                    </RadzenValueAxis>
+                    <RadzenLegend Visible="false" />
+                </RadzenChart>
             }
         </AntDesign.Col>
         <AntDesign.Col Span="12" Style="padding: 5px;">
-            @if (DatasetsOverTimeData != null)
+            @if (DatasetGrowthPoints.Length > 0)
             {
-                <AntDesign.Charts.Area @ref="DatasetsOverTime"
-                                       Data="DatasetsOverTimeData"
-                                       Config="DatasetsOverTimeConfig" />
+                <RadzenChart Style="width:100%;height:260px"
+                             MarginLeft="40" MarginRight="56" MarginTop="16" MarginBottom="28"
+                             aria-label="Area chart of the cumulative dataset count over time">
+                    <RadzenAreaSeries TItem="Index.GrowthPoint"
+                                      Data="@DatasetGrowthPoints"
+                                      CategoryProperty="@nameof(Index.GrowthPoint.Date)"
+                                      ValueProperty="@nameof(Index.GrowthPoint.Count)"
+                                      Title="Datasets"
+                                      Smooth="false"
+                                      Stroke="#1890ff"
+                                      StrokeWidth="2"
+                                      Fill="rgba(24, 144, 255, 0.15)" />
+                    <RadzenCategoryAxis Formatter="@FormatGrowthDate" Step="@DatasetGrowthStep" Padding="0" Stroke="transparent">
+                        <RadzenGridLines Visible="false" />
+                    </RadzenCategoryAxis>
+                    <RadzenValueAxis Min="0" Max="@DatasetGrowthValueMax" Step="@DatasetGrowthValueStep" Stroke="transparent">
+                        <RadzenGridLines Visible="true" Stroke="#f0f0f0" />
+                    </RadzenValueAxis>
+                    <RadzenLegend Visible="false" />
+                </RadzenChart>
             }
         </AntDesign.Col>
     </AntDesign.Row>

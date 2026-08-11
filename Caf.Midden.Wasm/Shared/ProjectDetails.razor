@@ -15,13 +15,13 @@
 <Divider />
 <Card>
     <TitleTemplate>
-        <Icon Type="project" Theme="outline" /> Description
+        <Icon Type="project" Theme="@IconThemeType.Outline" /> Description
     </TitleTemplate>
     <Body>
         <div>@((MarkupString)MarkdownDescription)</div>
         <Divider />
         <Icon Type="file-text" /> @NumberDatasets Datasets
-        <Divider Type="DirectionVHType.Vertical" />
+        <Divider Type="@DividerType.Vertical" />
         <Icon Type="calculator" /> @NumberVariables Variables
     </Body>
 </Card>

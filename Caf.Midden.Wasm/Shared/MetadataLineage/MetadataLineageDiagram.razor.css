@@ -1,0 +1,24 @@
+.lineage-diagram-container {
+    position: relative;
+    width: 100%;
+    min-height: 300px;
+    overflow: hidden;
+    padding-bottom: 56px;
+}
+
+.lineage-diagram-controls {
+    position: absolute;
+    right: 16px;
+    bottom: 12px;
+    z-index: 10;
+    display: flex;
+    gap: 6px;
+}
+
+::deep .lineage-diagram-container .diagram-link path {
+    stroke-width: 2px;
+}
+
+::deep .lineage-diagram-container svg {
+    overflow: visible;
+}

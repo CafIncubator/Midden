@@ -1,4 +1,5 @@
 ﻿using Caf.Midden.Core.Models.v0_2;
+using Caf.Midden.Wasm.Services;
 using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
@@ -10,13 +11,15 @@ namespace Caf.Midden.Wasm.Shared
 {
     public partial class ConfigurationLoader
     {
+        [Inject]
+        public AppBootstrapService Bootstrapper { get; set; } = default!;
+
         [Parameter]
         public RenderFragment ChildContent { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
-            Configuration config = await ConfigReader.Read();
-            State.UpdateAppConfig(this, config);
+            await Bootstrapper.EnsureConfigurationLoadedAsync(this);
         }
     }
 }

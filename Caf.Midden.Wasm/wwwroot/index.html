@@ -15,6 +15,10 @@
     <link href="_content/AntDesign/css/ant-design-blazor.css" rel="stylesheet" />
     <script src="_content/AntDesign/js/ant-design-blazor.js"></script>
 
+    <!-- "-base" theme: Radzen component styles without the CSS reset and typography that would fight AntDesign. -->
+    <link href="_content/Radzen.Blazor/css/default-base.css" rel="stylesheet" />
+    <script src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>
+
     <link href="_content/PSC.Blazor.Components.MarkdownEditor/css/easymde.min.css" rel="stylesheet" />
 
     <link href="_content/Z.Blazor.Diagrams/style.min.css" rel="stylesheet" />
@@ -24,6 +28,8 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
           integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
           crossorigin="" />
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.14.2/dist/leaflet-geoman.css" />
     <link href="css/custom.css" rel="stylesheet" />
 
 </head>
@@ -43,6 +49,12 @@
     </div>
 
     <script src="_framework/blazor.webassembly.js"></script>
+
+    <script src="js/rowDragDrop.js"></script>
+
+    <script src="js/autosaveInterop.js"></script>
+
+    <script src="js/homeSearchInterop.js"></script>
 
     <script>navigator.serviceWorker.register('service-worker.js');</script>
 
@@ -110,13 +122,14 @@
 
 
     </script>
-    <script src="https://unpkg.com/@antv/g2plot@1.1.28/dist/g2plot.js"></script>
-    <script src="_content/AntDesign.Charts/ant-design-charts-blazor.js"></script>
 
     <!-- Make sure you put this AFTER Leaflet's CSS -->
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
             integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
             crossorigin=""></script>
+
+    <!-- Leaflet-Geoman Free: drawing/editing tools, must come AFTER Leaflet -->
+    <script src="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.14.2/dist/leaflet-geoman.min.js"></script>
 
     <!-- Markdown editor stuff -->
     <script src="_content/PSC.Blazor.Components.MarkdownEditor/js/easymde.min.js"></script>

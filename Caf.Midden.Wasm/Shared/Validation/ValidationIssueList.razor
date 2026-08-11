@@ -1,0 +1,44 @@
+@using Caf.Midden.Core.Services.Validation
+
+@* Renders issues as a list. Each row is a button when OnIssueSelected is supplied, so an editor
+   that can navigate to the offending control (tabs, rows) can opt in without this component
+   knowing anything about how paths map to UI. *@
+<ul class="validation-summary-list">
+    @foreach (var issue in Issues)
+    {
+        <li>
+            @if (OnIssueSelected.HasDelegate)
+            {
+                <button type="button"
+                        class="validation-issue-link"
+                        @onclick="@(() => OnIssueSelected.InvokeAsync(issue))">
+                    @issue.Message
+                </button>
+            }
+            else
+            {
+                @issue.Message
+            }
+
+            @if (!string.IsNullOrWhiteSpace(issue.Hint))
+            {
+                <span class="validation-issue-hint">@issue.Hint</span>
+            }
+        </li>
+    }
+</ul>
+
+@code {
+    /// <summary>
+    /// The issues to list, already filtered to the severity the caller wants to show.
+    /// </summary>
+    [Parameter]
+    public IEnumerable<ValidationIssue> Issues { get; set; } = [];
+
+    /// <summary>
+    /// Optional. When set, each issue becomes clickable so the editor can focus the offending
+    /// control.
+    /// </summary>
+    [Parameter]
+    public EventCallback<ValidationIssue> OnIssueSelected { get; set; }
+}

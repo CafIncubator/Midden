@@ -1,0 +1,101 @@
+@using AntDesign
+@using Caf.Midden.Core.Services.Validation
+
+@* Owns the two download-gate dialogs shared by every editor.
+
+   Rendered declaratively (rather than via ModalService/ConfirmService) so the dialogs belong to
+   the host editor's own render tree, matching the draft-restore prompt. The shared AntContainer
+   resets its imperative dialog state on NavigationManager.LocationChanged, which silently
+   discards dialogs requested during the navigation that creates an editor. *@
+
+@* Nothing to accept or reject here - the only action is to go back and fix the fields - so the
+   default Ok/Cancel footer is replaced with a single Close button. *@
+<Modal Title="@ErrorTitle"
+       Visible="_errorsVisible"
+       OnCancel="@(_ => Close())"
+       Footer="@null">
+    <ValidationIssueList Issues="@ErrorIssues" OnIssueSelected="@OnIssueSelected" />
+    <div class="details-modal-footer">
+        <Button Type="@ButtonType.Primary" OnClick="@(() => Close())">Close</Button>
+    </div>
+</Modal>
+
+<Modal Title="@WarningTitle"
+       Visible="_warningsVisible"
+       OkText="@ProceedText"
+       CancelText="@("Keep editing")"
+       OnOk="@(_ => AcceptWarnings())"
+       OnCancel="@(_ => Close())">
+    <ValidationIssueList Issues="@WarningIssues" OnIssueSelected="@OnIssueSelected" />
+</Modal>
+
+@code {
+    private ValidationResult _result = ValidationResult.Empty;
+    private bool _errorsVisible;
+    private bool _warningsVisible;
+
+    /// <summary>
+    /// Invoked when the action is allowed to proceed: either the model was clean, or the user
+    /// accepted the warnings.
+    /// </summary>
+    [Parameter]
+    public EventCallback OnConfirmed { get; set; }
+
+    /// <summary>
+    /// Optional. When set, issues in both dialogs become clickable so the host editor can focus
+    /// the offending control.
+    /// </summary>
+    [Parameter]
+    public EventCallback<ValidationIssue> OnIssueSelected { get; set; }
+
+    [Parameter]
+    public string ErrorTitle { get; set; } = "Fix these before downloading";
+
+    [Parameter]
+    public string WarningTitle { get; set; } = "Download anyway?";
+
+    [Parameter]
+    public string ProceedText { get; set; } = "Download";
+
+    private IEnumerable<ValidationIssue> ErrorIssues => _result.Errors;
+
+    private IEnumerable<ValidationIssue> WarningIssues => _result.Warnings;
+
+    /// <summary>
+    /// Runs the gate for <paramref name="result"/>. Blocking errors open the summary; warnings
+    /// ask for confirmation; a clean result invokes <see cref="OnConfirmed"/> immediately.
+    /// </summary>
+    public async Task RequestAsync(ValidationResult result)
+    {
+        _result = result ?? ValidationResult.Empty;
+
+        if (_result.HasErrors)
+        {
+            _errorsVisible = true;
+            StateHasChanged();
+            return;
+        }
+
+        if (_result.HasWarnings)
+        {
+            _warningsVisible = true;
+            StateHasChanged();
+            return;
+        }
+
+        await OnConfirmed.InvokeAsync();
+    }
+
+    private void Close()
+    {
+        _errorsVisible = false;
+        _warningsVisible = false;
+    }
+
+    private async Task AcceptWarnings()
+    {
+        _warningsVisible = false;
+
+        await OnConfirmed.InvokeAsync();
+    }
+}

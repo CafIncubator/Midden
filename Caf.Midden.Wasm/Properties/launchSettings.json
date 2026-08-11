@@ -1,22 +1,8 @@
 {
-  "environmentVariables": {
-    "NO_PROXY": "localhost"
-  },
-  "iisSettings": {
-    "windowsAuthentication": false,
-    "anonymousAuthentication": true,
-    "iis": {
-      "applicationUrl": "http://localhost/Caf.Midden.Wasm",
-      "sslPort": 0
-    },
-    "iisExpress": {
-      "applicationUrl": "http://localhost:60130",
-      "sslPort": 44321
-    }
-  },
   "profiles": {
     "IIS Express": {
       "commandName": "IISExpress",
+      "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
@@ -33,6 +19,21 @@
       "applicationUrl": "https://localhost:5001;http://localhost:5000",
       "dotnetRunMessages": "true",
       "nativeDebugging": false
+    }
+  },
+  "environmentVariables": {
+    "NO_PROXY": "localhost"
+  },
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iis": {
+      "applicationUrl": "http://localhost/Caf.Midden.Wasm",
+      "sslPort": 0
+    },
+    "iisExpress": {
+      "applicationUrl": "http://localhost:60130",
+      "sslPort": 44321
     }
   }
 }

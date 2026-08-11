@@ -1,0 +1,14 @@
+@if (!string.IsNullOrWhiteSpace(Dataset?.TemporalExtent) || !string.IsNullOrWhiteSpace(Dataset?.TemporalResolution))
+{
+    <p><strong>Start/End</strong>: @Dataset.TemporalExtent</p>
+    <p><strong>Resolution</strong>: @Dataset.TemporalResolution</p>
+}
+else
+{
+    <Empty Simple />
+}
+
+@code {
+    [Parameter]
+    public Caf.Midden.Core.Models.v0_2.Dataset? Dataset { get; set; }
+}

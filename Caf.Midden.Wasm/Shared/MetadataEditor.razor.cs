@@ -6,17 +6,52 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Components.Web;
 using AntDesign;
+using AntDesign.TableModels;
 using Caf.Midden.Wasm.Shared.Modals;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.IO;
 using Microsoft.JSInterop;
+using Caf.Midden.Wasm.Services;
+using Caf.Midden.Core.Services.Validation;
+using Caf.Midden.Wasm.Shared.Validation;
+
+// Disambiguated from System.ComponentModel.DataAnnotations.ValidationResult.
+using ValidationResult = Caf.Midden.Core.Services.Validation.ValidationResult;
+
+// Aliased because Caf.Midden.Wasm.Shared.MetadataSections is a namespace of components and wins
+// simple-name resolution against the Core class of the same name.
+using Sections = Caf.Midden.Core.Services.Validation.MetadataSections;
 
 namespace Caf.Midden.Wasm.Shared
 {
     public partial class MetadataEditor : ComponentBase
     {
+        private const string DraftKeyPrefix = "midden.draft.metadata.v1";
+
+        private static readonly JsonSerializerOptions DraftPayloadJsonOptions = new()
+        {
+            Converters = { new JsonStringEnumConverter() }
+        };
+
+        private IDisposable? _stateSubscription;
+        private IAutosaveRegistration? _autosaveRegistration;
+        private DateTime? _lastSavedUtc;
+        private string _draftKey = DraftKeyPrefix;
+        private DraftEnvelope<Metadata>? _pendingDraft;
+        private bool _draftRestorePromptVisible;
+
+        private static readonly MetadataValidator Validator = new();
+
+        private ValidationResult _validation = ValidationResult.Empty;
+        private CompletenessResult? _completeness;
+        private ValidationGate? _validationGate;
+
+        // Bound to the Tabs component so activating a validation issue can switch tabs.
+        private string _activeTabKey = Sections.Basic;
+
         string markdownDescriptionHtml = "";
 
         private string ZoneTooltip = @"This is the ""data zone"" that the dataset belongs to. Items in the dropdown menu are populated by information specified in the app configuration.";
@@ -41,16 +76,176 @@ namespace Caf.Midden.Wasm.Shared
 
         AntDesign.Form<Metadata> form;
 
-        private async Task LastUpdated_StateChanged(
-            ComponentBase source,
-            string lastUpdated)
+        private Person? _dragContactSource;
+        private int? _dragContactSourceIndex;
+        private int? _dragContactOverIndex;
+        private Variable? _dragVariableSource;
+        private int? _dragVariableSourceIndex;
+        private int? _dragVariableOverIndex;
+        private DatasetStringListKind? _dragStringListKind;
+        private int? _dragStringSourceIndex;
+        private int? _dragStringOverIndex;
+
+        private async Task OnStateChanged(AppStateChangedEventArgs args)
         {
-            if(source != this)
+            RefreshValidation();
+            await InvokeAsync(StateHasChanged);
+            Console.WriteLine("LastUpdate_StateChanged");
+        }
+
+        private string AutosaveStatusText => _lastSavedUtc is null
+            ? string.Empty
+            : $"All changes saved \u00b7 {FormatRelativeTime(_lastSavedUtc.Value)}";
+
+        private string DraftRestorePromptText => _pendingDraft is null
+            ? string.Empty
+            : $"A saved draft from {FormatRelativeTime(_pendingDraft.SavedAtUtc)} was found. Resume editing it?";
+
+        #region Validation
+
+        /// <summary>
+        /// Re-runs the Core validator and completeness calculator against current state.
+        /// </summary>
+        /// <remarks>
+        /// The Core validator, rather than <c>form.Validate()</c>, is the gate: AntDesign skips
+        /// fields on <c>TabPane</c>s the user never opened, so the form cannot see them.
+        /// </remarks>
+        private void RefreshValidation()
+        {
+            if (State?.MetadataEdit is null)
             {
-                await InvokeAsync(StateHasChanged);
-                Console.WriteLine("LastUpdate_StateChanged");
+                _validation = ValidationResult.Empty;
+                _completeness = null;
+                return;
+            }
+
+            _validation = Validator.Validate(State.MetadataEdit, State.AppConfig);
+            _completeness = MetadataCompletenessCalculator.Calculate(State.MetadataEdit);
+        }
+
+        /// <summary>
+        /// Error counts keyed by tab. <see cref="MetadataSections"/> values are the TabPane keys,
+        /// so no translation table is needed.
+        /// </summary>
+        private IReadOnlyDictionary<string, int> ErrorCountsByTab =>
+            _validation.CountsBySection();
+
+        private int TabErrorCount(string tabKey) =>
+            ErrorCountsByTab.TryGetValue(tabKey, out var count) ? count : 0;
+
+        /// <summary>
+        /// Issues owned by a single variable row, matched on the indexed path the validator emits.
+        /// </summary>
+        private IEnumerable<ValidationIssue> VariableIssues(Variable variable)
+        {
+            var index = State.MetadataEdit.Dataset.Variables.IndexOf(variable);
+
+            if (index < 0)
+            {
+                return [];
+            }
+
+            var prefix = $"dataset.variables[{index}]";
+
+            return _validation.Issues.Where(
+                i => i.Path.StartsWith(prefix, StringComparison.Ordinal));
+        }
+
+        private bool VariableHasErrors(Variable variable) =>
+            VariableIssues(variable).Any(i => i.Severity == ValidationSeverity.Error);
+
+        private string VariableIssueTitle(Variable variable) =>
+            string.Join(" ", VariableIssues(variable).Select(i => i.Message));
+
+        /// <summary>
+        /// Issues owned by a single contact row.
+        /// </summary>
+        private IEnumerable<ValidationIssue> ContactIssues(Person contact)
+        {
+            var index = State.MetadataEdit.Dataset.Contacts.IndexOf(contact);
+
+            if (index < 0)
+            {
+                return [];
+            }
+
+            var prefix = $"dataset.contacts[{index}]";
+
+            return _validation.Issues.Where(
+                i => i.Path.StartsWith(prefix, StringComparison.Ordinal));
+        }
+
+        private bool ContactHasErrors(Person contact) =>
+            ContactIssues(contact).Any(i => i.Severity == ValidationSeverity.Error);
+
+        private string ContactIssueTitle(Person contact) =>
+            string.Join(" ", ContactIssues(contact).Select(i => i.Message));
+
+        // Only Download is gated. Preview produces nothing shareable, and viewing the rendered
+        // output is a legitimate way to diagnose the problems the gate reports, so blocking it
+        // would make the error state harder to fix.
+        private async Task RequestDownload()
+        {
+            if (State?.MetadataEdit is null || _validationGate is null)
+            {
+                return;
+            }
+
+            RefreshValidation();
+
+            await _validationGate.RequestAsync(_validation);
+        }
+
+        /// <summary>
+        /// Switches to the tab owning an issue so the user can act on it.
+        /// </summary>
+        private void OnValidationIssueSelected(ValidationIssue issue)
+        {
+            _activeTabKey = issue.Section;
+        }
+
+        /// <summary>
+        /// Appends an error count to a tab label. Text rather than color alone, so the badge is
+        /// still readable without color perception.
+        /// </summary>
+        private string TabLabel(string label, string sectionKey)
+        {
+            var count = TabErrorCount(sectionKey);
+
+            return count == 0 ? label : $"{label} ({count})";
+        }
+
+        private string BasicTabLabel => TabLabel("Basic", Sections.Basic);
+
+        private string VariablesTabLabel => TabLabel("Variables", Sections.Variables);
+
+        private string CoverageTabLabel => TabLabel("Coverage", Sections.Coverage);
+
+        private string StructureTabLabel => TabLabel("Structure", Sections.Structure);
+
+        private string ProcessingTabLabel => TabLabel("Processing", Sections.Processing);
+
+        private string CompletenessText =>
+            _completeness is null ? string.Empty : $"{_completeness.Percent}% complete";
+
+        private string CompletenessTooltip
+        {
+            get
+            {
+                if (_completeness is null)
+                {
+                    return string.Empty;
+                }
+
+                var suggestions = _completeness.TopSuggestions.Take(3).ToList();
+
+                return suggestions.Count == 0
+                    ? "This dataset is fully documented."
+                    : "To improve: " + string.Join(" ", suggestions.Select(s => s.Suggestion));
             }
         }
+
+        #endregion
 
         protected override void OnInitialized()
         {
@@ -61,13 +256,28 @@ namespace Caf.Midden.Wasm.Shared
             markdownDescriptionHtml = Markdig.Markdown.ToHtml(
                 State.MetadataEdit.Dataset.Description ?? string.Empty);
 
-            State.StateChanged += async (source, property) =>
-                await LastUpdated_StateChanged(source, property);
+            _stateSubscription = State.Subscribe(
+                this,
+                OnStateChanged,
+                AppStateChange.MetadataEdit,
+                AppStateChange.LastUpdated,
+                AppStateChange.AppConfig);
+
+            RefreshValidation();
         }
 
         Task OnMarkdownDescriptionValueHTMLChanged(string value)
         {
             markdownDescriptionHtml = value;
+            Autosave_NotifyChanged();
+            return Task.CompletedTask;
+        }
+
+        private Task OnMetadataLoaded(Metadata metadata)
+        {
+            State.SetMetadataEdit(metadata, this);
+            Autosave.RemoveDraft(_draftKey);
+            RefreshValidation();
             return Task.CompletedTask;
         }
 
@@ -76,6 +286,174 @@ namespace Caf.Midden.Wasm.Shared
             FieldChangedEventArgs e)
         {
             State.UpdateLastUpdated(this, DateTime.UtcNow);
+        }
+
+        private void OnFormFieldChanged(FieldChangedEventArgs e)
+        {
+            Autosave_NotifyChanged();
+        }
+
+        private void Autosave_NotifyChanged()
+        {
+            _autosaveRegistration?.NotifyChanged();
+
+            // Validation is ambient here; it never gates autosave.
+            RefreshValidation();
+        }
+
+        protected override void OnAfterRender(bool firstRender)
+        {
+            // Many mutations (contact/variable/tag add-delete-drag, etc.) happen via
+            // button/drag handlers rather than AntDesign FormItem field-changed events.
+            // Blazor re-renders after any such event, so treating a re-render as a proxy
+            // for "something may have changed" reliably captures all of them without
+            // needing to instrument every individual handler.
+            //
+            // While the restore prompt is open the state shown is still the pre-restore
+            // snapshot, so renders caused by the prompt itself must not be treated as edits -
+            // otherwise they'd autosave blank state over the cached draft before the user answers.
+            if (!firstRender && !_draftRestorePromptVisible)
+            {
+                Autosave_NotifyChanged();
+            }
+        }
+
+        protected override async Task OnInitializedAsync()
+        {
+            await Autosave.EnsureUnloadFlushRegisteredAsync();
+
+            _autosaveRegistration = Autosave.RegisterAutosave(
+                _draftKey,
+                BuildDraftSnapshotJson,
+                TimeSpan.FromMilliseconds(400),
+                TimeSpan.FromSeconds(20));
+
+            Autosave.Saved += OnAutosaveSaved;
+
+            // The restore prompt is a declarative <Modal> in this component's own markup,
+            // driven purely by component state, so it can be decided here without depending
+            // on render/navigation timing.
+            TryOfferDraftRestore();
+        }
+
+        private void OnAutosaveSaved(string key, DateTime savedAtUtc)
+        {
+            if (key != _draftKey)
+            {
+                return;
+            }
+
+            _lastSavedUtc = savedAtUtc;
+            InvokeAsync(StateHasChanged);
+        }
+
+        private static string GetIdentityFingerprint(Metadata metadata)
+            => $"{metadata?.Dataset?.Zone}|{metadata?.Dataset?.Name}|{metadata?.Dataset?.Project}";
+
+        private string? BuildDraftSnapshotJson()
+        {
+            // While the restore prompt is open the current state is still the pre-restore
+            // snapshot. Skip autosaving in this window - including the periodic fallback
+            // timer - so an unanswered prompt can't clobber the real cached draft with it.
+            if (_draftRestorePromptVisible)
+            {
+                return null;
+            }
+
+            if (State.MetadataEdit is null)
+            {
+                return null;
+            }
+
+            var envelope = new DraftEnvelope<Metadata>
+            {
+                SavedAtUtc = DateTime.UtcNow,
+                IdentityFingerprint = GetIdentityFingerprint(State.MetadataEdit),
+                Payload = State.MetadataEdit
+            };
+
+            return AutosaveService.SerializeEnvelope(envelope, DraftPayloadJsonOptions);
+        }
+
+        private void TryOfferDraftRestore()
+        {
+            if (Autosave.HasBeenPrompted(_draftKey))
+            {
+                return;
+            }
+
+            var draft = Autosave.TryGetDraft<Metadata>(_draftKey);
+            if (draft?.Payload is null)
+            {
+                return;
+            }
+
+            // Only offer to restore if the draft matches the currently loaded dataset
+            // (or the editor is still in its blank "new" state), so a stale draft from
+            // editing a different dataset isn't offered while editing this one.
+            var currentFingerprint = GetIdentityFingerprint(State.MetadataEdit);
+            var isBlankCurrent = string.IsNullOrEmpty(State.MetadataEdit?.Dataset?.Name)
+                && string.IsNullOrEmpty(State.MetadataEdit?.Dataset?.Zone)
+                && string.IsNullOrEmpty(State.MetadataEdit?.Dataset?.Project);
+            if (!isBlankCurrent && draft.IdentityFingerprint != currentFingerprint)
+            {
+                return;
+            }
+
+            Autosave.TryMarkPrompted(_draftKey);
+
+            _pendingDraft = draft;
+            _draftRestorePromptVisible = true;
+        }
+
+        private void OnDraftRestoreAccepted()
+        {
+            var payload = _pendingDraft?.Payload;
+
+            _draftRestorePromptVisible = false;
+            _pendingDraft = null;
+
+            if (payload is null)
+            {
+                return;
+            }
+
+            State.SetMetadataEdit(payload, this);
+            markdownDescriptionHtml = Markdig.Markdown.ToHtml(
+                State.MetadataEdit.Dataset.Description ?? string.Empty);
+        }
+
+        private void OnDraftRestoreDeclined()
+        {
+            _draftRestorePromptVisible = false;
+            _pendingDraft = null;
+
+            Autosave.RemoveDraft(_draftKey);
+        }
+
+        private static string FormatRelativeTime(DateTime savedAtUtc)
+        {
+            var elapsed = DateTime.UtcNow - savedAtUtc;
+
+            if (elapsed < TimeSpan.FromMinutes(1))
+            {
+                return "just now";
+            }
+
+            if (elapsed < TimeSpan.FromHours(1))
+            {
+                var minutes = (int)elapsed.TotalMinutes;
+                return $"{minutes} minute{(minutes == 1 ? string.Empty : "s")} ago";
+            }
+
+            if (elapsed < TimeSpan.FromDays(1))
+            {
+                var hours = (int)elapsed.TotalHours;
+                return $"{hours} hour{(hours == 1 ? string.Empty : "s")} ago";
+            }
+
+            var days = (int)elapsed.TotalDays;
+            return $"{days} day{(days == 1 ? string.Empty : "s")} ago";
         }
 
         private void NewMetadata()
@@ -88,14 +466,15 @@ namespace Caf.Midden.Wasm.Shared
                 CreationDate = dt,
                 ModifiedDate = dt
             });
-            
+
             State.UpdateLastUpdated(this, DateTime.UtcNow);
 
+            Autosave.RemoveDraft(_draftKey);
         }
 
         #region Contact Functions
         private ModalRef personModalRef;
-        private async Task OpenPersonModalTemplate(Person contact)
+        private Task OpenPersonModalTemplate(Person contact)
         {
             var templateOptions = new ViewModels.PersonModalViewModel
             {
@@ -132,9 +511,12 @@ namespace Caf.Midden.Wasm.Shared
                 return Task.CompletedTask;
             };
 
-            personModalRef = await ModalService
-                .CreateModalAsync<PersonModal, ViewModels.PersonModalViewModel>(
-                    modalConfig, templateOptions);
+            personModalRef = ModalService
+                .CreateModal<PersonModal, ViewModels.PersonModalViewModel>(
+                    modalConfig,
+                    templateOptions);
+
+            return Task.CompletedTask;
         }
 
         private void RemoveBlankContacts()
@@ -170,6 +552,104 @@ namespace Caf.Midden.Wasm.Shared
         private void DeleteContactHandler(Person person)
         {
             State.MetadataEdit.Dataset.Contacts.Remove(person);
+        }
+
+        private void OnContactDragStart(Person contact)
+        {
+            _dragContactSource = contact;
+            _dragContactSourceIndex = State.MetadataEdit.Dataset.Contacts.IndexOf(contact);
+            _dragContactOverIndex = _dragContactSourceIndex;
+        }
+
+        private void OnContactDragEnter(Person targetContact)
+        {
+            if (_dragContactSourceIndex is null) return;
+
+            var targetIndex = State.MetadataEdit.Dataset.Contacts.IndexOf(targetContact);
+            if (targetIndex < 0 || _dragContactOverIndex == targetIndex) return;
+
+            _dragContactOverIndex = targetIndex;
+            StateHasChanged();
+        }
+
+        private Dictionary<string, object> GetContactRowAttributes(RowData<Person> row)
+        {
+            var contact = row.Data;
+
+            var attributes = new Dictionary<string, object>
+            {
+                ["ondragenter"] = EventCallback.Factory.Create<DragEventArgs>(
+                    this, () => OnContactDragEnter(contact)),
+                ["ondrop"] = EventCallback.Factory.Create<DragEventArgs>(
+                    this, () => OnContactDrop(contact))
+            };
+
+            var issueTitle = ContactIssueTitle(contact);
+
+            if (!string.IsNullOrEmpty(issueTitle))
+            {
+                attributes["title"] = issueTitle;
+            }
+
+            return attributes;
+        }
+
+        private string GetContactRowClassName(RowData<Person> row)
+        {
+            var className = DropRowClassName(
+                State.MetadataEdit.Dataset.Contacts.IndexOf(row.Data),
+                _dragContactSourceIndex,
+                _dragContactOverIndex);
+
+            // Contacts are edited in a modal, so the row is the only place the problem can show.
+            if (ContactHasErrors(row.Data))
+            {
+                className = string.IsNullOrEmpty(className)
+                    ? "validation-row-error"
+                    : $"{className} validation-row-error";
+            }
+
+            return className;
+        }
+
+        private void OnContactDrop(Person targetContact)
+        {
+            if (_dragContactSource == null || _dragContactSourceIndex is null)
+            {
+                ClearContactDragState();
+                return;
+            }
+
+            var contacts = State.MetadataEdit.Dataset.Contacts;
+            var sourceIndex = _dragContactSourceIndex.Value;
+            var targetIndex = contacts.IndexOf(targetContact);
+
+            if (targetIndex < 0 ||
+                sourceIndex < 0 ||
+                sourceIndex >= contacts.Count ||
+                sourceIndex == targetIndex)
+            {
+                ClearContactDragState();
+                return;
+            }
+
+            var item = _dragContactSource;
+            contacts.RemoveAt(sourceIndex);
+            contacts.Insert(targetIndex, item);
+
+            ClearContactDragState();
+        }
+
+        private void OnContactDragEnd()
+        {
+            ClearContactDragState();
+        }
+
+        private void ClearContactDragState()
+        {
+            _dragContactSource = null;
+            _dragContactSourceIndex = null;
+            _dragContactOverIndex = null;
         }
         #endregion
 
@@ -300,6 +780,88 @@ namespace Caf.Midden.Wasm.Shared
         {
             State.MetadataEdit.Dataset.DerivedWorks.Remove(derived);
         }
+
+        private enum DatasetStringListKind
+        {
+            Tags,
+            Methods,
+            ParentDatasets,
+            DerivedWorks
+        }
+
+        private void OnStringDragStart(DatasetStringListKind listKind, int index)
+        {
+            _dragStringListKind = listKind;
+            _dragStringSourceIndex = index;
+            _dragStringOverIndex = index;
+        }
+
+        private void OnStringDragEnter(DatasetStringListKind listKind, int index)
+        {
+            if (_dragStringListKind != listKind || _dragStringOverIndex == index) return;
+            _dragStringOverIndex = index;
+        }
+
+        private bool IsStringDragOver(DatasetStringListKind listKind, int index)
+        {
+            return _dragStringListKind == listKind && _dragStringOverIndex == index;
+        }
+
+        private void OnStringDrop(DatasetStringListKind listKind, int index)
+        {
+            if (_dragStringListKind != listKind || _dragStringSourceIndex is null)
+            {
+                ClearStringDragState();
+                return;
+            }
+
+            var list = GetStringList(listKind);
+            var sourceIndex = _dragStringSourceIndex.Value;
+
+            if (sourceIndex < 0 || sourceIndex >= list.Count || index < 0 || index > list.Count)
+            {
+                ClearStringDragState();
+                return;
+            }
+
+            if (sourceIndex == index)
+            {
+                ClearStringDragState();
+                return;
+            }
+
+            var item = list[sourceIndex];
+            list.RemoveAt(sourceIndex);
+
+            var insertAt = sourceIndex < index ? index - 1 : index;
+            list.Insert(insertAt, item);
+
+            ClearStringDragState();
+        }
+
+        private void OnStringDragEnd()
+        {
+            ClearStringDragState();
+        }
+
+        private void ClearStringDragState()
+        {
+            _dragStringListKind = null;
+            _dragStringSourceIndex = null;
+            _dragStringOverIndex = null;
+        }
+
+        private List<string> GetStringList(DatasetStringListKind listKind)
+        {
+            return listKind switch
+            {
+                DatasetStringListKind.Tags => State.MetadataEdit.Dataset.Tags,
+                DatasetStringListKind.Methods => State.MetadataEdit.Dataset.Methods,
+                DatasetStringListKind.ParentDatasets => State.MetadataEdit.Dataset.ParentDatasets,
+                DatasetStringListKind.DerivedWorks => State.MetadataEdit.Dataset.DerivedWorks,
+                _ => throw new ArgumentOutOfRangeException(nameof(listKind), listKind, null)
+            };
+        }
         #endregion
 
         #region Variable Functions
@@ -307,7 +869,7 @@ namespace Caf.Midden.Wasm.Shared
         private Variable VariableQuickEditRef;
         private ViewModels.VariableModalViewModel QuickEditViewModel;
 
-        private async Task StartQuickEdit(Variable variable)
+        private Task StartQuickEdit(Variable variable)
         {
             VariableQuickEditRef = variable;
             if(QuickEditViewModel == null)
@@ -351,9 +913,10 @@ namespace Caf.Midden.Wasm.Shared
                 QuickEditViewModel.SelectedTags = variable.Tags ??= new List<string>();
                 QuickEditViewModel.SelectedQCApplied = variable.QCApplied ??= new List<string>();
             }
+            return Task.CompletedTask;
         }
 
-        private async Task EndQuickEdit()
+        private Task EndQuickEdit()
         {
             // TODO: Some validation checks
 
@@ -368,10 +931,11 @@ namespace Caf.Midden.Wasm.Shared
             VariableQuickEditRef.VariableType = QuickEditViewModel.Variable.VariableType;
 
             VariableQuickEditRef = null;
+            return Task.CompletedTask;
         }
 
         private ModalRef variableModalRef;
-        private async Task OpenVariableModalTemplate(Variable variable)
+        private Task OpenVariableModalTemplate(Variable variable)
         {
             var templateOptions = new ViewModels.VariableModalViewModel
             {
@@ -425,9 +989,12 @@ namespace Caf.Midden.Wasm.Shared
                 return Task.CompletedTask;
             };
 
-            variableModalRef = await ModalService
-                .CreateModalAsync<VariableModal, ViewModels.VariableModalViewModel>(
-                    modalConfig, templateOptions);
+            variableModalRef = ModalService
+                .CreateModal<VariableModal, ViewModels.VariableModalViewModel>(
+                    modalConfig,
+                    templateOptions);
+
+            return Task.CompletedTask;
         }
 
         private void RemoveBlankVariables()
@@ -461,6 +1028,120 @@ namespace Caf.Midden.Wasm.Shared
         {
             State.MetadataEdit.Dataset.Variables.Remove(variable);
         }
+
+        private void OnVariableDragStart(Variable variable)
+        {
+            _dragVariableSource = variable;
+            _dragVariableSourceIndex = State.MetadataEdit.Dataset.Variables.IndexOf(variable);
+            _dragVariableOverIndex = _dragVariableSourceIndex;
+        }
+
+        private void OnVariableDragEnter(Variable targetVariable)
+        {
+            if (_dragVariableSourceIndex is null) return;
+
+            var targetIndex = State.MetadataEdit.Dataset.Variables.IndexOf(targetVariable);
+            if (targetIndex < 0 || _dragVariableOverIndex == targetIndex) return;
+
+            _dragVariableOverIndex = targetIndex;
+            StateHasChanged();
+        }
+
+        private Dictionary<string, object> GetVariableRowAttributes(RowData<Variable> row)
+        {
+            var variable = row.Data;
+
+            var attributes = new Dictionary<string, object>
+            {
+                ["ondragenter"] = EventCallback.Factory.Create<DragEventArgs>(
+                    this, () => OnVariableDragEnter(variable)),
+                ["ondrop"] = EventCallback.Factory.Create<DragEventArgs>(
+                    this, () => OnVariableDrop(variable))
+            };
+
+            var issueTitle = VariableIssueTitle(variable);
+
+            if (!string.IsNullOrEmpty(issueTitle))
+            {
+                attributes["title"] = issueTitle;
+            }
+
+            return attributes;
+        }
+
+        private string GetVariableRowClassName(RowData<Variable> row)
+        {
+            var className = DropRowClassName(
+                State.MetadataEdit.Dataset.Variables.IndexOf(row.Data),
+                _dragVariableSourceIndex,
+                _dragVariableOverIndex);
+
+            // Bulk CSV import can introduce dozens of invalid rows at once, so the row itself has
+            // to carry the signal - a summary at the bottom of the page would not locate them.
+            if (VariableHasErrors(row.Data))
+            {
+                className = string.IsNullOrEmpty(className)
+                    ? "validation-row-error"
+                    : $"{className} validation-row-error";
+            }
+
+            return className;
+        }
+
+        private void OnVariableDrop(Variable targetVariable)
+        {
+            if (_dragVariableSource == null || _dragVariableSourceIndex is null)
+            {
+                ClearVariableDragState();
+                return;
+            }
+
+            var variables = State.MetadataEdit.Dataset.Variables;
+            var sourceIndex = _dragVariableSourceIndex.Value;
+            var targetIndex = variables.IndexOf(targetVariable);
+
+            if (targetIndex < 0 ||
+                sourceIndex < 0 ||
+                sourceIndex >= variables.Count ||
+                sourceIndex == targetIndex)
+            {
+                ClearVariableDragState();
+                return;
+            }
+
+            var item = _dragVariableSource;
+            variables.RemoveAt(sourceIndex);
+            variables.Insert(targetIndex, item);
+
+            ClearVariableDragState();
+        }
+
+        private void OnVariableDragEnd()
+        {
+            ClearVariableDragState();
+        }
+
+        private void ClearVariableDragState()
+        {
+            _dragVariableSource = null;
+            _dragVariableSourceIndex = null;
+            _dragVariableOverIndex = null;
+        }
+
+        private static string DropRowClassName(int rowIndex, int? sourceIndex, int? overIndex)
+        {
+            const string droppable = "midden-droppable-row";
+
+            if (rowIndex < 0 || sourceIndex is null || overIndex is null)
+                return droppable;
+
+            if (rowIndex != overIndex.Value || overIndex.Value == sourceIndex.Value)
+                return droppable;
+
+            return sourceIndex.Value > overIndex.Value
+                ? $"{droppable} midden-drop-above"
+                : $"{droppable} midden-drop-below";
+        }
         #endregion
 
         #region Geometry
@@ -470,19 +1151,30 @@ namespace Caf.Midden.Wasm.Shared
             State.MetadataEdit.Dataset.Geometry = value;
         }
 
+        // Drawing/editing on the map no longer matches the selected saved geometry
+        private void OnMapGeometryChanged(Dataset dataset, string value)
+        {
+            dataset.Geometry = value;
+
+            if (!string.Equals(GeometryTemplate, value, StringComparison.Ordinal))
+            {
+                GeometryTemplate = null;
+            }
+        }
+
         public void Dispose()
         {
             //this.EditContext.OnFieldChanged -=
             //     EditContext_OnFieldChange;
-            State.StateChanged -= async (source, property) =>
-                 await LastUpdated_StateChanged(source, property);
+            Autosave.Saved -= OnAutosaveSaved;
+            _autosaveRegistration?.Dispose();
+            _stateSubscription?.Dispose();
         }
         #endregion
 
+        // Callers reach this through RequestDownload, which runs the Core validator gate first.
         private async Task<string> SaveDataset()
         {
-            // TODO: Validate first!
-
             JsonSerializerOptions options = new JsonSerializerOptions()
             {
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
@@ -509,11 +1201,13 @@ namespace Caf.Midden.Wasm.Shared
                 $"{State.MetadataEdit.Dataset.Name}.midden",
                 Convert.ToBase64String(fileBytes));
 
+            Autosave.RemoveDraft(_draftKey);
+
             return jsonString;
         }
 
         private ModalRef metadataDetailsModalRef;
-        private async Task OpenMetadataDetailsModalTemplate(Metadata metadata)
+        private Task OpenMetadataDetailsModalTemplate(Metadata metadata)
         {
             var templateOptions = new ViewModels.MetadataDetailsViewModel
             {
@@ -540,9 +1234,12 @@ namespace Caf.Midden.Wasm.Shared
                 return Task.CompletedTask;
             };
 
-            metadataDetailsModalRef = await ModalService
-                .CreateModalAsync<MetadataDetailsModal, ViewModels.MetadataDetailsViewModel>(
-                    modalConfig, templateOptions);
+            metadataDetailsModalRef = ModalService
+                .CreateModal<MetadataDetailsModal, ViewModels.MetadataDetailsViewModel>(
+                    modalConfig,
+                    templateOptions);
+
+            return Task.CompletedTask;
         }
     }
 }

@@ -48,3 +48,108 @@ a, .btn-link {
         right: 0.75rem;
         top: 0.5rem;
     }
+
+.string-list-editor-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+    cursor: grab;
+}
+
+    .string-list-editor-row:active {
+        cursor: grabbing;
+    }
+
+.string-list-editor-handle {
+    cursor: inherit;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 16px;
+    width: 16px;
+    color: rgba(0, 0, 0, 0.45);
+    font-size: 14px;
+    line-height: 1;
+    user-select: none;
+}
+
+.string-list-editor-input {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+/* Rows that host a map grow to fit it, and only the handle initiates a drag */
+.string-list-editor-row-map {
+    align-items: flex-start;
+    cursor: default;
+    margin-bottom: 12px;
+}
+
+    .string-list-editor-row-map:active {
+        cursor: default;
+    }
+
+    .string-list-editor-row-map .string-list-editor-handle {
+        cursor: grab;
+        margin-top: 6px;
+    }
+
+        .string-list-editor-row-map .string-list-editor-handle:active {
+            cursor: grabbing;
+        }
+
+.geojson-editor-map .geojson-editor-map-warning {
+    margin-top: 8px;
+}
+
+/* Raw GeoJSON toolbar button */
+.geojson-raw-control a {
+    font-weight: bold;
+    font-size: 14px;
+    line-height: 26px;
+    text-align: center;
+}
+
+.string-list-editor-drop-indicator {
+    height: 8px;
+    margin: -4px 0;
+}
+
+.string-list-editor-drop-indicator-visible::before {
+    content: "";
+    display: block;
+    height: 2px;
+    background-color: #1890ff;
+    margin: 3px 0;
+}
+
+tr.midden-drop-above > td {
+    box-shadow: inset 0 2px 0 #1890ff;
+}
+
+tr.midden-drop-below > td {
+    box-shadow: inset 0 -2px 0 #1890ff;
+}
+
+/*
+ * The Lineage Diagram modal disables the default AntDesign zoom-in/out open
+ * animation. Blazor.Diagrams sizes its canvas via a ResizeObserver that calls
+ * getBoundingClientRect(), which reflects any *in-progress* CSS transform. If
+ * the modal is still mid-animation when that first measurement happens, the
+ * diagram permanently locks onto a scaled-down size and never corrects itself
+ * because ResizeObserver does not fire again for transform-only changes.
+ * Disabling the transform/animation guarantees the diagram measures its real,
+ * final size on the very first check.
+ */
+.lineage-diagram-modal-wrap .ant-modal {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+}
+
+.lineage-diagram-modal-wrap .ant-modal-content {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+}

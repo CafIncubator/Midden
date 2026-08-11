@@ -1,110 +1,227 @@
 ﻿@inject Caf.Midden.Wasm.Services.StateContainer State
 @inject ModalService ModalService
 
-@if (this.ShowHeader)
+@if (ShowHeader)
 {
-    <Divider Orientation="center">Datasets</Divider>
+    <Divider Orientation="@DividerOrientation.Center">Datasets</Divider>
 }
 
-@if (State.Catalog != null && this.ShowSearch)
+@if (State.Catalog != null && ShowSearch)
 {
-    <AntDesign.Row Gutter="8" Align="middle">
-        @if (State.AppConfig?.Zones != null && State.AppConfig.Zones.Any())
-        {
-            <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(2,6)">
-                <SimpleSelect 
-                    Id="zone" 
-                    @bind-Value="SelectedZone" 
-                    Placeholder="Select Zone" 
-                    AllowClear="true"
-                    OnSelectedItemChanged="OnZoneFilterChange">
+    <div class="catalog-controls">
+        <AntDesign.Row Gutter="8" Align="@RowAlign.Middle">
+            <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(6,0)">
+                <Search Placeholder="Search datasets"
+                        OnChange="SearchHandler"
+                        EnterButton="true"
+                        @bind-Value="SearchTerm"
+                        AllowClear="true" />
+            </AntDesign.Col>
+            <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(3,0)">
+                <SimpleSelect Id="zone"
+                              @bind-Value="SelectedZone"
+                              Placeholder="Zone"
+                              AllowClear="true"
+                              OnSelectedItemChanged="OnZoneFilterChange">
                     <SelectOptions>
-                        @foreach (var zone in State.AppConfig.Zones)
+                        @foreach (var zone in ZoneOptions)
                         {
                             <SimpleSelectOption Value="@zone" Label="@zone" />
                         }
                     </SelectOptions>
                 </SimpleSelect>
             </AntDesign.Col>
-        }
-        <Divider Type="DirectionVHType.Vertical" />
-        <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(8,0)">
-            <Search Placeholder="Search datasets"
-                    OnChange="SearchHandler"
-                    EnterButton="true" 
-                    @bind-Value="SearchTerm"
-                    AllowClear="true" />
-        </AntDesign.Col>
-    </AntDesign.Row>
+            <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(4,0)">
+                <SimpleSelect Id="project"
+                              @bind-Value="SelectedProject"
+                              Placeholder="Project"
+                              AllowClear="true"
+                              OnSelectedItemChanged="OnProjectFilterChange">
+                    <SelectOptions>
+                        @foreach (var project in ProjectOptions)
+                        {
+                            <SimpleSelectOption Value="@project" Label="@project" />
+                        }
+                    </SelectOptions>
+                </SimpleSelect>
+            </AntDesign.Col>
+            <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(6,0)">
+                <Select Mode="@SelectMode.Multiple"
+                        Class="catalog-tag-select"
+                        Placeholder="Tag"
+                        Values="@SelectedTags"
+                        ValuesChanged="OnTagFilterChange"
+                        MaxTagCount="2"
+                        TItemValue="string"
+                        TItem="string">
+                    <SelectOptions>
+                        @foreach (var tag in TagOptions)
+                        {
+                            <SelectOption TItemValue="string" TItem="string" Value="@tag" Label="@tag" />
+                        }
+                    </SelectOptions>
+                </Select>
+            </AntDesign.Col>
+            <AntDesign.Col Xs="@Property(12,0)" Lg="@Property(3,0)">
+                <div class="catalog-filter-sort-actions">
+                    <Popover Trigger="@(new Trigger[]{ Trigger.Click })" Placement="Placement.BottomLeft">
+                        <ChildContent>
+                            <Button>
+                                <Icon Type="tags" Theme="@IconThemeType.Outline" /> @(SelectedTags.Count > 0 ? $"({SelectedTags.Count}) " : string.Empty)@TagMatchModeLabel
+                            </Button>
+                        </ChildContent>
+                        <ContentTemplate>
+                            <div style="width:260px;">
+                                <Search Placeholder="Search tags"
+                                        @bind-Value="TagBrowseSearchTerm"
+                                        OnChange="OnTagBrowseSearchChanged"
+                                        AllowClear="true" />
+                                <div style="display:flex; gap:4px; margin:8px 0; align-items:center;">
+                                    <span class="catalog-empty-value">Match</span>
+                                    <Button Size="@AntDesign.ButtonSize.Small"
+                                            Type="@(TagMatchAll ? AntDesign.ButtonType.Default : AntDesign.ButtonType.Primary)"
+                                            OnClick="@(() => SetTagMatchMode(false))">Any</Button>
+                                    <Button Size="@AntDesign.ButtonSize.Small"
+                                            Type="@(TagMatchAll ? AntDesign.ButtonType.Primary : AntDesign.ButtonType.Default)"
+                                            OnClick="@(() => SetTagMatchMode(true))">All</Button>
+                                </div>
+                                <div style="display:flex; gap:4px; margin:8px 0;">
+                                    <Button Size="@AntDesign.ButtonSize.Small"
+                                            Type="@(TagBrowseSortByPopularity ? AntDesign.ButtonType.Default : AntDesign.ButtonType.Primary)"
+                                            OnClick="@(() => SetTagBrowseSort(false))">A-Z</Button>
+                                    <Button Size="@AntDesign.ButtonSize.Small"
+                                            Type="@(TagBrowseSortByPopularity ? AntDesign.ButtonType.Primary : AntDesign.ButtonType.Default)"
+                                            OnClick="@(() => SetTagBrowseSort(true))">Most used</Button>
+                                </div>
+                                <div style="max-height:280px; overflow-y:auto;">
+                                    @{ var tagBrowseList = GetTagBrowseList(); }
+                                    @if (tagBrowseList.Count == 0)
+                                    {
+                                        <Empty Simple />
+                                    }
+                                    else
+                                    {
+                                        @foreach (var item in tagBrowseList)
+                                        {
+                                            <div style="padding:2px 0;" @key="item.Tag">
+                                                <Checkbox Checked="@SelectedTags.Contains(item.Tag)"
+                                                          CheckedChanged="@((bool v) => ToggleTagSelection(item.Tag, v))">
+                                                    @item.Tag <span class="catalog-empty-value">(@item.Count)</span>
+                                                </Checkbox>
+                                            </div>
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        </ContentTemplate>
+                    </Popover>
+                    <Divider Type="@DividerType.Vertical" />
+                    <Popover Trigger="@(new Trigger[]{ Trigger.Click })" Placement="Placement.BottomRight">
+                        <ChildContent>
+                            <Button>
+                                <Icon Type="sort-ascending" Theme="@IconThemeType.Outline" />
+                            </Button>
+                        </ChildContent>
+                        <ContentTemplate>
+                            <div style="display:flex; flex-direction:column; gap:4px; min-width:160px;">
+                                <Button Size="@AntDesign.ButtonSize.Small"
+                                        Type="@(SelectedSort == DatasetSortOptions.Recent ? AntDesign.ButtonType.Primary : AntDesign.ButtonType.Default)"
+                                        OnClick="@(() => SetSort(DatasetSortOptions.Recent))">Most recent</Button>
+                                <Button Size="@AntDesign.ButtonSize.Small"
+                                        Type="@(SelectedSort == DatasetSortOptions.Oldest ? AntDesign.ButtonType.Primary : AntDesign.ButtonType.Default)"
+                                        OnClick="@(() => SetSort(DatasetSortOptions.Oldest))">Oldest</Button>
+                                <Button Size="@AntDesign.ButtonSize.Small"
+                                        Type="@(SelectedSort == DatasetSortOptions.NameAz ? AntDesign.ButtonType.Primary : AntDesign.ButtonType.Default)"
+                                        OnClick="@(() => SetSort(DatasetSortOptions.NameAz))">Name A-Z</Button>
+                                <Button Size="@AntDesign.ButtonSize.Small"
+                                        Type="@(SelectedSort == DatasetSortOptions.VariableCount ? AntDesign.ButtonType.Primary : AntDesign.ButtonType.Default)"
+                                        OnClick="@(() => SetSort(DatasetSortOptions.VariableCount))">Most variables</Button>
+                            </div>
+                        </ContentTemplate>
+                    </Popover>
+                </div>
+            </AntDesign.Col>
 
-    <Space />
+        </AntDesign.Row>
+    </div>
 }
 
-
-
-@if (FilteredMetadata != null)
 @if (FilteredMetadata.Count > 0)
 {
-    <Row Gutter="16" Wrap="true">
-        @foreach (var metadata in FilteredMetadata)
-        {
-            <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(12,0)" Style="padding:5px">
+    @if (ShowResultCount)
+    {
+        <div class="catalog-summary-bar">
+            <div><strong>@FilteredMetadata.Count</strong> datasets</div>
+            <div>Showing @GetCurrentRangeStart()-@GetCurrentRangeEnd() of @FilteredMetadata.Count</div>
+        </div>
+    }
 
-            <Card Class="dataset-card" Style="overflow:hidden">
-                <TitleTemplate>
-         
-                    <Icon Style="color: white;" Type="file-text" Theme="outline" />
-                            <a href="catalog/datasets/@metadata.Dataset.Zone/@metadata.Dataset.Project/@metadata.Dataset.Name" style="color: white;">
-                        @metadata.Dataset.Name
-                    </a>
-                    
-                </TitleTemplate>
-                <Extra>
-                    <Button OnClick="() => OpenMetadataDetailsModalTemplate(metadata)">
-                        <Icon Type="zoom-in" Theme="outline" />
-                    </Button>
-                     
-                </Extra>
-                <Body>
-                    <Icon Type="folder" />
-                            <a href="catalog/datasets/@metadata.Dataset.Zone">
-                        @metadata.Dataset.Zone
-                    </a>
-                    <Divider Type="DirectionVHType.Vertical" />
-                    <Icon Type="project" />
-                           
-                    <a href="catalog/projects/@metadata.Dataset.Project">
-                        @metadata.Dataset.Project
-                    </a>
-                    <Divider Type="DirectionVHType.Vertical" />
-                    <Icon Type="calculator" /> @(metadata.Dataset.Variables.Count())
-                    <Divider Type="DirectionVHType.Vertical" />
-                    <Icon Type="calendar" /> @metadata.ModifiedDate.ToString("d")
-                    
-                    <Divider />
-                    <div class="truncate">
-                    @if (!String.IsNullOrEmpty(metadata.Dataset.Description))
+    <Row Gutter="16" Wrap="true">
+        @foreach (var card in PagedMetadata)
+        {
+            <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(12,0)" Style="padding:5px" @key="card.Metadata">
+                <Card Class="dataset-card catalog-card" Style="overflow:hidden">
+                    <TitleTemplate>
+                        <Icon Type="file-text" Theme="@IconThemeType.Outline" />
+                        <a href="catalog/datasets/@card.Metadata.Dataset.Zone/@card.Metadata.Dataset.Project/@card.Metadata.Dataset.Name" class="catalog-card-title-link">
+                            @card.Metadata.Dataset.Name
+                        </a>
+                    </TitleTemplate>
+                    <Extra>
+                        <Button Class="magnifying-button" OnClick="() => OpenMetadataDetailsModalTemplate(card.Metadata)">
+                            <Icon Type="zoom-in" Theme="@IconThemeType.Outline" />
+                        </Button>
+                    </Extra>
+                    <Body>
+                        <div class="catalog-meta-line">
+                            <span><Icon Type="folder" /> Zone: <a href="catalog/datasets/@card.Metadata.Dataset.Zone">@card.Metadata.Dataset.Zone</a></span>
+                            <span><Icon Type="project" /> Project: <a href="catalog/projects/@card.Metadata.Dataset.Project">@card.Metadata.Dataset.Project</a></span>
+                            <span><Icon Type="calculator" /> Vars: @card.Metadata.Dataset.Variables.Count</span>
+                            <span><Icon Type="calendar" /> Updated: @(card.Metadata.Dataset.LastUpdate?.ToString("d") ?? card.Metadata.ModifiedDate.ToString("d"))</span>
+                        </div>
+
+                        <Divider />
+                        @if (!string.IsNullOrWhiteSpace(card.DescriptionHtml))
                         {
-                            @((MarkupString)(Markdig.Markdown.ToHtml(metadata.Dataset.Description, pipeline)))
+                            <div class="@(card.IsDescriptionExpanded ? string.Empty : "truncate")">@((MarkupString)card.DescriptionHtml)</div>
+                            @if (card.CanExpandDescription)
+                            {
+                                <span class="catalog-read-more" @onclick="() => ToggleDescription(card)">@(card.IsDescriptionExpanded ? "Show less" : "Read more")</span>
+                            }
                         }
                         else
                         {
                             <Empty Simple />
                         }
-                    </div>
-                    <Divider />
+                        <Divider />
 
-                    @foreach (var tag in metadata.Dataset.Tags)
-                    {
-                        <Tag><a href="catalog/datasets/tags/@tag">@tag</a></Tag>
-                    }
-                </Body>
-            </Card>
-        </AntDesign.Col>
+                        <div class="catalog-tag-row">
+                            @foreach (var tag in card.VisibleTags)
+                            {
+                                <Tag><a href="catalog/datasets/tags/@tag">@tag</a></Tag>
+                            }
+                            @if (card.HiddenTagCount > 0)
+                            {
+                                <Tag>+@card.HiddenTagCount more</Tag>
+                            }
+                        </div>
+                    </Body>
+                </Card>
+            </AntDesign.Col>
         }
     </Row>
-}
-else {
-    <Empty Simple />
-}
 
+    @if (ShowPager)
+    {
+        <div class="catalog-pagination-bar">
+            <Button Disabled="@(CurrentPage <= 1)" OnClick="() => MoveToPage(CurrentPage - 1)">Previous</Button>
+            <span>Page @CurrentPage of @TotalPages</span>
+            <Button Disabled="@(CurrentPage >= TotalPages)" OnClick="() => MoveToPage(CurrentPage + 1)">Next</Button>
+        </div>
+    }
+}
+else
+{
+    <Empty Simple />
+    <div class="catalog-summary-bar">No datasets match the current filters.</div>
+}

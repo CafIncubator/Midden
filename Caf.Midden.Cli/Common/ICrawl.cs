@@ -1,18 +1,18 @@
 ﻿using Caf.Midden.Core.Models.v0_2;
 using Caf.Midden.Core.Services;
 using Caf.Midden.Core.Services.Metadata;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Caf.Midden.Cli.Common
+namespace Caf.Midden.Cli.Common;
+
+/// <summary>
+/// <c>GetFileNames</c> was previously public even though its semantics differ per crawler
+/// (local returns full paths, Data Lake returns relative paths, Drive returns file *IDs*),
+/// which made it an implementation detail leaking through the interface. It has been removed
+/// from the public contract; each crawler still exposes it privately for its own
+/// <c>GetMetadatas</c>/<c>GetProjects</c> implementations.
+/// </summary>
+public interface ICrawl : IDisposable
 {
-    public interface ICrawl
-    {
-        List<string> GetFileNames(string fileExtension);
-        List<Metadata> GetMetadatas(IMetadataParser parser);
-        List<Project> GetProjects(ProjectReader reader);
-    }
+    IReadOnlyList<Metadata> GetMetadatas(IMetadataParser parser);
+    IReadOnlyList<Project> GetProjects(ProjectReader reader);
 }

@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="Caf.Midden.Cli.Tests/Caf.Midden.Cli.Tests.csproj" />
+  <Project Path="Caf.Midden.Cli/Caf.Midden.Cli.csproj" />
+  <Project Path="Caf.Midden.Core.Tests/Caf.Midden.Core.Tests.csproj" />
+  <Project Path="Caf.Midden.Core/Caf.Midden.Core.csproj" />
+  <Project Path="Caf.Midden.Wasm/Caf.Midden.Wasm.csproj" />
+</Solution>

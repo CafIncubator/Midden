@@ -116,7 +116,7 @@ namespace Caf.Midden.Core.Services.Metadata
 
                 // Get temporal extent
                 string temporalStart = string.IsNullOrEmpty(variable.StartDate) ? "" : variable.StartDate;
-                string temporalEnd = string.IsNullOrEmpty(variable.EndDate) ? "" : variable.StartDate;
+                string temporalEnd = string.IsNullOrEmpty(variable.EndDate) ? "" : variable.EndDate;
 
                 newVariable.TemporalExtent = $"{temporalStart}/{temporalEnd}";
 

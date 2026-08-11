@@ -1,34 +1,14 @@
 ﻿using Caf.Midden.Cli.Actions;
-using Caf.Midden.Cli.Models;
 using Caf.Midden.Cli.Services;
-using System;
 using System.CommandLine;
-using System.IO;
 
-namespace Caf.Midden.Cli
-{
-    class Program
-    {
-        static int Main(string[] args)
-        {
-            ConfigurationService configReader = new ConfigurationService();
+var configurationService = new ConfigurationService();
 
-            string currDir = AppDomain.CurrentDomain.BaseDirectory;
-            Console.WriteLine("MiddenCli: CurrentDirectory is: " + currDir);
-            CliConfiguration? config = configReader.GetConfiguration(Path.Combine(currDir, "configuration.json"));
+var rootCommand = new RootCommand("Create Midden catalogs from one or more supported data stores.");
+rootCommand.Add(CollateCommand.Create(configurationService));
+rootCommand.Add(ValidateCommand.Create());
+rootCommand.Add(SetupCommand.Create(configurationService));
+rootCommand.Add(SecretCommand.Create(configurationService));
+rootCommand.Add(LoginCommand.Create(configurationService));
 
-            var cmd = new RootCommand
-            {
-                new Collate(
-                    "collate",
-                    "Create a Midden catalog file from one or more data stores.",
-                    config),
-                new Setup(
-                    "setup",
-                    "Creates a blank 'configuration.json' file")
-            };
-
-            return cmd.Invoke(args);
-        }
-    }
-}
+return await rootCommand.Parse(args).InvokeAsync();

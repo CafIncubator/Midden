@@ -1,0 +1,22 @@
+@implements IAsyncDisposable
+
+<div class="geojson-editor-map">
+    <div @ref="mapElement" id="@mapElementId" style="@($"height: {Height}; width: 100%;")"></div>
+    @if (!string.IsNullOrEmpty(validationMessage))
+    {
+        <AntDesign.Alert Type="@AlertType.Warning"
+                         Message="@validationMessage"
+                         ShowIcon="true"
+                         Class="geojson-editor-map-warning" />
+    }
+</div>
+
+<AntDesign.Modal Title="@("Raw GeoJSON")"
+                 Visible="@rawGeoJsonVisible"
+                 OnOk="@OnRawGeoJsonOk"
+                 OnCancel="@OnRawGeoJsonCancel"
+                 DestroyOnClose="true">
+    <AntDesign.TextArea @bind-Value="rawGeoJson"
+                        Rows="8"
+                        Placeholder="Valid geojson geometry, e.g. {&quot;type&quot;:&quot;Point&quot;,&quot;coordinates&quot;:[-117.1,46.7]}" />
+</AntDesign.Modal>

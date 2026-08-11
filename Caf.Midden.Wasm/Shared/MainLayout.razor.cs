@@ -1,4 +1,5 @@
 ﻿using Caf.Midden.Core.Models.v0_2;
+using Caf.Midden.Wasm.Services;
 using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
@@ -11,28 +12,31 @@ namespace Caf.Midden.Wasm.Shared
     {
         //string DebugMsg { get; set; } = "";
 
-        bool collapsed;
+        private IDisposable? _stateSubscription;
 
-        private async Task LastUpdated_StateChanged(
-            ComponentBase source,
-            string lastUpdated)
+        private bool collapsed = false;
+
+        private async Task OnStateChanged(AppStateChangedEventArgs args)
         {
-            if(source != this)
-            {
-                await InvokeAsync(StateHasChanged);
-                //DebugMsg = "StateHasChanged";
-            }
+            await InvokeAsync(StateHasChanged);
+            //DebugMsg = "StateHasChanged";
         }
 
         protected override void OnInitialized()
         {
-            State.StateChanged += async (source, property)
-                => await LastUpdated_StateChanged(source, property);
+            _stateSubscription = State.Subscribe(
+                this,
+                OnStateChanged,
+                AppStateChange.LastUpdated,
+                AppStateChange.AppConfig,
+                AppStateChange.Catalog,
+                AppStateChange.MetadataEdit,
+                AppStateChange.ProjectEdit);
         }
+
         public void Dispose()
         {
-            State.StateChanged -= async (source, property)
-                => await LastUpdated_StateChanged(source, property);
+            _stateSubscription?.Dispose();
         }
 
         //void OnCollapse(bool isCollapsed)

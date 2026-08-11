@@ -1,0 +1,13 @@
+@page "/editor/app-configuration"
+
+@inject Services.StateContainer State
+
+<div class="site-layout-background">
+    <PageHeader Title="App Configuration Editor">
+        <PageHeaderExtra>
+            <a href="https://github.com/CafIncubator/Midden/wiki" target="_blank"><Button Icon="@IconType.TwoTone.QuestionCircle">Help</Button></a>
+        </PageHeaderExtra>
+    </PageHeader>
+    <ConfigurationEditor />
+    <BackTop></BackTop>
+</div>

@@ -9,11 +9,11 @@
         <PortRenderer @key="port" Port="port" />
     }
     <Tooltip Title="@Node.Name" Placement="Placement.TopLeft">
-        <Card Size="small" Title="@Node.Name" Style="width:250px; text-overflow:ellipsis;">
+        <Card Size="@CardSize.Small" Title="@Node.Name" Style="width:250px; text-overflow:ellipsis;">
         <Extra>
             @if (!String.IsNullOrEmpty(Node.Url))
             {
-            <a href="@Node.Url" target="_blank"><Icon Type="link" Theme="outline" /></a>
+            <a href="@Node.Url" target="_blank"><Icon Type="link" Theme="@IconThemeType.Outline" /></a>
             }
         </Extra>
         <Body>

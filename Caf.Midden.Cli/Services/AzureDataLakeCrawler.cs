@@ -1,164 +1,154 @@
-﻿using Azure;
-using Azure.Core;
+﻿using Azure.Core;
 using Azure.Identity;
 using Azure.Storage.Files.DataLake;
 using Azure.Storage.Files.DataLake.Models;
 using Caf.Midden.Cli.Common;
-using Caf.Midden.Cli.Models;
 using Caf.Midden.Core.Models.v0_2;
 using Caf.Midden.Core.Services;
 using Caf.Midden.Core.Services.Metadata;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace Caf.Midden.Cli.Services
+namespace Caf.Midden.Cli.Services;
+
+public sealed class AzureDataLakeCrawler : ICrawl
 {
-    public class AzureDataLakeCrawler : ICrawl
+    private readonly DataLakeFileSystemClient fileSystemClient;
+    private readonly ICrawlLogger logger;
+    private IReadOnlyList<Azure.Storage.Files.DataLake.Models.PathItem>? cachedPaths;
+
+    public AzureDataLakeCrawler(
+        string accountName,
+        string tenantId,
+        string clientId,
+        string clientSecret,
+        string fileSystemName,
+        string? endpointSuffix = null,
+        ICrawlLogger? logger = null)
+        : this(
+            accountName,
+            fileSystemName,
+            CreateClientSecretCredential(tenantId, clientId, clientSecret),
+            endpointSuffix,
+            logger)
     {
-        private const string MIDDEN_FILE_EXTENSION = ".midden";
-        private const string MIPPEN_FILE_SEARCH_TERM = "DESCRIPTION.md";
+    }
 
-        private readonly string accountName;
-        private readonly string tenantId;
-        private readonly string clientId;
-        private readonly string clientSecret;
-        private readonly string fileSystemName;
+    /// <summary>
+    /// Creates a crawler using an already configured credential, allowing the caller to supply
+    /// managed identity, an interactive browser sign in, or a client secret.
+    /// </summary>
+    /// <param name="endpointSuffix">
+    /// Overrides the default "dfs.core.windows.net" endpoint suffix, for Azure Government, Azure
+    /// China, or other sovereign clouds.
+    /// </param>
+    public AzureDataLakeCrawler(
+        string accountName,
+        string fileSystemName,
+        TokenCredential credential,
+        string? endpointSuffix = null,
+        ICrawlLogger? logger = null)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(accountName);
+        ArgumentException.ThrowIfNullOrWhiteSpace(fileSystemName);
+        ArgumentNullException.ThrowIfNull(credential);
 
-        private readonly DataLakeServiceClient serviceClient;
+        var suffix = string.IsNullOrWhiteSpace(endpointSuffix) ? "dfs.core.windows.net" : endpointSuffix;
+        var serviceClient = new DataLakeServiceClient(new Uri($"https://{accountName}.{suffix}"), credential);
+        fileSystemClient = serviceClient.GetFileSystemClient(fileSystemName);
+        this.logger = logger ?? ConsoleCrawlLogger.Instance;
+    }
 
-        public AzureDataLakeCrawler(
-            string accountName,
-            string tenantId,
-            string clientId,
-            string clientSecret,
-            string fileSystemName)
+    private static TokenCredential CreateClientSecretCredential(string tenantId, string clientId, string clientSecret)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(tenantId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(clientId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(clientSecret);
+
+        return new ClientSecretCredential(tenantId, clientId, clientSecret);
+    }
+
+    public void Dispose()
+    {
+        // DataLakeFileSystemClient/DataLakeServiceClient hold no unmanaged resources requiring
+        // explicit disposal; this satisfies ICrawl's IDisposable contract for symmetry with
+        // crawlers that do own disposable resources (e.g. DriveService).
+    }
+
+    internal IReadOnlyList<string> GetFileNames(string fileExtension)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(fileExtension);
+
+        var names = GetCachedPaths()
+            .Where(pathItem => pathItem.IsDirectory != true && pathItem.Name.EndsWith(fileExtension, StringComparison.OrdinalIgnoreCase))
+            .Select(pathItem => pathItem.Name)
+            .ToList();
+
+        logger.Info($"Found a total of {names.Count} files");
+        return names;
+    }
+
+    /// <summary>
+    /// Lists the file system once and caches the result so that <c>GetMetadatas</c> and
+    /// <c>GetProjects</c> both filtering from the same listing does not issue a second remote
+    /// listing call when a data store has <c>ShouldCollateProjects</c> enabled.
+    /// </summary>
+    private IReadOnlyList<Azure.Storage.Files.DataLake.Models.PathItem> GetCachedPaths() =>
+        cachedPaths ??= fileSystemClient
+            .GetPaths(path: null, recursive: true, userPrincipalName: false, cancellationToken: CancellationToken.None)
+            .ToList();
+
+    public IReadOnlyList<Metadata> GetMetadatas(IMetadataParser parser)
+    {
+        List<Metadata> metadatas = [];
+
+        foreach (var fileName in GetFileNames(MiddenFileConventions.MiddenFileExtension))
         {
-            this.accountName = accountName;
-            this.tenantId = tenantId;
-            this.clientId = clientId;
-            this.clientSecret = clientSecret;
-            this.fileSystemName = fileSystemName;
-
-            this.serviceClient = InitializeClient();
-        }
-
-        private DataLakeServiceClient InitializeClient()
-        {
-            TokenCredential credential = new ClientSecretCredential(
-                tenantId, clientId, clientSecret, new TokenCredentialOptions());
-
-            string dfsUri = $"https://{accountName}.dfs.core.windows.net";
-
-            return new DataLakeServiceClient(new Uri(dfsUri), credential);
-        }
-
-        // Gets a list of midden/mippen file names that are two levels deep from the root. 
-        // Assumes directory structure is something like "root/{projectName}/{datasetName}.midden"
-        public List<string> GetFileNames(string fileExtension)
-        {
-            DataLakeFileSystemClient fileSystemClient =
-                serviceClient.GetFileSystemClient(fileSystemName);
-
-            var names = new List<string>();
-
-            foreach (PathItem pathItem in fileSystemClient.GetPaths())
+            try
             {
-                if (pathItem.IsDirectory ?? false)
+                var fileClient = fileSystemClient.GetFileClient(fileName);
+                using var stream = fileClient.OpenRead();
+
+                // A StreamReader with BOM detection avoids buffering the whole file into a
+                // second byte array via ToArray() and correctly strips a UTF-8 BOM instead of
+                // leaving it as a stray character in the parsed JSON.
+                using var reader = new StreamReader(stream, Encoding.UTF8, detectEncodingFromByteOrderMarks: true);
+                var json = reader.ReadToEnd();
+                var metadata = parser.Parse(json);
+
+                if (metadata.Dataset is null)
                 {
-                    foreach (PathItem subPathItem in fileSystemClient.GetPaths(pathItem.Name))
-                    {
-                        if (subPathItem.Name.Contains(fileExtension))
-                        {
-                            Console.WriteLine($"  In {pathItem.Name} found {subPathItem.Name}");
-
-                            names.Add(subPathItem.Name);
-                        }
-                            
-                    }
+                    logger.Warning($"Skipping file '{fileName}': the file has no 'Dataset' section.");
+                    continue;
                 }
+
+                metadata.Dataset.DatasetPath = MiddenFileConventions.TrimSuffix(fileClient.Path, MiddenFileConventions.MiddenFileExtension);
+                metadatas.Add(metadata);
             }
-
-            Console.WriteLine($"Found a total of {names.Count} files");
-
-            return names;
-        }
-
-        public List<Metadata> GetMetadatas(
-            IMetadataParser parser)
-        {
-            List<string> fileNames = GetFileNames(MIDDEN_FILE_EXTENSION);
-
-            List<Metadata> metadatas = new List<Metadata>();
-
-            DataLakeFileSystemClient fileSystemClient =
-                    serviceClient.GetFileSystemClient(fileSystemName);
-            
-            foreach (var fileName in fileNames)
+            catch (Exception exception)
             {
-                try
-                {
-                    // Get file contents as json string
-                    DataLakeFileClient fileClient =
-                        fileSystemClient.GetFileClient(fileName);
-
-                    Response<FileDownloadInfo> fileContents = fileClient.Read();
-
-                    string json;
-                    using (MemoryStream ms = new MemoryStream())
-                    {
-                        fileContents.Value.Content.CopyTo(ms);
-                        json = Encoding.UTF8.GetString(ms.ToArray());
-                    }
-
-                    // Parse json string and add relative path to Dataset
-                    Metadata metadata = parser.Parse(json);
-
-                    string filePath = fileClient.Path.Replace(MIDDEN_FILE_EXTENSION, "");
-                    metadata.Dataset.DatasetPath = filePath;
-
-                    metadatas.Add(metadata);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error parsing file: {fileName}, reason: {ex}");
-                }
+                logger.Warning($"Error parsing file '{fileName}': {exception.Message}");
             }
-
-            return metadatas;
         }
 
-        public List<Project> GetProjects(
-            ProjectReader reader)
+        return metadatas;
+    }
+
+    public IReadOnlyList<Project> GetProjects(ProjectReader reader)
+    {
+        List<Project> projects = [];
+
+        foreach (var fileName in GetFileNames(MiddenFileConventions.MippenFileSearchTerm))
         {
-            List<string> fileNames = GetFileNames(MIPPEN_FILE_SEARCH_TERM);
+            var fileClient = fileSystemClient.GetFileClient(fileName);
+            using var stream = fileClient.OpenRead();
+            var project = reader.Read(stream);
 
-            List<Project> projects = new List<Project>();
-
-            DataLakeFileSystemClient fileSystemClient =
-                    serviceClient.GetFileSystemClient(fileSystemName);
-
-            foreach (var fileName in fileNames)
+            if (project is not null)
             {
-                // Get file contents
-                DataLakeFileClient fileClient =
-                    fileSystemClient.GetFileClient(fileName);
-
-                // Try to get a project
-                Project project;
-                using (var stream = fileClient.OpenRead())
-                {
-                    project = reader.Read(stream);
-                }
-
-                if(project is not null)
-                    projects.Add(project);
+                projects.Add(project);
             }
-
-            return projects;
         }
+
+        return projects;
     }
 }

@@ -1,45 +1,42 @@
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
-using Caf.Midden.Wasm.Services;
-using Caf.Midden.Core.Services.Configuration;
-using Microsoft.JSInterop;
+using Caf.Midden.Wasm;
 using Caf.Midden.Core.Services;
+using Caf.Midden.Core.Services.Configuration;
+using Caf.Midden.Wasm.Services;
+using Radzen;
 
-namespace Caf.Midden.Wasm
-{
-    public class Program
-    {
-        public static async Task Main(string[] args)
-        {
-            var builder = WebAssemblyHostBuilder.CreateDefault(args);
-            builder.RootComponents.Add<App>("#app");
 
-            builder.Services.AddScoped(
-                sp => new HttpClient { 
-                    BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) 
-            });
+var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
-            builder.Services.AddScoped<StateContainer>();
+builder.RootComponents.Add<App>("#app");
 
-            builder.Services.AddScoped<IReadConfiguration>(
-                sp => new ConfigurationReaderHttp(
-                    sp.GetRequiredService<HttpClient>(),
-                    "app-config.json"));
+// HttpClient scoped to the WASM base address
+builder.Services.AddScoped(sp =>
+    new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
-            builder.Services.AddScoped<IReadCatalog>(
-                sp => new CatalogReaderHttp(
-                    sp.GetRequiredService<HttpClient>()));
+// App services
+builder.Services.AddScoped<StateContainer>();
+builder.Services.AddScoped<AppBootstrapService>();
+builder.Services.AddScoped<AutosaveService>();
+builder.Services.AddSingleton<CatalogInsightsService>();
+builder.Services.AddSingleton<CatalogSearchService>();
 
-            builder.Services.AddAntDesign();
+builder.Services.AddScoped<IReadConfiguration>(sp =>
+    new ConfigurationReaderHttp(
+        sp.GetRequiredService<HttpClient>(),
+        "app-config.json"));
 
-            await builder.Build().RunAsync();
-        }
-    }
-}
+builder.Services.AddScoped<IReadCatalog>(sp =>
+    new CatalogReaderHttp(
+        sp.GetRequiredService<HttpClient>()));
+
+// UI framework
+builder.Services.AddAntDesign();
+
+// Radzen supplies the dashboard charts: it renders SVG directly from Blazor, so axis
+// formatting is plain C# and the plot tracks its container without a JS measurement step.
+builder.Services.AddRadzenComponents();
+
+await builder.Build().RunAsync();
+

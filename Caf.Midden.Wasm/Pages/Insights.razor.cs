@@ -1,268 +1,131 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Caf.Midden.Wasm.Services;
+using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using AntDesign.Charts;
-using Caf.Midden.Core.Models.v0_2;
-using System.Globalization;
 
 namespace Caf.Midden.Wasm.Pages
 {
     public partial class Insights : IDisposable
     {
-        // Simple stats
+        [Inject]
+        public CatalogInsightsService InsightsService { get; set; } = default!;
+
+        private IDisposable? _stateSubscription;
+
         int TotalDatasets { get; set; }
         int TotalVariables { get; set; }
         int TotalTags { get; set; }
         int TotalContacts { get; set; }
         int TotalProjects { get; set; }
 
-        Dictionary<string, int> TopTags { get; set; }
-        Dictionary<string, int> TopContacts { get; set; }
+        Dictionary<string, int> TopTags { get; set; } = new();
+        Dictionary<string, int> TopContacts { get; set; } = new();
 
         DateTime CatalogLastUpdate { get; set; }
 
+        public ZoneCount[] MetadataPerZoneData { get; set; } = Array.Empty<ZoneCount>();
 
-        IChartComponent MetadataPerZone = new Column();
-        public object[] MetadataPerZoneData { get; set; }
-        ColumnConfig MetadataPerZoneConfig = new ColumnConfig
+        // Headroom so the tallest column's data label still fits above it.
+        public int MetadataPerZoneAxisMax
         {
-            Title = new Title
+            get
             {
-                Visible = true,
-                Text = "Datasets per Zone"
-            },
-            ForceFit = true,
-            Padding = "auto",
-            XField = "zone",
-            YField = "count"
-        };
-
-        IChartComponent DatasetsOverTime = new Area();
-        public object[] DatasetsOverTimeData { get; set; }
-        AreaConfig DatasetsOverTimeConfig = new AreaConfig
-        {
-            Title = new Title
-            {
-                Visible = true,
-                Text = "Dataset growth"
-            },
-            ForceFit = true,
-            Padding = "auto",
-            XField = "date",
-            YField = "count",
-            XAxis = new ValueCatTimeAxis
-            {
-                Visible = true,
-                Type = "dateTime"
-            },
-            YAxis = new ValueAxis
-            {
-                Visible = true,
-                Min = 0
+                int max = MetadataPerZoneData.Select(item => item.Count).DefaultIfEmpty(0).Max();
+                return max + Math.Max(1, (int)Math.Ceiling(max * 0.15));
             }
-        };
+        }
+
+        public int DatasetGrowthValueStep { get; private set; } = 1;
+
+        public int DatasetGrowthValueMax { get; private set; } = 1;
+
+        public Index.GrowthPoint[] DatasetGrowthPoints { get; set; } = Array.Empty<Index.GrowthPoint>();
+
+        private DateTime _growthFirstDate;
+        private DateTime _growthLastDate;
+
+        // A step equal to the whole span makes the axis emit exactly two ticks: the first and last
+        // point, which is all a cumulative curve needs.
+        public object? DatasetGrowthStep { get; private set; }
+
+        private string FormatGrowthDate(object value)
+            => value is DateTime date
+                ? date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)
+                : string.Empty;
 
         protected override void OnInitialized()
         {
-            State.StateChanged += async (source, property)
-                => await StateChanged(source, property);
+            _stateSubscription = State.Subscribe(
+                this,
+                OnStateChanged,
+                AppStateChange.Catalog,
+                AppStateChange.AppConfig);
 
-            if (State?.Catalog != null)
-                SetInsights();
+            UpdateInsights();
         }
 
-        private async Task StateChanged(
-            ComponentBase source,
-            string property)
+        private async Task OnStateChanged(AppStateChangedEventArgs args)
         {
-            if (source != this)
-            {
-                if (property == "UpdateCatalog")
-                {
-                    SetInsights();
-                }
-
-                await InvokeAsync(StateHasChanged);
-            }
+            UpdateInsights();
+            await InvokeAsync(StateHasChanged);
         }
 
-        private void SetInsights()
+        private void UpdateInsights()
         {
-            if (State.Catalog == null)
-                return;
+            CatalogInsightsSnapshot snapshot = InsightsService.BuildSnapshot(State.Catalog, State.AppConfig);
 
-            if (State.AppConfig == null)
-                return;
+            TotalDatasets = snapshot.TotalDatasets;
+            TotalVariables = snapshot.TotalVariables;
+            TotalTags = snapshot.TotalTags;
+            TotalContacts = snapshot.TotalContacts;
+            TotalProjects = snapshot.TotalProjects;
+            CatalogLastUpdate = snapshot.CatalogLastUpdate;
+            TopTags = snapshot.TopTags.ToDictionary(item => item.Key, item => item.Count);
+            TopContacts = snapshot.TopContacts.ToDictionary(item => item.Key, item => item.Count);
 
-            SetSimpleStats();
-            CreateDatasetsPerZone();
-            CreateDatasetsOverTime();
-            SetTopStats();
+            MetadataPerZoneData = snapshot.DatasetsByZone.ToArray();
+
+            DatasetGrowthPoints = snapshot.DatasetGrowth
+                .Select(point => new Index.GrowthPoint(
+                    DateTime.ParseExact(point.Date, "yyyy-MM", CultureInfo.InvariantCulture),
+                    point.Count))
+                .ToArray();
+
+            _growthFirstDate = DatasetGrowthPoints.Length > 0 ? DatasetGrowthPoints[0].Date : default;
+            _growthLastDate = DatasetGrowthPoints.Length > 0 ? DatasetGrowthPoints[^1].Date : default;
+
+            TimeSpan growthSpan = _growthLastDate - _growthFirstDate;
+            DatasetGrowthStep = growthSpan > TimeSpan.Zero ? growthSpan : null;
+
+            int growthMax = DatasetGrowthPoints.Select(point => point.Count).DefaultIfEmpty(0).Max();
+            DatasetGrowthValueStep = NiceStep(growthMax);
+            DatasetGrowthValueMax = Math.Max(
+                DatasetGrowthValueStep,
+                (int)Math.Ceiling((double)growthMax / DatasetGrowthValueStep) * DatasetGrowthValueStep);
         }
 
-        private void SetSimpleStats()
+        // Rounds a step to 1, 2, 5 or 10 times a power of ten so ticks read 0/10/20.
+        private static int NiceStep(int max, int targetTicks = 3)
         {
-            if (State.Catalog == null)
-                return;
-
-            this.TotalDatasets = State.Catalog.Metadatas.Count;
-            this.TotalVariables = State.Catalog.Metadatas.SelectMany(m =>
-                m.Dataset.Variables).Count();
-
-            this.CatalogLastUpdate = State.Catalog.CreationDate;
-
-            this.TotalProjects = State.Catalog.Metadatas
-                .Select(m => m.Dataset.Project)
-                .Distinct()
-                .Count();
-
-            List<string> UniqueTags = new List<string>();
-            List<string> UniqueContacts = new List<string>();
-
-            foreach(Metadata meta in State.Catalog.Metadatas)
+            if (max <= 0)
             {
-                // Get unique tags from all datasets and variables
-                UniqueTags = UniqueTags
-                    .Union(meta.Dataset.Tags)
-                    .ToList()
-                    .Union(meta.Dataset.Variables
-                        .SelectMany(v => v.Tags))
-                    .ToList();
-
-                // Get unique contacts from all datasets
-                UniqueContacts = UniqueContacts
-                    .Union<string>(meta.Dataset.Contacts
-                        .Select(p => p.Name)
-                        .Where(n => n != null)
-                        .ToList<string>())
-                    .ToList();
+                return 1;
             }
 
-            this.TotalTags = UniqueTags.Count;
-            this.TotalContacts = UniqueContacts.Count;
-        }
+            double raw = (double)max / targetTicks;
+            double magnitude = Math.Pow(10, Math.Floor(Math.Log10(raw)));
+            double normalized = raw / magnitude;
+            double nice = normalized <= 1 ? 1 : normalized <= 2 ? 2 : normalized <= 5 ? 5 : 10;
 
-        private void CreateDatasetsPerZone()
-        {
-            List<object> objs = new List<object>();
-
-            foreach (string zone in State.AppConfig.Zones)
-            {
-                int numberMetas = State.Catalog.Metadatas.Count(m =>
-                    m.Dataset.Zone == zone);
-
-                object obj = new
-                {
-                    zone = zone,
-                    count = numberMetas
-                };
-
-                objs.Add(obj);
-            }
-
-            this.MetadataPerZoneData = objs.ToArray();
-
-            MetadataPerZone.ChangeData(MetadataPerZoneData);
-        }
-
-        private void CreateDatasetsOverTime()
-        {
-            List<object> objs = new List<object>();
-
-            // Groups datasets by creation date to get counts of those added the same month
-            var grouped = State.Catalog.Metadatas.GroupBy(m => m.CreationDate.ToString("yyyyMM"))
-                .Select(i => new
-                {
-                    date = DateTime.ParseExact(i.Key, "yyyyMM", CultureInfo.InvariantCulture),
-                    count = i.Count()
-                })
-                .OrderBy(g => g.date)
-                .ToList();
-
-            int total = 0;
-
-            if (grouped.Count == 0)
-                return;
-
-            DateTime min = grouped.Min(g => g.date);
-            DateTime now = DateTime.UtcNow;
-            DateTime curr = min;
-
-            // Set threshold of year diff to displaying 10 years of data
-            if((curr.Year - min.Year) > 10)
-            {
-                min = new DateTime(curr.Year - 10, 1, 1);
-            }
-
-            while(grouped.Count > 0)
-            {
-                object obj;
-
-                // Moving in accending order, so curr should only match first index
-                if(grouped[0].date.Month == curr.Month && grouped[0].date.Year == curr.Year)
-                {
-                    total += grouped[0].count;
-
-                    grouped.RemoveAt(0);
-                    
-                }
-
-                obj = new
-                {
-                    date = curr,
-                    count = total
-                };
-
-                objs.Add(obj);
-
-                curr = curr.AddMonths(1);
-
-            }
-
-            this.DatasetsOverTimeData = objs.ToArray();
-
-            DatasetsOverTime.ChangeData(DatasetsOverTimeData);
-        }
-        
-        private void SetTopStats()
-        {
-            List<string> Tags = new List<string>();
-            List<string> Contacts = new List<string>();
-
-            foreach (Metadata meta in State.Catalog.Metadatas)
-            {
-                // Get tags from all datasets and variables
-                Tags = Tags.Concat(meta.Dataset.Tags).ToList();
-                Tags = Tags.Concat(meta.Dataset.Variables
-                        .SelectMany(v => v.Tags)).ToList();
-
-                // Get contacts from all datasets
-                Contacts = Contacts.Concat(meta.Dataset.Contacts
-                        .Select(p => p.Name)
-                        .Where(n => n != null)
-                        .ToList<string>()).ToList();
-            }
-
-
-            this.TopTags = Tags.GroupBy(s => s)
-                .ToDictionary(g => g.Key, g => g.Count())
-                .OrderByDescending(d => d.Value)
-                .Take(5)
-                .ToDictionary(d => d.Key, d => d.Value);
-
-            this.TopContacts = Contacts.GroupBy(s => s)
-                .ToDictionary(g => g.Key, g => g.Count())
-                .OrderByDescending(d => d.Value)
-                .Take(5)
-                .ToDictionary(d => d.Key, d => d.Value);
+            return Math.Max(1, (int)(nice * magnitude));
         }
 
         public void Dispose()
         {
-            State.StateChanged -= async (source, property)
-                => await StateChanged(source, property);
+            _stateSubscription?.Dispose();
         }
     }
 }

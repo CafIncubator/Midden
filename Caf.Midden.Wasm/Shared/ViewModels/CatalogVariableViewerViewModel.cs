@@ -11,6 +11,8 @@ namespace Caf.Midden.Wasm.Shared.ViewModels
         public List<CatalogVariable> CatalogVariables { get; set; } = new List<CatalogVariable>();
 
         public List<CatalogVariable> FilteredCatalogVariables { get; set; } = new List<CatalogVariable>();
+
+        public List<CatalogVariable> PagedCatalogVariables { get; set; } = new List<CatalogVariable>();
         public string SearchTerm { get; set; }
     }
 
@@ -35,6 +37,20 @@ namespace Caf.Midden.Wasm.Shared.ViewModels
         public string DatasetName { get; set; }
 
         public string ProjectName { get; set; }
+
+        /// <summary>
+        /// Precomputed lower-invariant text used for fast, allocation-light
+        /// search filtering (avoids repeated ToLower() calls per keystroke).
+        /// </summary>
+        public string SearchText { get; set; } = string.Empty;
+
+        public bool CanExpandDescription { get; set; }
+
+        public bool IsDescriptionExpanded { get; set; }
+
+        public bool CanExpandMethods { get; set; }
+
+        public bool IsMethodsExpanded { get; set; }
 
         public CatalogVariable DeepCopy()
         {

@@ -5,3 +5,333 @@
 ::deep .ant-typography {
     color: unset !important;
 }
+
+::deep .home-kpi-card {
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+
+::deep .home-stats-col {
+    padding: 5px;
+}
+
+/* Cards in a row are stretched by the flex row, but their content boxes are not, which left
+   ragged bottoms when neighbouring lists had different row counts. */
+::deep .home-stats-col > .ant-card,
+::deep .home-stats-col > .ant-list {
+    height: 100%;
+}
+
+/* Lists have no Extra slot like Card does, so the header itself carries the alignment. */
+::deep .home-list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+::deep .home-chart-wrapper {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+::deep .home-chart-wrapper-fill {
+    display: block;
+    width: 100%;
+}
+
+::deep .home-search-hero {
+    display: flex;
+    justify-content: center;
+    padding: 8px 0 4px 0;
+}
+
+::deep .home-search-bar {
+    position: relative;
+    width: 100%;
+    max-width: 760px;
+}
+
+::deep .home-search-field {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 48px;
+    padding: 0 14px;
+    background: #fff;
+    border: 1px solid #d9d9d9;
+    border-radius: 24px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+::deep .home-search-field:focus-within {
+    border-color: #1890ff;
+    box-shadow: 0 0 0 3px rgba(24, 144, 255, 0.12);
+}
+
+::deep .home-search-icon {
+    font-size: 17px;
+    color: rgba(0, 0, 0, 0.35);
+}
+
+::deep .home-search-input {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 15px;
+    color: inherit;
+}
+
+::deep .home-search-input::-webkit-search-cancel-button {
+    display: none;
+}
+
+::deep .home-search-kbd {
+    flex: none;
+    padding: 2px 8px;
+    border: 1px solid #e4e4e4;
+    border-bottom-width: 2px;
+    border-radius: 5px;
+    font-size: 11px;
+    line-height: 16px;
+    color: rgba(0, 0, 0, 0.4);
+    background: #fafafa;
+    white-space: nowrap;
+}
+
+::deep .home-search-clear {
+    flex: none;
+    border: none;
+    padding: 0;
+    background: transparent;
+    cursor: pointer;
+    font-size: 15px;
+    color: rgba(0, 0, 0, 0.25);
+    line-height: 1;
+}
+
+::deep .home-search-clear:hover {
+    color: rgba(0, 0, 0, 0.45);
+}
+
+::deep .home-search-results {
+    position: absolute;
+    z-index: 20;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid #f0f0f0;
+    border-radius: 10px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.14);
+    padding: 6px 0;
+    max-height: 62vh;
+    overflow-y: auto;
+}
+
+::deep .home-search-group + .home-search-group {
+    border-top: 1px solid #f0f0f0;
+    margin-top: 4px;
+    padding-top: 4px;
+}
+
+::deep .home-search-group-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px 4px 16px;
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(0, 0, 0, 0.45);
+}
+
+::deep .home-search-group-count {
+    font-weight: 500;
+    letter-spacing: 0;
+    padding: 0 7px;
+    border-radius: 9px;
+    background: #f5f5f5;
+}
+
+::deep .home-search-result {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 7px 16px;
+    cursor: pointer;
+}
+
+::deep .home-search-result:hover {
+    background: #f5f8ff;
+}
+
+::deep .home-search-result-icon {
+    flex: none;
+    color: rgba(0, 0, 0, 0.35);
+}
+
+::deep .home-search-result-title {
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+::deep .home-search-result-subtitle {
+    margin-left: auto;
+    flex: none;
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.45);
+}
+
+::deep .home-search-see-all {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 16px 8px 16px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+::deep .home-search-empty {
+    padding: 20px 16px;
+}
+
+::deep .home-attention-intro {
+    margin-bottom: 8px;
+}
+
+::deep .home-coverage-split {
+    display: flex;
+    justify-content: space-around;
+    gap: 12px;
+    padding: 8px 0 12px 0;
+}
+
+::deep .home-coverage-split-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+::deep .home-coverage-count {
+    font-size: 26px;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+::deep .home-temporal-strip {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    overflow-x: auto;
+    padding: 12px 0 4px 0;
+    min-height: 90px;
+}
+
+::deep .home-temporal-year {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px;
+    min-width: 34px;
+}
+
+::deep .home-temporal-bar {
+    width: 100%;
+    background: #1890ff;
+    border-radius: 2px 2px 0 0;
+}
+
+::deep .home-temporal-label {
+    font-size: 10px;
+    color: rgba(0, 0, 0, 0.45);
+}
+
+::deep .home-attention-progress {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 12px;
+}
+
+::deep .home-attention-caption {
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.45);
+}
+
+::deep .home-attention-subhead {
+    margin: 12px 0 4px 0;
+    padding-top: 10px;
+    border-top: 1px solid #f0f0f0;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(0, 0, 0, 0.45);
+}
+
+::deep .home-attention-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 6px 0;
+    border-bottom: 1px solid #fafafa;
+}
+
+::deep a.home-attention-row:hover {
+    background: #f5f8ff;
+}
+
+::deep .home-attention-row-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+::deep .home-attention-badge {
+    flex: none;
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(0, 0, 0, 0.45);
+}
+
+::deep .home-attention-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+::deep .home-attention-validation {
+    display: flex;
+    justify-content: space-around;
+    gap: 12px;
+    padding: 12px 0;
+}
+
+::deep .home-attention-validation-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-size: 20px;
+}
+
+::deep .home-attention-validation-count {
+    font-size: 26px;
+    font-weight: 600;
+    line-height: 1.2;
+}

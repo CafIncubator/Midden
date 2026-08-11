@@ -1,5 +1,8 @@
 ﻿@using AntDesign
+@using Caf.Midden.Core.Services.Validation
+@using Caf.Midden.Wasm.Shared.Validation
 @inject Caf.Midden.Wasm.Services.StateContainer State
+@inject Caf.Midden.Wasm.Services.AutosaveService Autosave
 @inject ModalService ModalService
 @inject IJSRuntime JS
 
@@ -9,23 +12,52 @@
                     OkText="Reset"
                     CancelText="Cancel"
                     OnConfirm="NewMetadata">
-            <Button><Icon Type="plus" Theme="outline" /> New</Button>
+            <Button><Icon Type="plus" Theme="@IconThemeType.Outline" /> New</Button>
         </Popconfirm>
     </SpaceItem>
     <SpaceItem>
-        <MetadataLoaderFileSystem @bind-Metadata="State.MetadataEdit" />
+        <MetadataLoaderFileSystem Metadata="State.MetadataEdit"
+                      MetadataChanged="OnMetadataLoaded" />
+    </SpaceItem>
+    <SpaceItem>
+        <span class="autosave-status">@AutosaveStatusText</span>
+    </SpaceItem>
+    <SpaceItem>
+        <ValidationStatusChip Result="_validation" />
+    </SpaceItem>
+    <SpaceItem>
+        @* Completeness is deliberately separate from validity: it rewards effort instead of
+           blocking the download. *@
+        <AntDesign.Tooltip Title="@CompletenessTooltip">
+            <span class="validation-status">@CompletenessText</span>
+        </AntDesign.Tooltip>
     </SpaceItem>
 </Space>
 <AntDesign.Divider />
+
+@* Rendered declaratively (rather than via ConfirmService) so the prompt is owned by this
+   component's own render tree. The shared AntContainer resets its imperative dialog state on
+   NavigationManager.LocationChanged, which silently discarded confirm dialogs requested during
+   the navigation that creates this editor. *@
+<Modal Title="@("Resume Draft?")"
+       Visible="_draftRestorePromptVisible"
+       OkText="@("Yes")"
+       CancelText="@("No")"
+       OnOk="@(_ => OnDraftRestoreAccepted())"
+       OnCancel="@(_ => OnDraftRestoreDeclined())"
+       MaskClosable="false"
+       Closable="false">
+    <p>@DraftRestorePromptText</p>
+</Modal>
 
 @if (State?.MetadataEdit != null && State?.AppConfig != null)
 {
     <AntDesign.Form Model="State.MetadataEdit"
                     Layout="@FormLayout.Vertical"
-                    ValidateMode="@FormValidateMode.Rules"
+                    OnFieldChanged="OnFormFieldChanged"
                     @ref="form">
-        <Tabs Animated>
-            <TabPane Key="1" Tab="Basic">
+        <Tabs Animated @bind-ActiveKey="_activeTabKey">
+            <TabPane Key="1" Tab="@BasicTabLabel">
                 <EditorFormItemWithHelpPopup 
                     Label="Zone" 
                     Id="zone" 
@@ -78,14 +110,23 @@
                     {
                         <AntDesign.Table TItem="Caf.Midden.Core.Models.v0_2.Person"
                                             DataSource="@context.Dataset.Contacts"
+                                            OnRow="@GetContactRowAttributes"
+                                            RowClassName="@GetContactRowClassName"
                                             HidePagination="@true">
                             <ChildContent Context="contact">
-                                <AntDesign.Column @bind-Field="contact.Name"
-                                                    Width="30%" />
-                                <AntDesign.Column @bind-Field="contact.Email"
-                                                    Width="30%" />
-                                <AntDesign.Column @bind-Field="contact.Role"
-                                                    Width="30%" />
+                                <AntDesign.PropertyColumn Property="@(item => item.Name)" Title="" Width="4%">
+                                    <span draggable="true"
+                                          class="string-list-editor-handle"
+                                          title="Drag to reorder"
+                                          @ondragstart="@(() => OnContactDragStart(contact))"
+                                          @ondragend="@OnContactDragEnd">⋮⋮</span>
+                                </AntDesign.PropertyColumn>
+                                <AntDesign.PropertyColumn Property="@(item => item.Name)"
+                                                            Width="30%" />
+                                <AntDesign.PropertyColumn Property="@(item => item.Email)"
+                                                            Width="30%" />
+                                <AntDesign.PropertyColumn Property="@(item => item.Role)"
+                                                            Width="30%" />
                                 <ActionColumn Title="Action">
                                     <Space>
                                         <SpaceItem>
@@ -114,7 +155,7 @@
                         <SpaceItem>
                             <Button OnClick="AddDatasetTagHandler">Add</Button>
                         </SpaceItem>
-                        <SpaceItem><Divider Type="DirectionVHType.Vertical" /></SpaceItem>
+                        <SpaceItem><Divider Type="@DividerType.Vertical" /></SpaceItem>
                         <div style="width: 100%;">
                             <SpaceItem>
                                 <SimpleSelect Placeholder="Add saved tag"
@@ -137,21 +178,36 @@
 
                     @if (context.Dataset.Tags.Count > 0)
                     {
-                        <AntList DataSource="@context.Dataset.Tags">
-                            <ChildContent Context="tag">
-                                <ListItem>
-                                    <span><Tag>@tag</Tag></span>
+                        <div class="string-list-editor">
+                            @for (int i = 0; i < context.Dataset.Tags.Count; i++)
+                            {
+                                var index = i;
+                                var tag = context.Dataset.Tags[index];
+                                <div class="string-list-editor-drop-indicator @(IsStringDragOver(DatasetStringListKind.Tags, index) ? "string-list-editor-drop-indicator-visible" : string.Empty)"></div>
+                                <div draggable="true"
+                                     class="string-list-editor-row"
+                                     @ondragstart="@(() => OnStringDragStart(DatasetStringListKind.Tags, index))"
+                                     @ondragenter="@(() => OnStringDragEnter(DatasetStringListKind.Tags, index))"
+                                     @ondragover:preventDefault
+                                     @ondrop="@(() => OnStringDrop(DatasetStringListKind.Tags, index))"
+                                     @ondragend="@OnStringDragEnd">
+                                    <span class="string-list-editor-handle" title="Drag to reorder" aria-hidden="true">⋮⋮</span>
+                                    <div class="string-list-editor-input"><Tag>@tag</Tag></div>
                                     <Button Danger OnClick="() => DeleteDatasetTagHandler(tag)">
                                         <Icon Type="delete" />
                                     </Button>
-                                </ListItem>
-                            </ChildContent>
-                        </AntList>
+                                </div>
+                            }
+                            <div class="string-list-editor-drop-indicator @(IsStringDragOver(DatasetStringListKind.Tags, context.Dataset.Tags.Count) ? "string-list-editor-drop-indicator-visible" : string.Empty)"
+                                 @ondragenter="@(() => OnStringDragEnter(DatasetStringListKind.Tags, context.Dataset.Tags.Count))"
+                                 @ondragover:preventDefault
+                                 @ondrop="@(() => OnStringDrop(DatasetStringListKind.Tags, context.Dataset.Tags.Count))"></div>
+                        </div>
                     }
                 </EditorFormItemWithHelpPopup>
 
             </TabPane>
-            <TabPane Key="2" Tab="Variables">
+            <TabPane Key="2" Tab="@VariablesTabLabel">
 
                 <EditorFormItemWithHelpPopup Label="Variables" Id="variables" Tooltip="@VariablesTooltip" IsRequired=false>
                     <Space>
@@ -162,8 +218,8 @@
                             <DataDictionaryLoaderCafCsv />
                         </SpaceItem>
                         <SpaceItem>
-                            <AntDesign.Tooltip Title="@("WARNING: Uploading will replace all current variables. The uploaded file must be a CSV with the following column headers: FieldName, Units, Description")">
-                                <Icon Type="info-circle" Theme="fill" />
+                            <AntDesign.Tooltip Title="@("WARNING: Uploading will replace all current variables. The uploaded file must be a CSV with a Name, Description, and Units column; those three are the only ones required, so a minimal 3-column CSV is accepted. Optional columns: Tags, Methods, TemporalResolution, TemporalExtent, SpatialRepeats, IsQCSpecified, QCApplied, ProcessingLevel, VariableType. Tags, Methods, and QCApplied support multiple values within a cell, separated by a semicolon (;). If any value contains a comma, wrap it in double quotes so it isn't mistaken for a column separator. This is the same format produced by the \"Download\" button in the dataset preview, so a downloaded data dictionary can be edited and re-uploaded as-is.")">
+                                <Icon Type="info-circle" Theme="@IconThemeType.Fill" />
                             </AntDesign.Tooltip>
                         </SpaceItem>
                     </Space>
@@ -175,14 +231,21 @@
                     {
                         <AntDesign.Table TItem="Caf.Midden.Core.Models.v0_2.Variable"
                                             DataSource="@context.Dataset.Variables"
+                                            OnRow="@GetVariableRowAttributes"
+                                            RowClassName="@GetVariableRowClassName"
                                             Size="@TableSize.Small"
                                             ScrollX="1400"
                                             PageSize="50">
                             <ChildContent Context="variable">
-
-                                
-                                <AntDesign.Column @bind-Field="variable.Name"
-                                                    Fixed="left">
+                                <AntDesign.PropertyColumn Property="@(item => item.Name)" Title="" Width="45px" Fixed="@AntDesign.ColumnFixPlacement.Left">
+                                    <span draggable="true"
+                                          class="string-list-editor-handle"
+                                          title="Drag to reorder"
+                                          @ondragstart="@(() => OnVariableDragStart(variable))"
+                                          @ondragend="@OnVariableDragEnd">⋮⋮</span>
+                                </AntDesign.PropertyColumn>
+                                <AntDesign.PropertyColumn Property="@(item => item.Name)"
+                                                            Fixed="@AntDesign.ColumnFixPlacement.Left">
                                                     @if(VariableQuickEditRef == variable)
                                                     {
                                     <Input @bind-Value="QuickEditViewModel.Variable.Name" />
@@ -192,10 +255,10 @@
                                     <div>@variable.Name</div>
                                 }
 
-                                                    </AntDesign.Column>
-                                <AntDesign.Column @bind-Field="variable.Description"
-                                                    Ellipsis />
-                                <AntDesign.Column @bind-Field="variable.Units">
+                                                    </AntDesign.PropertyColumn>
+                                <AntDesign.PropertyColumn Property="@(item => item.Description)"
+                                                            Ellipsis />
+                                <AntDesign.PropertyColumn Property="@(item => item.Units)">
                                     @if(VariableQuickEditRef == variable)
                                     {
                                     <Input @bind-Value="QuickEditViewModel.Variable.Units" />
@@ -204,20 +267,20 @@
                                 {
                                     <div>@variable.Units</div>
                                 }
-                            </AntDesign.Column>
-                                <AntDesign.Column @bind-Field="variable.Methods"
-                                                    Ellipsis>
+                            </AntDesign.PropertyColumn>
+                                <AntDesign.PropertyColumn Property="@(item => item.Methods)"
+                                                            Ellipsis>
                                     @foreach (var method in variable.Methods)
                                         {
                                         <p>@method</p>
                                         }
-                                </AntDesign.Column>
+                                </AntDesign.PropertyColumn>
 
-                                <AntDesign.Column @bind-Field="variable.QCApplied"
-                                                    Title="Quality Control">
+                                <AntDesign.PropertyColumn Property="@(item => item.QCApplied)"
+                                                            Title="Quality Control">
                                 @if(VariableQuickEditRef == variable)
                                 {
-                                    <Select Mode="multiple"
+                                    <Select Mode="@SelectMode.Multiple"
                                             Placeholder="Select Quality Control"
                                             @bind-Values="QuickEditViewModel.SelectedQCApplied"
                                             TItemValue="string"
@@ -230,19 +293,23 @@
                                         </SelectOptions>
                                     </Select>
                                 }
-                                else
+                                else if (variable.QCApplied is { Count: > 0 })
                                 {
                                     @foreach (var qc in variable.QCApplied)
                                     {
                                         <Tag>@qc</Tag>
                                     }
                                 }
-                                
-                                </AntDesign.Column>
+                                else
+                                {
+                                    <span class="variable-not-specified">Not specified</span>
+                                }
+
+                                </AntDesign.PropertyColumn>
 
 
-                                <AntDesign.Column @bind-Field="variable.ProcessingLevel"
-                                                    Title="Processing">
+                                <AntDesign.PropertyColumn Property="@(item => item.ProcessingLevel)"
+                                                            Title="Processing">
                                 @if(VariableQuickEditRef == variable)
                                 {
                                     <SimpleSelect Id="variable-processing" @bind-Value="@QuickEditViewModel.Variable.ProcessingLevel"
@@ -255,16 +322,20 @@
                                         </SelectOptions>
                                     </SimpleSelect>
                                 }
-                                else
+                                else if (!string.IsNullOrWhiteSpace(variable.ProcessingLevel))
                                 {
                                     <Tag>@variable.ProcessingLevel</Tag>
                                 }
-                                
-                                </AntDesign.Column>
+                                else
+                                {
+                                    <span class="variable-not-specified">Not specified</span>
+                                }
+
+                                </AntDesign.PropertyColumn>
 
 
-                            <AntDesign.Column @bind-Field="variable.VariableType"
-                                              Title="Type">
+                            <AntDesign.PropertyColumn Property="@(item => item.VariableType)"
+                                                      Title="Type">
                                 @if(VariableQuickEditRef == variable)
                                 {
                                     <SimpleSelect Id="variable-type" @bind-Value="@QuickEditViewModel.Variable.VariableType"
@@ -277,22 +348,26 @@
                                         </SelectOptions>
                                     </SimpleSelect>
                                 }
-                                else
+                                else if (!string.IsNullOrWhiteSpace(variable.VariableType))
                                 {
                                     <Tag>@variable.VariableType</Tag>
                                 }
-                                
-                            </AntDesign.Column>
+                                else
+                                {
+                                    <span class="variable-not-specified">Not specified</span>
+                                }
 
-                                <AntDesign.Column @bind-Field="variable.Tags">
+                            </AntDesign.PropertyColumn>
+
+                                <AntDesign.PropertyColumn Property="@(item => item.Tags)">
                                     @foreach (var tag in variable.Tags)
                                         {
                                         <Tag>@tag</Tag>
                                         }
-                                </AntDesign.Column>
+                                </AntDesign.PropertyColumn>
 <!-- Depricated                 <AntDesign.Column @bind-Field="variable.Height" /> -->
                                 <ActionColumn Title="Action"
-                                                Fixed="right">
+                                                Fixed="@AntDesign.ColumnFixPlacement.Right">
                                     <Space>
                                     <SpaceItem>
                                         @if(VariableQuickEditRef == variable)
@@ -322,7 +397,7 @@
                 </EditorFormItemWithHelpPopup>
 
             </TabPane>
-            <TabPane Key="3" Tab="Coverage">
+            <TabPane Key="3" Tab="@CoverageTabLabel">
                 <EditorFormItemWithHelpPopup Label="Spatial Repeats" Id="spatial-repeats" Tooltip="@SpatialRepeatsTooltip" IsRequired=false>
                     <AntDesign.InputNumber Id="spatial-repeats"
                                             @bind-Value="context.Dataset.SpatialRepeats" />
@@ -347,8 +422,8 @@
                         </SimpleSelect>
                     </FormItem>
                     <FormItem>
-                        <AntDesign.TextArea @bind-Value="context.Dataset.Geometry"
-                                            Placeholder="Valid geojson" />
+                        <GeoJsonEditorMap Value="@context.Dataset.Geometry"
+                                          ValueChanged="@((string v) => OnMapGeometryChanged(context.Dataset, v))" />
                     </FormItem>
                 </EditorFormItemWithHelpPopup>
 
@@ -363,7 +438,7 @@
                 </EditorFormItemWithHelpPopup>
 
             </TabPane>
-            <TabPane Key="4" Tab="Structure">
+            <TabPane Key="4" Tab="@StructureTabLabel">
                 <EditorFormItemWithHelpPopup Label="File Format" Id="file-format" Tooltip="@FileFormatTooltip" IsRequired=false>
                     <AntDesign.Input Id="file-format" @bind-Value="context.Dataset.Format"
                                  Placeholder="Format, usually file extension" />
@@ -397,11 +472,11 @@
 
 
             </TabPane>
-            <TabPane Key="5" Tab="Processing">
+            <TabPane Key="5" Tab="@ProcessingTabLabel">
 
                 <EditorFormItemWithHelpPopup Label="Methods" Id="methods" Tooltip="@DatasetMethodsTooltip" IsRequired=false>
                     <InputGroup>
-                        <Row Justify="space-between">
+                        <Row Justify="@RowJustify.SpaceBetween">
                             <AntDesign.Col Span="20">
                                 <Input Id="methods" @bind-Value="NewDatasetMethod"
                                     Placeholder="Enter URL, text, or markdown"/>
@@ -414,23 +489,37 @@
                     <br />
                     @if (context.Dataset.Methods.Count > 0)
                     {
-                        <AntList DataSource="@context.Dataset.Methods"
-                                    Size="small">
-                            <ChildContent Context="method">
-                                <ListItem>
-                                    <span><Text>@method</Text></span>
+                        <div class="string-list-editor">
+                            @for (int i = 0; i < context.Dataset.Methods.Count; i++)
+                            {
+                                var index = i;
+                                var method = context.Dataset.Methods[index];
+                                <div class="string-list-editor-drop-indicator @(IsStringDragOver(DatasetStringListKind.Methods, index) ? "string-list-editor-drop-indicator-visible" : string.Empty)"></div>
+                                <div draggable="true"
+                                     class="string-list-editor-row"
+                                     @ondragstart="@(() => OnStringDragStart(DatasetStringListKind.Methods, index))"
+                                     @ondragenter="@(() => OnStringDragEnter(DatasetStringListKind.Methods, index))"
+                                     @ondragover:preventDefault
+                                     @ondrop="@(() => OnStringDrop(DatasetStringListKind.Methods, index))"
+                                     @ondragend="@OnStringDragEnd">
+                                    <span class="string-list-editor-handle" title="Drag to reorder" aria-hidden="true">⋮⋮</span>
+                                    <div class="string-list-editor-input"><Text>@method</Text></div>
                                     <Button Danger OnClick="() => DeleteDatasetMethodHandler(method)">
                                         <Icon Type="delete" />
                                     </Button>
-                                </ListItem>
-                            </ChildContent>
-                        </AntList>
+                                </div>
+                            }
+                            <div class="string-list-editor-drop-indicator @(IsStringDragOver(DatasetStringListKind.Methods, context.Dataset.Methods.Count) ? "string-list-editor-drop-indicator-visible" : string.Empty)"
+                                 @ondragenter="@(() => OnStringDragEnter(DatasetStringListKind.Methods, context.Dataset.Methods.Count))"
+                                 @ondragover:preventDefault
+                                 @ondrop="@(() => OnStringDrop(DatasetStringListKind.Methods, context.Dataset.Methods.Count))"></div>
+                        </div>
                     }
                 </EditorFormItemWithHelpPopup>
 
                 <EditorFormItemWithHelpPopup Label="Parent Datasets" Id="parent-datasets" Tooltip="@ParentDatasetsTooltip" IsRequired=false>
                     <InputGroup>
-                        <Row Justify="space-between">
+                        <Row Justify="@RowJustify.Start">
                             <AntDesign.Col Span="20">
                                 <Input Id="parent-datasets" @bind-Value="NewParentDataset"
                                    Placeholder="Enter URL" />
@@ -443,22 +532,37 @@
                     <br />
                     @if (context.Dataset.ParentDatasets.Count > 0)
                     {
-                        <AntList DataSource="@context.Dataset.ParentDatasets">
-                            <ChildContent Context="parentDataset">
-                                <ListItem>
-                                    <span><Text>@parentDataset</Text></span>
+                        <div class="string-list-editor">
+                            @for (int i = 0; i < context.Dataset.ParentDatasets.Count; i++)
+                            {
+                                var index = i;
+                                var parentDataset = context.Dataset.ParentDatasets[index];
+                                <div class="string-list-editor-drop-indicator @(IsStringDragOver(DatasetStringListKind.ParentDatasets, index) ? "string-list-editor-drop-indicator-visible" : string.Empty)"></div>
+                                <div draggable="true"
+                                     class="string-list-editor-row"
+                                     @ondragstart="@(() => OnStringDragStart(DatasetStringListKind.ParentDatasets, index))"
+                                     @ondragenter="@(() => OnStringDragEnter(DatasetStringListKind.ParentDatasets, index))"
+                                     @ondragover:preventDefault
+                                     @ondrop="@(() => OnStringDrop(DatasetStringListKind.ParentDatasets, index))"
+                                     @ondragend="@OnStringDragEnd">
+                                    <span class="string-list-editor-handle" title="Drag to reorder" aria-hidden="true">⋮⋮</span>
+                                    <div class="string-list-editor-input"><Text>@parentDataset</Text></div>
                                     <Button Danger OnClick="() => DeleteParentDatasetHandler(parentDataset)">
                                         <Icon Type="delete" />
                                     </Button>
-                                </ListItem>
-                            </ChildContent>
-                        </AntList>
+                                </div>
+                            }
+                            <div class="string-list-editor-drop-indicator @(IsStringDragOver(DatasetStringListKind.ParentDatasets, context.Dataset.ParentDatasets.Count) ? "string-list-editor-drop-indicator-visible" : string.Empty)"
+                                 @ondragenter="@(() => OnStringDragEnter(DatasetStringListKind.ParentDatasets, context.Dataset.ParentDatasets.Count))"
+                                 @ondragover:preventDefault
+                                 @ondrop="@(() => OnStringDrop(DatasetStringListKind.ParentDatasets, context.Dataset.ParentDatasets.Count))"></div>
+                        </div>
                     }
                 </EditorFormItemWithHelpPopup>
 
                 <EditorFormItemWithHelpPopup Label="Derived Works" Id="derived-works" Tooltip="@DerivedWorksTooltip" IsRequired=false>
                     <InputGroup>
-                        <Row Justify="space-between">
+                        <Row Justify="@RowJustify.Start">
                             <AntDesign.Col Span="20">
                                 <Input Id="derived-works" @bind-Value="NewDerivedWork" />
                             </AntDesign.Col>
@@ -470,16 +574,31 @@
                     <br />
                     @if (context.Dataset.DerivedWorks.Count > 0)
                     {
-                        <AntList DataSource="@context.Dataset.DerivedWorks">
-                            <ChildContent Context="derived">
-                                <ListItem>
-                                    <span><Text>@derived</Text></span>
+                        <div class="string-list-editor">
+                            @for (int i = 0; i < context.Dataset.DerivedWorks.Count; i++)
+                            {
+                                var index = i;
+                                var derived = context.Dataset.DerivedWorks[index];
+                                <div class="string-list-editor-drop-indicator @(IsStringDragOver(DatasetStringListKind.DerivedWorks, index) ? "string-list-editor-drop-indicator-visible" : string.Empty)"></div>
+                                <div draggable="true"
+                                     class="string-list-editor-row"
+                                     @ondragstart="@(() => OnStringDragStart(DatasetStringListKind.DerivedWorks, index))"
+                                     @ondragenter="@(() => OnStringDragEnter(DatasetStringListKind.DerivedWorks, index))"
+                                     @ondragover:preventDefault
+                                     @ondrop="@(() => OnStringDrop(DatasetStringListKind.DerivedWorks, index))"
+                                     @ondragend="@OnStringDragEnd">
+                                    <span class="string-list-editor-handle" title="Drag to reorder" aria-hidden="true">⋮⋮</span>
+                                    <div class="string-list-editor-input"><Text>@derived</Text></div>
                                     <Button Danger OnClick="() => DeleteDerivedWorkHandler(derived)">
                                         <Icon Type="delete" />
                                     </Button>
-                                </ListItem>
-                            </ChildContent>
-                        </AntList>
+                                </div>
+                            }
+                            <div class="string-list-editor-drop-indicator @(IsStringDragOver(DatasetStringListKind.DerivedWorks, context.Dataset.DerivedWorks.Count) ? "string-list-editor-drop-indicator-visible" : string.Empty)"
+                                 @ondragenter="@(() => OnStringDragEnter(DatasetStringListKind.DerivedWorks, context.Dataset.DerivedWorks.Count))"
+                                 @ondragover:preventDefault
+                                 @ondrop="@(() => OnStringDrop(DatasetStringListKind.DerivedWorks, context.Dataset.DerivedWorks.Count))"></div>
+                        </div>
                     }
                 </EditorFormItemWithHelpPopup>
 
@@ -487,16 +606,32 @@
         </Tabs>
     </AntDesign.Form>
     <Divider />
-    <Row Justify="end">
-        <Button Type="default" OnClick="() => OpenMetadataDetailsModalTemplate(State.MetadataEdit)">
-            <Icon Type="eye" />
-            Preview
-        </Button>
-        <Button Type="primary" OnClick="SaveDataset">
-            <Icon Type="download" />
-            Download
-        </Button>
+    <Row Justify="@RowJustify.End">
+        <Space>
+            @* Repeated from the toolbar so the state is visible at the point of action. *@
+            <SpaceItem>
+                <ValidationStatusChip Result="_validation" Announce="false" />
+            </SpaceItem>
+            <SpaceItem>
+                <Button Type="default" OnClick="() => OpenMetadataDetailsModalTemplate(State.MetadataEdit)">
+                    <Icon Type="eye" />
+                    Preview
+                </Button>
+            </SpaceItem>
+            <SpaceItem>
+                <Button Type="@ButtonType.Primary" OnClick="RequestDownload">
+                    <Icon Type="download" />
+                    Download
+                </Button>
+            </SpaceItem>
+        </Space>
     </Row>
+
+    @* Selecting an issue switches to the tab that owns it, which matters here because AntDesign
+       renders tab panes lazily and the offending field may never have been on screen. *@
+    <ValidationGate @ref="_validationGate"
+                    OnConfirmed="@(() => SaveDataset())"
+                    OnIssueSelected="@OnValidationIssueSelected" />
 }
 else
 {

@@ -1,6 +1,7 @@
 ﻿using Caf.Midden.Core.Services.Metadata;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,6 +25,7 @@ namespace Caf.Midden.Core.Tests
             Assert.IsType<Models.v0_2.Metadata>(actual);
         }
 
+        [Fact]
         public void Convert_v0_1_0alpha3WithVals_ConvertsProperly()
         {
             var creationDate = "2020-12-20";
@@ -91,7 +93,9 @@ namespace Caf.Midden.Core.Tests
 
             Models.v0_2.Metadata actual = sut.Convert(input);
 
-            Assert.Equal(creationDate, actual.CreationDate.ToString());
+            Assert.Equal(
+                DateTime.ParseExact(creationDate, "yyyy-MM-dd", CultureInfo.InvariantCulture),
+                actual.CreationDate);
             Assert.Equal(contactName, actual.Dataset.Contacts[0].Name);
             Assert.Equal(tempExtent, actual.Dataset.TemporalExtent);
             Assert.False(actual.Dataset.Variables[0].IsQCSpecified);
