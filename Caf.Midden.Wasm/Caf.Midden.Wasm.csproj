@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<Nullable>annotations</Nullable>
-		<OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
+		<StaticWebAssetFingerprintingEnabled>false</StaticWebAssetFingerprintingEnabled>
 	<ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
 		<InvariantGlobalization>false</InvariantGlobalization>
 		<BlazorWebAssemblyLoadAllGlobalizationData>true</BlazorWebAssemblyLoadAllGlobalizationData>
