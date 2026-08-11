@@ -30,6 +30,9 @@
     <SpaceItem>
         <span class="autosave-status">@AutosaveStatusText</span>
     </SpaceItem>
+    <SpaceItem>
+        <ValidationStatusChip Result="_validation" />
+    </SpaceItem>
 </Space>
 <AntDesign.Divider />
 
@@ -74,11 +77,21 @@
     </AntDesign.Form>
     <Divider />
     <Row Justify="@RowJustify.End">
-        <Button Type="@ButtonType.Primary" OnClick="SaveProject">
-            <Icon Type="download" />
-            Download
-        </Button>
+        <Space>
+            @* Repeated from the toolbar so the state is visible at the point of action. *@
+            <SpaceItem>
+                <ValidationStatusChip Result="_validation" Announce="false" />
+            </SpaceItem>
+            <SpaceItem>
+                <Button Type="@ButtonType.Primary" OnClick="RequestDownload">
+                    <Icon Type="download" />
+                    Download
+                </Button>
+            </SpaceItem>
+        </Space>
     </Row>
+
+    <ValidationGate @ref="_validationGate" OnConfirmed="@(() => SaveProject())" />
 } else {
     <p>Loading...</p>
 }

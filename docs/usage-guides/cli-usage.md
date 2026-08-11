@@ -13,6 +13,7 @@ You run it whenever you want the catalog to pick up new or changed metadata.
 
 - [Quick start](#quick-start)
 - [Commands](#commands)
+- [Checking metadata before you publish](#checking-metadata-before-you-publish)
 - [The configuration file](#the-configuration-file)
 - [Data store types](#data-store-types)
 - [Handling passwords and secrets](#handling-passwords-and-secrets)
@@ -75,6 +76,7 @@ Run `MiddenCli --help`, or `--help` on any command, to see this at any time.
 |---|---|
 | `setup` | Create a blank `configuration.json` in the current folder |
 | `collate` | Crawl your data stores and write `catalog.json` |
+| `validate` | Check `.midden` and `DESCRIPTION.md` files for problems, without building a catalog |
 | `secret set <name>` | Store a password or key safely, encrypted |
 | `secret list` | Show which secrets are stored (never the values) |
 | `secret remove <name>` | Delete a stored secret |
@@ -115,6 +117,105 @@ When it finishes, `collate` prints a summary — stores succeeded/failed/skipped
 projects found, and elapsed time — and exits with a non-zero code if any store failed or was
 skipped, even without `--strict`. This lets a scheduled job detect a partial catalog from the
 exit code alone.
+
+---
+
+## Checking metadata before you publish
+
+`collate` is deliberately forgiving: if a `.midden` file cannot be read, it skips that file and
+carries on so one bad file cannot cost you the whole catalog. The downside is that a broken
+dataset shows up only as a dataset quietly *missing* from the published catalog, which is easy
+to miss and hard to trace back.
+
+`validate` is how you find those problems on purpose:
+
+```powershell
+MiddenCli validate C:\Path\To\Projects
+```
+
+It reads every `.midden` and `DESCRIPTION.md` file it finds, checks them, and prints what is
+wrong and where:
+
+```
+C:\Path\To\Projects\Raw\CookEastMet.midden
+  error: dataset.name: A dataset name is required.
+    The .midden file and the catalog entry are both named from this.
+  warning: dataset.tags: This dataset has no tags.
+    Tags are how users browse and search the catalog.
+Summary: checked 7 file(s). 1 with errors, 3 with warnings, 0 unreadable.
+```
+
+You can give it individual files or whole folders; folders are searched all the way down. A
+named file is checked whatever it is called, so you can validate a file you have not renamed to
+`.midden` yet.
+
+### Options
+
+| Option | Meaning |
+|---|---|
+| `-a`, `--app-config <path>` | The app configuration file the Editor produces. Supplies your team's zone, project, and tag lists |
+| `-w`, `--warnings-as-errors` | Treat quality warnings as failures |
+| `-q`, `--quiet` | Only print files that have problems |
+
+Examples:
+
+```powershell
+# Check one file you are about to hand over
+MiddenCli validate .\CookEastMet.midden
+
+# Check everything, using your team's vocabularies
+MiddenCli validate C:\Projects --app-config C:\midden\app-configuration.json
+
+# In CI: only show problems, and insist on clean metadata
+MiddenCli validate C:\Projects --quiet --warnings-as-errors
+```
+
+### Errors and warnings are different on purpose
+
+**Errors** mean the dataset would break the catalog or the file itself — a missing name, an
+unparseable geometry. These always fail the run.
+
+**Warnings** mean the metadata is usable but thin: no tags, a variable with no description.
+These do *not* fail the run by default. Documentation is often genuinely incomplete while work
+is in progress, and a tool that refuses to proceed until every field is filled in teaches people
+to enter junk values to get past it. If your team has agreed on a standard and wants it
+enforced, pass `--warnings-as-errors`.
+
+This is the same distinction the Editor makes: errors block the Download button, warnings ask
+for a confirmation you can accept.
+
+### Vocabularies need `--app-config`
+
+Checks for zone, project, and tag names compare against the lists in your Midden app
+configuration — the file the Configuration editor produces. Those lists are specific to your
+organisation, so without `--app-config` those particular checks are **skipped rather than
+guessed**. Everything else is still checked.
+
+### Exit codes
+
+| Code | Meaning |
+|---|---|
+| `0` | Everything checked was clean |
+| `1` | At least one file has a problem |
+| `2` | The check could not run — a path did not exist, or the app configuration was unreadable |
+
+`2` is separate from `1` so an automated job can tell "your metadata is wrong" apart from "the
+check never actually ran". A typo in a scheduled job's path would otherwise look exactly like a
+passing build.
+
+### Using it in a scheduled job
+
+Validating before crawling turns a silently incomplete catalog into an explicit failure you can
+act on:
+
+```powershell
+MiddenCli validate C:\Projects --quiet
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+MiddenCli collate --silent
+```
+
+`validate` never writes anything and never needs credentials — it only reads files you already
+have. It is always safe to run.
 
 ---
 
@@ -393,6 +494,21 @@ datasets. Pass `--strict` if you would rather the run stop immediately on the fi
 `collate` detects when two data stores would overwrite each other's dataset in the catalog and
 reports the collision instead of silently keeping only one. Rename one of the data stores, or
 adjust its `Path`, so the two no longer overlap.
+
+**A dataset is missing from the catalog and nothing looked wrong.**
+`collate` skips files it cannot read so that one bad file does not cost you the whole run, which
+means a broken `.midden` file disappears quietly. Run `MiddenCli validate` over that folder to
+see the actual problem and which file it is in.
+
+**`validate` reports problems in a file the Editor was happy with.**
+Both use the same rules, so this usually means the file was edited by hand afterwards, or it was
+written by an older version of the Editor. Opening it in the Editor will show the same issues in
+the tab that owns them.
+
+**`validate` says a zone, project, or tag is unrecognised.**
+Those lists come from your Midden app configuration, so pass `--app-config` pointing at it. If
+you already did, the value genuinely is not in your team's vocabulary — either correct the file
+or add the value to the configuration in the Editor.
 
 ---
 

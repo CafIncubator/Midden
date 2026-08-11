@@ -1,11 +1,14 @@
 using AntDesign;
 using Caf.Midden.Core.Models.v0_2;
+using Caf.Midden.Core.Services.Validation;
+using Caf.Midden.Wasm.Shared.Validation;
 using Caf.Midden.Wasm.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
@@ -24,11 +27,15 @@ namespace Caf.Midden.Wasm.Shared
             Converters = { new JsonStringEnumConverter() }
         };
 
+        private static readonly ConfigurationValidator Validator = new();
+
         private IDisposable? _stateSubscription;
         private IAutosaveRegistration? _autosaveRegistration;
         private DateTime? _lastSavedUtc;
         private DraftEnvelope<Configuration>? _pendingDraft;
         private bool _draftRestorePromptVisible;
+        private ValidationResult _validation = ValidationResult.Empty;
+        private ValidationGate? _validationGate;
 
         [Parameter]
         public bool isLoading { get; set; } = false;
@@ -43,15 +50,30 @@ namespace Caf.Midden.Wasm.Shared
             ? string.Empty
             : $"A saved draft from {FormatRelativeTime(_pendingDraft.SavedAtUtc)} was found. Resume editing it?";
 
+        private IEnumerable<ValidationIssue> GeometryIssues(int index) =>
+            _validation.Issues.Where(i =>
+                i.Path.StartsWith(
+                    $"configuration.geometries[{index}]",
+                    StringComparison.Ordinal));
+
+        private void RefreshValidation()
+        {
+            _validation = ConfigurationEdit is null
+                ? ValidationResult.Empty
+                : Validator.Validate(ConfigurationEdit);
+        }
+
         private async Task OnStateChanged(Services.AppStateChangedEventArgs args)
         {
             ConfigurationEdit = State.AppConfig;
+            RefreshValidation();
             await InvokeAsync(StateHasChanged);
         }
 
         protected override void OnInitialized()
         {
             ConfigurationEdit = State.AppConfig;
+            RefreshValidation();
 
             _stateSubscription = State.Subscribe(
                 this,
@@ -96,6 +118,9 @@ namespace Caf.Midden.Wasm.Shared
         private void Autosave_NotifyChanged()
         {
             _autosaveRegistration?.NotifyChanged();
+
+            // Validation is ambient and cheap here; it never gates autosave.
+            RefreshValidation();
         }
 
         private string? BuildDraftSnapshotJson()
@@ -156,6 +181,7 @@ namespace Caf.Midden.Wasm.Shared
 
             ConfigurationEdit = payload;
             State.UpdateAppConfig(this, ConfigurationEdit);
+            RefreshValidation();
         }
 
         private void OnDraftRestoreDeclined()
@@ -196,6 +222,7 @@ namespace Caf.Midden.Wasm.Shared
             ConfigurationEdit = new Configuration();
             State.UpdateAppConfig(this, ConfigurationEdit);
             Autosave.RemoveDraft(DraftKey);
+            RefreshValidation();
         }
 
         private void AddGeometry()
@@ -250,6 +277,20 @@ namespace Caf.Midden.Wasm.Shared
         {
             ConfigurationEdit?.Geometries.Remove(geometry);
             Autosave_NotifyChanged();
+        }
+
+        // The Download button stays enabled; the gate decides whether the save actually happens so
+        // the user always learns *why* nothing downloaded, and where the problem is.
+        private async Task RequestDownload()
+        {
+            if (ConfigurationEdit is null || _validationGate is null)
+            {
+                return;
+            }
+
+            RefreshValidation();
+
+            await _validationGate.RequestAsync(_validation);
         }
 
         private async Task<string> SaveConfiguration()
@@ -315,6 +356,7 @@ namespace Caf.Midden.Wasm.Shared
                     ConfigurationEdit = configuration;
                     State.UpdateAppConfig(this, configuration);
                     Autosave.RemoveDraft(DraftKey);
+                    RefreshValidation();
                 }
             }
             catch

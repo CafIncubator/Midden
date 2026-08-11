@@ -15,6 +15,15 @@ using System.Text.Json.Serialization;
 using System.IO;
 using Microsoft.JSInterop;
 using Caf.Midden.Wasm.Services;
+using Caf.Midden.Core.Services.Validation;
+using Caf.Midden.Wasm.Shared.Validation;
+
+// Disambiguated from System.ComponentModel.DataAnnotations.ValidationResult.
+using ValidationResult = Caf.Midden.Core.Services.Validation.ValidationResult;
+
+// Aliased because Caf.Midden.Wasm.Shared.MetadataSections is a namespace of components and wins
+// simple-name resolution against the Core class of the same name.
+using Sections = Caf.Midden.Core.Services.Validation.MetadataSections;
 
 namespace Caf.Midden.Wasm.Shared
 {
@@ -33,6 +42,15 @@ namespace Caf.Midden.Wasm.Shared
         private string _draftKey = DraftKeyPrefix;
         private DraftEnvelope<Metadata>? _pendingDraft;
         private bool _draftRestorePromptVisible;
+
+        private static readonly MetadataValidator Validator = new();
+
+        private ValidationResult _validation = ValidationResult.Empty;
+        private CompletenessResult? _completeness;
+        private ValidationGate? _validationGate;
+
+        // Bound to the Tabs component so activating a validation issue can switch tabs.
+        private string _activeTabKey = Sections.Basic;
 
         string markdownDescriptionHtml = "";
 
@@ -70,6 +88,7 @@ namespace Caf.Midden.Wasm.Shared
 
         private async Task OnStateChanged(AppStateChangedEventArgs args)
         {
+            RefreshValidation();
             await InvokeAsync(StateHasChanged);
             Console.WriteLine("LastUpdate_StateChanged");
         }
@@ -81,6 +100,152 @@ namespace Caf.Midden.Wasm.Shared
         private string DraftRestorePromptText => _pendingDraft is null
             ? string.Empty
             : $"A saved draft from {FormatRelativeTime(_pendingDraft.SavedAtUtc)} was found. Resume editing it?";
+
+        #region Validation
+
+        /// <summary>
+        /// Re-runs the Core validator and completeness calculator against current state.
+        /// </summary>
+        /// <remarks>
+        /// The Core validator, rather than <c>form.Validate()</c>, is the gate: AntDesign skips
+        /// fields on <c>TabPane</c>s the user never opened, so the form cannot see them.
+        /// </remarks>
+        private void RefreshValidation()
+        {
+            if (State?.MetadataEdit is null)
+            {
+                _validation = ValidationResult.Empty;
+                _completeness = null;
+                return;
+            }
+
+            _validation = Validator.Validate(State.MetadataEdit, State.AppConfig);
+            _completeness = MetadataCompletenessCalculator.Calculate(State.MetadataEdit);
+        }
+
+        /// <summary>
+        /// Error counts keyed by tab. <see cref="MetadataSections"/> values are the TabPane keys,
+        /// so no translation table is needed.
+        /// </summary>
+        private IReadOnlyDictionary<string, int> ErrorCountsByTab =>
+            _validation.CountsBySection();
+
+        private int TabErrorCount(string tabKey) =>
+            ErrorCountsByTab.TryGetValue(tabKey, out var count) ? count : 0;
+
+        /// <summary>
+        /// Issues owned by a single variable row, matched on the indexed path the validator emits.
+        /// </summary>
+        private IEnumerable<ValidationIssue> VariableIssues(Variable variable)
+        {
+            var index = State.MetadataEdit.Dataset.Variables.IndexOf(variable);
+
+            if (index < 0)
+            {
+                return [];
+            }
+
+            var prefix = $"dataset.variables[{index}]";
+
+            return _validation.Issues.Where(
+                i => i.Path.StartsWith(prefix, StringComparison.Ordinal));
+        }
+
+        private bool VariableHasErrors(Variable variable) =>
+            VariableIssues(variable).Any(i => i.Severity == ValidationSeverity.Error);
+
+        private string VariableIssueTitle(Variable variable) =>
+            string.Join(" ", VariableIssues(variable).Select(i => i.Message));
+
+        /// <summary>
+        /// Issues owned by a single contact row.
+        /// </summary>
+        private IEnumerable<ValidationIssue> ContactIssues(Person contact)
+        {
+            var index = State.MetadataEdit.Dataset.Contacts.IndexOf(contact);
+
+            if (index < 0)
+            {
+                return [];
+            }
+
+            var prefix = $"dataset.contacts[{index}]";
+
+            return _validation.Issues.Where(
+                i => i.Path.StartsWith(prefix, StringComparison.Ordinal));
+        }
+
+        private bool ContactHasErrors(Person contact) =>
+            ContactIssues(contact).Any(i => i.Severity == ValidationSeverity.Error);
+
+        private string ContactIssueTitle(Person contact) =>
+            string.Join(" ", ContactIssues(contact).Select(i => i.Message));
+
+        // Only Download is gated. Preview produces nothing shareable, and viewing the rendered
+        // output is a legitimate way to diagnose the problems the gate reports, so blocking it
+        // would make the error state harder to fix.
+        private async Task RequestDownload()
+        {
+            if (State?.MetadataEdit is null || _validationGate is null)
+            {
+                return;
+            }
+
+            RefreshValidation();
+
+            await _validationGate.RequestAsync(_validation);
+        }
+
+        /// <summary>
+        /// Switches to the tab owning an issue so the user can act on it.
+        /// </summary>
+        private void OnValidationIssueSelected(ValidationIssue issue)
+        {
+            _activeTabKey = issue.Section;
+        }
+
+        /// <summary>
+        /// Appends an error count to a tab label. Text rather than color alone, so the badge is
+        /// still readable without color perception.
+        /// </summary>
+        private string TabLabel(string label, string sectionKey)
+        {
+            var count = TabErrorCount(sectionKey);
+
+            return count == 0 ? label : $"{label} ({count})";
+        }
+
+        private string BasicTabLabel => TabLabel("Basic", Sections.Basic);
+
+        private string VariablesTabLabel => TabLabel("Variables", Sections.Variables);
+
+        private string CoverageTabLabel => TabLabel("Coverage", Sections.Coverage);
+
+        private string StructureTabLabel => TabLabel("Structure", Sections.Structure);
+
+        private string ProcessingTabLabel => TabLabel("Processing", Sections.Processing);
+
+        private string CompletenessText =>
+            _completeness is null ? string.Empty : $"{_completeness.Percent}% complete";
+
+        private string CompletenessTooltip
+        {
+            get
+            {
+                if (_completeness is null)
+                {
+                    return string.Empty;
+                }
+
+                var suggestions = _completeness.TopSuggestions.Take(3).ToList();
+
+                return suggestions.Count == 0
+                    ? "This dataset is fully documented."
+                    : "To improve: " + string.Join(" ", suggestions.Select(s => s.Suggestion));
+            }
+        }
+
+        #endregion
 
         protected override void OnInitialized()
         {
@@ -97,6 +262,8 @@ namespace Caf.Midden.Wasm.Shared
                 AppStateChange.MetadataEdit,
                 AppStateChange.LastUpdated,
                 AppStateChange.AppConfig);
+
+            RefreshValidation();
         }
 
         Task OnMarkdownDescriptionValueHTMLChanged(string value)
@@ -110,6 +277,7 @@ namespace Caf.Midden.Wasm.Shared
         {
             State.SetMetadataEdit(metadata, this);
             Autosave.RemoveDraft(_draftKey);
+            RefreshValidation();
             return Task.CompletedTask;
         }
 
@@ -128,6 +296,9 @@ namespace Caf.Midden.Wasm.Shared
         private void Autosave_NotifyChanged()
         {
             _autosaveRegistration?.NotifyChanged();
+
+            // Validation is ambient here; it never gates autosave.
+            RefreshValidation();
         }
 
         protected override void OnAfterRender(bool firstRender)
@@ -405,21 +576,40 @@ namespace Caf.Midden.Wasm.Shared
         {
             var contact = row.Data;
 
-            return new Dictionary<string, object>
+            var attributes = new Dictionary<string, object>
             {
                 ["ondragenter"] = EventCallback.Factory.Create<DragEventArgs>(
                     this, () => OnContactDragEnter(contact)),
                 ["ondrop"] = EventCallback.Factory.Create<DragEventArgs>(
                     this, () => OnContactDrop(contact))
             };
+
+            var issueTitle = ContactIssueTitle(contact);
+
+            if (!string.IsNullOrEmpty(issueTitle))
+            {
+                attributes["title"] = issueTitle;
+            }
+
+            return attributes;
         }
 
         private string GetContactRowClassName(RowData<Person> row)
         {
-            return DropRowClassName(
+            var className = DropRowClassName(
                 State.MetadataEdit.Dataset.Contacts.IndexOf(row.Data),
                 _dragContactSourceIndex,
                 _dragContactOverIndex);
+
+            // Contacts are edited in a modal, so the row is the only place the problem can show.
+            if (ContactHasErrors(row.Data))
+            {
+                className = string.IsNullOrEmpty(className)
+                    ? "validation-row-error"
+                    : $"{className} validation-row-error";
+            }
+
+            return className;
         }
 
         private void OnContactDrop(Person targetContact)
@@ -861,21 +1051,41 @@ namespace Caf.Midden.Wasm.Shared
         {
             var variable = row.Data;
 
-            return new Dictionary<string, object>
+            var attributes = new Dictionary<string, object>
             {
                 ["ondragenter"] = EventCallback.Factory.Create<DragEventArgs>(
                     this, () => OnVariableDragEnter(variable)),
                 ["ondrop"] = EventCallback.Factory.Create<DragEventArgs>(
                     this, () => OnVariableDrop(variable))
             };
+
+            var issueTitle = VariableIssueTitle(variable);
+
+            if (!string.IsNullOrEmpty(issueTitle))
+            {
+                attributes["title"] = issueTitle;
+            }
+
+            return attributes;
         }
 
         private string GetVariableRowClassName(RowData<Variable> row)
         {
-            return DropRowClassName(
+            var className = DropRowClassName(
                 State.MetadataEdit.Dataset.Variables.IndexOf(row.Data),
                 _dragVariableSourceIndex,
                 _dragVariableOverIndex);
+
+            // Bulk CSV import can introduce dozens of invalid rows at once, so the row itself has
+            // to carry the signal - a summary at the bottom of the page would not locate them.
+            if (VariableHasErrors(row.Data))
+            {
+                className = string.IsNullOrEmpty(className)
+                    ? "validation-row-error"
+                    : $"{className} validation-row-error";
+            }
+
+            return className;
         }
 
         private void OnVariableDrop(Variable targetVariable)
@@ -962,10 +1172,9 @@ namespace Caf.Midden.Wasm.Shared
         }
         #endregion
 
+        // Callers reach this through RequestDownload, which runs the Core validator gate first.
         private async Task<string> SaveDataset()
         {
-            // TODO: Validate first!
-
             JsonSerializerOptions options = new JsonSerializerOptions()
             {
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,

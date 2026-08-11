@@ -1,4 +1,6 @@
 ﻿@using AntDesign
+@using Caf.Midden.Core.Services.Validation
+@using Caf.Midden.Wasm.Shared.Validation
 @inject Caf.Midden.Wasm.Services.StateContainer State
 @inject Caf.Midden.Wasm.Services.AutosaveService Autosave
 @inject ModalService ModalService
@@ -19,6 +21,16 @@
     </SpaceItem>
     <SpaceItem>
         <span class="autosave-status">@AutosaveStatusText</span>
+    </SpaceItem>
+    <SpaceItem>
+        <ValidationStatusChip Result="_validation" />
+    </SpaceItem>
+    <SpaceItem>
+        @* Completeness is deliberately separate from validity: it rewards effort instead of
+           blocking the download. *@
+        <AntDesign.Tooltip Title="@CompletenessTooltip">
+            <span class="validation-status">@CompletenessText</span>
+        </AntDesign.Tooltip>
     </SpaceItem>
 </Space>
 <AntDesign.Divider />
@@ -44,8 +56,8 @@
                     Layout="@FormLayout.Vertical"
                     OnFieldChanged="OnFormFieldChanged"
                     @ref="form">
-        <Tabs Animated>
-            <TabPane Key="1" Tab="Basic">
+        <Tabs Animated @bind-ActiveKey="_activeTabKey">
+            <TabPane Key="1" Tab="@BasicTabLabel">
                 <EditorFormItemWithHelpPopup 
                     Label="Zone" 
                     Id="zone" 
@@ -195,7 +207,7 @@
                 </EditorFormItemWithHelpPopup>
 
             </TabPane>
-            <TabPane Key="2" Tab="Variables">
+            <TabPane Key="2" Tab="@VariablesTabLabel">
 
                 <EditorFormItemWithHelpPopup Label="Variables" Id="variables" Tooltip="@VariablesTooltip" IsRequired=false>
                     <Space>
@@ -373,7 +385,7 @@
                 </EditorFormItemWithHelpPopup>
 
             </TabPane>
-            <TabPane Key="3" Tab="Coverage">
+            <TabPane Key="3" Tab="@CoverageTabLabel">
                 <EditorFormItemWithHelpPopup Label="Spatial Repeats" Id="spatial-repeats" Tooltip="@SpatialRepeatsTooltip" IsRequired=false>
                     <AntDesign.InputNumber Id="spatial-repeats"
                                             @bind-Value="context.Dataset.SpatialRepeats" />
@@ -414,7 +426,7 @@
                 </EditorFormItemWithHelpPopup>
 
             </TabPane>
-            <TabPane Key="4" Tab="Structure">
+            <TabPane Key="4" Tab="@StructureTabLabel">
                 <EditorFormItemWithHelpPopup Label="File Format" Id="file-format" Tooltip="@FileFormatTooltip" IsRequired=false>
                     <AntDesign.Input Id="file-format" @bind-Value="context.Dataset.Format"
                                  Placeholder="Format, usually file extension" />
@@ -448,7 +460,7 @@
 
 
             </TabPane>
-            <TabPane Key="5" Tab="Processing">
+            <TabPane Key="5" Tab="@ProcessingTabLabel">
 
                 <EditorFormItemWithHelpPopup Label="Methods" Id="methods" Tooltip="@DatasetMethodsTooltip" IsRequired=false>
                     <InputGroup>
@@ -583,15 +595,31 @@
     </AntDesign.Form>
     <Divider />
     <Row Justify="@RowJustify.End">
-        <Button Type="default" OnClick="() => OpenMetadataDetailsModalTemplate(State.MetadataEdit)">
-            <Icon Type="eye" />
-            Preview
-        </Button>
-        <Button Type="@ButtonType.Primary" OnClick="SaveDataset">
-            <Icon Type="download" />
-            Download
-        </Button>
+        <Space>
+            @* Repeated from the toolbar so the state is visible at the point of action. *@
+            <SpaceItem>
+                <ValidationStatusChip Result="_validation" Announce="false" />
+            </SpaceItem>
+            <SpaceItem>
+                <Button Type="default" OnClick="() => OpenMetadataDetailsModalTemplate(State.MetadataEdit)">
+                    <Icon Type="eye" />
+                    Preview
+                </Button>
+            </SpaceItem>
+            <SpaceItem>
+                <Button Type="@ButtonType.Primary" OnClick="RequestDownload">
+                    <Icon Type="download" />
+                    Download
+                </Button>
+            </SpaceItem>
+        </Space>
     </Row>
+
+    @* Selecting an issue switches to the tab that owns it, which matters here because AntDesign
+       renders tab panes lazily and the offending field may never have been on screen. *@
+    <ValidationGate @ref="_validationGate"
+                    OnConfirmed="@(() => SaveDataset())"
+                    OnIssueSelected="@OnValidationIssueSelected" />
 }
 else
 {

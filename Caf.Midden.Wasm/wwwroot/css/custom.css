@@ -17,6 +17,62 @@
     align-self: center;
 }
 
+.validation-status {
+    font-size: 12px;
+    align-self: center;
+}
+
+.validation-status-ok {
+    color: #52c41a;
+}
+
+.validation-status-warning {
+    color: #faad14;
+}
+
+.validation-status-error {
+    color: #ff4d4f;
+}
+
+.validation-row-issue {
+    color: #ff4d4f;
+    font-size: 12px;
+    margin: 0 0 8px 24px;
+}
+
+/* A left rule rather than a background tint, so the marker survives the drag-over row styling
+   and does not rely on color alone to be noticed. */
+.validation-row-error > td:first-child {
+    box-shadow: inset 3px 0 0 0 #ff4d4f;
+}
+
+.validation-summary-list {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.validation-issue-hint {
+    color: rgba(0, 0, 0, 0.45);
+    display: block;
+}
+
+/* Issue rows are real buttons when the host editor can navigate to the offending control, so they
+   stay keyboard-focusable rather than being clickable text. */
+.validation-issue-link {
+    background: none;
+    border: none;
+    padding: 0;
+    color: #1890ff;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+    .validation-issue-link:hover,
+    .validation-issue-link:focus-visible {
+        text-decoration: underline;
+    }
+
 
 .site-layout .site-layout-background {
     background: #fff;

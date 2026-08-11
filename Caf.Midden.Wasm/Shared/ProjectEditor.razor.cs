@@ -15,6 +15,12 @@ using System.IO;
 using Microsoft.JSInterop;
 using System.ComponentModel.DataAnnotations;
 using Caf.Midden.Core.Services;
+using Caf.Midden.Core.Services.Validation;
+using Caf.Midden.Wasm.Shared.Validation;
+
+// Disambiguated from System.ComponentModel.DataAnnotations.ValidationResult, which this file also
+// has in scope.
+using ValidationResult = Caf.Midden.Core.Services.Validation.ValidationResult;
 
 namespace Caf.Midden.Wasm.Shared
 {
@@ -27,12 +33,16 @@ namespace Caf.Midden.Wasm.Shared
             Converters = { new JsonStringEnumConverter() }
         };
 
+        private static readonly ProjectValidator Validator = new();
+
         private IDisposable? _stateSubscription;
         private IAutosaveRegistration? _autosaveRegistration;
         private DateTime? _lastSavedUtc;
         private string _draftKey = DraftKeyPrefix;
         private DraftEnvelope<Project>? _pendingDraft;
         private bool _draftRestorePromptVisible;
+        private ValidationResult _validation = ValidationResult.Empty;
+        private ValidationGate? _validationGate;
 
         public Project Project { get; set; } = new Project();
 
@@ -49,8 +59,16 @@ namespace Caf.Midden.Wasm.Shared
             ? string.Empty
             : $"A saved draft from {FormatRelativeTime(_pendingDraft.SavedAtUtc)} was found. Resume editing it?";
 
+        private void RefreshValidation()
+        {
+            _validation = State.ProjectEdit is null
+                ? ValidationResult.Empty
+                : Validator.Validate(State.ProjectEdit, State.AppConfig);
+        }
+
         private async Task OnStateChanged(AppStateChangedEventArgs args)
         {
+            RefreshValidation();
             await InvokeAsync(StateHasChanged);
             Console.WriteLine("LastUpdate_StateChanged");
         }
@@ -65,6 +83,8 @@ namespace Caf.Midden.Wasm.Shared
                 OnStateChanged,
                 AppStateChange.ProjectEdit,
                 AppStateChange.LastUpdated);
+
+            RefreshValidation();
         }
 
         protected override async Task OnInitializedAsync()
@@ -104,6 +124,9 @@ namespace Caf.Midden.Wasm.Shared
         private void Autosave_NotifyChanged()
         {
             _autosaveRegistration?.NotifyChanged();
+
+            // Validation is ambient and cheap here; it never gates autosave.
+            RefreshValidation();
         }
 
         private static string GetIdentityFingerprint(Project project)
@@ -223,6 +246,20 @@ namespace Caf.Midden.Wasm.Shared
 
             State.UpdateProjectEdit(this, new Project());
             Autosave.RemoveDraft(_draftKey);
+        }
+
+        // The Download button stays enabled; the gate decides whether the save actually happens so
+        // the user always learns *why* nothing downloaded, and what to fix.
+        private async Task RequestDownload()
+        {
+            if (State.ProjectEdit is null || _validationGate is null)
+            {
+                return;
+            }
+
+            RefreshValidation();
+
+            await _validationGate.RequestAsync(_validation);
         }
 
         private async Task<string> SaveProject()

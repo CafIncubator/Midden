@@ -32,6 +32,9 @@
     <SpaceItem>
         <span class="autosave-status">@AutosaveStatusText</span>
     </SpaceItem>
+    <SpaceItem>
+        <ValidationStatusChip Result="_validation" />
+    </SpaceItem>
 </Space>
 <AntDesign.Divider />
 
@@ -54,15 +57,15 @@
     <AntDesign.Form Model="ConfigurationEdit"
                     Layout="@FormLayout.Vertical"
                     OnFieldChanged="OnFormFieldChanged">
-        <FormItem Label="Organization Name">
+        <FormItem Label="Organization Name" Required="true">
             <AntDesign.Input @bind-Value="@context.OrganizationName"
                               Placeholder="Name of your organization" />
         </FormItem>
-        <FormItem Label="Tool Name">
+        <FormItem Label="Tool Name" Required="true">
             <AntDesign.Input @bind-Value="@context.ToolName"
                               Placeholder="Name of the tool as displayed to users" />
         </FormItem>
-        <FormItem Label="Catalog Path">
+        <FormItem Label="Catalog Path" Required="true">
             <AntDesign.Input @bind-Value="@context.CatalogPath"
                               Placeholder="Relative path to the catalog.json file" />
         </FormItem>
@@ -119,6 +122,17 @@
                             Icon="delete"
                             OnClick="@(() => RemoveGeometry(geometry))" />
                 </div>
+                @foreach (var issue in GeometryIssues(geometryIndex))
+                {
+                    <div class="validation-row-issue">
+                        <Icon Type="exclamation-circle" Theme="@IconThemeType.Outline" />
+                        @issue.Message
+                        @if (!string.IsNullOrWhiteSpace(issue.Hint))
+                        {
+                            <span class="validation-issue-hint">@issue.Hint</span>
+                        }
+                    </div>
+                }
             }
             <div class="string-list-editor-drop-indicator @(_dragOverGeometryIndex == context.Geometries.Count ? "string-list-editor-drop-indicator-visible" : string.Empty)"
                  @ondragenter="@(() => OnGeometryDragEnter(context.Geometries.Count))"
@@ -132,11 +146,22 @@
     </AntDesign.Form>
     <Divider />
     <AntDesign.Row Justify="@RowJustify.End">
-        <Button Type="@ButtonType.Primary" OnClick="SaveConfiguration">
-            <Icon Type="download" />
-            Download
-        </Button>
+        <Space>
+            @* Repeated from the toolbar: this form is long enough that the toolbar chip is
+               scrolled out of view by the time the user reaches the download button. *@
+            <SpaceItem>
+                <ValidationStatusChip Result="_validation" Announce="false" />
+            </SpaceItem>
+            <SpaceItem>
+                <Button Type="@ButtonType.Primary" OnClick="RequestDownload">
+                    <Icon Type="download" />
+                    Download
+                </Button>
+            </SpaceItem>
+        </Space>
     </AntDesign.Row>
+
+    <ValidationGate @ref="_validationGate" OnConfirmed="@(() => SaveConfiguration())" />
 }
 else
 {

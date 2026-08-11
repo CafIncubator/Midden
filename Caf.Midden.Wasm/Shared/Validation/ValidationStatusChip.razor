@@ -1,0 +1,58 @@
+@using AntDesign
+@using Caf.Midden.Core.Services.Validation
+
+@* Ambient validity indicator, so the user learns about problems while editing rather than being
+   surprised by them at download time. Conveys state with an icon and a count, never color alone. *@
+<span class="@StatusClass" role="@(Announce ? "status" : null)" aria-live="@(Announce ? "polite" : null)">
+    <Icon Type="@StatusIcon" Theme="@IconThemeType.Outline" />
+    @StatusText
+</span>
+
+@code {
+    /// <summary>
+    /// The current validation state. Treated as clean when null.
+    /// </summary>
+    [Parameter]
+    public ValidationResult? Result { get; set; }
+
+    /// <summary>
+    /// Whether this instance announces changes to assistive technology. Set false on a repeated
+    /// chip so the same message is not announced twice.
+    /// </summary>
+    [Parameter]
+    public bool Announce { get; set; } = true;
+
+    private int ErrorCount => Result?.Errors.Count() ?? 0;
+
+    private int WarningCount => Result?.Warnings.Count() ?? 0;
+
+    private string StatusText
+    {
+        get
+        {
+            if (ErrorCount > 0)
+            {
+                return $"{ErrorCount} issue{(ErrorCount == 1 ? string.Empty : "s")} to fix";
+            }
+
+            if (WarningCount > 0)
+            {
+                return $"{WarningCount} suggestion{(WarningCount == 1 ? string.Empty : "s")}";
+            }
+
+            return "Ready to download";
+        }
+    }
+
+    private string StatusClass => ErrorCount > 0
+        ? "validation-status validation-status-error"
+        : WarningCount > 0
+            ? "validation-status validation-status-warning"
+            : "validation-status validation-status-ok";
+
+    private string StatusIcon => ErrorCount > 0
+        ? "close-circle"
+        : WarningCount > 0
+            ? "exclamation-circle"
+            : "check-circle";
+}
