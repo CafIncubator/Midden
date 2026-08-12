@@ -105,6 +105,10 @@ namespace Caf.Midden.Wasm.Shared
             List<CatalogProject> catalogProjects = catalog.Projects
                 .Where(project => string.IsNullOrWhiteSpace(Project) || string.Equals(project.Name, Project, StringComparison.OrdinalIgnoreCase))
                 .Select(project => BuildCatalogProject(project, metadataByProject))
+                .GroupBy(project => Normalize(project.Name))
+                .Select(group => group
+                    .OrderByDescending(project => project.LastModified ?? DateTime.MinValue)
+                    .First())
                 .ToList();
 
             IEnumerable<CatalogProject> orderedProjects = catalogProjects
