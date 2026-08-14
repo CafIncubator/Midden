@@ -89,7 +89,7 @@
                             <Icon Type="comment" Theme="@IconThemeType.Outline" /> Derived Works
                         </TitleTemplate>
                         <Body>
-                            <ExpandableTextListSection Items="@DerivedWorkItems" OnToggle="@ToggleExpandableText" />
+                            <ExpandableTextListSection Items="@DerivedWorkItems" OnToggle="@ToggleExpandableText" Bordered="false" />
                         </Body>
                     </Card>
                 </AntDesign.Col>
@@ -226,7 +226,7 @@
     <AntDesign.Modal Title="Derived Works" Visible="@ShowDerivedWorks" DestroyOnClose="true" Width="1200" OnCancel="@CloseDerivedWorks" Footer="@null">
         @if (ShowDerivedWorks)
         {
-            <ExpandableTextListSection Items="@DerivedWorkItems" OnToggle="@ToggleExpandableText" />
+            <ExpandableTextListSection Items="@DerivedWorkItems" OnToggle="@ToggleExpandableText" Bordered="false" />
             <div class="details-modal-footer">
                 <AntDesign.Button @onclick="CloseDerivedWorks">Close</AntDesign.Button>
             </div>

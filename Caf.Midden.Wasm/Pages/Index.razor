@@ -490,6 +490,11 @@
         <AntDesign.Row Gutter="16" Wrap="true">
             <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(12,0)" Class="home-stats-col">
                 <AntDesign.Card Bordered Title="Catalog completeness">
+                    <Extra>
+                        <CardInfo Text="How thoroughly each dataset's metadata is filled out, averaged across the whole catalog. The datasets listed below have the lowest scores and would benefit most from more documentation." />
+                    </Extra>
+                    <Body>
+
                     <div class="home-attention-progress">
                         <AntDesign.Progress Type="@ProgressType.Circle"
                                             Percent="@Completeness.AveragePercent"
@@ -509,28 +514,31 @@
                             </a>
                         }
                     }
+                    </Body>
                 </AntDesign.Card>
             </AntDesign.Col>
 
             <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(12,0)" Class="home-stats-col">
                 <AntDesign.Card Bordered Title="Validation health">
+                    <Extra>
+                        <CardInfo Text="How many datasets pass validation cleanly, how many have warnings, and how many have errors. Use it to gauge how much metadata needs correction." />
+                    </Extra>
+                    <Body>
                     <div class="home-attention-validation">
                         <div class="home-attention-validation-item">
-                            <Icon Type="check-circle" Theme="@IconThemeType.Fill" Style="color:#52c41a;" />
                             <span class="home-attention-validation-count">@ValidationHealth.Clean</span>
                             <span class="home-attention-caption">Clean</span>
                         </div>
                         <div class="home-attention-validation-item">
-                            <Icon Type="warning" Theme="@IconThemeType.Fill" Style="color:#faad14;" />
                             <span class="home-attention-validation-count">@ValidationHealth.WithWarnings</span>
                             <span class="home-attention-caption">Warnings</span>
                         </div>
                         <div class="home-attention-validation-item">
-                            <Icon Type="close-circle" Theme="@IconThemeType.Fill" Style="color:#ff4d4f;" />
                             <span class="home-attention-validation-count">@ValidationHealth.WithErrors</span>
                             <span class="home-attention-caption">Errors</span>
                         </div>
                     </div>
+                    </Body>
                 </AntDesign.Card>
             </AntDesign.Col>
         </AntDesign.Row>
@@ -538,11 +546,12 @@
         <AntDesign.Row Gutter="16" Wrap="true">
             <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(12,0)" Class="home-stats-col">
                 <AntDesign.Card Bordered Title="Orphaned projects">
+                    <Extra>
+                        <CardInfo Text="Projects that datasets refer to, but that have no project record of their own in the catalog. Documenting these projects fills in the missing context for their datasets." />
+                    </Extra>
+                    <Body>
                     @if (OrphanedProjects.Count > 0)
                     {
-                        <div class="home-attention-caption">
-                            Referenced by datasets, but with no project record in the catalog.
-                        </div>
                         @foreach (var project in OrphanedProjects)
                         {
                             <div class="home-attention-row">
@@ -558,29 +567,28 @@
                     {
                         <Empty Simple Description="@("Every referenced project is documented")" />
                     }
+                    </Body>
                 </AntDesign.Card>
             </AntDesign.Col>
 
             <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(12,0)" Class="home-stats-col">
                 <AntDesign.Card Bordered Title="Undocumented variables">
+                    <Extra>
+                        <CardInfo Text="Variables that are missing a description or a unit of measurement, which makes them hard for anyone else to understand or reuse. Shows the datasets with the most gaps so you know where to start." />
+                    </Extra>
+                    <Body>
                     @if (UndocumentedVariables.AffectedVariables > 0)
                     {
-                        <div class="home-attention-caption">
-                            Variables missing a description or units cannot be interpreted by a data user.
-                        </div>
                         <div class="home-attention-validation">
                             <div class="home-attention-validation-item">
-                                <Icon Type="file-text" Theme="@IconThemeType.Fill" Style="color:#faad14;" />
                                 <span class="home-attention-validation-count">@UndocumentedVariables.MissingDescription</span>
                                 <span class="home-attention-caption">No description</span>
                             </div>
                             <div class="home-attention-validation-item">
-                                <Icon Type="calculator" Theme="@IconThemeType.Fill" Style="color:#ff4d4f;" />
                                 <span class="home-attention-validation-count">@UndocumentedVariables.MissingUnits</span>
                                 <span class="home-attention-caption">No units</span>
                             </div>
                             <div class="home-attention-validation-item">
-                                <Icon Type="check-circle" Theme="@IconThemeType.Fill" Style="color:#52c41a;" />
                                 <span class="home-attention-validation-count">@UndocumentedVariables.DocumentedPercent%</span>
                                 <span class="home-attention-caption">Documented</span>
                             </div>
@@ -602,6 +610,7 @@
                     {
                         <Empty Simple Description="@("Every variable declares a description and units")" />
                     }
+                    </Body>
                 </AntDesign.Card>
             </AntDesign.Col>
         </AntDesign.Row>

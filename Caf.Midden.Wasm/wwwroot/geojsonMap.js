@@ -59,7 +59,12 @@ export function create(mapElement, geometry) {
 
     document.getElementById(mapElement.id).style.width = "100%";
 
-    leafletMap.fitBounds(spatialExtent.getBounds());
+    var geometryType = geojsonFeature.geometry && geojsonFeature.geometry.type;
+    var isPointGeometry = geometryType === "Point" || geometryType === "MultiPoint";
+
+    leafletMap.fitBounds(
+        spatialExtent.getBounds(),
+        isPointGeometry ? { maxZoom: 15 } : undefined);
 
     return leafletMap;
 }

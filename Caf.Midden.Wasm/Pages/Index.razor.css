@@ -30,6 +30,23 @@
     gap: 8px;
 }
 
+::deep .home-stats-col > .ant-list.ant-list-bordered > .ant-list-header {
+    border-bottom: 1px solid #d9e2ef;
+}
+
+::deep .home-stats-col > .ant-list.ant-list-split .ant-list-item {
+    border-bottom: 1px solid #d9e2ef;
+}
+
+/* Rows may be direct <li> children of .ant-list-items, or wrapped in an <a> (e.g. tag lists
+   that link out). Scoping to ".ant-list-items > .ant-list-item:last-child" (rather than a bare
+   ":last-child") ensures only the true last row loses its border, not every anchor-wrapped
+   item (each of which is otherwise the sole/last child of its own <a>). */
+::deep .home-stats-col > .ant-list.ant-list-split .ant-list-items > .ant-list-item:last-child,
+::deep .home-stats-col > .ant-list.ant-list-split .ant-list-items > a:last-child > .ant-list-item {
+    border-bottom: none;
+}
+
 ::deep .home-chart-wrapper {
     display: flex;
     justify-content: center;
