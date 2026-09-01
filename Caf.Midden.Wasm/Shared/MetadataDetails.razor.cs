@@ -6,10 +6,8 @@ using Markdig;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Caf.Midden.Wasm.Shared
@@ -24,32 +22,6 @@ namespace Caf.Midden.Wasm.Shared
             .UseAdvancedExtensions()
             .UseYamlFrontMatter()
             .Build();
-
-        /// <summary>
-        /// The set of Variable properties included in the downloadable CSV, and the
-        /// order they appear in. This must stay in sync with the columns supported
-        /// by <see cref="DataDictionaryReaderCafCsv"/> so downloaded data dictionaries
-        /// can be re-uploaded without modification.
-        /// </summary>
-        private static readonly string[] VariableCsvPropertyNames = new[]
-        {
-            nameof(Variable.Name),
-            nameof(Variable.Description),
-            nameof(Variable.Units),
-            nameof(Variable.Tags),
-            nameof(Variable.Methods),
-            nameof(Variable.TemporalResolution),
-            nameof(Variable.TemporalExtent),
-            nameof(Variable.SpatialRepeats),
-            nameof(Variable.IsQCSpecified),
-            nameof(Variable.QCApplied),
-            nameof(Variable.ProcessingLevel),
-            nameof(Variable.VariableType)
-        };
-
-        private static readonly PropertyInfo[] VariableCsvProperties = VariableCsvPropertyNames
-            .Select(name => typeof(Variable).GetProperty(name)!)
-            .ToArray();
 
         private string _metadataIdentity = string.Empty;
 
@@ -353,56 +325,10 @@ namespace Caf.Midden.Wasm.Shared
             }
 
             string datasetName = Metadata.Dataset.Name.Replace(" ", "_");
-            string filename = $"{datasetName}_datadictionary.csv";
-            string csvData = ConvertToCSV(Metadata.Dataset.Variables);
+            string filename = $"{datasetName}_DataDictionary.csv";
+            string csvData = DataDictionaryWriterCafCsv.Write(Metadata.Dataset);
 
             await JSRuntime.InvokeVoidAsync("downloadCSV", filename, csvData);
-        }
-
-        private static string ConvertToCSV(IEnumerable<Variable> data)
-        {
-            List<Variable> rows = data.ToList();
-            if (rows.Count == 0)
-            {
-                return string.Empty;
-            }
-
-            string header = string.Join(",", VariableCsvProperties.Select(property => $"\"{property.Name}\""));
-            IEnumerable<string> csvRows = rows.Select(row =>
-                string.Join(",", VariableCsvProperties.Select(property => EscapeCsvValue(property.GetValue(row)))));
-
-            return $"{header}\n{string.Join("\n", csvRows)}";
-        }
-
-        private static string EscapeCsvValue(object? value)
-        {
-            if (value == null)
-            {
-                return "\"\"";
-            }
-
-            if (value is IEnumerable enumerable && value is not string)
-            {
-                List<string> values = new();
-                foreach (object? item in enumerable)
-                {
-                    values.Add(NormalizeCsvText(item?.ToString() ?? string.Empty));
-                }
-
-                return $"\"{string.Join(DataDictionaryReaderCafCsv.ListValueDelimiter + " ", values)}\"";
-            }
-
-            return $"\"{NormalizeCsvText(value.ToString() ?? string.Empty)}\"";
-        }
-
-        private static string NormalizeCsvText(string value)
-        {
-            return value
-                .Replace("\r\n", " ")
-                .Replace("\n", " ")
-                .Replace("\r", " ")
-                .Replace("\"", "\"\"")
-                .Trim();
         }
 
         public sealed class ExpandableTextItem
