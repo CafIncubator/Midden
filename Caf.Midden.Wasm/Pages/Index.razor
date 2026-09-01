@@ -161,7 +161,7 @@
 
     <Divider />
 
-    <Title Level="2">Catalog Insights</Title>
+    <Title Level="2">Insights</Title>
     <AntDesign.Row Gutter="16" Wrap="true">
         <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(12,0)" Class="home-stats-col">
             <AntDesign.Card Bordered Title="Projects by status">
@@ -482,10 +482,7 @@
     {
         <Divider />
 
-        <Title Level="2">Needs Attention</Title>
-        <div class="home-attention-caption home-attention-intro">
-            For catalog contributors: metadata in this catalog that could be improved.
-        </div>
+        <Title Level="2">Health Report</Title>
 
         <AntDesign.Row Gutter="16" Wrap="true">
             <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(12,0)" Class="home-stats-col">
@@ -510,7 +507,10 @@
                         {
                             <a class="home-attention-row" href="@DatasetUrl(item.Zone, item.Project, item.Name)">
                                 <span class="home-attention-row-title">@item.Name</span>
-                                <span class="home-attention-badge" style="color:@CompletenessColor(item.Percent);">@item.Percent%</span>
+                                <span class="home-attention-row-trailing">
+                                    <span class="home-attention-badge" style="color:@CompletenessColor(item.Percent);">@item.Percent%</span>
+                                    <Icon Type="right" Class="home-attention-row-arrow" />
+                                </span>
                             </a>
                         }
                     }
@@ -554,14 +554,15 @@
                     {
                         @foreach (var project in OrphanedProjects)
                         {
-                            <div class="home-attention-row">
+                            <a class="home-attention-row" href="@ProjectEditorUrl(project.Name)">
                                 <span class="home-attention-row-title">@project.Name</span>
-                                <span class="home-attention-badge">@project.DatasetCount dataset@(project.DatasetCount == 1 ? "" : "s")</span>
-                            </div>
+                                <span class="home-attention-row-trailing">
+                                    <span class="home-attention-badge">@project.DatasetCount dataset@(project.DatasetCount == 1 ? "" : "s")</span>
+                                    <Icon Type="right" Class="home-attention-row-arrow" />
+                                </span>
+                            </a>
                         }
-                        <a class="home-attention-cta" href="editor/project">
-                            Document a project <Icon Type="right" />
-                        </a>
+
                     }
                     else
                     {
@@ -601,7 +602,10 @@
                             {
                                 <a class="home-attention-row" href="@DatasetUrl(item.Zone, item.Project, item.Name)">
                                     <span class="home-attention-row-title">@item.Name</span>
-                                    <span class="home-attention-badge">@item.MissingCount of @item.VariableCount</span>
+                                    <span class="home-attention-row-trailing">
+                                        <span class="home-attention-badge">@item.MissingCount of @item.VariableCount</span>
+                                        <Icon Type="right" Class="home-attention-row-arrow" />
+                                    </span>
                                 </a>
                             }
                         }

@@ -268,6 +268,9 @@ namespace Caf.Midden.Wasm.Pages
         private static string DatasetUrl(string zone, string project, string name)
             => $"catalog/datasets/{zone}/{project}/{name}";
 
+        private static string ProjectEditorUrl(string name)
+            => $"editor/project?name={Uri.EscapeDataString(name)}";
+
         private static string CompletenessColor(int percent) => percent switch
         {
             >= 80 => "#52c41a",
