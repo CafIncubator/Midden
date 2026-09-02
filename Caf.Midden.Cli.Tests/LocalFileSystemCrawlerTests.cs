@@ -1,10 +1,21 @@
 ﻿using Caf.Midden.Cli.Services;
+using Caf.Midden.Core.Services;
 using Caf.Midden.Core.Services.Metadata;
 
 namespace Caf.Midden.Cli.Tests;
 
 public class LocalFileSystemCrawlerTests
 {
+    [Fact]
+    public void GetProjects_ValidInput_ReturnsProductionProject()
+    {
+        var sut = new LocalFileSystemCrawler(@"Assets\MockDataStoreLocal");
+
+        var actual = sut.GetProjects(new ProjectReader(new ProjectParser()));
+
+        Assert.Contains(actual, project => project.Name == "ProductionProject");
+    }
+
     [Fact]
     public void GetFileNames_ValidInput_ReturnsExpected()
     {

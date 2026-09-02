@@ -35,7 +35,6 @@
     private const int NODE_HEIGHT = 120;
     private const double ZOOM_INCREMENT = 0.2;
 
-    private bool _InitialResize = false;
     private bool _ViewportInitialized = false;
     private double _lastContainerWidth = -1;
     private double _lastContainerHeight = -1;
@@ -117,7 +116,6 @@
         {
             if (Diagram.Container != null && Diagram.Container.Width > 0 && Diagram.Container.Height > 0)
             {
-                _InitialResize = true;
                 FitAndCenterDiagram();
                 _lastContainerWidth = Diagram.Container.Width;
                 _lastContainerHeight = Diagram.Container.Height;

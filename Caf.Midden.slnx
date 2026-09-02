@@ -1,4 +1,5 @@
 <Solution>
+  <Project Path="Caf.Midden.Cli.LiveTests/Caf.Midden.Cli.LiveTests.csproj" />
   <Project Path="Caf.Midden.Cli.Tests/Caf.Midden.Cli.Tests.csproj" />
   <Project Path="Caf.Midden.Cli/Caf.Midden.Cli.csproj" />
   <Project Path="Caf.Midden.Core.Tests/Caf.Midden.Core.Tests.csproj" />

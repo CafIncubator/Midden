@@ -1,7 +1,6 @@
 ﻿using Azure.Core;
 using Azure.Identity;
 using Azure.Storage.Files.DataLake;
-using Azure.Storage.Files.DataLake.Models;
 using Caf.Midden.Cli.Common;
 using Caf.Midden.Core.Models.v0_2;
 using Caf.Midden.Core.Services;
@@ -12,9 +11,9 @@ namespace Caf.Midden.Cli.Services;
 
 public sealed class AzureDataLakeCrawler : ICrawl
 {
-    private readonly DataLakeFileSystemClient fileSystemClient;
+    private readonly IAzureDataLakeGateway gateway;
     private readonly ICrawlLogger logger;
-    private IReadOnlyList<Azure.Storage.Files.DataLake.Models.PathItem>? cachedPaths;
+    private IReadOnlyList<AzureDataLakeItem>? cachedPaths;
 
     public AzureDataLakeCrawler(
         string accountName,
@@ -47,6 +46,22 @@ public sealed class AzureDataLakeCrawler : ICrawl
         TokenCredential credential,
         string? endpointSuffix = null,
         ICrawlLogger? logger = null)
+        : this(CreateGateway(accountName, fileSystemName, credential, endpointSuffix), logger)
+    {
+    }
+
+    internal AzureDataLakeCrawler(IAzureDataLakeGateway gateway, ICrawlLogger? logger = null)
+    {
+        ArgumentNullException.ThrowIfNull(gateway);
+        this.gateway = gateway;
+        this.logger = logger ?? ConsoleCrawlLogger.Instance;
+    }
+
+    private static IAzureDataLakeGateway CreateGateway(
+        string accountName,
+        string fileSystemName,
+        TokenCredential credential,
+        string? endpointSuffix)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(accountName);
         ArgumentException.ThrowIfNullOrWhiteSpace(fileSystemName);
@@ -54,8 +69,7 @@ public sealed class AzureDataLakeCrawler : ICrawl
 
         var suffix = string.IsNullOrWhiteSpace(endpointSuffix) ? "dfs.core.windows.net" : endpointSuffix;
         var serviceClient = new DataLakeServiceClient(new Uri($"https://{accountName}.{suffix}"), credential);
-        fileSystemClient = serviceClient.GetFileSystemClient(fileSystemName);
-        this.logger = logger ?? ConsoleCrawlLogger.Instance;
+        return new AzureDataLakeGateway(serviceClient.GetFileSystemClient(fileSystemName));
     }
 
     private static TokenCredential CreateClientSecretCredential(string tenantId, string clientId, string clientSecret)
@@ -67,19 +81,14 @@ public sealed class AzureDataLakeCrawler : ICrawl
         return new ClientSecretCredential(tenantId, clientId, clientSecret);
     }
 
-    public void Dispose()
-    {
-        // DataLakeFileSystemClient/DataLakeServiceClient hold no unmanaged resources requiring
-        // explicit disposal; this satisfies ICrawl's IDisposable contract for symmetry with
-        // crawlers that do own disposable resources (e.g. DriveService).
-    }
+    public void Dispose() => gateway.Dispose();
 
     internal IReadOnlyList<string> GetFileNames(string fileExtension)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(fileExtension);
 
         var names = GetCachedPaths()
-            .Where(pathItem => pathItem.IsDirectory != true && pathItem.Name.EndsWith(fileExtension, StringComparison.OrdinalIgnoreCase))
+            .Where(pathItem => !pathItem.IsDirectory && pathItem.Name.EndsWith(fileExtension, StringComparison.OrdinalIgnoreCase))
             .Select(pathItem => pathItem.Name)
             .ToList();
 
@@ -92,10 +101,7 @@ public sealed class AzureDataLakeCrawler : ICrawl
     /// <c>GetProjects</c> both filtering from the same listing does not issue a second remote
     /// listing call when a data store has <c>ShouldCollateProjects</c> enabled.
     /// </summary>
-    private IReadOnlyList<Azure.Storage.Files.DataLake.Models.PathItem> GetCachedPaths() =>
-        cachedPaths ??= fileSystemClient
-            .GetPaths(path: null, recursive: true, userPrincipalName: false, cancellationToken: CancellationToken.None)
-            .ToList();
+    private IReadOnlyList<AzureDataLakeItem> GetCachedPaths() => cachedPaths ??= gateway.ListPaths();
 
     public IReadOnlyList<Metadata> GetMetadatas(IMetadataParser parser)
     {
@@ -105,8 +111,7 @@ public sealed class AzureDataLakeCrawler : ICrawl
         {
             try
             {
-                var fileClient = fileSystemClient.GetFileClient(fileName);
-                using var stream = fileClient.OpenRead();
+                using var stream = gateway.OpenRead(fileName);
 
                 // A StreamReader with BOM detection avoids buffering the whole file into a
                 // second byte array via ToArray() and correctly strips a UTF-8 BOM instead of
@@ -121,7 +126,7 @@ public sealed class AzureDataLakeCrawler : ICrawl
                     continue;
                 }
 
-                metadata.Dataset.DatasetPath = MiddenFileConventions.TrimSuffix(fileClient.Path, MiddenFileConventions.MiddenFileExtension);
+                metadata.Dataset.DatasetPath = MiddenFileConventions.TrimSuffix(fileName, MiddenFileConventions.MiddenFileExtension);
                 metadatas.Add(metadata);
             }
             catch (Exception exception)
@@ -139,8 +144,7 @@ public sealed class AzureDataLakeCrawler : ICrawl
 
         foreach (var fileName in GetFileNames(MiddenFileConventions.MippenFileSearchTerm))
         {
-            var fileClient = fileSystemClient.GetFileClient(fileName);
-            using var stream = fileClient.OpenRead();
+            using var stream = gateway.OpenRead(fileName);
             var project = reader.Read(stream);
 
             if (project is not null)

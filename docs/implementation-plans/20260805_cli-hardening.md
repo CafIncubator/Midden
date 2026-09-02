@@ -511,16 +511,15 @@ Every phase must leave the solution in this state:
 
 - `dotnet build` succeeds for the full solution.
 - `Caf.Midden.Core.Tests` — 8 tests passing.
-- `Caf.Midden.Cli.Tests` \u2014 47 tests total as of the end of Phase 6. 40 are guaranteed-offline
-  (security, configuration, exception sanitizer, Google Drive query, local crawler, and collate
-  orchestration suites). The remaining 7 (`GoogleDriveCrawlerTests` \u00d7 3 and
-  `CrawlerIntegrationTests` \u00d7 4) each check for a credentials file under
-  `Assets/CliConfigurationSecrets/` and no-op if it is absent, so they pass trivially without
-  credentials and exercise the real crawler against a live account when credentials are present.
-- Integration tests requiring cloud credentials are expected to no-op locally, and run for real
-  only in environments where `Assets/CliConfigurationSecrets/` has been populated.
+- The guaranteed-offline CLI tests cover security, configuration, exception sanitization, Google
+  Drive queries, the local crawler, and collate orchestration. Live Azure and Google smoke tests
+  now reside in `Caf.Midden.Cli.LiveTests` and are explicit xUnit v3 tests, so the default solution
+  test command compiles but does not execute them.
+- Maintainers run the live tests explicitly after populating the ignored
+  `Caf.Midden.Cli.LiveTests/Assets/CliConfigurationSecrets/` directory. Missing credential files
+  are reported as skips rather than silent passes.
 
-Credential material must never be committed. `Caf.Midden.Cli.Tests/Assets/CliConfigurationSecrets/`
+Credential material must never be committed. `Caf.Midden.Cli.LiveTests/Assets/CliConfigurationSecrets/`
 is git-ignored and was confirmed on 2026-08-05 to have no history in `git log --all`.
 
 ## Related documents

@@ -1,23 +1,16 @@
 ﻿using Caf.Midden.Cli.Common;
-using Caf.Midden.Cli.Security;
 using Caf.Midden.Core.Models.v0_2;
 using Caf.Midden.Core.Services;
 using Caf.Midden.Core.Services.Metadata;
-using Google.Apis.Drive.v3;
-using Google.Apis.Services;
 using System.Text;
-using DriveFile = Google.Apis.Drive.v3.Data.File;
-using SharedDrive = Google.Apis.Drive.v3.Data.Drive;
 
 namespace Caf.Midden.Cli.Services;
 
 public sealed class GoogleWorkspaceSharedDriveCrawler : ICrawl
 {
-    private static readonly string[] Scopes = [DriveService.Scope.DriveReadonly];
-
-    private readonly DriveService service;
+    private readonly IGoogleDriveGateway gateway;
     private readonly ICrawlLogger logger;
-    private List<SharedDrive>? cachedDriveList;
+    private IReadOnlyList<GoogleSharedDrive>? cachedDriveList;
 
     public GoogleWorkspaceSharedDriveCrawler(
         string clientId,
@@ -25,44 +18,25 @@ public sealed class GoogleWorkspaceSharedDriveCrawler : ICrawl
         string applicationName,
         string? tokenStorePath = null,
         ICrawlLogger? logger = null)
+        : this(
+            GoogleDriveGateway.CreateWithOAuth(clientId, clientSecret, applicationName, tokenStorePath),
+            logger)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(clientId);
-        ArgumentException.ThrowIfNullOrWhiteSpace(clientSecret);
-        ArgumentException.ThrowIfNullOrWhiteSpace(applicationName);
-
-        var credential = GoogleCredentialFactory.Authorize(clientId, clientSecret, tokenStorePath);
-
-        service = new DriveService(new BaseClientService.Initializer
-        {
-            HttpClientInitializer = credential,
-            ApplicationName = applicationName,
-        });
-
-        GoogleDriveServiceFactory.ConfigureRetry(service.HttpClient);
-        this.logger = logger ?? ConsoleCrawlLogger.Instance;
     }
 
     public GoogleWorkspaceSharedDriveCrawler(string jsonKeyPath, string applicationName, ICrawlLogger? logger = null)
+        : this(GoogleDriveGateway.CreateWithServiceAccount(jsonKeyPath, applicationName), logger)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(jsonKeyPath);
-        ArgumentException.ThrowIfNullOrWhiteSpace(applicationName);
+    }
 
-        var credential = GoogleCredentialFactory.FromServiceAccountFile(jsonKeyPath);
-
-        service = new DriveService(new BaseClientService.Initializer
-        {
-            HttpClientInitializer = credential,
-            ApplicationName = applicationName,
-        });
-
-        GoogleDriveServiceFactory.ConfigureRetry(service.HttpClient);
+    internal GoogleWorkspaceSharedDriveCrawler(IGoogleDriveGateway gateway, ICrawlLogger? logger = null)
+    {
+        ArgumentNullException.ThrowIfNull(gateway);
+        this.gateway = gateway;
         this.logger = logger ?? ConsoleCrawlLogger.Instance;
     }
 
-    public void Dispose()
-    {
-        service.Dispose();
-    }
+    public void Dispose() => gateway.Dispose();
 
     internal IReadOnlyList<string> GetFileNames(string fileNameContains)
     {
@@ -121,12 +95,12 @@ public sealed class GoogleWorkspaceSharedDriveCrawler : ICrawl
         return projects;
     }
 
-    private List<DriveFile> GetFiles(
+    private List<GoogleDriveItem> GetFiles(
         string fileNameContains = MiddenFileConventions.MiddenFileExtension,
         bool fileNameContainsIsExactMatch = false,
         string? fileNameEndsWith = null)
     {
-        List<DriveFile> files = [];
+        List<GoogleDriveItem> files = [];
 
         foreach (var drive in GetSharedDrives())
         {
@@ -134,24 +108,14 @@ public sealed class GoogleWorkspaceSharedDriveCrawler : ICrawl
 
             do
             {
-                var listRequest = service.Files.List();
-                listRequest.DriveId = drive.Id;
-                listRequest.PageSize = 100;
-                listRequest.Fields = "nextPageToken, files(id, name, parents, driveId, trashed)";
-                listRequest.IncludeItemsFromAllDrives = true;
-                listRequest.SupportsAllDrives = true;
-                listRequest.Corpora = "drive";
-                listRequest.PageToken = pageToken;
-                listRequest.Q = fileNameContainsIsExactMatch
+                var query = fileNameContainsIsExactMatch
                     ? $"name = '{GoogleDriveQuery.EscapeTerm(fileNameContains)}'"
                     : $"name contains '{GoogleDriveQuery.EscapeTerm(fileNameContains)}'";
+                var response = gateway.ListFiles(query, pageToken, drive.Id);
 
-                var response = listRequest.Execute();
-                var driveFiles = response.Files ?? [];
-
-                foreach (var file in driveFiles)
+                foreach (var file in response.Files)
                 {
-                    if (file.Trashed == true)
+                    if (file.IsTrashed)
                     {
                         continue;
                     }
@@ -173,25 +137,15 @@ public sealed class GoogleWorkspaceSharedDriveCrawler : ICrawl
         return files;
     }
 
-    private List<SharedDrive> GetSharedDrives()
+    private IReadOnlyList<GoogleSharedDrive> GetSharedDrives()
     {
-        cachedDriveList ??= service.Drives.List().Execute().Drives?.ToList() ?? [];
+        cachedDriveList ??= gateway.ListSharedDrives();
         return cachedDriveList;
     }
 
-    private string DownloadFileText(string fileId)
-    {
-        using var memoryStream = new MemoryStream();
-        var fileRequest = service.Files.Get(fileId);
-        fileRequest.SupportsAllDrives = true;
-        fileRequest.Download(memoryStream);
-        memoryStream.Position = 0;
+    private string DownloadFileText(string fileId) => gateway.DownloadFileText(fileId);
 
-        using var reader = new StreamReader(memoryStream, Encoding.UTF8, detectEncodingFromByteOrderMarks: true);
-        return reader.ReadToEnd();
-    }
-
-    private string GetAbsolutePath(DriveFile file)
+    private string GetAbsolutePath(GoogleDriveItem file)
     {
         if (file.Parents is not { Count: > 0 })
         {
@@ -227,11 +181,5 @@ public sealed class GoogleWorkspaceSharedDriveCrawler : ICrawl
         return path.Aggregate(Path.Combine);
     }
 
-    private DriveFile GetFile(string id)
-    {
-        var request = service.Files.Get(id);
-        request.Fields = "id, name, parents, driveId, trashed";
-        request.SupportsAllDrives = true;
-        return request.Execute();
-    }
+    private GoogleDriveItem GetFile(string id) => gateway.GetFile(id);
 }

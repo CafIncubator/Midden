@@ -1,20 +1,14 @@
 ﻿using Caf.Midden.Cli.Common;
-using Caf.Midden.Cli.Security;
 using Caf.Midden.Core.Models.v0_2;
 using Caf.Midden.Core.Services;
 using Caf.Midden.Core.Services.Metadata;
-using Google.Apis.Drive.v3;
-using Google.Apis.Services;
 using System.Text;
-using DriveFile = Google.Apis.Drive.v3.Data.File;
 
 namespace Caf.Midden.Cli.Services;
 
 public sealed class GoogleDriveCrawler : ICrawl
 {
-    private static readonly string[] Scopes = [DriveService.Scope.DriveReadonly];
-
-    private readonly DriveService service;
+    private readonly IGoogleDriveGateway gateway;
     private readonly ICrawlLogger logger;
 
     public GoogleDriveCrawler(
@@ -23,27 +17,20 @@ public sealed class GoogleDriveCrawler : ICrawl
         string applicationName,
         string? tokenStorePath = null,
         ICrawlLogger? logger = null)
+        : this(
+            GoogleDriveGateway.CreateWithOAuth(clientId, clientSecret, applicationName, tokenStorePath),
+            logger)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(clientId);
-        ArgumentException.ThrowIfNullOrWhiteSpace(clientSecret);
-        ArgumentException.ThrowIfNullOrWhiteSpace(applicationName);
+    }
 
-        var credential = GoogleCredentialFactory.Authorize(clientId, clientSecret, tokenStorePath);
-
-        service = new DriveService(new BaseClientService.Initializer
-        {
-            HttpClientInitializer = credential,
-            ApplicationName = applicationName,
-        });
-
-        GoogleDriveServiceFactory.ConfigureRetry(service.HttpClient);
+    internal GoogleDriveCrawler(IGoogleDriveGateway gateway, ICrawlLogger? logger = null)
+    {
+        ArgumentNullException.ThrowIfNull(gateway);
+        this.gateway = gateway;
         this.logger = logger ?? ConsoleCrawlLogger.Instance;
     }
 
-    public void Dispose()
-    {
-        service.Dispose();
-    }
+    public void Dispose() => gateway.Dispose();
 
     internal IReadOnlyList<string> GetFileNames(string fileNameContains)
     {
@@ -102,31 +89,24 @@ public sealed class GoogleDriveCrawler : ICrawl
         return projects;
     }
 
-    private List<DriveFile> GetFiles(
+    private List<GoogleDriveItem> GetFiles(
         string fileNameContains = MiddenFileConventions.MiddenFileExtension,
         bool fileNameContainsIsExactMatch = false,
         string? fileNameEndsWith = null)
     {
-        List<DriveFile> results = [];
+        List<GoogleDriveItem> results = [];
         string? pageToken = null;
 
         do
         {
-            var listRequest = service.Files.List();
-            listRequest.PageSize = 100;
-            listRequest.Fields = "nextPageToken, files(id, name, parents, driveId, trashed)";
-            listRequest.SupportsAllDrives = true;
-            listRequest.IncludeItemsFromAllDrives = true;
-            listRequest.PageToken = pageToken;
-            listRequest.Q = fileNameContainsIsExactMatch
+            var query = fileNameContainsIsExactMatch
                 ? $"name = '{GoogleDriveQuery.EscapeTerm(fileNameContains)}'"
                 : $"name contains '{GoogleDriveQuery.EscapeTerm(fileNameContains)}'";
-
-            var response = listRequest.Execute();
+            var response = gateway.ListFiles(query, pageToken);
 
             foreach (var file in response.Files ?? [])
             {
-                if (file.Trashed == true)
+                if (file.IsTrashed)
                 {
                     continue;
                 }
@@ -148,21 +128,9 @@ public sealed class GoogleDriveCrawler : ICrawl
     }
 
     private string DownloadFileText(string fileId)
-    {
-        using var memoryStream = new MemoryStream();
-        var fileRequest = service.Files.Get(fileId);
-        fileRequest.SupportsAllDrives = true;
-        fileRequest.Download(memoryStream);
-        memoryStream.Position = 0;
+        => gateway.DownloadFileText(fileId);
 
-        // Reading from the stream directly, rather than ToArray() + GetString, avoids a second
-        // full-file allocation and correctly strips a UTF-8 BOM instead of leaving it as a stray
-        // character in the parsed JSON.
-        using var reader = new StreamReader(memoryStream, Encoding.UTF8, detectEncodingFromByteOrderMarks: true);
-        return reader.ReadToEnd();
-    }
-
-    private string GetAbsolutePath(DriveFile file)
+    private string GetAbsolutePath(GoogleDriveItem file)
     {
         if (file.Parents is not { Count: > 0 })
         {
@@ -189,11 +157,5 @@ public sealed class GoogleDriveCrawler : ICrawl
         return path.Aggregate(Path.Combine);
     }
 
-    private DriveFile GetFile(string id)
-    {
-        var request = service.Files.Get(id);
-        request.Fields = "id, name, parents, driveId, trashed";
-        request.SupportsAllDrives = true;
-        return request.Execute();
-    }
+    private GoogleDriveItem GetFile(string id) => gateway.GetFile(id);
 }

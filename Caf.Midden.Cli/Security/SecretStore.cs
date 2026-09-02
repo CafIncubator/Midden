@@ -144,7 +144,7 @@ public sealed class SecretStore : IDisposable
                 CryptographicOperations.ZeroMemory(plaintext);
             }
         }
-        catch (CryptographicException exception)
+        catch (Exception exception) when (exception is FormatException or CryptographicException)
         {
             (protector as IDisposable)?.Dispose();
 
