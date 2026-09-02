@@ -32,4 +32,13 @@ public static class MiddenFileConventions
             ? value[..^suffix.Length]
             : value;
     }
+
+    /// <summary>
+    /// Converts a crawler path to the forward-slash form stored in catalogs.
+    /// </summary>
+    public static string NormalizeDatasetPath(string value)
+    {
+        ArgumentNullException.ThrowIfNull(value);
+        return value.Replace('\\', '/');
+    }
 }

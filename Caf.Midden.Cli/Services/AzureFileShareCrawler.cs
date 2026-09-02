@@ -91,9 +91,10 @@ public sealed class AzureFileShareCrawler : ICrawl
                     continue;
                 }
 
-                metadata.Dataset.DatasetPath = MiddenFileConventions.TrimSuffix(
-                    Path.GetRelativePath(path, file.Path),
-                    MiddenFileConventions.MiddenFileExtension);
+                metadata.Dataset.DatasetPath = MiddenFileConventions.NormalizeDatasetPath(
+                    MiddenFileConventions.TrimSuffix(
+                        Path.GetRelativePath(path, file.Path),
+                        MiddenFileConventions.MiddenFileExtension));
                 metadatas.Add(metadata);
             }
 

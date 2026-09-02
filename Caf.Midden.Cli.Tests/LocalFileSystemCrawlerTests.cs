@@ -9,7 +9,7 @@ public class LocalFileSystemCrawlerTests
     [Fact]
     public void GetProjects_ValidInput_ReturnsProductionProject()
     {
-        var sut = new LocalFileSystemCrawler(@"Assets\MockDataStoreLocal");
+        var sut = new LocalFileSystemCrawler(Path.Combine("Assets", "MockDataStoreLocal"));
 
         var actual = sut.GetProjects(new ProjectReader(new ProjectParser()));
 
@@ -19,7 +19,7 @@ public class LocalFileSystemCrawlerTests
     [Fact]
     public void GetFileNames_ValidInput_ReturnsExpected()
     {
-        var sut = new LocalFileSystemCrawler(@"Assets\MockDataStoreLocal");
+        var sut = new LocalFileSystemCrawler(Path.Combine("Assets", "MockDataStoreLocal"));
 
         var actual = sut.GetFileNames(".midden");
 
@@ -29,7 +29,7 @@ public class LocalFileSystemCrawlerTests
     [Fact]
     public void GetMetadatas_ValidInput_ReturnsWithVariableType()
     {
-        var sut = new LocalFileSystemCrawler(@"Assets\MockDataStoreLocalVarTypes");
+        var sut = new LocalFileSystemCrawler(Path.Combine("Assets", "MockDataStoreLocalVarTypes"));
 
         var actual = sut.GetMetadatas(new MetadataParser(new MetadataConverter()));
 
@@ -39,7 +39,7 @@ public class LocalFileSystemCrawlerTests
     [Fact]
     public void GetMetadatas_MalformedFilesPresent_SkipsThemAndReturnsTheValidOnes()
     {
-        var sut = new LocalFileSystemCrawler(@"Assets\MockDataStoreLocalMalformed");
+        var sut = new LocalFileSystemCrawler(Path.Combine("Assets", "MockDataStoreLocalMalformed"));
 
         var actual = sut.GetMetadatas(new MetadataParser(new MetadataConverter()));
 
@@ -51,7 +51,7 @@ public class LocalFileSystemCrawlerTests
     public void GetMetadatas_MalformedFilesPresent_ReportsEachSkipAsAWarningOnTheInjectedLogger()
     {
         var logger = new RecordingCrawlLogger();
-        var sut = new LocalFileSystemCrawler(@"Assets\MockDataStoreLocalMalformed", logger);
+        var sut = new LocalFileSystemCrawler(Path.Combine("Assets", "MockDataStoreLocalMalformed"), logger);
 
         sut.GetMetadatas(new MetadataParser(new MetadataConverter()));
 
@@ -65,7 +65,7 @@ public class LocalFileSystemCrawlerTests
     [Fact]
     public void GetFileNames_ExtensionAppearsInsideNamesAndDirectoryNames_OnlyMatchesFileSuffix()
     {
-        var sut = new LocalFileSystemCrawler(@"Assets\MockDataStoreLocalPathologicalPath");
+        var sut = new LocalFileSystemCrawler(Path.Combine("Assets", "MockDataStoreLocalPathologicalPath"));
 
         var actual = sut.GetFileNames(".midden");
 
@@ -78,12 +78,12 @@ public class LocalFileSystemCrawlerTests
     [Fact]
     public void GetMetadatas_SuffixAppearsMidPath_OnlyTrailingSuffixIsTrimmedFromDatasetPath()
     {
-        var sut = new LocalFileSystemCrawler(@"Assets\MockDataStoreLocalPathologicalPath");
+        var sut = new LocalFileSystemCrawler(Path.Combine("Assets", "MockDataStoreLocalPathologicalPath"));
 
         var actual = sut.GetMetadatas(new MetadataParser(new MetadataConverter()));
 
         var dataset = Assert.Single(actual);
-        Assert.Equal("archive.midden.data\\x", dataset.Dataset.DatasetPath);
+        Assert.Equal("archive.midden.data/x", dataset.Dataset.DatasetPath);
     }
 
     [Fact]
@@ -91,13 +91,14 @@ public class LocalFileSystemCrawlerTests
     {
         // The on-disk equivalent of this test has to be skipped on machines without elevation or
         // Developer Mode. Faking the file system makes the reparse-point case run everywhere.
+        var root = Path.Combine("fake", "root");
         var fileSystem = new FakeFileSystem()
-            .AddDirectory(@"C:\root")
-            .AddFile(@"C:\root\real\real.midden")
-            .AddReparsePointDirectory(@"C:\root\link")
-            .AddFile(@"C:\root\link\escaped.midden");
+            .AddDirectory(root)
+            .AddFile(Path.Combine(root, "real", "real.midden"))
+            .AddReparsePointDirectory(Path.Combine(root, "link"))
+            .AddFile(Path.Combine(root, "link", "escaped.midden"));
 
-        var sut = new LocalFileSystemCrawler(@"C:\root", fileSystem: fileSystem);
+        var sut = new LocalFileSystemCrawler(root, fileSystem: fileSystem);
 
         var actual = sut.GetFileNames(".midden");
 
@@ -108,22 +109,23 @@ public class LocalFileSystemCrawlerTests
     [Fact]
     public void GetMetadatas_FakedTree_ReadsThroughTheInjectedFileSystem()
     {
+        var root = Path.Combine("fake", "root");
         var fileSystem = new FakeFileSystem()
-            .AddDirectory(@"C:\root")
-            .AddFile(@"C:\root\Raw\Dataset.midden", """
+            .AddDirectory(root)
+            .AddFile(Path.Combine(root, "Raw", "Dataset.midden"), """
                 {
                     "file": { "schema-version": "v0.1.0-alpha2", "creation-date": "2020-07-29" },
                     "dataset": { "zone": "Raw", "project": "FakedProject", "name": "FakedDataset" }
                 }
                 """);
 
-        var sut = new LocalFileSystemCrawler(@"C:\root", fileSystem: fileSystem);
+        var sut = new LocalFileSystemCrawler(root, fileSystem: fileSystem);
 
         var actual = sut.GetMetadatas(new MetadataParser(new MetadataConverter()));
 
         var metadata = Assert.Single(actual);
         Assert.Equal("FakedDataset", metadata.Dataset.Name);
-        Assert.Equal(@"Raw\Dataset", metadata.Dataset.DatasetPath);
+        Assert.Equal("Raw/Dataset", metadata.Dataset.DatasetPath);
     }
 
     [Fact]

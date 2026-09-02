@@ -64,7 +64,8 @@ public sealed class GoogleWorkspaceSharedDriveCrawler : ICrawl
                     continue;
                 }
 
-                metadata.Dataset.DatasetPath = MiddenFileConventions.TrimSuffix(GetAbsolutePath(file), MiddenFileConventions.MiddenFileExtension);
+                metadata.Dataset.DatasetPath = MiddenFileConventions.NormalizeDatasetPath(
+                    MiddenFileConventions.TrimSuffix(GetAbsolutePath(file), MiddenFileConventions.MiddenFileExtension));
                 metadatas.Add(metadata);
             }
             catch (Exception exception)

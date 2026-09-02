@@ -109,7 +109,8 @@ public sealed class LocalFileSystemCrawler : ICrawl
 
             var relativePath = Path.GetRelativePath(rootDirectory, file);
 
-            metadata.Dataset.DatasetPath = MiddenFileConventions.TrimSuffix(relativePath, MiddenFileConventions.MiddenFileExtension);
+            metadata.Dataset.DatasetPath = MiddenFileConventions.NormalizeDatasetPath(
+                MiddenFileConventions.TrimSuffix(relativePath, MiddenFileConventions.MiddenFileExtension));
             metadatas.Add(metadata);
         }
 

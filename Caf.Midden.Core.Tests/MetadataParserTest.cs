@@ -14,7 +14,7 @@ namespace Caf.Midden.Core.Tests
         [Fact]
         private void Parse_v0_1_0alpha1String_ExpectedBehavior()
         {
-            string filePath = @"Assets\MetadataFiles\example_v0_1_0alpha1.json";
+            string filePath = Path.Combine("Assets", "MetadataFiles", "example_v0_1_0alpha1.json");
             string json = File.ReadAllText(filePath);
             var sut = new MetadataParser(
                 new MetadataConverter());

@@ -27,7 +27,7 @@ public class GoogleDriveCrawlerContractTests
         var actual = sut.GetMetadatas(new MetadataParser(new MetadataConverter()));
 
         Assert.Equal(2, actual.Count);
-        Assert.Equal("Raw\\DatasetOne", actual[0].Dataset.DatasetPath);
+        Assert.Equal("Raw/DatasetOne", actual[0].Dataset.DatasetPath);
         Assert.Equal("DatasetTwo", actual[1].Dataset.DatasetPath);
         Assert.Collection(
             gateway.ListRequests,
