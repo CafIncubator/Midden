@@ -74,11 +74,27 @@ compiled as part of the solution. Maintainers opt in with `xUnit.Explicit=only`;
 report missing credential fixtures as skips, and a protected live-test workflow uses
 `xUnit.FailSkips=true` so missing infrastructure fails that workflow.
 
-### D2. CI precedes branch protection
+### D2. Develop is hardened before main is changed
 
-Required status checks are enabled only after the repository produces a green baseline. This
-avoids normalizing ignored or bypassed checks. The first workflow restores, builds, and tests;
-coverage and additional security tooling are added after that workflow is stable.
+Required status checks are enabled on `develop` only after that branch produces a green
+baseline. This avoids normalizing ignored or bypassed checks. The first workflow restores,
+builds, and tests; coverage and additional security tooling are added after that workflow is
+stable.
+
+Midden uses `develop` as its long-lived integration branch and `main` as its releasable branch.
+Feature branches merge into `develop`; release changes merge from `develop` into `main`;
+after the initial launch, hotfixes merge into `main` and are then merged back into `develop`.
+Required CI therefore runs on pull requests and pushes to both long-lived branches.
+
+Because `develop` has diverged substantially from the current pre-release `main`, Phases 0
+through 5 are implemented and validated only on `develop`. Do not cherry-pick readiness files or
+partially merge application changes into `main`. The complete release candidate is promoted from
+`develop` to `main` once, in Phase 6, after all earlier gates pass.
+
+Workflow definitions may include future `main` triggers while they are developed on `develop`.
+Those triggers do not change `main`. GitHub reads Dependabot configuration and scheduled
+workflows from the default branch, so those capabilities are prepared earlier but cannot be
+considered active until Phase 6.
 
 ### D3. Repository documentation is authoritative
 
@@ -136,19 +152,31 @@ dotnet test Caf.Midden.slnx --configuration Release --no-build
 
 All three commands complete successfully on a clean checkout without cloud credentials.
 
-## Phase 1 - Add continuous integration and repository hygiene
+## Phase 1 - Harden develop with continuous integration
 
-**Outcome:** every proposed change receives consistent automated validation.
+**Outcome:** every change proposed for `develop` receives consistent automated validation, and
+the same automation is ready to activate on `main` during the final promotion.
 
 | # | Item | Acceptance criteria |
 |---|---|---|
 | 6 | Stop ignoring `.github` | Remove the root `.github` ignore entry without changing unrelated ignore rules |
-| 7 | Add pull request CI | A workflow restores, builds with warnings enforced, and runs the deterministic suite on pull requests and the default branch |
+| 7 | Add pull request CI | A workflow restores, builds with warnings enforced, and runs the deterministic suite on pull requests and pushes to `develop`; it is preconfigured to do the same for `main` after Phase 6 |
 | 8 | Validate supported operating systems | CI covers Linux and Windows; add macOS where platform-specific behavior justifies its runner cost |
 | 9 | Collect test coverage | Existing Coverlet collectors produce a report; publishing to an external service is optional and requires an ownership decision |
-| 10 | Add dependency maintenance | Dependabot checks NuGet dependencies on a low-noise schedule and groups compatible updates where practical |
-| 11 | Add security scanning | Enable GitHub dependency review on pull requests and CodeQL on pushes, pull requests, and a schedule |
-| 12 | Protect the default branch | Require the stable CI checks, at least one approving review, and resolved conversations; do not require administrator bypass for routine releases |
+| 10 | Prepare dependency maintenance | Commit a low-noise Dependabot configuration for NuGet and GitHub Actions updates targeting `develop`; activation waits until the configuration reaches the default branch in Phase 6 |
+| 11 | Add security scanning on develop | Dependency review runs on pull requests to `develop`, and CodeQL runs on pushes and pull requests to `develop`; future `main` and scheduled triggers are present but activate in Phase 6 |
+| 12 | Protect develop | Require stable CI checks, at least one approving review, and resolved conversations on `develop`; defer new `main` checks and protection changes to Phase 6 |
+
+**Exit gate**
+
+- The Phase 0 commands pass from a clean checkout of `develop` on Linux and Windows.
+- A pull request into `develop` passes build, test, coverage, dependency review, and CodeQL checks.
+- Required checks and review rules protect `develop`.
+- No readiness changes have been merged or cherry-picked into `main`.
+
+Dependabot version updates and scheduled CodeQL runs are intentionally not part of this exit gate
+because GitHub activates them from the default branch. Their configuration is reviewed here and
+verified after the final promotion.
 
 Avoid adding badges until their workflows and links are stable. A red or stale badge is worse
 than no badge.
@@ -222,29 +250,51 @@ depend on all package ecosystems.
 | 41 | Add repository metadata | Configure description, homepage, topics, social preview, funding metadata if applicable, Discussions, and private vulnerability reporting in GitHub settings |
 | 42 | Record key decisions | Introduce short architecture decision records for licensing, versioning, integration-test policy, and release distribution |
 
+## Phase 6 - Promote the release candidate and activate main
+
+**Outcome:** the fully reviewed release candidate becomes the protected default branch and can
+be launched as `v1.0.0` without any earlier partial synchronization to `main`.
+
+| # | Item | Acceptance criteria |
+|---|---|---|
+| 43 | Freeze the release candidate | Phases 0 through 5 are complete on `develop`; the candidate commit passes all required checks, release smoke tests, documentation review, and the clean-checkout gate |
+| 44 | Review the cumulative promotion | Open one `develop`-to-`main` pull request, review the complete branch diff and migration impact, and approve it as the `v1.0.0` release candidate; do not merge partial subsets |
+| 45 | Promote develop to main | Merge the approved release candidate once; record the source and resulting commit identifiers, and make no unrelated direct changes to `main` |
+| 46 | Verify default-branch automation | The post-merge `main` CI and CodeQL runs pass on Linux and Windows; coverage is uploaded; Dependabot accepts its configuration and targets version updates to `develop` while security updates target `main`; scheduled workflows and security features report healthy status |
+| 47 | Protect main | After the new checks have produced stable check names, require them on `main` together with at least one approving review and resolved conversations; block force pushes and deletion |
+| 48 | Launch and synchronize | Create the protected `v1.0.0` tag and GitHub Release only after items 46 and 47 pass, verify published artifacts and checksums, then merge any release-only `main` changes back into `develop` |
+
+The new workflows cannot be relied on as required checks for the promotion pull request if their
+definitions do not yet exist on `main`. Compensate by requiring the exact candidate commit to pass
+all checks on `develop`, reviewing the full promotion diff, and withholding the release tag until
+the post-merge `main` runs succeed. Do not configure a required `main` check until GitHub has
+reported that check at least once.
+
 ---
 
 ## Delivery order and milestones
 
-### Milestone 1 - Contribution-ready
+### Milestone 1 - Develop contribution-ready
 
-Complete Phases 0 and 1. A clean checkout is green, and pull requests receive required checks.
+Complete Phases 0 and 1 on `develop`. A clean checkout is green, pull requests receive required
+checks, and `main` remains unchanged.
 
 ### Milestone 2 - Community-ready
 
-Complete Phase 2 and the README/architecture portions of Phase 3. Contribution, conduct,
-security, ownership, support, and technical orientation are explicit.
+Complete Phase 2 and the README/architecture portions of Phase 3 on `develop`. Contribution,
+conduct, security, ownership, support, and technical orientation are ready for promotion.
 
-### Milestone 3 - Release-ready
+### Milestone 3 - Release-candidate ready
 
-Complete Phase 4 and the dependency-license review from Phase 5. A maintainer can create a
-versioned, documented, verifiable release from a tag without local build artifacts.
+Complete Phases 3 through 5 on `develop`. A maintainer can create a versioned, documented,
+verifiable release from the candidate without local build artifacts, but no release tag is
+created yet.
 
-### Milestone 4 - Sustainable
+### Milestone 4 - Version 1.0.0 launched
 
-Complete the remaining Phase 5 items and assign recurring ownership. Review the process after
-the first external contributions and simplify anything that is not earning its maintenance
-cost.
+Complete Phase 6. The release candidate is promoted once, default-branch automation and
+protection are healthy, `v1.0.0` is published, and any release-only changes are synchronized back
+to `develop`.
 
 ## Suggested issue breakdown
 
@@ -253,8 +303,8 @@ Keep pull requests reviewable by opening separate issues for these work streams:
 1. Deterministic default tests and live-integration test policy.
 2. Secret-store invalid-payload exception contract.
 3. SDK pin and documented developer commands.
-4. CI and branch protection.
-5. Dependabot, dependency review, and CodeQL.
+4. Develop CI and branch protection.
+5. Dependabot configuration, dependency review, and CodeQL preparation.
 6. Licensing decision and contributor provenance.
 7. Community health files and templates.
 8. README and link/image cleanup.
@@ -262,6 +312,7 @@ Keep pull requests reviewable by opening separate issues for these work streams:
 10. Versioning, changelog, and release runbook.
 11. Release artifact workflow and smoke tests.
 12. Accessibility and dependency-license audits.
+13. Final `develop`-to-`main` promotion, default-branch activation, and `v1.0.0` launch.
 
 ## Definition of done
 
@@ -275,6 +326,8 @@ The open-source readiness initiative is complete when:
 - A version tag produces tested, checksummed release artifacts and a changelog entry.
 - Dependency and code scanning run automatically with a named triage owner.
 - Repository settings and recurring maintenance tasks are documented and assigned.
+- All readiness work was prepared on `develop`, and `main` changed only through the final
+  reviewed promotion.
 
 ## Risks and mitigations
 
@@ -283,6 +336,8 @@ The open-source readiness initiative is complete when:
 | Community files name contacts or policies that are not actively monitored | Confirm owners and response expectations before publication |
 | Live integration tests become permanently neglected | Assign an owner and scheduled cadence, or replace them with deterministic contract tests |
 | CI grows slow or expensive | Keep the required path focused; schedule broader platform and security checks where appropriate |
+| The cumulative promotion to `main` is too large to review safely | Freeze `develop`, require every earlier phase gate, review the complete branch diff, and record the exact validated candidate commit |
+| New workflows cannot run as required checks before they exist on `main` | Validate the exact candidate on protected `develop`, review the promotion diff, and require successful post-merge `main` runs before tagging the release |
 | Release automation publishes an unintended build | Require protected tags/environments, smoke tests, checksums, and maintainer approval |
 | Governance becomes burdensome for a small team | Start with the minimum policy set and revisit it after real contributor feedback |
 | Licensing language conflicts with organizational policy | Treat legal approval as a gate before soliciting external contributions |

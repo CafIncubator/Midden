@@ -56,7 +56,7 @@ public class ProjectValidatorTests
     public void Validate_MissingDescription_IsOnlyAWarning()
     {
         var project = ValidProject();
-        project.Description = null;
+        project.Description = null!;
 
         var result = validator.Validate(project, Configuration());
 
