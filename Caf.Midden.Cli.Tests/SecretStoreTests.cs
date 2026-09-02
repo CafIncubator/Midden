@@ -1,4 +1,5 @@
 using Caf.Midden.Cli.Security;
+using System.Text.Json.Nodes;
 
 namespace Caf.Midden.Cli.Tests;
 
@@ -78,6 +79,24 @@ public class SecretStoreTests : IDisposable
         File.WriteAllText(StorePath, contents[..start] + tampered + contents[(start + 1)..]);
 
         Assert.Throws<InvalidDataException>(() => SecretStore.Open(StorePath, Password));
+    }
+
+    [Fact]
+    public void Open_InvalidBase64Payload_IsRejected()
+    {
+        using (var store = SecretStore.Open(StorePath, Password, SecretProtectionProvider.Password))
+        {
+            store.Set("adls-prod", "s3cr3t");
+            store.Save();
+        }
+
+        var envelope = JsonNode.Parse(File.ReadAllText(StorePath))!.AsObject();
+        envelope["Payload"] = "not valid Base64";
+        File.WriteAllText(StorePath, envelope.ToJsonString());
+
+        var exception = Assert.Throws<InvalidDataException>(() => SecretStore.Open(StorePath, Password));
+
+        Assert.IsType<FormatException>(exception.InnerException);
     }
 
     [Fact]

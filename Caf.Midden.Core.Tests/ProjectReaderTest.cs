@@ -16,7 +16,7 @@ namespace Caf.Midden.Core.Tests
         [Fact]
         public void Read_v0_2_NoFrontMatter_ReturnsNull()
         {
-            string filePath = @"Assets\ProjectFiles\v0_2_no_front_matter.md";
+            string filePath = Path.Combine("Assets", "ProjectFiles", "v0_2_no_front_matter.md");
             ProjectParser parser = new ProjectParser();
             ProjectReader sut = new ProjectReader(parser);
 
@@ -32,7 +32,7 @@ namespace Caf.Midden.Core.Tests
         [Fact]
         public void Read_v0_2_IncorrectFrontMatter_ReturnsNull()
         {
-            string filePath = @"Assets\ProjectFiles\v0_2_incorrect_front_matter.md";
+            string filePath = Path.Combine("Assets", "ProjectFiles", "v0_2_incorrect_front_matter.md");
             ProjectParser parser = new ProjectParser();
             ProjectReader sut = new ProjectReader(parser);
 
@@ -48,7 +48,7 @@ namespace Caf.Midden.Core.Tests
         [Fact]
         public void Read_v0_2_NoClosingFrontMatter_ReturnsNull()
         {
-            string filePath = @"Assets\ProjectFiles\v0_2_no_closing_front_matter.md";
+            string filePath = Path.Combine("Assets", "ProjectFiles", "v0_2_no_closing_front_matter.md");
             ProjectParser parser = new ProjectParser();
             ProjectReader sut = new ProjectReader(parser);
 
@@ -64,7 +64,7 @@ namespace Caf.Midden.Core.Tests
         [Fact]
         public void Read_v0_2_CorrectFrontMatter_ReturnsProject()
         {
-            string filePath = @"Assets\ProjectFiles\v0_2_correct_front_matter.md";
+            string filePath = Path.Combine("Assets", "ProjectFiles", "v0_2_correct_front_matter.md");
             ProjectParser parser = new ProjectParser();
             ProjectReader sut = new ProjectReader(parser);
 
@@ -86,7 +86,7 @@ namespace Caf.Midden.Core.Tests
         [Fact]
         public void Read_v0_2_CorrectFrontMatterWithAdditonalVariables_ReturnsProject()
         {
-            string filePath = @"Assets\ProjectFiles\v0_2_correct_front_matter_additional_variables.md";
+            string filePath = Path.Combine("Assets", "ProjectFiles", "v0_2_correct_front_matter_additional_variables.md");
             ProjectParser parser = new ProjectParser();
             ProjectReader sut = new ProjectReader(parser);
 

@@ -323,6 +323,18 @@
     color: rgba(0, 0, 0, 0.45);
 }
 
+::deep .home-attention-row-trailing {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    flex: none;
+}
+
+::deep .home-attention-row-arrow {
+    flex: none;
+    color: rgba(0, 0, 0, 0.25);
+}
+
 ::deep .home-attention-cta {
     display: inline-flex;
     align-items: center;

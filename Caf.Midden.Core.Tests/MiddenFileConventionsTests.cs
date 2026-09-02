@@ -24,4 +24,14 @@ public class MiddenFileConventionsTests
 
         Assert.Equal("archive.midden.data/x", actual);
     }
+
+    [Theory]
+    [InlineData(@"Raw\Dataset", "Raw/Dataset")]
+    [InlineData("Raw/Dataset", "Raw/Dataset")]
+    public void NormalizeDatasetPath_UsesForwardSlashes(string input, string expected)
+    {
+        var actual = MiddenFileConventions.NormalizeDatasetPath(input);
+
+        Assert.Equal(expected, actual);
+    }
 }

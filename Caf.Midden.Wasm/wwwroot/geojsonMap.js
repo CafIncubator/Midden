@@ -82,37 +82,69 @@ export function destroy(leafletMap) {
 // spatial coverage view. Boxes are pre-computed server-side as west/south/east/north, so there
 // is no geometry to parse here and each dataset costs exactly one shape.
 //
+// Two renderings of the same boxes are added as toggleable overlays via the layer control, so
+// the "outlined extents" and "density heatmap" treatments can be compared side by side:
+//   - Extents: each box drawn as an outlined, semi-transparent rectangle. Precise per-dataset
+//     boundaries, but overlap reads as a tangle of borders once dataset count grows.
+//   - Coverage heatmap: box centers accumulated through Leaflet.heat, weighted by box count so
+//     areas with more datasets glow brighter. No per-shape borders, so overlap reads cleanly as
+//     density instead of clutter, at the cost of exact boundaries. minOpacity keeps even a single
+//     lightly-weighted point clearly visible against busy basemap tiles when zoomed out, instead
+//     of fading into near-invisibility the way Leaflet.heat's defaults do for sparse points.
+//
+// This widget defaults to the heatmap overlay (extents available but off) on the OpenStreetMap
+// base layer: the heatmap is the primary "where is our data" signal for this card, and the plain
+// OSM tiles keep the map legible without competing with satellite/topo imagery detail.
+//
 // Boxes flagged isPoint have no area (point geometries, axis-aligned lines) and would render as
 // an invisible zero-size rectangle, so they are drawn as circle markers instead. Markers keep a
 // constant screen size at any zoom, which is the honest representation: the dataset claims a
-// location, not a region.
+// location, not a region. Point boxes are also fed into the heatmap using their exact location.
 export function createBoxes(mapElement, boxes) {
     var baseLayers = createBaseLayers();
 
-    var leafletMap = L.map(mapElement.id, { layers: baseLayers.layers });
+    var leafletMap = L.map(mapElement.id, { layers: [baseLayers.baseMaps['OpenStreetMap']] });
 
-    L.control.layers(baseLayers.baseMaps).addTo(leafletMap);
-
-    var group = L.featureGroup().addTo(leafletMap);
+    var extentsGroup = L.featureGroup();
+    var heatPoints = [];
 
     (boxes || []).forEach(function (box) {
         if (box.isPoint) {
             L.circleMarker(
                 [box.centerLatitude, box.centerLongitude],
                 { radius: 4, color: '#1890ff', weight: 1, fillOpacity: 0.6 })
-                .addTo(group);
+                .addTo(extentsGroup);
+            heatPoints.push([box.centerLatitude, box.centerLongitude, 1]);
         } else {
             L.rectangle(
                 [[box.south, box.west], [box.north, box.east]],
                 { color: '#1890ff', weight: 1, fillOpacity: 0.15 })
-                .addTo(group);
+                .addTo(extentsGroup);
+
+            var centerLat = (box.south + box.north) / 2;
+            var centerLng = (box.west + box.east) / 2;
+            heatPoints.push([centerLat, centerLng, 1]);
         }
     });
 
+    var heatLayer = L.heatLayer(heatPoints, {
+        radius: 22,
+        blur: 15,
+        maxZoom: 12,
+        max: 1,
+        minOpacity: 0.45,
+        gradient: { 0.2: '#1890ff', 0.5: '#faad14', 1.0: '#f5222d' }
+    }).addTo(leafletMap);
+
+    L.control.layers(baseLayers.baseMaps, {
+        'Extents': extentsGroup,
+        'Coverage heatmap': heatLayer
+    }).addTo(leafletMap);
+
     document.getElementById(mapElement.id).style.width = "100%";
 
-    if (group.getLayers().length > 0) {
-        leafletMap.fitBounds(group.getBounds(), { padding: [12, 12] });
+    if (extentsGroup.getLayers().length > 0) {
+        leafletMap.fitBounds(extentsGroup.getBounds(), { padding: [12, 12] });
     } else {
         leafletMap.setView([0, 0], 1);
     }

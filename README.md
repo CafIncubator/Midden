@@ -20,47 +20,49 @@ Midden is a suite of three tools; an editor, a crawler, and a data catalog. The 
 
 Midden has a metadata editor that supports fields common in many standard metadata formats including contact info, data dictionaries, methods, tags, spatial information, and much more.
 
-![screenshot of editor](media/editor.jpg)
+![screenshot of editor](media/editor.png)
 
 ### The Crawler
 
 Midden has a cross-platform command-line interface with commands to crawl various data stores (local file system, Google Workspace Shared drive, Azure Data Lake Gen 2, more coming soon...) and collates all metadata into a single file.
 
-![screenshot of crawler](media/crawler.jpg)
+![screenshot of crawler](media/crawler.png)
 
 ### The Catalog
 
-Midden supports viewing all metadata through a rich interactive interface that supports global search through datasets and variables.
+Midden supports viewing all metadata through a rich interactive interface that supports global search through datasets, variables, projects, and tags.
 
-![screenshot of catalog](media/CatalogImage.PNG)
+![screenshot of catalog](media/catalog.png)
+
+![screenshot of global search](media/home-search.png)
 
 ## The workflow
 
-1. Researcher does magic, creates a dataset
-2. Researcher uses the Editor to create metadata then downloads and saves the file with the dataset
-3. Researcher (or data manager, or an automated script) runs the Crawler
+1. Researcher sciences, creates a dataset
+2. Researcher uses the Editor to create metadata then downloads and saves the file alongside the dataset
+3. Researcher (or an automated script) runs the Crawler
 4. The data catalog is updated with the new metadata
-5. Collaborators find data using the Catalog, rejoice
+5. Collaborators find the data through the catalog, rejoice
 
 ![workflow of Midden](media/midden-workflow-figure.jpg)
 
 ## Screenshots
 
-**Insights Dashboard** shows interesting statistics of your data holdings.
+**Catalog Insights** helps your team and collaborators understand your data holdings at a glance.
 
-![screenshot of the Insights dashboard](media/Insights.PNG)
+![screenshot of the Insights dashboard](media/ss-insights.png)
 
 ---
 
 **Variable Data Catalog** allows searching for specific variables across all datasets.
 
-![screenshot of the variable catalog](media/variable.PNG)
+![screenshot of the variable catalog](media/ss-variable-catalog.png)
 
 ---
 
 **Dataset Details** shows all metadata of a given dataset.
 
-![screenshot of the dataset](media/datasetDetails.PNG)
+![screenshot of the dataset](media/ss-dataset-details.png)
 
 ---
 
@@ -79,7 +81,25 @@ Midden supports viewing all metadata through a rich interactive interface that s
 
 ## Why "Midden"?
 
-A midden is a refuse heap created by various entities such as packrats, earthworms, and human societies. It is also a rich source of information for scientists trying to study a system. The Midden Data Catalog takes datasets without any context (i.e. refuge) and helps apply metadata so it becomes information; a digital midden, if you will.
+A midden is a refuse heap created by various entities such as packrats, earthworms, and human societies. It is also a rich source of information for scientists trying to study a system. The Midden Data Catalog takes datasets without any context (i.e. "refuse") and helps apply metadata so it becomes information; a digital midden, if you will.
+
+## Developer baseline
+
+The repository requires the .NET SDK selected by `global.json`. From the repository root, restore,
+build, and run the deterministic test suite with:
+
+```powershell
+dotnet restore Caf.Midden.slnx
+dotnet build Caf.Midden.slnx --configuration Release --no-restore
+dotnet test Caf.Midden.slnx --configuration Release --no-build
+```
+
+Live cloud integration tests are explicit and require private provider credentials. After following
+the setup in [the live-test guide](Caf.Midden.Cli.LiveTests/README.md), opt in from the repository root:
+
+```powershell
+dotnet test Caf.Midden.Cli.LiveTests --configuration Release -- xUnit.Explicit=only
+```
 
 ## Contributing
 

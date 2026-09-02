@@ -1,4 +1,7 @@
 ﻿@page "/editor/project"
+@using Caf.Midden.Core.Models.v0_2
+@using System
+@using System.Linq
 
 @inject Services.StateContainer State
 
@@ -7,3 +10,19 @@
        <ProjectEditor />
     <BackTop></BackTop>
 </div>
+
+@code {
+    [SupplyParameterFromQuery(Name = "name")]
+    public string? Name { get; set; }
+
+    protected override void OnInitialized()
+    {
+        if (!string.IsNullOrWhiteSpace(Name))
+        {
+            var existingProject = State.Catalog?.Projects?.FirstOrDefault(p =>
+                p.Name.Equals(Name, StringComparison.OrdinalIgnoreCase));
+
+            State.UpdateProjectEdit(this, existingProject ?? new Project { Name = Name });
+        }
+    }
+}
