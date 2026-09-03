@@ -34,6 +34,17 @@ Pick the path that sounds most like what you came here to do:
 | Host an editor and catalog for my organization | [Deploy your own](#deploy-your-own) |
 | Build, test, or contribute to Midden | [Develop Midden](#develop-midden) |
 
+## Releases and support
+
+Official versions and self-contained CLI downloads are published through
+[GitHub Releases](https://github.com/CafIncubator/Midden/releases). See the
+[changelog](CHANGELOG.md) for release history and upgrade notes, and the
+[versioning policy](VERSIONING.md) for the shared CLI, Core, and Wasm version rules.
+
+Only the latest GitHub Release receives fixes; older releases and development builds are not
+supported. See [SECURITY.md](SECURITY.md) for the complete support and private vulnerability
+reporting policy.
+
 ### The Editor
 
 Midden has a metadata editor that supports fields common in many standard metadata formats including contact info, data dictionaries, methods, tags, spatial information, and much more.

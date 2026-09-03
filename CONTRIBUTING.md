@@ -126,6 +126,11 @@ The pull request author must confirm that they created the contribution or are a
 submit it under Apache-2.0. This confirmation applies to all commits and materials in the pull
 request. No `Signed-off-by` commit trailer is required.
 
+Midden's components share the version policy in [VERSIONING.md](VERSIONING.md). Contributors do
+not increment development versions in feature branches; GitHub Actions assigns the
+`dev.RUN_NUMBER` suffix. Release maintainers make stable version and changelog changes through the process in
+[RELEASING.md](RELEASING.md).
+
 ## Community expectations
 
 Participation in this project is governed by [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md). Support
