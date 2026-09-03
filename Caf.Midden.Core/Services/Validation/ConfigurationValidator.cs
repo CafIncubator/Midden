@@ -1,6 +1,7 @@
 // Aliased with a distinct name: the sibling namespace Caf.Midden.Core.Services.Configuration wins
 // simple-name resolution against the model type, and an alias of the same name would not.
 using AppConfiguration = Caf.Midden.Core.Models.v0_2.Configuration;
+using Caf.Midden.Core.Services.Configuration;
 
 namespace Caf.Midden.Core.Services.Validation;
 
@@ -21,6 +22,16 @@ public sealed class ConfigurationValidator : IValidator<AppConfiguration>
         ArgumentNullException.ThrowIfNull(model);
 
         var issues = new IssueCollector();
+
+        if (!AppConfigurationVersions.IsSupported(model.SchemaVersion))
+        {
+            issues.Error(
+                Section,
+                "configuration.schemaVersion",
+                "configuration.schemaVersion.unsupported",
+                $"App configuration schema version '{model.SchemaVersion}' is not supported.",
+                $"Use '{AppConfigurationVersions.Current}' or migrate a legacy '{AppConfigurationVersions.Legacy}' configuration.");
+        }
 
         RequireText(issues, model.OrganizationName, "organizationName", "An organization name is required.");
         RequireText(issues, model.ToolName, "toolName", "A tool name is required.");

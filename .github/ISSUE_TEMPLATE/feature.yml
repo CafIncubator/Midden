@@ -1,0 +1,58 @@
+name: Feature request
+description: Propose a defined improvement based on a research or user need
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Explain the need before prescribing an implementation. For an early idea or usage question, start in GitHub Discussions.
+  - type: dropdown
+    id: component
+    attributes:
+      label: Affected component
+      options:
+        - Metadata editor
+        - Data catalog
+        - CLI
+        - Core library or validation
+        - Build or CI
+        - Documentation
+        - Multiple components
+        - Other or unknown
+    validations:
+      required: true
+  - type: textarea
+    id: need
+    attributes:
+      label: User or research need
+      description: Who needs this improvement, and what are they unable to do today?
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Desired outcome
+      description: Describe observable behavior and what success would look like.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Describe current workarounds or alternative approaches, if any.
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Add sanitized examples, mockups, or links that clarify the proposal.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Submission checks
+      options:
+        - label: I searched existing issues and discussions for this request.
+          required: true
+        - label: I removed credentials, private URLs, identifying research data, and other sensitive information.
+          required: true

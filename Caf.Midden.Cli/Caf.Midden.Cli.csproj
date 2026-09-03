@@ -3,7 +3,7 @@
     <OutputType>Exe</OutputType>
     <PackageId>MiddenCli</PackageId>
     <Description>Command-line tool for aggregating project and dataset metadata from data stores into a Midden catalog.</Description>
-    <PackageLicenseExpression>CC0-1.0</PackageLicenseExpression>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/cafincubator/midden</RepositoryUrl>
     <AssemblyName>MiddenCli</AssemblyName>
     <PublishSingleFile>true</PublishSingleFile>

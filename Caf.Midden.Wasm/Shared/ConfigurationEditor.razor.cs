@@ -40,6 +40,9 @@ namespace Caf.Midden.Wasm.Shared
         [Parameter]
         public bool isLoading { get; set; } = false;
 
+        [Inject]
+        private IMessageService MessageService { get; set; } = default!;
+
         private Configuration? ConfigurationEdit { get; set; }
 
         private string AutosaveStatusText => _lastSavedUtc is null
@@ -339,29 +342,33 @@ namespace Caf.Midden.Wasm.Shared
 
             try
             {
-                JsonSerializerOptions options = new JsonSerializerOptions()
-                {
-                    PropertyNameCaseInsensitive = true
-                };
-
                 string fileString;
                 using (var sr = new StreamReader(e.File.OpenReadStream(), Encoding.UTF8))
                 {
                     fileString = await sr.ReadToEndAsync();
                 }
 
-                var configuration = JsonSerializer.Deserialize<Configuration>(fileString, options);
-                if (configuration is not null)
-                {
-                    ConfigurationEdit = configuration;
-                    State.UpdateAppConfig(this, configuration);
-                    Autosave.RemoveDraft(DraftKey);
-                    RefreshValidation();
-                }
+                var configuration = Caf.Midden.Core.Services.Configuration.AppConfigurationParser.Parse(fileString);
+                ConfigurationEdit = configuration;
+                State.UpdateAppConfig(this, configuration);
+                Autosave.RemoveDraft(DraftKey);
+                RefreshValidation();
             }
-            catch
+            catch (JsonException exception)
             {
-                // TODO: Indicate error state
+                MessageService.Error(new MessageConfig
+                {
+                    Content = $"The app configuration could not be read. {exception.Message}",
+                    Duration = 8
+                });
+            }
+            catch (Exception)
+            {
+                MessageService.Error(new MessageConfig
+                {
+                    Content = "The app configuration could not be read. Please check the file and try again.",
+                    Duration = 8
+                });
             }
             finally
             {

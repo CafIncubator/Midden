@@ -1,40 +1,58 @@
 # Midden
 
-**See it in action**: https://meta.cafltar.org
+**See it in action:** Browse the [CAF LTAR Midden catalog](https://meta.cafltar.org).
 
 Midden is a data catalog that is easily adaptable to fit within a typical researcher's workflow. Midden solves the problem of "who is collecting what data, and where can I access it?" that is the bane of many large academic research projects.
 
 ## Motivation
 
-There are numerous solutions for cataloging data to make it discoverable. Many of these solutions, however, require technical knowledge that is uncommon among academic researchers. Many researchers feel at ease with managing their data workflow through their native filesystem (see [here](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1005510), [here](https://data.research.cornell.edu/content/file-management), [here](https://data.library.arizona.edu/data-management/best-practices/data-project-organization)). Despite that, many data catalogs require complex solutions that is more typical in teams of data scientists and data engineers.
+There are numerous solutions for cataloging data to make it discoverable. Many of these
+solutions, however, require technical knowledge that is uncommon among academic researchers.
+Many researchers feel at ease managing their data through their native filesystem, an approach
+reflected in [Good enough practices in scientific computing](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1005510),
+[Cornell's file-management guidance](https://data.research.cornell.edu/content/file-management),
+and the [University of Arizona's data-organization guidance](https://lib.arizona.edu/research/data/data-management/best-practices/data-organization).
+Despite that, many data catalogs require complex systems more typical of teams with dedicated
+data scientists and data engineers.
 
 Midden meets researchers where they are comfortable.
 
 ## Overview
 
-Midden is a suite of three tools; an editor, a crawler, and a data catalog. The editor and catalog are static web apps that can be hosted for free from various providers ([Github](https://pages.github.com/), [Azure](https://azure.microsoft.com/en-us/services/app-service/static/), [netlify](https://www.netlify.com/)) and the crawler is a cross-platform command line interface.
+Midden is a suite of three tools: an editor, a crawler, and a data catalog. The editor and catalog
+are one static web application that can be hosted on services such as
+[GitHub Pages](https://pages.github.com/),
+[Azure Static Web Apps](https://azure.microsoft.com/products/app-service/static), or
+[Netlify](https://www.netlify.com/). The crawler is a cross-platform command-line application.
 
-**Please visit the [Wiki](https://github.com/CafIncubator/Midden/wiki) if you intend to actually use Midden**.
+Pick the path that sounds most like what you came here to do:
+
+| I want to... | Start here |
+|---|---|
+| Browse a catalog or create metadata | [Use Midden](#use-midden) |
+| Find metadata and build `catalog.json` | [Run the CLI](#run-the-cli) |
+| Host an editor and catalog for my organization | [Deploy your own](#deploy-your-own) |
+| Build, test, or contribute to Midden | [Develop Midden](#develop-midden) |
 
 ### The Editor
 
 Midden has a metadata editor that supports fields common in many standard metadata formats including contact info, data dictionaries, methods, tags, spatial information, and much more.
 
-![screenshot of editor](media/editor.png)
+![Midden metadata editor showing dataset fields, contacts, tags, and spatial information](media/editor.png)
 
 ### The Crawler
 
 Midden has a cross-platform command-line interface with commands to crawl various data stores (local file system, Google Workspace Shared drive, Azure Data Lake Gen 2, more coming soon...) and collates all metadata into a single file.
 
-![screenshot of crawler](media/crawler.png)
+![Midden CLI crawling configured data stores and reporting its progress](media/crawler.png)
 
 ### The Catalog
 
 Midden supports viewing all metadata through a rich interactive interface that supports global search through datasets, variables, projects, and tags.
 
-![screenshot of catalog](media/catalog.png)
+![Midden catalog home page with links to datasets, variables, projects, and insights](media/catalog.png)
 
-![screenshot of global search](media/home-search.png)
+![Global search results grouped into datasets, variables, projects, and tags](media/home-search.png)
 
 ## The workflow
 
@@ -44,46 +62,71 @@ Midden supports viewing all metadata through a rich interactive interface that s
 4. The data catalog is updated with the new metadata
 5. Collaborators find the data through the catalog, rejoice
 
-![workflow of Midden](media/midden-workflow-figure.jpg)
+![Midden workflow from researcher and metadata editor through crawler to searchable catalog](media/midden-workflow-figure.jpg)
 
 ## Screenshots
 
 **Catalog Insights** helps your team and collaborators understand your data holdings at a glance.
 
-![screenshot of the Insights dashboard](media/ss-insights.png)
+![Insights dashboard summarizing datasets, projects, variables, tags, contacts, and spatial coverage](media/ss-insights.png)
 
 ---
 
 **Variable Data Catalog** allows searching for specific variables across all datasets.
 
-![screenshot of the variable catalog](media/ss-variable-catalog.png)
+![Variable catalog with searchable variable names, units, types, and dataset counts](media/ss-variable-catalog.png)
 
 ---
 
 **Dataset Details** shows all metadata of a given dataset.
 
-![screenshot of the dataset](media/ss-dataset-details.png)
+![Dataset details page showing description, access, contacts, temporal extent, and variables](media/ss-dataset-details.png)
 
 ---
 
-## Installing
+## Use Midden
 
-1. Fork the [repository](https://github.com/cafincubator/midden)
-2. Create a local clone
+Open your organization's Midden site to browse its catalog or create metadata in the editor. The
+editor downloads a `.midden` metadata file; save that file beside the dataset it describes so the
+crawler can find both. A screenshot may be worth a thousand words, but only the metadata file can
+tell the crawler who collected the soil-moisture readings in 2019.
 
-    `git clone https://github.com/{your-account}/midden.git`
+The [CAF LTAR Midden catalog](https://meta.cafltar.org) is a live example. Its vocabulary and data
+belong to that organization; your own deployment can use terminology that fits your research.
 
-3. Make it yours by editing Midden/Caf.Midden.Wasm/wwwroot/app-config.json
+## Run the CLI
 
-4. Publish to a free static website host ([Github Pages](https://www.meziantou.net/publishing-a-blazor-webassembly-application-to-github-pages.htm), [netlify](https://swimburger.net/blog/dotnet/how-to-deploy-blazor-webassembly-to-netlify), [Azure Static Web Apps](https://code-maze.com/deploying-blazor-webassembly-into-azure-static-web-apps/))
+The Midden CLI validates metadata, crawls local and cloud data stores, and collates the results
+into `catalog.json`. Follow the [CLI usage guide](docs/usage-guides/cli-usage.md) for installation,
+configuration, secrets, provider sign-in, automation, and troubleshooting.
 
-5. Create metadata, crawl metadata, update catalog.json, push changes to Github, enjoy the envy of your peers.
+If something has gone sideways, start with the
+[troubleshooting guide](docs/usage-guides/troubleshooting.md). It knows about missing
+configuration, secret-store errors, partial crawls, deployment routes, stale catalogs, and the
+occasional successful HTTP response containing entirely the wrong thing.
+
+## Deploy your own
+
+Midden can be published to any static host that serves Blazor WebAssembly files and supports a
+single-page application fallback. The maintained [deployment guide](docs/usage-guides/deployment.md)
+covers publishing, `app-config.json`, catalog updates, base paths, GitHub Pages, Netlify, Azure
+Static Web Apps, cache behavior, verification, and rollback.
+
+Use the [configuration reference](docs/usage-guides/configuration.md) and its safe examples to
+adapt the vocabulary without accidentally publishing credentials. The catalog is public by
+design; surprises should be limited to interesting datasets.
 
 ## Why "Midden"?
 
 A midden is a refuse heap created by various entities such as packrats, earthworms, and human societies. It is also a rich source of information for scientists trying to study a system. The Midden Data Catalog takes datasets without any context (i.e. "refuse") and helps apply metadata so it becomes information; a digital midden, if you will.
 
-## Developer baseline
+## Develop Midden
+
+Start with the [architecture overview](docs/architecture/overview.md) for the Core, CLI, and Wasm
+boundaries, data flow, crawler abstractions, validation, and credential model. See
+[CONTRIBUTING.md](CONTRIBUTING.md) for the complete contributor workflow.
+
+### Developer baseline
 
 The repository requires the .NET SDK selected by `global.json`. From the repository root, restore,
 build, and run the deterministic test suite with:
@@ -103,7 +146,13 @@ dotnet test Caf.Midden.Cli.LiveTests --configuration Release -- xUnit.Explicit=o
 
 ## Contributing
 
-Please help us make this tool better. We welcome Issues and Pull Requests. Contribution guidelines coming soon...
+Contributions from researchers, data managers, developers, technical writers, and other users
+are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, testing, and pull request guidance.
+
+Use the channels in [SUPPORT.md](SUPPORT.md) for questions and issue reports. Before
+participating, read [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md). Project roles and decision-making
+are described in [GOVERNANCE.md](GOVERNANCE.md). Report suspected vulnerabilities privately by
+following [SECURITY.md](SECURITY.md).
 
 ## Attribution
 
@@ -113,6 +162,8 @@ The Midden web tools rely heavily on the UI component library [Ant Design Blazor
 
 ## License
 
-As a work of the United States government, this project is in the public domain within the United States.
-
-Additionally, we waive copyright and related rights in the work worldwide through the CC0 1.0 Universal public domain dedication.
+Portions prepared by United States Government employees as part of their official duties are
+not subject to copyright protection in the United States under 17 U.S.C. 105. To the extent
+copyright or patent rights apply and are licensable, Midden is distributed under the
+[Apache License, Version 2.0](LICENSE.md). See [NOTICE.md](NOTICE.md) for the complete federal
+public-domain and prior-release notice.

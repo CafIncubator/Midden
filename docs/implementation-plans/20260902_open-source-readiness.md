@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | Proposed |
+| **Status** | In progress (Phases 0-1 complete) |
 | **Created** | 2026-09-02 |
 | **Scope** | Repository governance, contributor experience, CI, releases, security, and documentation |
 
@@ -110,27 +110,30 @@ release notes. Generated `Publish` directories remain untracked.
 
 ### D5. Contributor policy should be explicit but lightweight
 
-Use issue and pull request templates, a standard code of conduct, CODEOWNERS, and Developer
-Certificate of Origin sign-off if provenance is required. Do not add a CLA by default; it adds
-friction and administration that this project does not currently need.
+Use issue and pull request templates, a standard code of conduct, and CODEOWNERS. Rely on
+Apache-2.0 Section 5 for contribution terms and require pull request authors to confirm that they
+created their contribution or are authorized to submit it. Do not require DCO commit sign-off or
+a CLA; both add friction and administration that this project does not currently need.
 
-### D6. Licensing needs an explicit contribution decision
+### D6. Use Apache-2.0 with a federal public-domain notice
 
-The current CC0 dedication is clear for existing United States government work, but external
-contributions may not have the same legal status and CC0 expressly excludes patent grants.
-Before actively recruiting contributors, obtain organizational/legal confirmation of one of
-these approaches:
+The provisional licensing approach, pending agency or legal review, uses the OSI-approved
+Apache License 2.0 for copyrightable material and contributions. A separate notice explains that
+portions prepared by United States Government employees as part of their official duties are
+not subject to copyright protection in the United States under 17 U.S.C. 105.
 
-1. Keep CC0 for all code and document that contributors dedicate submissions under CC0.
-2. Use a standard OSI-approved software license for copyrightable contributions while retaining
-   a notice that eligible United States government work is public domain.
+Federal funding or public-access status alone does not make external contributions United States
+Government works. Apache-2.0 supplies consistent inbound and outbound contribution terms and an
+express patent grant for rights a contributor is authorized to license. Earlier CC0 grants and
+dedications remain unaffected.
 
-Record the approved choice in `LICENSE.md` and `CONTRIBUTING.md`. Apache-2.0 is worth evaluating
-when an explicit patent grant is desirable; this plan does not make the legal choice.
+Record this approach in `LICENSE.md`, `NOTICE.md`, package metadata, and `CONTRIBUTING.md`.
+Obtain agency or legal review before the final release and revise the documents if that review
+requires a different approach.
 
 ---
 
-## Phase 0 - Establish a green baseline
+## Phase 0 - Establish a green baseline (complete)
 
 **Outcome:** a fresh clone can build and test without private infrastructure.
 
@@ -152,7 +155,7 @@ dotnet test Caf.Midden.slnx --configuration Release --no-build
 
 All three commands complete successfully on a clean checkout without cloud credentials.
 
-## Phase 1 - Harden develop with continuous integration
+## Phase 1 - Harden develop with continuous integration (complete)
 
 **Outcome:** every change proposed for `develop` receives consistent automated validation, and
 the same automation is ready to activate on `main` during the final promotion.
@@ -178,6 +181,11 @@ Dependabot version updates and scheduled CodeQL runs are intentionally not part 
 because GitHub activates them from the default branch. Their configuration is reviewed here and
 verified after the final promotion.
 
+**Completion record:** PR #164 merged to `develop` at commit
+`5c73ab9a2a6e061c2f410e651473baf4b00f517f`. Its Linux and Windows builds, deterministic tests,
+coverage, dependency review, and CodeQL checks passed. GitHub reports `develop` as protected, and
+the Phase 1 readiness commits are not present on `main`.
+
 Avoid adding badges until their workflows and links are stable. A red or stale badge is worse
 than no badge.
 
@@ -199,7 +207,7 @@ than no badge.
 Private email addresses and maintainer handles cannot be invented in code. Their owners must be
 confirmed before these documents are merged.
 
-## Phase 3 - Repair onboarding and technical documentation
+## Phase 3 - Repair onboarding and technical documentation (complete)
 
 **Outcome:** users and developers can understand and operate the project without relying on
 tribal knowledge.
@@ -207,7 +215,7 @@ tribal knowledge.
 | # | Item | Acceptance criteria |
 |---|---|---|
 | 21 | Rewrite the README entry paths | Separate "Use Midden," "Run the CLI," "Deploy your own," and "Develop Midden" paths; link the CLI guide and contribution guide |
-| 22 | Correct README defects | Fix wording errors, use the actual global-search screenshot, standardize GitHub/Netlify naming, and verify every image and external link |
+| 22 | Correct README defects | Fix unintentional wording errors while preserving intentional wordplay, use the actual global-search screenshot, standardize GitHub/Netlify naming, and verify every image and external link |
 | 23 | Add an architecture overview | Explain Core, CLI, Wasm, data flow, metadata versions, crawler abstractions, validation, catalog generation, and credential boundaries in `docs/architecture` |
 | 24 | Document deployment | Give maintained steps for static hosting, app configuration, catalog updates, base paths, and service-worker/cache considerations |
 | 25 | Document configuration schemas | Provide safe example files with placeholders and explain compatibility/versioning expectations |
@@ -216,6 +224,15 @@ tribal knowledge.
 
 The comprehensive `docs/usage-guides/cli-usage.md` remains the canonical CLI operating guide
 and should be linked rather than duplicated.
+
+Approved decisions, implementation steps, and validation evidence are recorded in the
+[Phase 3 documentation plan](20260903_phase-3-documentation-plan.md).
+
+**Completion record:** Maintainer review was completed on 2026-09-03. The README entry paths,
+architecture, deployment, configuration, troubleshooting, and accessibility work are complete.
+Configuration versions are enforced as `v0.2` current and `v0.1` legacy, Azure Static Web Apps
+uses `staticwebapp.config.json`, and the Phase 3 validation record is maintained in the linked
+documentation plan.
 
 ## Phase 4 - Define versioning and automate releases
 
