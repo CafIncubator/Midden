@@ -63,6 +63,23 @@ for (const route of routes) {
   });
 }
 
+test("visible autosave status meets color contrast requirements", async ({ page }) => {
+  await page.goto("/editor/dataset");
+  await routes[0].waitUntilReady(page);
+
+  const autosaveStatus = page.locator(".autosave-status");
+  await autosaveStatus.evaluate(element => {
+    element.textContent = "All changes saved";
+  });
+
+  const results = await new AxeBuilder({ page })
+    .include(".autosave-status")
+    .withRules(["color-contrast"])
+    .analyze();
+
+  expect(results.violations).toEqual([]);
+});
+
 function countTargetSignatures(nodes) {
   return nodes.reduce((counts, node) => {
     const signature = normalizeTarget(node.target);
@@ -74,6 +91,7 @@ function countTargetSignatures(nodes) {
 function normalizeTarget(target) {
   return JSON.stringify(target)
     .replaceAll(/#ant-blazor-[0-9a-f-]+/gi, "#ant-blazor-*")
+    .replaceAll(/b-[a-z0-9]{10}/gi, "b-*")
     .replaceAll(/_bl_\d+/g, "_bl_*");
 }
 

@@ -5,8 +5,8 @@
       "[\"#ant-blazor-*_list\"]": 1
     },
     "color-contrast": {
-      "[\".ant-menu-submenu-selected > .ant-menu-submenu-title[role=\\\"button\\\"][aria-haspopup=\\\"true\\\"] > .ant-menu-title-content > span[b-tldvsw9xnq=\\\"\\\"] > span[b-tldvsw9xnq=\\\"\\\"]\"]": 1,
-      "[\".active > span[b-tldvsw9xnq=\\\"\\\"]\"]": 1,
+      "[\".ant-menu-submenu-selected > .ant-menu-submenu-title[role=\\\"button\\\"][aria-haspopup=\\\"true\\\"] > .ant-menu-title-content > span[b-*=\\\"\\\"] > span[b-*=\\\"\\\"]\"]": 1,
+      "[\".active > span[b-*=\\\"\\\"]\"]": 1,
       "[\"span[role=\\\"status\\\"]\"]": 1,
       "[\"div[_bl_*=\\\"\\\"]\"]": 1,
       "[\"#ant-blazor-* > .validation-status-error.validation-status\"]": 1,
@@ -36,8 +36,8 @@
       "[\"#ant-blazor-*\"]": 1
     },
     "color-contrast": {
-      "[\".ant-menu-submenu-selected > .ant-menu-submenu-title[role=\\\"button\\\"][aria-haspopup=\\\"true\\\"] > .ant-menu-title-content > span[b-tldvsw9xnq=\\\"\\\"] > span[b-tldvsw9xnq=\\\"\\\"]\"]": 1,
-      "[\".active > span[b-tldvsw9xnq=\\\"\\\"]\"]": 1,
+      "[\".ant-menu-submenu-selected > .ant-menu-submenu-title[role=\\\"button\\\"][aria-haspopup=\\\"true\\\"] > .ant-menu-title-content > span[b-*=\\\"\\\"] > span[b-*=\\\"\\\"]\"]": 1,
+      "[\".active > span[b-*=\\\"\\\"]\"]": 1,
       "[\".ant-select-selection-overflow > .ant-select-selection-placeholder\"]": 1,
       "[\"#ant-blazor-* > .ant-card-body > .catalog-meta-line > span:nth-child(1) > a[href$=\\\"Production\\\"]\"]": 9,
       "[\"#ant-blazor-* > .ant-card-body > .catalog-meta-line > span:nth-child(2) > a[href$=\\\"TestProject\\\"]\"]": 3,
@@ -45,7 +45,7 @@
       "[\"#ant-blazor-* > .ant-card-body > .catalog-meta-line > span:nth-child(1) > a[href$=\\\"Raw\\\"]\"]": 2,
       "[\"#ant-blazor-* > .ant-card-body > .catalog-meta-line > span:nth-child(2) > a\"]": 9,
       "[\"a[href$=\\\"saga-gis.org/\\\"]\"]": 1,
-      "[\"#ant-blazor-* > a[b-tldvsw9xnq=\\\"\\\"]\"]": 1
+      "[\"#ant-blazor-* > a[b-*=\\\"\\\"]\"]": 1
     },
     "label": {
       "[\"#zone_list\"]": 1,
