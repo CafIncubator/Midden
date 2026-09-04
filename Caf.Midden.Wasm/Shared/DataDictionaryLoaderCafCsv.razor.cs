@@ -38,7 +38,6 @@ namespace Caf.Midden.Wasm.Shared
                 return;
             }
 
-            // TODO IoC?
             DataDictionaryReaderCafCsv reader =
                 new DataDictionaryReaderCafCsv();
 

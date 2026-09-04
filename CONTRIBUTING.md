@@ -59,6 +59,36 @@ dotnet test Caf.Midden.slnx --configuration Release --no-build
 
 These commands must succeed without private credentials or interactive prompts.
 
+### Web accessibility check
+
+Changes to the web editor, catalog, shared layout, or styles should also run the representative
+Chromium and axe check. Install Node.js 24 and run:
+
+```powershell
+npm ci
+npx playwright install chromium
+npm run test:accessibility
+```
+
+Playwright starts the Blazor application and waits for it to become ready; do not add fixed delays
+to the test. A failure report is written beneath `TestResults/Accessibility`.
+
+### Bundled browser assets
+
+Leaflet, Leaflet-Geoman Free, and Leaflet.heat are pinned in `package.json` and `package-lock.json`.
+Their distributable files and licenses are committed beneath `Caf.Midden.Wasm/wwwroot/lib` so an
+ordinary .NET build does not require Node.js. Do not edit those generated copies directly.
+
+After changing one of those package versions, regenerate and verify the committed assets:
+
+```powershell
+npm ci
+npm run sync:web-assets
+npm run verify:web-assets
+```
+
+CI runs the verification command and rejects missing, changed, or stale generated files.
+
 ## Live cloud integration tests
 
 The tests in `Caf.Midden.Cli.LiveTests` connect to real Azure or Google resources. They are

@@ -107,3 +107,49 @@ jobs:
           path: TestResults/Coverage/**/coverage.cobertura.xml
           if-no-files-found: error
           retention-days: 14
+
+  accessibility:
+    name: Accessibility
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Restore Wasm
+        run: dotnet restore Caf.Midden.Wasm/Caf.Midden.Wasm.csproj
+
+      - name: Install accessibility dependencies
+        run: npm ci
+
+      - name: Verify bundled web assets
+        run: npm run verify:web-assets
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Test representative routes
+        run: npm run test:accessibility
+
+      - name: Upload accessibility diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: accessibility-diagnostics
+          path: TestResults/Accessibility
+          if-no-files-found: warn
+          retention-days: 14

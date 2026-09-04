@@ -34,8 +34,8 @@ Notable changes to Midden are recorded here. This project follows
 
 ### Migration notes
 
-- Review the current examples in `docs/examples/configuration` before replacing a legacy `v0.1`
-  configuration with `v0.2`.
+- Review `docs/examples/app-config.example.json` and `docs/usage-guides/configuration.md` before
+  replacing a legacy `v0.1` application configuration with `v0.2`.
 - Review `docs/usage-guides/cli-usage.md` before replacing an older CLI; command validation and
   credential handling have changed substantially since `v0.4.0`.
 

@@ -28,6 +28,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="..\LICENSE.md" Link="wwwroot\legal\LICENSE.md" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\NOTICE.md" Link="wwwroot\legal\NOTICE.md" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\THIRD-PARTY-NOTICES.md" Link="wwwroot\legal\THIRD-PARTY-NOTICES.md" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Update="wwwroot\app-config.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

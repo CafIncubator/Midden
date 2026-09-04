@@ -36,8 +36,8 @@ export function createBaseLayers() {
 // Creates a leaflet map using USGS tile layers and adds the spatial extent as a geojson layer
 export function create(mapElement, geometry) {
 
-    // Creates a geojson feature from the geometry argument
-    // TODO: Error handling
+    // Creates a geojson feature from the geometry argument. The Blazor component reports parse
+    // or rendering failures without preventing the rest of the metadata view from loading.
     var geojsonFeature = {
         "type": "Feature",
         "properties": {},

@@ -11,8 +11,8 @@
             }
 
         <div class="configure-icon">
-        <a href="editor/app-configuration">
-            <Icon Type="setting" Theme="@IconThemeType.Outline" />
+        <a href="editor/app-configuration" aria-label="Configure Midden">
+            <Icon Type="setting" Theme="@IconThemeType.Outline" Role="presentation" />
         </a>
         </div>
         </Header>
@@ -27,30 +27,30 @@
                         DefaultOpenKeys=@(new[]{"2", "3"})
                         Mode="MenuMode.Inline">
                     <MenuItem Key="1" RouterLink="" RouterMatch="NavLinkMatch.Prefix">
-                        <Icon Type="home" Theme="@IconThemeType.Outline" />
+                        <Icon Type="home" Theme="@IconThemeType.Outline" Role="presentation" />
                         <span>Home</span>
                     </MenuItem>
                     <SubMenu Key="2" Title="Catalog" TitleTemplate=@catalogTitle>
                         <MenuItem Key="2a" RouterLink="catalog/datasets" RouterMatch="NavLinkMatch.Prefix">
-                            <Icon Type="file-text" Theme="@IconThemeType.Outline" />
+                            <Icon Type="file-text" Theme="@IconThemeType.Outline" Role="presentation" />
                             <span>Datasets</span>
                         </MenuItem>
                         <MenuItem Key="2b" RouterLink="catalog/variables" RouterMatch="NavLinkMatch.Prefix">
-                            <Icon Type="calculator" Theme="@IconThemeType.Outline" />
+                            <Icon Type="calculator" Theme="@IconThemeType.Outline" Role="presentation" />
                             <span>Variables</span>
                         </MenuItem>
                         <MenuItem Key="2c" RouterLink="catalog/projects" RouterMatch="NavLinkMatch.Prefix">
-                            <Icon Type="project" Theme="@IconThemeType.Outline" />
+                            <Icon Type="project" Theme="@IconThemeType.Outline" Role="presentation" />
                             <span>Projects</span>
                         </MenuItem>
                     </SubMenu>
                     <SubMenu Key="3" Title="Editor" TitleTemplate=@editorTitle>
                         <MenuItem Key="3a" RouterLink="editor/dataset" RouterMatch="NavLinkMatch.Prefix">
-                            <Icon Type="file-text" Theme="@IconThemeType.Outline" />
+                            <Icon Type="file-text" Theme="@IconThemeType.Outline" Role="presentation" />
                             <span>Dataset</span>
                         </MenuItem>
                         <MenuItem Key="3b" RouterLink="editor/project" RouterMatch="NavLinkMatch.Prefix">
-                            <Icon Type="project" Theme="@IconThemeType.Outline" />
+                            <Icon Type="project" Theme="@IconThemeType.Outline" Role="presentation" />
                             <span>Project</span>
                         </MenuItem>
                     </SubMenu>
@@ -63,7 +63,7 @@
                 </Content>
                 <Footer Style="text-align:center">
                     Made with <a href="https://github.com/cafincubator/midden">
-                        <Icon Type="github" Theme="@IconThemeType.Outline" /> Midden
+                        <Icon Type="github" Theme="@IconThemeType.Outline" Role="presentation" /> Midden
                     </a>
                     <Divider Type="@DividerType.Vertical" />
                     <span>Web Tools @($"v{State.AssemblyVersion}")</span>
@@ -76,13 +76,13 @@
 @code {
     RenderFragment catalogTitle =
         @<span>
-            <Icon Type="read" Theme="@IconThemeType.Outline" />
+            <Icon Type="read" Theme="@IconThemeType.Outline" Role="presentation" />
             <span>Catalog</span>
         </span>;
 
     RenderFragment editorTitle =
         @<span>
-            <Icon Type="edit" Theme="@IconThemeType.Outline" />
+            <Icon Type="edit" Theme="@IconThemeType.Outline" Role="presentation" />
             <span>Editor</span>
         </span>;
 

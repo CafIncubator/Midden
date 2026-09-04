@@ -44,6 +44,9 @@ namespace Caf.Midden.Wasm.Shared
         private ValidationResult _validation = ValidationResult.Empty;
         private ValidationGate? _validationGate;
 
+        [Inject]
+        private IMessageService MessageService { get; set; } = default!;
+
         public Project Project { get; set; } = new Project();
 
         [Parameter]
@@ -288,12 +291,12 @@ namespace Caf.Midden.Wasm.Shared
         private async Task OnInputFileProjectChange(
             InputFileChangeEventArgs e)
         {
-            isLoading = true;
-
             if (e.FileCount != 1)
             {
                 return;
             }
+
+            isLoading = true;
 
             try
             {
@@ -301,7 +304,6 @@ namespace Caf.Midden.Wasm.Shared
                     new ProjectReader(
                         new ProjectParser());
 
-                // TODO: Figure out how to pass e.File.OpenReadStream() to projectReader without it failing
                 string fileString;
                 using (var sr = new StreamReader(e.File.OpenReadStream(), Encoding.UTF8))
                 {
@@ -309,16 +311,19 @@ namespace Caf.Midden.Wasm.Shared
                 }
 
                 var project = projectReader.Read(fileString);
-                if (project is not null)
+                if (project is null)
                 {
-                    State.UpdateProjectEdit(this, project);
-                    Autosave.RemoveDraft(_draftKey);
+                    ShowProjectImportError();
+                    return;
                 }
+
+                State.UpdateProjectEdit(this, project);
+                Autosave.RemoveDraft(_draftKey);
                 //await ProjectChanged.InvokeAsync(this.Project);
             }
-            catch
+            catch (Exception)
             {
-                // TODO: Indicate error state
+                ShowProjectImportError();
             }
             finally
             {
@@ -326,6 +331,13 @@ namespace Caf.Midden.Wasm.Shared
                 await InvokeAsync(StateHasChanged);
             }
         }
+
+        private void ShowProjectImportError() =>
+            MessageService.Error(new MessageConfig
+            {
+                Content = "The project file could not be read. Check that it is a valid DESCRIPTION.md file and try again.",
+                Duration = 8
+            });
 
         public void Dispose()
         {

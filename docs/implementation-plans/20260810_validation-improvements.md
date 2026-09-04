@@ -1,7 +1,7 @@
 # Implementation Plan: Validation Improvements
 
-> Status: Active. Revised after the autosave/draft-recovery work shipped and after a full
-> design review of the three editors, the `Caf.Midden.Core` models, and the CLI.
+> Status: Complete. The rollout steps below shipped. Starting-state observations are retained as
+> historical design context and may no longer describe the current implementation.
 
 ## Goal
 
