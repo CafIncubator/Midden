@@ -1,16 +1,59 @@
 {
   "dataset editor": {
-    "aria-required-attr": 2,
-    "color-contrast": 7,
-    "label": 4,
-    "role-img-alt": 14
+    "aria-required-attr": {
+      "[\"#zone_list\"]": 1,
+      "[\"#ant-blazor-*_list\"]": 1
+    },
+    "color-contrast": {
+      "[\".ant-menu-submenu-selected > .ant-menu-submenu-title[role=\\\"button\\\"][aria-haspopup=\\\"true\\\"] > .ant-menu-title-content > span[b-tldvsw9xnq=\\\"\\\"] > span[b-tldvsw9xnq=\\\"\\\"]\"]": 1,
+      "[\".active > span[b-tldvsw9xnq=\\\"\\\"]\"]": 1,
+      "[\"span[role=\\\"status\\\"]\"]": 1,
+      "[\"div[_bl_*=\\\"\\\"]\"]": 1,
+      "[\"#ant-blazor-* > .validation-status-error.validation-status\"]": 1,
+      "[\"#ant-blazor-* > span\"]": 1,
+      "[\"#ant-blazor-* > a\"]": 1
+    },
+    "label": {
+      "[\"#zone_list\"]": 1,
+      "[\"textarea[autocorrect=\\\"off\\\"]\"]": 1,
+      "[\"#ant-blazor-*\"]": 1,
+      "[\"#ant-blazor-*_list\"]": 1
+    },
+    "role-img-alt": {
+      "[\"#ant-blazor-*\"]": 14
+    }
   },
   "dataset catalog": {
-    "aria-required-attr": 3,
-    "aria-valid-attr-value": 1,
-    "button-name": 1,
-    "color-contrast": 29,
-    "label": 3,
-    "role-img-alt": 1
+    "aria-required-attr": {
+      "[\"#zone_list\"]": 1,
+      "[\"#project_list\"]": 1,
+      "[\"input[_bl_*=\\\"\\\"]\"]": 1
+    },
+    "aria-valid-attr-value": {
+      "[\"input[_bl_*=\\\"\\\"]\"]": 1
+    },
+    "button-name": {
+      "[\"#ant-blazor-*\"]": 1
+    },
+    "color-contrast": {
+      "[\".ant-menu-submenu-selected > .ant-menu-submenu-title[role=\\\"button\\\"][aria-haspopup=\\\"true\\\"] > .ant-menu-title-content > span[b-tldvsw9xnq=\\\"\\\"] > span[b-tldvsw9xnq=\\\"\\\"]\"]": 1,
+      "[\".active > span[b-tldvsw9xnq=\\\"\\\"]\"]": 1,
+      "[\".ant-select-selection-overflow > .ant-select-selection-placeholder\"]": 1,
+      "[\"#ant-blazor-* > .ant-card-body > .catalog-meta-line > span:nth-child(1) > a[href$=\\\"Production\\\"]\"]": 9,
+      "[\"#ant-blazor-* > .ant-card-body > .catalog-meta-line > span:nth-child(2) > a[href$=\\\"TestProject\\\"]\"]": 3,
+      "[\"a[href$=\\\"Work\\\"]\"]": 1,
+      "[\"#ant-blazor-* > .ant-card-body > .catalog-meta-line > span:nth-child(1) > a[href$=\\\"Raw\\\"]\"]": 2,
+      "[\"#ant-blazor-* > .ant-card-body > .catalog-meta-line > span:nth-child(2) > a\"]": 9,
+      "[\"a[href$=\\\"saga-gis.org/\\\"]\"]": 1,
+      "[\"#ant-blazor-* > a[b-tldvsw9xnq=\\\"\\\"]\"]": 1
+    },
+    "label": {
+      "[\"#zone_list\"]": 1,
+      "[\"#project_list\"]": 1,
+      "[\"input[_bl_*=\\\"\\\"]\"]": 1
+    },
+    "role-img-alt": {
+      "[\"#ant-blazor-*\"]": 1
+    }
   }
 }

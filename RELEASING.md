@@ -24,6 +24,8 @@ these repository settings by themselves.
 ## Prerequisites
 
 - Phases required for the planned release are complete on `develop`.
+- Agency or legal approval of the licensing approach is recorded in
+   `docs/architecture/decisions/0001-project-licensing.md` and remains current for the release.
 - Required checks pass on the exact candidate commit.
 - The release maintainer can merge to `main`, create protected `v*` tags, approve the `release`
   environment, and publish GitHub Releases.

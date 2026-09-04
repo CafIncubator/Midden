@@ -7,5 +7,11 @@
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",
     "@playwright/test": "1.62.1"
-  }
+  },
+  "dependencies": {
+    "@geoman-io/leaflet-geoman-free": "2.20.0",
+    "leaflet": "1.7.1",
+    "leaflet.heat": "0.2.0"
+  },
+  "overrides": {}
 }

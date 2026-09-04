@@ -14,6 +14,7 @@
     IJSObjectReference? mapModule;
     IJSObjectReference? mapInstance;
     string? _errorMessage;
+    bool _loadAttempted;
 
     [Parameter]
     public string? Geometry { get; set; }
@@ -21,8 +22,10 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         // Creates the map DOM element if it's not already created
-        if (mapModule == null && !string.IsNullOrWhiteSpace(Geometry))
+        if (!_loadAttempted && !string.IsNullOrWhiteSpace(Geometry))
         {
+            _loadAttempted = true;
+
             try
             {
                 mapModule = await JS.InvokeAsync<IJSObjectReference>(

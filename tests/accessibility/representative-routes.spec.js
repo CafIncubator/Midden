@@ -1,20 +1,41 @@
 const AxeBuilder = require("@axe-core/playwright").default;
 const { expect, test } = require("@playwright/test");
+const fs = require("node:fs");
+const path = require("node:path");
 const reviewedBaseline = require("./axe-reviewed-baseline.json");
 
 const routes = [
-  { name: "dataset editor", path: "/editor/dataset", readyText: "Dataset Editor" },
-  { name: "dataset catalog", path: "/catalog/datasets", readyText: "Dataset Catalog" }
+  {
+    name: "dataset editor",
+    path: "/editor/dataset",
+    waitUntilReady: page => expect(page.locator("#name").first()).toBeVisible()
+  },
+  {
+    name: "dataset catalog",
+    path: "/catalog/datasets",
+    waitUntilReady: page => expect(page.locator(".catalog-summary-bar > div").first()).toContainText(/^\d+ datasets$/)
+  }
 ];
 
 for (const route of routes) {
   test(`${route.name} does not exceed the reviewed axe baseline`, async ({ page }, testInfo) => {
     await page.goto(route.path);
-    await expect(page.getByText(route.readyText, { exact: true }).first()).toBeVisible();
+    await route.waitUntilReady(page);
 
     const results = await new AxeBuilder({ page }).analyze();
     const blockingViolations = results.violations.filter(
       violation => violation.impact === "serious" || violation.impact === "critical"
+    );
+
+    const actualBaseline = Object.fromEntries(blockingViolations.map(violation => [
+      violation.id,
+      countTargetSignatures(violation.nodes)
+    ]));
+    const resultsDirectory = "TestResults/Accessibility/axe-results";
+    fs.mkdirSync(resultsDirectory, { recursive: true });
+    fs.writeFileSync(
+      path.join(resultsDirectory, `${route.name.replaceAll(" ", "-")}.json`),
+      JSON.stringify({ baseline: actualBaseline, results }, null, 2)
     );
 
     await testInfo.attach("axe-results.json", {
@@ -22,16 +43,38 @@ for (const route of routes) {
       contentType: "application/json"
     });
 
-    const unreviewedViolations = blockingViolations.filter(violation => {
-      const maximumAffectedNodes = reviewedBaseline[route.name][violation.id];
-
-      return maximumAffectedNodes === undefined || violation.nodes.length > maximumAffectedNodes;
-    });
+    const unreviewedViolations = blockingViolations
+      .map(violation => {
+        const configuredTargets = reviewedBaseline[route.name][violation.id];
+        const reviewedTargets = typeof configuredTargets === "object" ? { ...configuredTargets } : {};
+        const nodes = violation.nodes.filter(node => {
+          const signature = normalizeTarget(node.target);
+          const remaining = reviewedTargets[signature] ?? 0;
+          reviewedTargets[signature] = Math.max(0, remaining - 1);
+          return remaining === 0;
+        });
+        return { ...violation, nodes };
+      })
+      .filter(violation => violation.nodes.length > 0);
 
     if (unreviewedViolations.length > 0) {
       throw new Error(formatViolations(unreviewedViolations));
     }
   });
+}
+
+function countTargetSignatures(nodes) {
+  return nodes.reduce((counts, node) => {
+    const signature = normalizeTarget(node.target);
+    counts[signature] = (counts[signature] ?? 0) + 1;
+    return counts;
+  }, {});
+}
+
+function normalizeTarget(target) {
+  return JSON.stringify(target)
+    .replaceAll(/#ant-blazor-[0-9a-f-]+/gi, "#ant-blazor-*")
+    .replaceAll(/_bl_\d+/g, "_bl_*");
 }
 
 function formatViolations(violations) {

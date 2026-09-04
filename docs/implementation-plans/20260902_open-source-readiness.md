@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | In progress (Phases 0-1 complete) |
+| **Status** | In progress (Phases 0-5 complete; Phase 6 promotion pending) |
 | **Created** | 2026-09-02 |
 | **Scope** | Repository governance, contributor experience, CI, releases, security, and documentation |
 
@@ -70,9 +70,10 @@ later run in a protected scheduled workflow after credentials, cost, and mainten
 are agreed.
 
 The live tests are isolated in `Caf.Midden.Cli.LiveTests`, use xUnit v3 explicit tests, and remain
-compiled as part of the solution. Maintainers opt in with `xUnit.Explicit=only`; selected tests
-report missing credential fixtures as skips, and a protected live-test workflow uses
-`xUnit.FailSkips=true` so missing infrastructure fails that workflow.
+compiled as part of the solution. Maintainers opt in from the command line with
+`xUnit.Explicit=only`, and selected tests report missing credential fixtures as skips. Test
+Explorer behavior and a protected hosted live-test workflow will be configured later; neither is
+a Phase 0-5 completion gate.
 
 ### D2. Develop is hardened before main is changed
 
@@ -117,8 +118,8 @@ a CLA; both add friction and administration that this project does not currently
 
 ### D6. Use Apache-2.0 with a federal public-domain notice
 
-The provisional licensing approach, pending agency or legal review, uses the OSI-approved
-Apache License 2.0 for copyrightable material and contributions. A separate notice explains that
+The approved licensing approach uses the OSI-approved Apache License 2.0 for copyrightable
+material and contributions. A separate notice explains that
 portions prepared by United States Government employees as part of their official duties are
 not subject to copyright protection in the United States under 17 U.S.C. 105.
 
@@ -128,8 +129,7 @@ express patent grant for rights a contributor is authorized to license. Earlier 
 dedications remain unaffected.
 
 Record this approach in `LICENSE.md`, `NOTICE.md`, package metadata, and `CONTRIBUTING.md`.
-Obtain agency or legal review before the final release and revise the documents if that review
-requires a different approach.
+Agency or legal review approved this approach on 2026-09-04.
 
 ---
 
@@ -189,7 +189,7 @@ the Phase 1 readiness commits are not present on `main`.
 Avoid adding badges until their workflows and links are stable. A red or stale badge is worse
 than no badge.
 
-## Phase 2 - Create the contributor and community surface
+## Phase 2 - Create the contributor and community surface (complete)
 
 **Outcome:** people know how to participate and where to ask for help.
 
@@ -202,10 +202,21 @@ than no badge.
 | 17 | Add a pull request template | Requests problem/context, change summary, validation, documentation impact, screenshots for UI changes, and linked issues |
 | 18 | Identify ownership | Add CODEOWNERS and a short maintainer/governance section describing review and release authority |
 | 19 | Establish support channels | State what belongs in Issues versus Discussions or another support channel, and enable the selected repository feature |
-| 20 | Create useful labels | Define a small label set for type, priority, component, contributor readiness, and blocked work; seed several bounded `good first issue` tasks |
+| 20 | Create useful labels | Define a small label set for type, priority, component, contributor readiness, and blocked work; do not manufacture `good first issue` tasks before suitable bounded work exists |
 
 Private email addresses and maintainer handles cannot be invented in code. Their owners must be
 confirmed before these documents are merged.
+
+The maintainer waived issue seeding during the readiness pass. Contributor-ready issues will be
+created only when real, bounded work is available.
+
+**Completion record:** Phase 2 was completed on 2026-09-04. The contribution, conduct, security,
+support, ownership, issue, and pull-request materials are present. Discussions, private content
+reporting, and private vulnerability reporting are enabled. The repository label set covers type,
+priority, component, contributor readiness, and blocked work; the priority labels are
+`priority: high`, `priority: medium`, and `priority: low`. Agency or legal review approved the
+Apache-2.0 and federal public-domain notice approach. No artificial `good first issue` tasks were
+created.
 
 ## Phase 3 - Repair onboarding and technical documentation (complete)
 
@@ -294,7 +305,7 @@ be launched as `v1.0.0` without any earlier partial synchronization to `main`.
 
 | # | Item | Acceptance criteria |
 |---|---|---|
-| 43 | Freeze the release candidate | Phases 0 through 5 are complete on `develop`; the candidate commit passes all required checks, release smoke tests, documentation review, and the clean-checkout gate |
+| 43 | Freeze the release candidate | Phases 0 through 5 are complete on `develop`; the candidate commit passes all required hosted checks, release smoke tests, documentation review, and the clean-checkout gate; perform the hosted Phase 5 validation deferred from the implementation branch |
 | 44 | Review the cumulative promotion | Open one `develop`-to-`main` pull request, review the complete branch diff and migration impact, and approve it as the `v1.0.0` release candidate; do not merge partial subsets |
 | 45 | Promote develop to main | Merge the approved release candidate once; record the source and resulting commit identifiers, and make no unrelated direct changes to `main` |
 | 46 | Verify default-branch automation | The post-merge `main` CI and CodeQL runs pass on Linux and Windows; coverage is uploaded; Dependabot accepts its configuration and targets version updates to `develop` while security updates target `main`; scheduled workflows and security features report healthy status |

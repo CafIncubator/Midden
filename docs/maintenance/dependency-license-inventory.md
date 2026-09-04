@@ -4,11 +4,11 @@
 |---|---|
 | **Reviewed** | 2026-09-04 |
 | **Scope** | Self-contained CLI archives and published Wasm application |
-| **Source** | Restored NuGet assets, package metadata, published web assets, and external browser dependencies |
+| **Source** | Restored NuGet assets, package metadata, and published web assets |
 
 This is a release-focused inventory, not a legal opinion. It records the resolved production
 dependencies and notices reviewed for Phase 5. Re-review it before a release when dependency
-versions, runtime targets, bundled assets, or CDN references change.
+versions, runtime targets, or bundled browser assets change.
 
 Test-only packages, analyzers, SDK packs, ILLink build tasks, the Wasm development server, and
 GitHub Actions do not ship in Midden release output and are excluded from artifact notices.
@@ -115,20 +115,22 @@ Apache-2.0 option.
 
 | Component | Version | Delivery | License |
 |---|---:|---|---|
+| Bootstrap | 4.3.1 | Self-hosted static asset | MIT |
 | EasyMDE fork | 2.0.x, bundled by MarkdownEditor 10.0.9 | Published static asset | MIT |
 | Mermaid | 11.12.0, bundled by MarkdownEditor 10.0.9 | Published optional static asset | MIT |
 | highlight.js | 11.11.1, bundled by MarkdownEditor 10.0.9 | Published optional static asset | BSD-3-Clause |
-| Leaflet | 1.7.1 | unpkg CDN | BSD-2-Clause |
-| Leaflet-Geoman Free | 2.14.2 | unpkg CDN | MIT |
-| Leaflet.heat | 0.2.0 | unpkg CDN | MIT |
+| Leaflet | 1.7.1 | Self-hosted static asset | BSD-2-Clause |
+| Leaflet-Geoman Free | 2.20.0 | Self-hosted static asset | MIT |
+| Leaflet.heat | 0.2.0 | Self-hosted static asset | BSD-2-Clause |
 | Open Iconic icons | 1.1.1 | Vendored static asset | MIT |
 | Open Iconic font | 1.1.1 | Vendored static asset | SIL-OFL-1.1 |
 
-The Open Iconic MIT and OFL texts are already distributed beside its static assets. CDN-loaded
-libraries remain subject to their upstream licenses even though they are fetched by the browser
-rather than copied into the repository. Mermaid and highlight.js are copied into published output
-by the Markdown editor package but are loaded only when their corresponding editor options are
-enabled; Midden does not currently enable those options.
+The Leaflet, Leaflet-Geoman Free, Leaflet.heat, and Open Iconic license texts are distributed
+beside their static assets. Project-level `LICENSE.md`, `NOTICE.md`, and
+`THIRD-PARTY-NOTICES.md` are published under the Wasm application's `wwwroot/legal` directory.
+Mermaid and highlight.js are copied into published output by the Markdown editor package but are
+loaded only when their corresponding editor options are enabled; Midden does not currently enable
+those options.
 
 ## Upstream sources
 
@@ -146,8 +148,10 @@ enabled; Midden does not currently enable those options.
 | PSC Markdown Editor | <https://github.com/erossini/BlazorMarkdownEditor> |
 | Radzen Blazor | <https://github.com/radzenhq/radzen-blazor> |
 | Z.Blazor.Diagrams and SvgPathProperties | <https://github.com/Blazor-Diagrams/Blazor.Diagrams> |
+| Bootstrap | <https://github.com/twbs/bootstrap> |
 | Leaflet | <https://github.com/Leaflet/Leaflet> |
 | Leaflet-Geoman Free | <https://github.com/geoman-io/leaflet-geoman> |
+| Leaflet.heat | <https://github.com/Leaflet/Leaflet.heat> |
 | Leaflet.heat | <https://github.com/Leaflet/Leaflet.heat> |
 | EasyMDE fork | <https://github.com/erossini/EasyMarkdownEditor> |
 | Mermaid | <https://github.com/mermaid-js/mermaid> |

@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | In progress (quality review implemented; later workstreams pending) |
+| **Status** | Complete locally; hosted release-candidate validation deferred to Phase 6 |
 | **Created** | 2026-09-04 |
 | **Related plan** | [Open-source readiness](20260902_open-source-readiness.md) |
 
@@ -154,8 +154,8 @@ Create `docs/architecture/decisions/` with a brief index and four numbered recor
 
 Each record should fit on roughly one page and contain status, date, context, decision,
 consequences, and links to the authoritative license, versioning, testing, or release documents.
-The licensing record must state that agency or legal review remains a release gate while that
-review is pending.
+The licensing record must state whether agency or legal review is pending or complete and record
+the review date.
 
 ## Quality review implementation record
 
@@ -200,9 +200,11 @@ reviewed maximum-count baseline:
 | Dataset catalog | `label` | 3 | Search and select controls |
 | Dataset catalog | `role-img-alt` | 1 | AntDesign-generated paging icon |
 
-The test fails when a new serious/critical rule appears or a listed rule affects more nodes; a
-reduction passes without requiring baseline churn. The baseline is not a claim that the listed
-violations conform.
+Each route waits for its representative application content rather than scanning the loading
+shell. The test compares normalized axe target signatures and their multiplicities, so replacing
+a reviewed violation with a different target under the same rule fails even when the total node
+count is unchanged. A reduction passes without requiring baseline churn. The baseline is not a
+claim that the listed violations conform.
 
 Exploratory keyboard review found that focus does not reliably enter interactive AntDesign
 popovers and that removing or clearing multi-select values is not consistently keyboard
@@ -236,8 +238,8 @@ product work.
 
 ### Dependency licenses and notices
 
-Production NuGet packages, the self-contained .NET runtime, bundled browser assets, and CDN-loaded
-browser libraries were reviewed on 2026-09-04. The artifact-specific versions and license
+Production NuGet packages, the self-contained .NET runtime, and self-hosted browser assets were
+reviewed on 2026-09-04. The artifact-specific versions, copyright attributions, and license
 expressions are recorded in
 [`docs/maintenance/dependency-license-inventory.md`](../maintenance/dependency-license-inventory.md).
 No production dependency with a source-redistribution obligation was found.
@@ -245,13 +247,16 @@ No production dependency with a source-redistribution obligation was found.
 `THIRD-PARTY-NOTICES.md` records the applicable MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, and
 Open Iconic terms. The release workflow now copies that file together with `LICENSE.md`,
 `NOTICE.md`, and the exact RID-specific .NET runtime license and third-party notice into every CLI
-archive. A local Windows self-contained publish rehearsal resolved runtime version 10.0.11 from
+archive. The Wasm publish also includes `LICENSE.md`, `NOTICE.md`, and
+`THIRD-PARTY-NOTICES.md` under `wwwroot/legal`; its Leaflet, Leaflet-Geoman Free, and Leaflet.heat
+dependencies are pinned, self-hosted, and distributed with their authoritative license files. A
+local Windows self-contained publish rehearsal resolved runtime version 10.0.11 from
 the generated dependency manifest and verified all five files beside the executable. That
 RID-specific runtime-pack version is independent of the 10.0.10 .NET NuGet reference versions
 listed in the dependency inventory.
 
 No continuous license scanner was added. Re-review the inventory before a release when production
-package versions, runtime targets, vendored assets, or browser CDN references change.
+package versions, runtime targets, or vendored browser assets change.
 
 ### Maintenance cadence
 
@@ -264,7 +269,7 @@ research issues are not closed automatically.
 The [architecture decision index](../architecture/decisions/README.md) records the licensing,
 shared product version, opt-in live-test policy, and initial GitHub Release distribution choices.
 Each record links to the authoritative policy or runbook that owns operational details. The
-licensing record retains agency or legal review as a release gate.
+licensing record documents agency or legal approval on 2026-09-04.
 
 ### Repository metadata review
 
@@ -278,14 +283,13 @@ public repository pages.
 | Topics | `academic`, `data`, `data-catalog`, `data-management`, `data-science`, `metadata`, `research`, `research-data-management` | Existing focused set retained |
 | Social preview | Maintainer-selected image | Uploaded in repository settings on 2026-09-04 |
 | Discussions | Enabled | Existing support channel retained |
-| Private vulnerability reporting | Not publicly verifiable | Enable and submit a maintainer-only test report before Phase 5 closes |
+| Private vulnerability reporting | Enabled | Confirmed by the maintainer on 2026-09-04 |
 | Funding | No approved destination | Not applicable; do not add `FUNDING.yml` |
 | Detected license | CC0-1.0 from current `main` | Expected until Phase 6; verify Apache-2.0 detection after promotion |
 
-The homepage decision and social preview are complete. Private vulnerability reporting still
-requires repository administration and cannot be completed from this unauthenticated workspace.
-Do not treat the old detected license as a Phase 5 defect because `main` intentionally remains
-unchanged until Phase 6.
+The homepage decision, social preview, and private vulnerability reporting are complete. Do not
+treat the old detected license as a Phase 5 defect because `main` intentionally remains unchanged
+until Phase 6.
 
 ## Delivery sequence
 
@@ -310,7 +314,7 @@ are promoted separately to `main`.
 | 38 - Unfinished markers | Maintained-project matches are classified; validation and visible error-state markers are fixed or logged | Complete; maintained source markers resolved or classified, with metadata database values excluded |
 | 39 - Dependency licenses | Shipped production dependencies and assets are reviewed; required notices are documented and packaged | Complete; reviewed inventory and archive notices added 2026-09-04 |
 | 40 - Maintenance cadence | Confirmed owner and intervals appear in governance documentation | Complete; cadence assigned in `GOVERNANCE.md` |
-| 41 - Repository metadata | Description, homepage, topics, social preview, Discussions, vulnerability reporting, and funding decision are reviewed and dated | Repository review complete; private vulnerability reporting remains |
+| 41 - Repository metadata | Description, homepage, topics, social preview, Discussions, vulnerability reporting, and funding decision are reviewed and dated | Complete; private vulnerability reporting confirmed enabled 2026-09-04 |
 | 42 - Key decisions | Four short ADRs and an index are committed and linked to authoritative documents | Complete; ADR-0001 through ADR-0004 added 2026-09-04 |
 
 ## Phase exit gate
@@ -326,9 +330,9 @@ Phase 5 is complete when:
 - GitHub repository metadata and private vulnerability reporting have been checked; and
 - the four architecture decisions are recorded.
 
-The exact candidate commit must then pass the normal CI and release-artifact workflows on
-`develop`. Phase 5 supplies evidence for the Phase 6 cumulative promotion; it does not introduce
-an independent merge or tag on `main`.
+Hosted validation of the exact candidate commit against the normal CI and release-artifact
+workflows is deferred to the Phase 6 freeze gate. Phase 5 supplies local evidence for that
+cumulative promotion; it does not introduce an independent merge or tag on `main`.
 
 ## Deferred until justified
 

@@ -2,6 +2,7 @@
 
 - **Status:** Accepted
 - **Date:** 2026-09-04
+- **Agency or legal review:** Approved 2026-09-04
 
 ## Context
 
@@ -22,8 +23,7 @@ and are licensable. The accompanying notice explains the status of United States
 and preserves the effect of earlier CC0 grants. Third-party materials remain governed by their own
 licenses and notices.
 
-Agency or legal review of this licensing approach remains a gate for the first release under these
-terms. Acceptance of this architecture decision does not replace that review.
+Agency or legal review approved this licensing approach on 2026-09-04.
 
 ## Consequences
 
@@ -32,8 +32,8 @@ terms. Acceptance of this architecture decision does not replace that review.
 - Contributions are submitted under the Apache 2.0 terms by default, and recipients receive the
   applicable copyright and patent grants.
 - Release preparation must preserve applicable third-party licenses and notices.
-- If agency or legal review requires a different approach, a superseding decision and matching
-  repository changes are required before release.
+- If future agency or legal review requires a different approach, a superseding decision and
+  matching repository changes are required before the affected release.
 
 ## Authoritative references
 

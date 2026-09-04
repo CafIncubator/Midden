@@ -25,11 +25,9 @@
     <!-- If you want the default style -->
     <link href="_content/Z.Blazor.Diagrams/default.styles.min.css" rel="stylesheet" />
 
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
-          integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
-          crossorigin="" />
+        <link rel="stylesheet" href="lib/leaflet/1.7.1/leaflet.css" />
     <!-- Make sure you put this AFTER Leaflet's CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.14.2/dist/leaflet-geoman.css" />
+        <link rel="stylesheet" href="lib/leaflet-geoman/2.20.0/leaflet-geoman.css" />
     <link href="css/custom.css" rel="stylesheet" />
 
 </head>
@@ -124,15 +122,13 @@
     </script>
 
     <!-- Make sure you put this AFTER Leaflet's CSS -->
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
-            integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
-            crossorigin=""></script>
+        <script src="lib/leaflet/1.7.1/leaflet.js"></script>
 
     <!-- Leaflet-Geoman Free: drawing/editing tools, must come AFTER Leaflet -->
-    <script src="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.14.2/dist/leaflet-geoman.min.js"></script>
+        <script src="lib/leaflet-geoman/2.20.0/leaflet-geoman.min.js"></script>
 
     <!-- Leaflet.heat: heatmap overlay for the catalog-wide spatial coverage widget, must come AFTER Leaflet -->
-    <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+        <script src="lib/leaflet-heat/0.2.0/leaflet-heat.js"></script>
 
     <!-- Markdown editor stuff -->
     <script src="_content/PSC.Blazor.Components.MarkdownEditor/js/easymde.min.js"></script>
