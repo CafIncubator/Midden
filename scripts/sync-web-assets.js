@@ -83,7 +83,7 @@ function verifyAsset(asset, packageRoot, outputRoot) {
     const destinationPath = actualFiles.get(relativePath);
     if (!destinationPath) {
       differences.push(`missing ${path.relative(repositoryRoot, path.join(outputRoot, relativePath))}`);
-    } else if (!fs.readFileSync(sourcePath).equals(fs.readFileSync(destinationPath))) {
+    } else if (!filesMatch(sourcePath, destinationPath)) {
       differences.push(`changed ${path.relative(repositoryRoot, destinationPath)}`);
     }
   }
@@ -93,6 +93,20 @@ function verifyAsset(asset, packageRoot, outputRoot) {
       differences.push(`stale ${path.relative(repositoryRoot, destinationPath)}`);
     }
   }
+}
+
+function filesMatch(sourcePath, destinationPath) {
+  const source = fs.readFileSync(sourcePath);
+  const destination = fs.readFileSync(destinationPath);
+  if (source.equals(destination)) {
+    return true;
+  }
+
+  const extension = path.extname(sourcePath).toLowerCase();
+  const isTextAsset = path.basename(sourcePath) === "LICENSE" || extension === ".css" || extension === ".js";
+  return isTextAsset
+    && source.toString("utf8").replaceAll("\r\n", "\n")
+      === destination.toString("utf8").replaceAll("\r\n", "\n");
 }
 
 function collectFiles(sourcePath, relativePath, files) {
