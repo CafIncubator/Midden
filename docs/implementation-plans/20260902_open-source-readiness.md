@@ -129,7 +129,7 @@ express patent grant for rights a contributor is authorized to license. Earlier 
 dedications remain unaffected.
 
 Record this approach in `LICENSE.md`, `NOTICE.md`, package metadata, and `CONTRIBUTING.md`.
-Agency or legal review approved this approach on 2026-09-04.
+Agency or legal review needed for final approval but best-guess review approved this licensing approach on 2026-09-04.
 
 ---
 
@@ -214,7 +214,7 @@ created only when real, bounded work is available.
 support, ownership, issue, and pull-request materials are present. Discussions, private content
 reporting, and private vulnerability reporting are enabled. The repository label set covers type,
 priority, component, contributor readiness, and blocked work; the priority labels are
-`priority: high`, `priority: medium`, and `priority: low`. Agency or legal review approved the
+`priority: high`, `priority: medium`, and `priority: low`. Best-guess review approved the
 Apache-2.0 and federal public-domain notice approach. No artificial `good first issue` tasks were
 created.
 

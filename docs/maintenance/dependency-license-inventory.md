@@ -152,7 +152,6 @@ those options.
 | Leaflet | <https://github.com/Leaflet/Leaflet> |
 | Leaflet-Geoman Free | <https://github.com/geoman-io/leaflet-geoman> |
 | Leaflet.heat | <https://github.com/Leaflet/Leaflet.heat> |
-| Leaflet.heat | <https://github.com/Leaflet/Leaflet.heat> |
 | EasyMDE fork | <https://github.com/erossini/EasyMarkdownEditor> |
 | Mermaid | <https://github.com/mermaid-js/mermaid> |
 | highlight.js | <https://github.com/highlightjs/highlight.js> |

@@ -2,7 +2,6 @@
 
 - **Status:** Accepted
 - **Date:** 2026-09-04
-- **Agency or legal review:** Approved 2026-09-04
 
 ## Context
 
@@ -23,7 +22,7 @@ and are licensable. The accompanying notice explains the status of United States
 and preserves the effect of earlier CC0 grants. Third-party materials remain governed by their own
 licenses and notices.
 
-Agency or legal review approved this licensing approach on 2026-09-04.
+Agency or legal review needed for final approval but best-guess review approved this licensing approach on 2026-09-04.
 
 ## Consequences
 

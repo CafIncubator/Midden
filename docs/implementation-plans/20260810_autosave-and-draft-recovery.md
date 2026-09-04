@@ -1,5 +1,8 @@
 # Implementation Plan: Autosave & Draft Recovery
 
+> Status: Shipped. This plan preserves the design rationale and is not a description of current
+> implementation details.
+
 ## Goal
 Prevent researchers from losing in-progress edits in `MetadataEditor`, `ProjectEditor`, and `ConfigurationEditor` due to accidental reloads, tab closures, or crashes, by autosaving drafts to browser `localStorage` and offering to restore them on return.
 

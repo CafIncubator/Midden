@@ -136,6 +136,9 @@ jobs:
       - name: Install accessibility dependencies
         run: npm ci
 
+      - name: Verify bundled web assets
+        run: npm run verify:web-assets
+
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
 

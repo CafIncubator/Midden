@@ -135,7 +135,8 @@ A midden is a refuse heap created by various entities such as packrats, earthwor
 
 Start with the [architecture overview](docs/architecture/overview.md) for the Core, CLI, and Wasm
 boundaries, data flow, crawler abstractions, validation, and credential model. See
-[CONTRIBUTING.md](CONTRIBUTING.md) for the complete contributor workflow.
+[the documentation index](docs/README.md) for the complete document set and
+[CONTRIBUTING.md](CONTRIBUTING.md) for the contributor workflow.
 
 ### Developer baseline
 

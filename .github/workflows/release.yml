@@ -15,6 +15,9 @@ on:
       - NOTICE.md
       - THIRD-PARTY-NOTICES.md
       - docs/maintenance/dependency-license-inventory.md
+      - package.json
+      - package-lock.json
+      - scripts/sync-web-assets.js
       - "Caf.Midden.*/**"
   workflow_dispatch:
 
@@ -102,6 +105,18 @@ jobs:
         uses: actions/setup-dotnet@v6
         with:
           global-json-file: global.json
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install web dependencies
+        run: npm ci
+
+      - name: Verify bundled web assets
+        run: npm run verify:web-assets
 
       - name: Restore
         run: dotnet restore Caf.Midden.slnx

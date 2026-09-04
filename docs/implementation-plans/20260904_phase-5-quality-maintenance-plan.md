@@ -269,7 +269,7 @@ research issues are not closed automatically.
 The [architecture decision index](../architecture/decisions/README.md) records the licensing,
 shared product version, opt-in live-test policy, and initial GitHub Release distribution choices.
 Each record links to the authoritative policy or runbook that owns operational details. The
-licensing record documents agency or legal approval on 2026-09-04.
+licensing record documents agency or legal best-guess approval on 2026-09-04.
 
 ### Repository metadata review
 

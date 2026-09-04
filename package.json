@@ -2,6 +2,8 @@
   "name": "caf-midden-quality-checks",
   "private": true,
   "scripts": {
+    "sync:web-assets": "node scripts/sync-web-assets.js",
+    "verify:web-assets": "node scripts/sync-web-assets.js --check",
     "test:accessibility": "playwright test"
   },
   "devDependencies": {
