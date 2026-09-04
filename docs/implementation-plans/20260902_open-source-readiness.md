@@ -253,7 +253,7 @@ NuGet, Homebrew, WinGet, containers, and code signing are follow-up distribution
 Evaluate them from demonstrated user demand rather than making the first release workflow
 depend on all package ecosystems.
 
-**Implementation record:** Phase 4 is implemented in this change and prepared for `develop`.
+**Implementation record:** Phase 4 was completed on 2026-09-04.
 Product versioning is centralized in `Directory.Build.props`; local builds use `dev.local`, and
 GitHub Actions assigns `dev.RUN_NUMBER` without feature-branch version edits. `VERSIONING.md`,
 `CHANGELOG.md`, and `RELEASING.md` define the shared product version, the four released beta
@@ -263,11 +263,12 @@ The `Release artifacts` workflow validates the solution and creates self-contain
 smoke-tested archives for `win-x64`, `linux-x64`, `osx-x64`, and `osx-arm64`. It aggregates and
 verifies SHA-256 checksums, publishes GitHub build-provenance attestations, and gates stable
 GitHub Release publication through the `release` environment. Local Windows and containerized
-Linux artifact rehearsals pass. Phase 4 reaches its exit gate after the workflow passes once on
-the Phase 4 merge to `develop`, including both hosted macOS jobs, and a maintainer verifies the
-protected `release` environment and `v*` tag ruleset described in `RELEASING.md`. The manual
-workflow trigger remains unavailable until the workflow reaches the default branch in Phase 6.
-The stable `v1.0.0` tag and dated changelog entry also remain Phase 6 activities.
+Linux artifact rehearsals pass. The Phase 4 merge commit `f34b2d3` passed the hosted
+[`Release artifacts`](https://github.com/CafIncubator/Midden/actions/runs/33885351004) workflow on
+`develop`, including all four native package and smoke-test jobs, checksum verification, and
+artifact attestations. The combined release assets were inspected, and the protected `release`
+environment and `v*` tag ruleset were verified. GitHub Release publication was correctly skipped.
+The stable `v1.0.0` tag, dated changelog entry, and promotion to `main` remain Phase 6 activities.
 
 ## Phase 5 - Quality, accessibility, and maintenance maturity
 
