@@ -54,9 +54,12 @@ NuGet, Homebrew, WinGet, containers, and code signing are not part of the initia
    this validation with its manual trigger.
 6. Confirm that all four native smoke-test jobs pass and retain the workflow URL in the release
    issue or pull request.
-7. Replace the changelog's release content under `Unreleased` with a dated `[VERSION]` section,
+7. Inspect one archive and confirm it contains `LICENSE.md`, `NOTICE.md`,
+   `THIRD-PARTY-NOTICES.md`, `DOTNET-LICENSE.txt`, and `DOTNET-THIRD-PARTY-NOTICES.txt`. Review
+   the dependency inventory when package versions or browser assets changed.
+8. Replace the changelog's release content under `Unreleased` with a dated `[VERSION]` section,
    add a new empty `Unreleased` section, and update its comparison links.
-8. Commit the final version and changelog changes to `develop` and rerun required checks.
+9. Commit the final version and changelog changes to `develop` and rerun required checks.
 
 ## Promote and publish
 
@@ -106,10 +109,11 @@ NuGet, Homebrew, WinGet, containers, and code signing are not part of the initia
 
 3. Extract and run `--help` and `--version` on locally available platforms. The release workflow's
    native jobs are authoritative for platforms maintainers do not own.
-4. Check the README release, changelog, support, and security links.
-5. Record the release URL, tag commit, workflow run, and checksum verification in the release
+4. Confirm the five legal and third-party notice files are present in each extracted archive.
+5. Check the README release, changelog, support, and security links.
+6. Record the release URL, tag commit, workflow run, and checksum verification in the release
    issue.
-6. Merge release-only `main` changes back into `develop`. Select and commit the next
+7. Merge release-only `main` changes back into `develop`. Select and commit the next
    `VersionPrefix` before accepting work intended for a later release.
 
 ## Failed or defective releases

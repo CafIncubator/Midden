@@ -11,6 +11,10 @@ on:
       - Caf.Midden.slnx
       - Directory.Build.props
       - global.json
+      - LICENSE.md
+      - NOTICE.md
+      - THIRD-PARTY-NOTICES.md
+      - docs/maintenance/dependency-license-inventory.md
       - "Caf.Midden.*/**"
   workflow_dispatch:
 
@@ -185,6 +189,51 @@ jobs:
           -p:IncludeNativeLibrariesForSelfExtract=true
           -p:DebugType=None
           -p:DebugSymbols=false
+
+      - name: Include legal notices
+        shell: pwsh
+        run: |
+          $publishDirectory = 'publish/${{ matrix.rid }}'
+          Copy-Item LICENSE.md, NOTICE.md, THIRD-PARTY-NOTICES.md -Destination $publishDirectory
+
+          $runtimePackageId = 'Microsoft.NETCore.App.Runtime.${{ matrix.rid }}'
+          $depsPath = Get-ChildItem 'Caf.Midden.Cli/obj/Release/net10.0/${{ matrix.rid }}' `
+            -Filter '*.deps.json' |
+            Select-Object -First 1
+          $deps = Get-Content $depsPath.FullName -Raw | ConvertFrom-Json
+          $runtimePackage = $deps.libraries.PSObject.Properties.Name |
+            Where-Object { $_ -like "runtimepack.$runtimePackageId/*" } |
+            Select-Object -First 1
+
+          if (-not $runtimePackage) {
+            throw "Could not find $runtimePackageId in the restored assets."
+          }
+
+          $runtimeVersion = ($runtimePackage -split '/')[1]
+          $packageRoot = if ($env:NUGET_PACKAGES) {
+            $env:NUGET_PACKAGES
+          } else {
+            Join-Path $HOME '.nuget/packages'
+          }
+          $runtimeRoot = Join-Path $packageRoot "$($runtimePackageId.ToLowerInvariant())/$runtimeVersion"
+
+          Copy-Item (Join-Path $runtimeRoot 'LICENSE.TXT') `
+            (Join-Path $publishDirectory 'DOTNET-LICENSE.txt')
+          Copy-Item (Join-Path $runtimeRoot 'THIRD-PARTY-NOTICES.TXT') `
+            (Join-Path $publishDirectory 'DOTNET-THIRD-PARTY-NOTICES.txt')
+
+          $requiredNotices = @(
+            'LICENSE.md',
+            'NOTICE.md',
+            'THIRD-PARTY-NOTICES.md',
+            'DOTNET-LICENSE.txt',
+            'DOTNET-THIRD-PARTY-NOTICES.txt'
+          )
+          foreach ($notice in $requiredNotices) {
+            if (-not (Test-Path (Join-Path $publishDirectory $notice))) {
+              throw "Required legal notice '$notice' is missing."
+            }
+          }
 
       - name: Smoke test CLI
         shell: pwsh

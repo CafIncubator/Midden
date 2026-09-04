@@ -14,5 +14,7 @@ dedication. Rights previously granted or waived under CC0 are not withdrawn by t
 distribution terms.
 
 Third-party software, fonts, images, and other materials remain subject to their respective
-licenses and notices. Use of USDA names, agency marks, or contributor names must not imply
-endorsement by the United States Government, USDA, or any contributor.
+licenses and notices. Reviewed production dependencies and redistribution notices are recorded
+in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md). Use of USDA names, agency marks, or
+contributor names must not imply endorsement by the United States Government, USDA, or any
+contributor.

@@ -131,7 +131,8 @@ request may still be valid even when maintainer capacity is limited.
 Review GitHub's repository settings and record the final values in the acceptance record:
 
 - retain or update the existing description and topics;
-- set the homepage to a confirmed maintained deployment;
+- set the homepage only when there is a confirmed maintained deployment, otherwise record it as
+   intentionally blank;
 - retain Discussions as the documented support channel;
 - upload a legible social preview image;
 - confirm private vulnerability reporting is enabled and test the reporting link; and
@@ -231,6 +232,61 @@ excluded from this repository-quality audit. The remaining matches are third-par
 prose or historical/current implementation-plan terms and examples; they are not unfinished
 product work.
 
+## Maintenance review implementation record
+
+### Dependency licenses and notices
+
+Production NuGet packages, the self-contained .NET runtime, bundled browser assets, and CDN-loaded
+browser libraries were reviewed on 2026-09-04. The artifact-specific versions and license
+expressions are recorded in
+[`docs/maintenance/dependency-license-inventory.md`](../maintenance/dependency-license-inventory.md).
+No production dependency with a source-redistribution obligation was found.
+
+`THIRD-PARTY-NOTICES.md` records the applicable MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, and
+Open Iconic terms. The release workflow now copies that file together with `LICENSE.md`,
+`NOTICE.md`, and the exact RID-specific .NET runtime license and third-party notice into every CLI
+archive. A local Windows self-contained publish rehearsal resolved runtime version 10.0.11 from
+the generated dependency manifest and verified all five files beside the executable. That
+RID-specific runtime-pack version is independent of the 10.0.10 .NET NuGet reference versions
+listed in the dependency inventory.
+
+No continuous license scanner was added. Re-review the inventory before a release when production
+package versions, runtime targets, vendored assets, or browser CDN references change.
+
+### Maintenance cadence
+
+`GOVERNANCE.md` assigns the lightweight monthly, release-time, annual, and role-change reviews to
+the current maintainer. The cadence is explicitly a reminder rather than an SLA, and inactive
+research issues are not closed automatically.
+
+### Architecture decision records
+
+The [architecture decision index](../architecture/decisions/README.md) records the licensing,
+shared product version, opt-in live-test policy, and initial GitHub Release distribution choices.
+Each record links to the authoritative policy or runbook that owns operational details. The
+licensing record retains agency or legal review as a release gate.
+
+### Repository metadata review
+
+Public repository metadata was reviewed on 2026-09-04 through the GitHub repository API and
+public repository pages.
+
+| Setting | Observed or selected value | Result |
+|---|---|---|
+| Description | Research metadata catalog and editor for common academic workflows | Existing value retained |
+| Homepage | Blank | Intentionally left blank; no maintained project website is being designated |
+| Topics | `academic`, `data`, `data-catalog`, `data-management`, `data-science`, `metadata`, `research`, `research-data-management` | Existing focused set retained |
+| Social preview | Maintainer-selected image | Uploaded in repository settings on 2026-09-04 |
+| Discussions | Enabled | Existing support channel retained |
+| Private vulnerability reporting | Not publicly verifiable | Enable and submit a maintainer-only test report before Phase 5 closes |
+| Funding | No approved destination | Not applicable; do not add `FUNDING.yml` |
+| Detected license | CC0-1.0 from current `main` | Expected until Phase 6; verify Apache-2.0 detection after promotion |
+
+The homepage decision and social preview are complete. Private vulnerability reporting still
+requires repository administration and cannot be completed from this unauthenticated workspace.
+Do not treat the old detected license as a Phase 5 defect because `main` intentionally remains
+unchanged until Phase 6.
+
 ## Delivery sequence
 
 Keep the work reviewable in three pull requests where practical:
@@ -252,10 +308,10 @@ are promoted separately to `main`.
 | 36 - Coverage expectations | Core and CLI line/branch baseline, commit, date, and Wasm limitation recorded; no arbitrary threshold added | Complete; baseline recorded 2026-09-04 |
 | 37 - Web accessibility | Axe runs on the selected editor and catalog routes; observed limitations are logged for comprehensive follow-up | Complete for Phase 5; regression baseline passes and `A11Y-01` through `A11Y-05` are deferred to the linked remediation plan |
 | 38 - Unfinished markers | Maintained-project matches are classified; validation and visible error-state markers are fixed or logged | Complete; maintained source markers resolved or classified, with metadata database values excluded |
-| 39 - Dependency licenses | Shipped production dependencies and assets are reviewed; required notices are documented and packaged | Pending |
-| 40 - Maintenance cadence | Confirmed owner and intervals appear in governance documentation | Pending |
-| 41 - Repository metadata | Description, homepage, topics, social preview, Discussions, vulnerability reporting, and funding decision are reviewed and dated | Pending |
-| 42 - Key decisions | Four short ADRs and an index are committed and linked to authoritative documents | Pending |
+| 39 - Dependency licenses | Shipped production dependencies and assets are reviewed; required notices are documented and packaged | Complete; reviewed inventory and archive notices added 2026-09-04 |
+| 40 - Maintenance cadence | Confirmed owner and intervals appear in governance documentation | Complete; cadence assigned in `GOVERNANCE.md` |
+| 41 - Repository metadata | Description, homepage, topics, social preview, Discussions, vulnerability reporting, and funding decision are reviewed and dated | Repository review complete; private vulnerability reporting remains |
+| 42 - Key decisions | Four short ADRs and an index are committed and linked to authoritative documents | Complete; ADR-0001 through ADR-0004 added 2026-09-04 |
 
 ## Phase exit gate
 

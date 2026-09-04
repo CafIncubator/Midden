@@ -58,6 +58,22 @@ input when practical. Project decisions are made by the current maintainers and 
 relevant issue, pull request, or project documentation. Security and Code of Conduct decisions
 follow their private processes.
 
+## Maintenance cadence
+
+The current maintainer, [@bryancarlsoncafltar](https://github.com/bryancarlsoncafltar), owns the
+following reviews. These intervals are reminders rather than service-level commitments. A dated
+issue, pull request, release checklist, or documented settings review is sufficient evidence.
+
+| Activity | Interval |
+|---|---|
+| Dependency updates and vulnerability alerts | Monthly and when GitHub raises an alert |
+| Issue, discussion, and pull-request triage | Monthly |
+| Release planning, documentation, and dependency-license review | Before each release |
+| Repository access, CODEOWNERS, private reporting, and security settings | Annually and whenever maintainer roles change |
+
+Midden does not automatically close inactive issues. An older research request may remain valid
+even when current maintainer capacity is limited.
+
 ## Becoming or leaving a maintainer
 
 Current maintainers may invite a contributor who has demonstrated sustained, constructive work

@@ -4,6 +4,9 @@ Midden is three cooperating tools with one shared understanding of metadata. The
 separate on purpose: researchers can edit metadata without installing the crawler, and a
 published catalog never needs the credentials used to find that metadata.
 
+The [architecture decision records](decisions/README.md) preserve the rationale for Midden's
+licensing, shared version, live-test boundary, and initial release distribution.
+
 ## Components
 
 | Component | Responsibility |
