@@ -1,6 +1,10 @@
 ﻿@inject IJSRuntime JS
 @implements IAsyncDisposable
 
+@if (_errorMessage is not null)
+{
+    <p role="alert">@_errorMessage</p>
+}
 <div @ref="map" id="@_mapId" style="height: 300px; width: 300px;"></div>
 
 @code {
@@ -9,6 +13,7 @@
     ElementReference map;
     IJSObjectReference? mapModule;
     IJSObjectReference? mapInstance;
+    string? _errorMessage;
 
     [Parameter]
     public string? Geometry { get; set; }
@@ -18,10 +23,18 @@
         // Creates the map DOM element if it's not already created
         if (mapModule == null && !string.IsNullOrWhiteSpace(Geometry))
         {
-            mapModule = await JS.InvokeAsync<IJSObjectReference>(
-                "import", "./geojsonMap.js");
-            mapInstance = await mapModule.InvokeAsync<IJSObjectReference>(
-                "create", map, Geometry);
+            try
+            {
+                mapModule = await JS.InvokeAsync<IJSObjectReference>(
+                    "import", "./geojsonMap.js");
+                mapInstance = await mapModule.InvokeAsync<IJSObjectReference>(
+                    "create", map, Geometry);
+            }
+            catch (JSException)
+            {
+                _errorMessage = "The spatial preview could not be displayed. Check that the geometry contains valid GeoJSON.";
+                await InvokeAsync(StateHasChanged);
+            }
         }
     }
 

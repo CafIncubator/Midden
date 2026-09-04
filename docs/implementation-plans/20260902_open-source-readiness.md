@@ -277,12 +277,15 @@ The stable `v1.0.0` tag, dated changelog entry, and promotion to `main` remain P
 | # | Item | Acceptance criteria |
 |---|---|---|
 | 36 | Establish coverage expectations | Report coverage trends and set thresholds only after measuring a stable baseline; do not reward low-value line coverage |
-| 37 | Add a web accessibility check | Run an automated axe or Lighthouse check against representative editor and catalog routes, followed by a documented keyboard/screen-reader manual pass |
+| 37 | Add a web accessibility check | Run an automated axe or Lighthouse check against representative editor and catalog routes; log observed keyboard/screen-reader limitations for comprehensive follow-up |
 | 38 | Audit unfinished markers | Convert actionable TODOs into issues with context and remove stale comments; prioritize validation and visible error-state TODOs |
 | 39 | Review dependency licenses | Generate and review direct/transitive dependency license information for release artifacts; document required notices |
 | 40 | Define maintenance cadence | Record owners and intervals for dependency review, stale issue triage, release planning, access review, and documentation checks |
 | 41 | Add repository metadata | Configure description, homepage, topics, social preview, funding metadata if applicable, Discussions, and private vulnerability reporting in GitHub settings |
 | 42 | Record key decisions | Introduce short architecture decision records for licensing, versioning, integration-test policy, and release distribution |
+
+The approved lean scope, implementation sequence, and validation evidence are maintained in the
+[Phase 5 quality and maintenance plan](20260904_phase-5-quality-maintenance-plan.md).
 
 ## Phase 6 - Promote the release candidate and activate main
 

@@ -1,0 +1,16 @@
+{
+  "dataset editor": {
+    "aria-required-attr": 2,
+    "color-contrast": 7,
+    "label": 4,
+    "role-img-alt": 14
+  },
+  "dataset catalog": {
+    "aria-required-attr": 3,
+    "aria-valid-attr-value": 1,
+    "button-name": 1,
+    "color-contrast": 29,
+    "label": 3,
+    "role-img-alt": 1
+  }
+}

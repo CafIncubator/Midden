@@ -67,7 +67,7 @@
                     <Popover Trigger="@(new Trigger[]{ Trigger.Click })" Placement="Placement.BottomLeft">
                         <ChildContent>
                             <Button>
-                                <Icon Type="tags" Theme="@IconThemeType.Outline" /> @(SelectedTags.Count > 0 ? $"({SelectedTags.Count}) " : string.Empty)@TagMatchModeLabel
+                                <Icon Type="tags" Theme="@IconThemeType.Outline" Role="presentation" /> @(SelectedTags.Count > 0 ? $"({SelectedTags.Count}) " : string.Empty)@TagMatchModeLabel
                             </Button>
                         </ChildContent>
                         <ContentTemplate>
@@ -118,8 +118,8 @@
                     <Divider Type="@DividerType.Vertical" />
                     <Popover Trigger="@(new Trigger[]{ Trigger.Click })" Placement="Placement.BottomRight">
                         <ChildContent>
-                            <Button>
-                                <Icon Type="sort-ascending" Theme="@IconThemeType.Outline" />
+                            <Button AriaLabel="Sort datasets">
+                                <Icon Type="sort-ascending" Theme="@IconThemeType.Outline" Role="presentation" />
                             </Button>
                         </ChildContent>
                         <ContentTemplate>
@@ -162,22 +162,24 @@
             <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(12,0)" Style="padding:5px" @key="card.Metadata">
                 <Card Class="dataset-card catalog-card" Style="overflow:hidden">
                     <TitleTemplate>
-                        <Icon Type="file-text" Theme="@IconThemeType.Outline" />
+                        <Icon Type="file-text" Theme="@IconThemeType.Outline" Role="presentation" />
                         <a href="catalog/datasets/@card.Metadata.Dataset.Zone/@card.Metadata.Dataset.Project/@card.Metadata.Dataset.Name" class="catalog-card-title-link">
                             @card.Metadata.Dataset.Name
                         </a>
                     </TitleTemplate>
                     <Extra>
-                        <Button Class="magnifying-button" OnClick="() => OpenMetadataDetailsModalTemplate(card.Metadata)">
-                            <Icon Type="zoom-in" Theme="@IconThemeType.Outline" />
+                        <Button Class="magnifying-button"
+                                AriaLabel="@($"View details for {card.Metadata.Dataset.Name}")"
+                                OnClick="() => OpenMetadataDetailsModalTemplate(card.Metadata)">
+                            <Icon Type="zoom-in" Theme="@IconThemeType.Outline" Role="presentation" />
                         </Button>
                     </Extra>
                     <Body>
                         <div class="catalog-meta-line">
-                            <span><Icon Type="folder" /> Zone: <a href="catalog/datasets/@card.Metadata.Dataset.Zone">@card.Metadata.Dataset.Zone</a></span>
-                            <span><Icon Type="project" /> Project: <a href="catalog/projects/@card.Metadata.Dataset.Project">@card.Metadata.Dataset.Project</a></span>
-                            <span><Icon Type="calculator" /> Vars: @card.Metadata.Dataset.Variables.Count</span>
-                            <span><Icon Type="calendar" /> Updated: @(card.Metadata.Dataset.LastUpdate?.ToString("d") ?? card.Metadata.ModifiedDate.ToString("d"))</span>
+                            <span><Icon Type="folder" Role="presentation" /> Zone: <a href="catalog/datasets/@card.Metadata.Dataset.Zone">@card.Metadata.Dataset.Zone</a></span>
+                            <span><Icon Type="project" Role="presentation" /> Project: <a href="catalog/projects/@card.Metadata.Dataset.Project">@card.Metadata.Dataset.Project</a></span>
+                            <span><Icon Type="calculator" Role="presentation" /> Vars: @card.Metadata.Dataset.Variables.Count</span>
+                            <span><Icon Type="calendar" Role="presentation" /> Updated: @(card.Metadata.Dataset.LastUpdate?.ToString("d") ?? card.Metadata.ModifiedDate.ToString("d"))</span>
                         </div>
 
                         <Divider />

@@ -59,6 +59,20 @@ dotnet test Caf.Midden.slnx --configuration Release --no-build
 
 These commands must succeed without private credentials or interactive prompts.
 
+### Web accessibility check
+
+Changes to the web editor, catalog, shared layout, or styles should also run the representative
+Chromium and axe check. Install Node.js 24 and run:
+
+```powershell
+npm ci
+npx playwright install chromium
+npm run test:accessibility
+```
+
+Playwright starts the Blazor application and waits for it to become ready; do not add fixed delays
+to the test. A failure report is written beneath `TestResults/Accessibility`.
+
 ## Live cloud integration tests
 
 The tests in `Caf.Midden.Cli.LiveTests` connect to real Azure or Google resources. They are

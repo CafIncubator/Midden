@@ -49,6 +49,9 @@ namespace Caf.Midden.Wasm.Shared
         private CompletenessResult? _completeness;
         private ValidationGate? _validationGate;
 
+        [Inject]
+        private IMessageService MessageService { get; set; } = default!;
+
         // Bound to the Tabs component so activating a validation issue can switch tabs.
         private string _activeTabKey = Sections.Basic;
 
@@ -918,17 +921,54 @@ namespace Caf.Midden.Wasm.Shared
 
         private Task EndQuickEdit()
         {
-            // TODO: Some validation checks
+            var editedVariable = VariableQuickEditRef.DeepCopy();
+            editedVariable.Name = QuickEditViewModel.Variable.Name;
+            editedVariable.Description = QuickEditViewModel.Variable.Description;
+            editedVariable.Units = QuickEditViewModel.Variable.Units;
+            editedVariable.Height = QuickEditViewModel.Variable.Height;
+            editedVariable.Tags = QuickEditViewModel.SelectedTags.ToList();
+            editedVariable.Methods = QuickEditViewModel.Variable.Methods;
+            editedVariable.QCApplied = QuickEditViewModel.SelectedQCApplied.ToList();
+            editedVariable.ProcessingLevel = QuickEditViewModel.Variable.ProcessingLevel;
+            editedVariable.VariableType = QuickEditViewModel.Variable.VariableType;
 
-            VariableQuickEditRef.Name = QuickEditViewModel.Variable.Name;
-            VariableQuickEditRef.Description = QuickEditViewModel.Variable.Description;
-            VariableQuickEditRef.Units = QuickEditViewModel.Variable.Units;
-            VariableQuickEditRef.Height = QuickEditViewModel.Variable.Height;
-            VariableQuickEditRef.Tags = QuickEditViewModel.SelectedTags.ToList();
-            VariableQuickEditRef.Methods = QuickEditViewModel.Variable.Methods;
-            VariableQuickEditRef.QCApplied = QuickEditViewModel.SelectedQCApplied.ToList();
-            VariableQuickEditRef.ProcessingLevel = QuickEditViewModel.Variable.ProcessingLevel;
-            VariableQuickEditRef.VariableType = QuickEditViewModel.Variable.VariableType;
+            var variableIndex = State.MetadataEdit.Dataset.Variables.IndexOf(VariableQuickEditRef);
+            if (variableIndex < 0)
+            {
+                VariableQuickEditRef = null;
+                return Task.CompletedTask;
+            }
+
+            var candidate = JsonSerializer.Deserialize<Metadata>(
+                JsonSerializer.Serialize(State.MetadataEdit, DraftPayloadJsonOptions),
+                DraftPayloadJsonOptions)!;
+            candidate.Dataset.Variables[variableIndex] = editedVariable;
+
+            var variablePath = $"dataset.variables[{variableIndex}]";
+            var errors = Validator.Validate(candidate, State.AppConfig).Errors
+                .Where(issue => issue.Path.StartsWith(variablePath, StringComparison.Ordinal))
+                .ToList();
+
+            if (errors.Count > 0)
+            {
+                MessageService.Error(new MessageConfig
+                {
+                    Content = string.Join(" ", errors.Select(issue => issue.Message)),
+                    Duration = 8
+                });
+
+                return Task.CompletedTask;
+            }
+
+            VariableQuickEditRef.Name = editedVariable.Name;
+            VariableQuickEditRef.Description = editedVariable.Description;
+            VariableQuickEditRef.Units = editedVariable.Units;
+            VariableQuickEditRef.Height = editedVariable.Height;
+            VariableQuickEditRef.Tags = editedVariable.Tags;
+            VariableQuickEditRef.Methods = editedVariable.Methods;
+            VariableQuickEditRef.QCApplied = editedVariable.QCApplied;
+            VariableQuickEditRef.ProcessingLevel = editedVariable.ProcessingLevel;
+            VariableQuickEditRef.VariableType = editedVariable.VariableType;
 
             VariableQuickEditRef = null;
             return Task.CompletedTask;
