@@ -1,0 +1,12 @@
+{
+	"file": {
+		"schema-version": "v0.1.0-alpha2",
+		"creation-date": "2020-07-29"
+	},
+	"dataset": {
+		"zone": "Raw",
+		"project": "CafMeteorologyECTower",
+		"name": "ValidFile",
+		"description": "A valid file used to verify malformed siblings are skipped, not fatal."
+	}
+}

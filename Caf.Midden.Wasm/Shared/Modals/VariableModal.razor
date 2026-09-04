@@ -29,7 +29,7 @@
 
     <EditorFormItemWithHelpPopup Label="Methods" Id="variable-methods" Tooltip="@VariableMethodsTooltip" IsRequired=false>
         <InputGroup>
-            <Row Justify="space-between">
+            <Row Justify="@RowJustify.SpaceBetween">
                 <AntDesign.Col Span="20">
                     <Input Id="variable-methods" @bind-Value="NewVariableMethod" />
                 </AntDesign.Col>
@@ -42,7 +42,7 @@
         @if (context.Variable.Methods.Count > 0)
         {
             <AntList DataSource="@context.Variable.Methods"
-                     Size="small">
+                     Size="@ListSize.Small">
                 <ChildContent Context="method">
                     <ListItem>
                         <span><Text>@method</Text></span>
@@ -56,7 +56,7 @@
     </EditorFormItemWithHelpPopup>
 
     <EditorFormItemWithHelpPopup Label="Quality Control" Id="variable-quality-control" Tooltip="@VariableQualityControlsTooltip" IsRequired=false>
-        <Select Mode="multiple"
+        <Select Mode="@SelectMode.Multiple"
                     Placeholder="Select Quality Control"
                     @bind-Values="@context.SelectedQCApplied"
                     TItemValue="string"
@@ -120,7 +120,7 @@
             <SpaceItem>
                 <Button OnClick="AddVariableTagHandler">Add</Button>
             </SpaceItem>
-            <SpaceItem><Divider Type="DirectionVHType.Vertical" /></SpaceItem>
+            <SpaceItem><Divider Type="@DividerType.Vertical" /></SpaceItem>
             <div style="width:100%;">
                 <SpaceItem>
                     <SimpleSelect Placeholder="Add saved tag"
@@ -172,8 +172,6 @@
     private string VariableProcessingTooltip = @"This provides information on how the data value was created. These are intended to be general categories to be used to filter variables when searching for certain level of processing (e.g. directly measured values vs modeled values). Details of the processing should be defined in the methods field (or in a linked resource). Items in the dropdown menu are populated by information specified in the app configuration.";
     private string VariableTypeTooltip = @"This provides additional filtering ability and further context to the variable. Examples based on statistical fields are 'discrete', 'continuous', 'nominal', etc. Default values 'dimension' and 'metric' are based on dimensional modeling. Items in the dropdown menu are populated by information specified in the app configuration.";
     private string VariableTagsTooltip = @"These tags are specific to the individual variable, as opposed to tags used for the parent dataset, and help with data discoverablity. These tags can also be used to map variable names to controlled vocabularies (e.g. ICASA,  AGROVOC).";
-    private string VariableHeightTooltip = @"Uhg, does anyone use this? Height at which the measurement was taken, if applicable. Depricated and likely will be removed.";
-
     protected override void OnInitialized()
     {
         _model = base.Options ?? new VariableModalViewModel();

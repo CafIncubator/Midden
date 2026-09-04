@@ -11,6 +11,69 @@
     box-shadow: 0px 0px 5px 3px rgba(41,41,41,.25);
 }
 
+.autosave-status {
+    color: #595959;
+    font-size: 12px;
+    align-self: center;
+}
+
+.validation-status {
+    font-size: 12px;
+    align-self: center;
+}
+
+.validation-status-ok {
+    color: #52c41a;
+}
+
+.validation-status-warning {
+    color: #faad14;
+}
+
+.validation-status-error {
+    color: #ff4d4f;
+}
+
+.validation-row-issue {
+    color: #ff4d4f;
+    font-size: 12px;
+    margin: 0 0 8px 24px;
+}
+
+/* A left rule rather than a background tint, so the marker survives the drag-over row styling
+   and does not rely on color alone to be noticed. */
+.validation-row-error > td:first-child {
+    box-shadow: inset 3px 0 0 0 #ff4d4f;
+}
+
+.validation-summary-list {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.validation-issue-hint {
+    color: rgba(0, 0, 0, 0.45);
+    display: block;
+}
+
+/* Issue rows are real buttons when the host editor can navigate to the offending control, so they
+   stay keyboard-focusable rather than being clickable text. */
+.validation-issue-link {
+    background: none;
+    border: none;
+    padding: 0;
+    color: #1890ff;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+    .validation-issue-link:hover,
+    .validation-issue-link:focus-visible {
+        text-decoration: underline;
+    }
+
+
 .site-layout .site-layout-background {
     background: #fff;
 }
@@ -129,7 +192,7 @@
     }
 
 .ant-card-head {
-    border-bottom: 1px solid #9e9e9e;
+    border-bottom: 1px solid #d9e2ef;
     background-color: #f6f6f6;
 }
 
@@ -173,36 +236,206 @@
     max-height: 100px;
 }
 
+.catalog-controls {
+    background: #fafafa;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 12px;
+}
+
+.catalog-tag-select .ant-select-selector {
+    flex-wrap: nowrap !important;
+    overflow: hidden;
+    height: 32px !important;
+}
+
+.catalog-tag-select .ant-select-selection-overflow {
+    flex-wrap: nowrap !important;
+    overflow: hidden;
+}
+
+.catalog-tag-select .ant-select-selection-overflow-item {
+    flex-shrink: 0;
+}
+
+.catalog-filter-sort-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.catalog-filter-sort-actions .ant-divider-vertical {
+    margin: 0 2px;
+    height: 20px;
+}
+
+.catalog-summary-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 10px;
+    color: rgba(0, 0, 0, 0.75);
+}
+
+.catalog-pagination-bar {
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.catalog-card.ant-card-bordered {
+    border: 1px solid #d9e2ef;
+}
+
 .dataset-card.ant-card-bordered {
-    border: 1px solid #44a5ff;
+    border: 1px solid #bdd7f7;
 }
 
 .dataset-card .ant-card-head {
-    background-color: #44a5ff; /* Dark gray for dataset heads */
-    color: white; /* White text for contrast */
-    /*padding: 10px;*/ /* Add spacing */
+    background-color: #f0f7ff;
+    border-bottom: 1px solid #bdd7f7;
 }
 
-.dataset-card .ant-card-head-title {
-    color: rgb(0,0,0,0.85); /* Ensure title text is white */
-    /*font-weight: bold;  Make text bold */
-}
-
+.dataset-card .ant-card-head-title,
 .dataset-card .ant-card-head-extra {
-    color: rgb(0,0,0,0.85); /* Style extra content if present */
-    background-color: darkgray; /* Dark gray for dataset heads */
+    color: rgba(0, 0, 0, 0.88);
+}
+
+.catalog-card-title-link {
+    font-weight: 600;
+    color: rgba(0, 0, 0, 0.88);
+}
+
+.catalog-meta-line {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    color: rgba(0, 0, 0, 0.75);
+    font-size: 13px;
+}
+
+.catalog-tag-row {
+    margin-top: 8px;
+}
+
+.catalog-read-more {
+    display: inline-block;
+    margin-top: 6px;
+    font-size: 12px;
+    color: #096dd9;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.catalog-empty-value {
+    color: rgba(0, 0, 0, 0.35);
+}
+
+/* Used in place of a normal value Tag to signal "no value set" without
+   looking like a selectable/real option (no border, no fill, muted + italic). */
+.variable-not-specified {
+    color: rgba(0, 0, 0, 0.35);
+    font-style: italic;
+}
+
+.catalog-name-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.catalog-name-view-btn {
+    flex: 0 0 auto;
+    padding: 0 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.catalog-name-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .magnifying-button {
-    background-color: #abb2b9; /* Dark gray background */
-    color: black; /* White icon color */
-    border: none; /* Remove border */
-    border-radius: 5px; /* Rounded corners */
-    cursor: pointer; /* Add pointer cursor */
+    background-color: #e6f4ff;
+    color: #0050b3;
+    border: 1px solid #91caff;
+    border-radius: 4px;
 }
 
 .magnifying-button:hover {
-    background-color: #333; /* Slightly darker gray on hover */
-    color:white;
-    font-weight:bold;
+    background-color: #bae0ff;
+    color: #003a8c;
+}
+
+.details-quick-peek-wrap {
+    margin: 10px 5px 16px 5px;
+    padding: 12px;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    background: #fafafa;
+}
+
+.details-quick-peek-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.details-quick-peek-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #003a8c;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+.details-quick-peek-subtitle {
+    font-size: 12px;
+    color: #595959;
+}
+
+.details-quick-peek {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.details-quick-peek .ant-btn {
+    border-radius: 999px;
+    border-color: #d0e3ff;
+    background-color: #ffffff;
+}
+
+.details-quick-peek .ant-btn:not([disabled]):hover,
+.details-quick-peek .ant-btn:not([disabled]):focus {
+    border-color: #69b1ff;
+    color: #0050b3;
+    background-color: #f0f7ff;
+}
+
+.details-preserve-lines {
+    white-space: pre-line;
+}
+
+.details-list-item {
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.details-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid #f0f0f0;
 }

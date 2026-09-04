@@ -1,0 +1,33 @@
+@using AntDesign
+
+<div class="string-list-editor">
+    @for (int i = 0; i < Items.Count; i++)
+    {
+        var index = i;
+        <div class="string-list-editor-drop-indicator @(_dragOverIndex == index ? "string-list-editor-drop-indicator-visible" : string.Empty)"></div>
+        <div draggable="true"
+             class="string-list-editor-row"
+             @ondragstart="@(() => OnDragStart(index))"
+             @ondragenter="@(() => OnDragEnter(index))"
+             @ondragover:preventDefault
+             @ondrop="@(() => OnDrop(index))"
+             @ondragend="@OnDragEnd">
+            <span class="string-list-editor-handle" title="Drag to reorder" aria-hidden="true">⋮⋮</span>
+            <div class="string-list-editor-input">
+                <AntDesign.Input Value="@Items[index]"
+                                  ValueChanged="@((string v) => UpdateItem(index, v))"
+                                  Placeholder="@Placeholder" />
+            </div>
+            <Button Danger
+                    Icon="delete"
+                    OnClick="@(() => RemoveItem(index))" />
+        </div>
+    }
+    <div class="string-list-editor-drop-indicator @(_dragOverIndex == Items.Count ? "string-list-editor-drop-indicator-visible" : string.Empty)"
+         @ondragenter="@(() => OnDragEnter(Items.Count))"
+         @ondragover:preventDefault
+         @ondrop="@(() => OnDrop(Items.Count))"></div>
+    <Button Type="@ButtonType.Primary" OnClick="AddItem">
+        <Icon Type="plus" Theme="@IconThemeType.Outline" /> Add @ItemLabel
+    </Button>
+</div>

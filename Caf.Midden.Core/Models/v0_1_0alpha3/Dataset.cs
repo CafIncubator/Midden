@@ -32,11 +32,9 @@ namespace Caf.Midden.Core.Models.v0_1_0alpha3
         [JsonPropertyName("filePathTemplate")]
         public string? FilePathTemplate { get; set; }
 
-        // TODO: Change to list of key/value pairs?
         [JsonPropertyName("filePathDescriptor")]
         public string? FilePathDescriptor { get; set; }
 
-        // TODO: Change to enum?
         [JsonPropertyName("structure")]
         public string? Structure { get; set; }
 

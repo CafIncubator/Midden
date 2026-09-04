@@ -1,0 +1,33 @@
+@if (!string.IsNullOrWhiteSpace(Dataset?.DatasetPath))
+{
+    <p><strong>Dataset Path</strong>: @Dataset.DatasetPath</p>
+}
+@if (!string.IsNullOrWhiteSpace(Dataset?.Format))
+{
+    <p><strong>Format</strong>: @Dataset.Format</p>
+}
+@if (!string.IsNullOrWhiteSpace(Dataset?.FilePathTemplate))
+{
+    <p><strong>Path Template</strong>: @Dataset.FilePathTemplate</p>
+}
+@if (!string.IsNullOrWhiteSpace(Dataset?.FilePathDescriptor))
+{
+    <p><strong>Path Description</strong>: @Dataset.FilePathDescriptor</p>
+}
+@if (!string.IsNullOrWhiteSpace(Dataset?.Structure))
+{
+    <p><strong>Structure</strong>: @Dataset.Structure</p>
+}
+@if (string.IsNullOrWhiteSpace(Dataset?.DatasetPath) &&
+    string.IsNullOrWhiteSpace(Dataset?.Format) &&
+    string.IsNullOrWhiteSpace(Dataset?.FilePathTemplate) &&
+    string.IsNullOrWhiteSpace(Dataset?.FilePathDescriptor) &&
+    string.IsNullOrWhiteSpace(Dataset?.Structure))
+{
+    <Empty Simple />
+}
+
+@code {
+    [Parameter]
+    public Caf.Midden.Core.Models.v0_2.Dataset? Dataset { get; set; }
+}

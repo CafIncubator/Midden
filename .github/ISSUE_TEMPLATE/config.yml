@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions and support
+    url: https://github.com/CafIncubator/Midden/discussions/categories/q-a
+    about: Ask for help using, configuring, or deploying Midden.
+  - name: Early ideas
+    url: https://github.com/CafIncubator/Midden/discussions/categories/ideas
+    about: Discuss an idea before turning it into a defined feature request.
+  - name: Security vulnerability
+    url: https://github.com/CafIncubator/Midden/security/policy
+    about: Do not open a public issue. Follow the private reporting instructions in the security policy.
+  - name: Code of Conduct concern
+    url: https://github.com/CafIncubator/Midden/blob/main/CODE_OF_CONDUCT.md
+    about: Do not open a public issue. Follow the private reporting instructions in the Code of Conduct.

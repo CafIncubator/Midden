@@ -1,0 +1,22 @@
+@if ((Dataset?.Contacts?.Count ?? 0) > 0)
+{
+    <AntDesign.Table TItem="Caf.Midden.Core.Models.v0_2.Person"
+                     DataSource="@Dataset!.Contacts"
+                     HidePagination="@true">
+        <ChildContent Context="contact">
+            <AntDesign.PropertyColumn Property="@(item => item.Name)">
+                <a href="mailto:@contact.Email">@contact.Name</a>
+            </AntDesign.PropertyColumn>
+            <AntDesign.PropertyColumn Property="@(item => item.Role)" />
+        </ChildContent>
+    </AntDesign.Table>
+}
+else
+{
+    <Empty Simple />
+}
+
+@code {
+    [Parameter]
+    public Caf.Midden.Core.Models.v0_2.Dataset? Dataset { get; set; }
+}

@@ -1,116 +1,357 @@
 ﻿@inject Caf.Midden.Wasm.Services.StateContainer State
 @inject ModalService ModalService
 
-<Divider Orientation="center">Variables</Divider>
+<Divider Orientation="@DividerOrientation.Center">Variables</Divider>
 
 @if (State.Catalog != null)
 {
-    <AntDesign.Row>
-        <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(8,8)">
-            <Search Placeholder="Search variables"
-                    OnChange="SearchHandler"
-                    EnterButton="true" @bind-Value="ViewModel.SearchTerm"
-                    AllowClear="true"/>
-        </AntDesign.Col>
-    </AntDesign.Row>
-
-    <Space />
+    <div class="catalog-controls">
+        <AntDesign.Row Gutter="8" Align="@RowAlign.Middle">
+            <AntDesign.Col Xs="@Property(24,0)" Lg="@Property(5,0)">
+                <Search Placeholder="Search variables"
+                        OnChange="SearchHandler"
+                        EnterButton="true" @bind-Value="ViewModel.SearchTerm"
+                        AllowClear="true"/>
+            </AntDesign.Col>
+            <AntDesign.Col Xs="@Property(12,0)" Lg="@Property(3,0)">
+                <SimpleSelect Id="variable-zone"
+                              @bind-Value="SelectedZone"
+                              Placeholder="Zone"
+                              AllowClear="true"
+                              OnSelectedItemChanged="OnZoneFilterChanged">
+                    <SelectOptions>
+                        @foreach (var zone in ZoneOptions)
+                        {
+                            <SimpleSelectOption Value="@zone" Label="@zone" />
+                        }
+                    </SelectOptions>
+                </SimpleSelect>
+            </AntDesign.Col>
+            <AntDesign.Col Xs="@Property(12,0)" Lg="@Property(3,0)">
+                <SimpleSelect Id="variable-project"
+                              @bind-Value="SelectedProject"
+                              Placeholder="Project"
+                              AllowClear="true"
+                              OnSelectedItemChanged="OnProjectFilterChanged">
+                    <SelectOptions>
+                        @foreach (var project in ProjectOptions)
+                        {
+                            <SimpleSelectOption Value="@project" Label="@project" />
+                        }
+                    </SelectOptions>
+                </SimpleSelect>
+            </AntDesign.Col>
+            <AntDesign.Col Xs="@Property(12,0)" Lg="@Property(3,0)">
+                <SimpleSelect Id="variable-processing"
+                              @bind-Value="SelectedProcessing"
+                              Placeholder="Processing"
+                              AllowClear="true"
+                              OnSelectedItemChanged="OnProcessingFilterChanged">
+                    <SelectOptions>
+                        @foreach (var processing in ProcessingOptions)
+                        {
+                            <SimpleSelectOption Value="@processing" Label="@processing" />
+                        }
+                    </SelectOptions>
+                </SimpleSelect>
+            </AntDesign.Col>
+            <AntDesign.Col Xs="@Property(12,0)" Lg="@Property(2,0)">
+                <SimpleSelect Id="variable-type"
+                              @bind-Value="SelectedVariableType"
+                              Placeholder="Type"
+                              AllowClear="true"
+                              OnSelectedItemChanged="OnVariableTypeFilterChanged">
+                    <SelectOptions>
+                        @foreach (var variableType in VariableTypeOptions)
+                        {
+                            <SimpleSelectOption Value="@variableType" Label="@variableType" />
+                        }
+                    </SelectOptions>
+                </SimpleSelect>
+            </AntDesign.Col>
+            <AntDesign.Col Xs="@Property(12,0)" Lg="@Property(4,0)">
+                <Select Mode="@SelectMode.Multiple"
+                        Class="catalog-tag-select"
+                        Placeholder="Tag"
+                        Values="@SelectedTags"
+                        ValuesChanged="OnTagFilterChanged"
+                        MaxTagCount="2"
+                        TItemValue="string"
+                        TItem="string">
+                    <SelectOptions>
+                        @foreach (var tag in TagOptions)
+                        {
+                            <SelectOption TItemValue="string" TItem="string" Value="@tag" Label="@tag" />
+                        }
+                    </SelectOptions>
+                </Select>
+            </AntDesign.Col>
+            <AntDesign.Col Xs="@Property(12,0)" Lg="@Property(3,0)">
+                <div class="catalog-filter-sort-actions">
+                    <Popover Trigger="@(new Trigger[]{ Trigger.Click })" Placement="Placement.BottomLeft">
+                        <ChildContent>
+                            <Button>
+                                <Icon Type="tags" Theme="@IconThemeType.Outline" /> @(SelectedTags.Count > 0 ? $"({SelectedTags.Count}) " : string.Empty)@TagMatchModeLabel
+                            </Button>
+                        </ChildContent>
+                        <ContentTemplate>
+                            <div style="width:260px;">
+                                <Search Placeholder="Search tags"
+                                        @bind-Value="TagBrowseSearchTerm"
+                                        OnChange="OnTagBrowseSearchChanged"
+                                        AllowClear="true" />
+                                <div style="display:flex; gap:4px; margin:8px 0; align-items:center;">
+                                    <span class="catalog-empty-value">Match</span>
+                                    <Button Size="@AntDesign.ButtonSize.Small"
+                                            Type="@(TagMatchAll ? AntDesign.ButtonType.Default : AntDesign.ButtonType.Primary)"
+                                            OnClick="@(() => SetTagMatchMode(false))">Any</Button>
+                                    <Button Size="@AntDesign.ButtonSize.Small"
+                                            Type="@(TagMatchAll ? AntDesign.ButtonType.Primary : AntDesign.ButtonType.Default)"
+                                            OnClick="@(() => SetTagMatchMode(true))">All</Button>
+                                </div>
+                                <div style="display:flex; gap:4px; margin:8px 0;">
+                                    <Button Size="@AntDesign.ButtonSize.Small"
+                                            Type="@(TagBrowseSortByPopularity ? AntDesign.ButtonType.Default : AntDesign.ButtonType.Primary)"
+                                            OnClick="@(() => SetTagBrowseSort(false))">A-Z</Button>
+                                    <Button Size="@AntDesign.ButtonSize.Small"
+                                            Type="@(TagBrowseSortByPopularity ? AntDesign.ButtonType.Primary : AntDesign.ButtonType.Default)"
+                                            OnClick="@(() => SetTagBrowseSort(true))">Most used</Button>
+                                </div>
+                                <div style="max-height:280px; overflow-y:auto;">
+                                    @{ var tagBrowseList = GetTagBrowseList(); }
+                                    @if (tagBrowseList.Count == 0)
+                                    {
+                                        <Empty Simple />
+                                    }
+                                    else
+                                    {
+                                        @foreach (var item in tagBrowseList)
+                                        {
+                                            <div style="padding:2px 0;" @key="item.Tag">
+                                                <Checkbox Checked="@SelectedTags.Contains(item.Tag)"
+                                                          CheckedChanged="@((bool v) => ToggleTagSelection(item.Tag, v))">
+                                                    @item.Tag <span class="catalog-empty-value">(@item.Count)</span>
+                                                </Checkbox>
+                                            </div>
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        </ContentTemplate>
+                    </Popover>
+                    <Divider Type="@DividerType.Vertical" />
+                    <Popover Trigger="@(new Trigger[]{ Trigger.Click })" Placement="Placement.BottomRight">
+                        <ChildContent>
+                            <Button>
+                                <Icon Type="sort-ascending" Theme="@IconThemeType.Outline" />
+                            </Button>
+                        </ChildContent>
+                        <ContentTemplate>
+                            <div style="display:flex; flex-direction:column; gap:4px; min-width:160px;">
+                                <Button Size="@AntDesign.ButtonSize.Small"
+                                        Type="@(SelectedSort == VariableSortOptions.NameAz ? AntDesign.ButtonType.Primary : AntDesign.ButtonType.Default)"
+                                        OnClick="@(() => SetSort(VariableSortOptions.NameAz))">Name A-Z</Button>
+                                <Button Size="@AntDesign.ButtonSize.Small"
+                                        Type="@(SelectedSort == VariableSortOptions.DatasetAz ? AntDesign.ButtonType.Primary : AntDesign.ButtonType.Default)"
+                                        OnClick="@(() => SetSort(VariableSortOptions.DatasetAz))">Dataset A-Z</Button>
+                                <Button Size="@AntDesign.ButtonSize.Small"
+                                        Type="@(SelectedSort == VariableSortOptions.ProjectAz ? AntDesign.ButtonType.Primary : AntDesign.ButtonType.Default)"
+                                        OnClick="@(() => SetSort(VariableSortOptions.ProjectAz))">Project A-Z</Button>
+                                <Button Size="@AntDesign.ButtonSize.Small"
+                                        Type="@(SelectedSort == VariableSortOptions.ZoneAz ? AntDesign.ButtonType.Primary : AntDesign.ButtonType.Default)"
+                                        OnClick="@(() => SetSort(VariableSortOptions.ZoneAz))">Zone A-Z</Button>
+                            </div>
+                        </ContentTemplate>
+                    </Popover>
+                </div>
+            </AntDesign.Col>
+        </AntDesign.Row>
+    </div>
 }
 
 @if(ViewModel?.FilteredCatalogVariables != null)
 {
-if(ViewModel?.FilteredCatalogVariables.Count > 0)
+if(ViewModel.FilteredCatalogVariables.Count > 0)
 {
+    <div class="catalog-summary-bar">
+        <div><strong>@ViewModel.FilteredCatalogVariables.Count</strong> variables</div>
+        <div>Showing @GetCurrentRangeStart()-@GetCurrentRangeEnd() of @ViewModel.FilteredCatalogVariables.Count</div>
+        <Popover Trigger="@(new Trigger[]{ Trigger.Click })" Placement="Placement.BottomRight">
+            <ChildContent>
+                <Button Size="@AntDesign.ButtonSize.Small">
+                    <Icon Type="setting" Theme="@IconThemeType.Outline" /> Columns
+                </Button>
+            </ChildContent>
+            <ContentTemplate>
+                <div style="min-width:180px;">
+                    @foreach (var col in ToggleableColumns)
+                    {
+                        <div style="padding:2px 0;">
+                            <Checkbox Checked="@ColumnVisibility[col.Key]"
+                                      CheckedChanged="@((bool v) => SetColumnVisible(col.Key, v))">@col.Label</Checkbox>
+                        </div>
+                    }
+                </div>
+            </ContentTemplate>
+        </Popover>
+    </div>
+
 <Row Gutter="16">
     <AntDesign.Col Span="24">
         <AntDesign.Table TItem="Caf.Midden.Wasm.Shared.ViewModels.CatalogVariable"
-                         DataSource="@ViewModel.FilteredCatalogVariables"
+                         DataSource="@ViewModel.PagedCatalogVariables"
                          Size="@TableSize.Small"
-                         ScrollX="2800"
+                         ScrollX="2400"
+                         ScrollY="calc(100vh - 420px)"
                          Bordered
+                         HidePagination="true"
                         Responsive>
             <ChildContent Context="cv">
-                <AntDesign.Column TData="string"
-                                  @bind-Field="cv.Name"
-                                  Fixed="left"
-                                  Sortable
-                                  Filterable />
-                <AntDesign.Column TData="string"
-                                  @bind-Field="cv.Description"
-                                  Width="600">
-                    <textarea readonly
-                              rows="@(string.IsNullOrEmpty(cv.Description) ? 1 : cv.Description.Split('\n').Length + 1)"
-                              style="width:100%; border:none;">@cv.Description</textarea>
-                </AntDesign.Column>
-                <AntDesign.Column @bind-Field="cv.Units" />
-                <AntDesign.Column @bind-Field="cv.Methods"
-                        Width="500">
-                    @foreach (var method in cv.Methods)
-                        {
-                    <textarea readonly
-                              rows="@(string.IsNullOrEmpty(method) ? 1 :method.Split('\n').Length + 1)"
-                              style="width:100%; border:none;">@method</textarea>
-                        }
-                </AntDesign.Column>
-
-                <AntDesign.Column @bind-Field="cv.QCApplied"
-                                  Title="Quality Control">
-                    @foreach (var qc in cv.QCApplied)
-                        {
-                        <Tag>@qc</Tag>
-                        }
-                </AntDesign.Column>
-                <AntDesign.Column @bind-Field="cv.ProcessingLevel"
-                                  TData="string"
-                                  Title="Processing"
-                                  Filters="FilterProcessing"
-                                  OnFilter="(value, processing)=>(string.IsNullOrEmpty(processing) ? false : processing.StartsWith(value))"
-                                  FilterMultiple="true">
-                    <Tag>@cv.ProcessingLevel</Tag>
-                </AntDesign.Column>
-                <AntDesign.Column @bind-Field="cv.VariableType"
-                                TData="string"
-                                Title="Type"
-                                Filters="FilterVariableType"
-                                OnFilter="(value, variableType)=>(string.IsNullOrEmpty(variableType) ? false : variableType.StartsWith(value))"
-                                FilterMultiple="true">
-                    <Tag>@cv.VariableType</Tag>
-                </AntDesign.Column>
-
-                <AntDesign.Column @bind-Field="cv.Tags">
-                    @foreach (var tag in cv.Tags)
-                        {
-                                <Tag><a href="catalog/variables/tags/@tag">@tag</a></Tag>
-                        }
-                </AntDesign.Column>
-
-                <AntDesign.Column TData="string"
-                                  @bind-Field="cv.Zone"
-                                  Filters="FilterZone"
-                                  OnFilter="(value, zone)=>(string.IsNullOrEmpty(zone) ? false : zone.StartsWith(value))"
-                                  FilterMultiple="true" />
-
-                <AntDesign.Column @bind-Field="cv.ProjectName"
-                                  Title="Project"/>
-                <AntDesign.Column TData="string"
-                                  @bind-Field="cv.DatasetName"
-                                  Title="Dataset"
-                                  Sortable />
-                <ActionColumn Title="Action"
-                              Fixed="right">
-                    <Space>
-                        <SpaceItem>
-                            <Button OnClick="() => OpenMetadataDetailsModalTemplate(cv)">
-                                <Icon Type="zoom-in" Theme="outline" /> View
+                <AntDesign.PropertyColumn Property="@(item => item.Name)"
+                                          Title="Name"
+                                          Fixed="@AntDesign.ColumnFixPlacement.Left"
+                                          Width="260">
+                    <div class="catalog-name-cell">
+                        <span title="View metadata">
+                            <Button Class="magnifying-button catalog-name-view-btn"
+                                    Size="@AntDesign.ButtonSize.Small"
+                                    OnClick="() => OpenMetadataDetailsModalTemplate(cv)">
+                                <Icon Type="zoom-in" Theme="@IconThemeType.Outline" />
                             </Button>
-                        </SpaceItem>
-                    </Space>
-                </ActionColumn>
+                        </span>
+                        <span class="catalog-name-text">@cv.Name</span>
+                    </div>
+                </AntDesign.PropertyColumn>
+                @if (ColumnVisibility["Description"])
+                {
+                    <AntDesign.PropertyColumn Property="@(item => item.Description)"
+                                              Title="Description"
+                                              Width="500">
+                        <div class="@(cv.IsDescriptionExpanded ? string.Empty : "truncate")">@cv.Description</div>
+                        @if (cv.CanExpandDescription)
+                        {
+                            <span class="catalog-read-more" @onclick="() => ToggleDescription(cv)">@(cv.IsDescriptionExpanded ? "Show less" : "Read more")</span>
+                        }
+                    </AntDesign.PropertyColumn>
+                }
+                @if (ColumnVisibility["Units"])
+                {
+                    <AntDesign.PropertyColumn Property="@(item => item.Units)" />
+                }
+                @if (ColumnVisibility["Methods"])
+                {
+                    <AntDesign.PropertyColumn Property="@(item => item.Methods)"
+                                              Width="400">
+                        @if (cv.Methods.Count > 0)
+                        {
+                            <div class="@(cv.IsMethodsExpanded ? string.Empty : "truncate")">
+                                @foreach (var method in cv.Methods)
+                                {
+                                    <div class="details-preserve-lines">@method</div>
+                                }
+                            </div>
+                            @if (cv.CanExpandMethods)
+                            {
+                                <span class="catalog-read-more" @onclick="() => ToggleMethods(cv)">@(cv.IsMethodsExpanded ? "Show less" : "Read more")</span>
+                            }
+                        }
+                        else
+                        {
+                            <span class="catalog-empty-value">—</span>
+                        }
+                    </AntDesign.PropertyColumn>
+                }
+
+                @if (ColumnVisibility["QualityControl"])
+                {
+                    <AntDesign.PropertyColumn Property="@(item => item.QCApplied)"
+                                              Title="Quality Control">
+                        @if (cv.QCApplied != null && cv.QCApplied.Count > 0)
+                        {
+                            @foreach (var qc in cv.QCApplied)
+                            {
+                                <Tag>@qc</Tag>
+                            }
+                        }
+                        else
+                        {
+                            <span class="catalog-empty-value">—</span>
+                        }
+                    </AntDesign.PropertyColumn>
+                }
+                @if (ColumnVisibility["Processing"])
+                {
+                    <AntDesign.PropertyColumn Property="@(item => item.ProcessingLevel)"
+                                              Title="Processing">
+                        @if (!string.IsNullOrWhiteSpace(cv.ProcessingLevel))
+                        {
+                            <Tag>@cv.ProcessingLevel</Tag>
+                        }
+                        else
+                        {
+                            <span class="catalog-empty-value">—</span>
+                        }
+                    </AntDesign.PropertyColumn>
+                }
+                @if (ColumnVisibility["Type"])
+                {
+                    <AntDesign.PropertyColumn Property="@(item => item.VariableType)"
+                                              Title="Type">
+                        @if (!string.IsNullOrWhiteSpace(cv.VariableType))
+                        {
+                            <Tag>@cv.VariableType</Tag>
+                        }
+                        else
+                        {
+                            <span class="catalog-empty-value">—</span>
+                        }
+                    </AntDesign.PropertyColumn>
+                }
+
+                @if (ColumnVisibility["Tags"])
+                {
+                    <AntDesign.PropertyColumn Property="@(item => item.Tags)">
+                        @if (cv.Tags != null && cv.Tags.Count > 0)
+                        {
+                            @foreach (var tag in cv.Tags)
+                            {
+                                <Tag><a href="catalog/variables/tags/@tag">@tag</a></Tag>
+                            }
+                        }
+                        else
+                        {
+                            <span class="catalog-empty-value">—</span>
+                        }
+                    </AntDesign.PropertyColumn>
+                }
+
+                @if (ColumnVisibility["Zone"])
+                {
+                    <AntDesign.PropertyColumn Property="@(item => item.Zone)" />
+                }
+
+                @if (ColumnVisibility["Project"])
+                {
+                    <AntDesign.PropertyColumn Property="@(item => item.ProjectName)"
+                                              Title="Project"/>
+                }
+                @if (ColumnVisibility["Dataset"])
+                {
+                    <AntDesign.PropertyColumn Property="@(item => item.DatasetName)"
+                                              Title="Dataset" />
+                }
             </ChildContent>
         </AntDesign.Table>
     </AntDesign.Col>
 </Row>
+
+    <div class="catalog-pagination-bar">
+        <Button Disabled="@(CurrentPage <= 1)" OnClick="() => MoveToPage(CurrentPage - 1)">Previous</Button>
+        <span>Page @CurrentPage of @TotalPages</span>
+        <Button Disabled="@(CurrentPage >= TotalPages)" OnClick="() => MoveToPage(CurrentPage + 1)">Next</Button>
+    </div>
 } else {
     <Empty Simple />
+    <div class="catalog-summary-bar">No variables match the current filters.</div>
 }
 }

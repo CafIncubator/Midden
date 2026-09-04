@@ -2,6 +2,7 @@
 using Caf.Midden.Core.Services.Metadata;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -13,13 +14,13 @@ namespace Caf.Midden.Core.Tests
     public class ProjectReaderTest
     {
         [Fact]
-        private void ReadAsync_v0_2_NoFrontMatter_ReturnsNull()
+        public void Read_v0_2_NoFrontMatter_ReturnsNull()
         {
-            string filePath = @"Assets\ProjectFiles\v0_2_no_front_matter.md";
+            string filePath = Path.Combine("Assets", "ProjectFiles", "v0_2_no_front_matter.md");
             ProjectParser parser = new ProjectParser();
             ProjectReader sut = new ProjectReader(parser);
 
-            Models.v0_2.Project actual;
+            Models.v0_2.Project? actual;
             using (Stream stream = File.OpenRead(filePath))
             {
                 actual = sut.Read(stream);
@@ -29,13 +30,13 @@ namespace Caf.Midden.Core.Tests
         }
 
         [Fact]
-        private void ReadAsync_v0_2_IncorrectFrontMatter_ReturnsNull()
+        public void Read_v0_2_IncorrectFrontMatter_ReturnsNull()
         {
-            string filePath = @"Assets\ProjectFiles\v0_2_incorrect_front_matter.md";
+            string filePath = Path.Combine("Assets", "ProjectFiles", "v0_2_incorrect_front_matter.md");
             ProjectParser parser = new ProjectParser();
             ProjectReader sut = new ProjectReader(parser);
 
-            Models.v0_2.Project actual;
+            Models.v0_2.Project? actual;
             using (Stream stream = File.OpenRead(filePath))
             {
                 actual = sut.Read(stream);
@@ -45,13 +46,13 @@ namespace Caf.Midden.Core.Tests
         }
 
         [Fact]
-        private void ReadAsync_v0_2_NoClosingFrontMatter_ReturnsNull()
+        public void Read_v0_2_NoClosingFrontMatter_ReturnsNull()
         {
-            string filePath = @"Assets\ProjectFiles\v0_2_incorrect_front_matter.md";
+            string filePath = Path.Combine("Assets", "ProjectFiles", "v0_2_no_closing_front_matter.md");
             ProjectParser parser = new ProjectParser();
             ProjectReader sut = new ProjectReader(parser);
 
-            Models.v0_2.Project actual;
+            Models.v0_2.Project? actual;
             using (Stream stream = File.OpenRead(filePath))
             {
                 actual = sut.Read(stream);
@@ -61,13 +62,13 @@ namespace Caf.Midden.Core.Tests
         }
 
         [Fact]
-        private void ReadAsync_v0_2_CorrectFrontMatter_ReturnsNull()
+        public void Read_v0_2_CorrectFrontMatter_ReturnsProject()
         {
-            string filePath = @"Assets\ProjectFiles\v0_2_correct_front_matter.md";
+            string filePath = Path.Combine("Assets", "ProjectFiles", "v0_2_correct_front_matter.md");
             ProjectParser parser = new ProjectParser();
             ProjectReader sut = new ProjectReader(parser);
 
-            Models.v0_2.Project actual;
+            Models.v0_2.Project? actual;
             using (Stream stream = File.OpenRead(filePath))
             {
                 actual = sut.Read(stream);
@@ -76,18 +77,20 @@ namespace Caf.Midden.Core.Tests
             Assert.NotNull(actual);
             Assert.Equal("TestProject", actual.Name);
             Assert.Equal("# Heading", actual.Description);
-            Assert.Equal(DateTime.Parse("2022-05-12T23:37:22.6390000Z"), actual.LastModified);
+            Assert.Equal(
+                DateTime.Parse("2022-05-12T23:37:22.6390000Z", CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind),
+                actual.LastModified);
             Assert.Equal("Incomplete", actual.ProjectStatus);
         }
 
         [Fact]
-        private void ReadAsync_v0_2_CorrectFrontMatterWithAdditonalVariables_ReturnsNull()
+        public void Read_v0_2_CorrectFrontMatterWithAdditonalVariables_ReturnsProject()
         {
-            string filePath = @"Assets\ProjectFiles\v0_2_correct_front_matter_additional_variables.md";
+            string filePath = Path.Combine("Assets", "ProjectFiles", "v0_2_correct_front_matter_additional_variables.md");
             ProjectParser parser = new ProjectParser();
             ProjectReader sut = new ProjectReader(parser);
 
-            Models.v0_2.Project actual;
+            Models.v0_2.Project? actual;
             using (Stream stream = File.OpenRead(filePath))
             {
                 actual = sut.Read(stream);

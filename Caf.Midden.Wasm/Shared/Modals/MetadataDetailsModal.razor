@@ -7,7 +7,7 @@
 @using Caf.Midden.Wasm.Shared.ViewModels
 @inject NavigationManager NavManager
 
-<AntDesign.Row Justify="space-between">
+<AntDesign.Row Justify="@RowJustify.SpaceBetween">
 
     <AntDesign.Col Span="22">
         <strong>@_model.Metadata.Dataset.Zone / @_model.Metadata.Dataset.Project / </strong>
@@ -16,8 +16,8 @@
     @if (NavManager.ToBaseRelativePath(NavManager.Uri).ToString() != "editor")
     {
         <AntDesign.Col Span="2">
-            <Button Type="primary" OnClick="ViewFull">
-                <Icon Type="fullscreen" Theme="outline" /> View Page
+            <Button Type="@ButtonType.Primary" OnClick="ViewFull">
+                <Icon Type="fullscreen" Theme="@IconThemeType.Outline" /> View Page
             </Button>
         </AntDesign.Col>
     }

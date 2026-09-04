@@ -11,12 +11,11 @@
 
 @inject Caf.Midden.Wasm.Services.StateContainer State
 
-<div id="diagramContainer" style="width: 100%; height: 300px;">
-
+<div class="lineage-diagram-container" style="height: @(Height + "px");">
     <CascadingValue Value="Diagram" IsFixed="true">
         <DiagramCanvas></DiagramCanvas>
     </CascadingValue>
-    <div style="position: absolute; bottom:20px; right: 20px">
+    <div class="lineage-diagram-controls">
         <Button Icon="@IconType.Outline.PlusSquare" OnClick="ZoomIn" />
         <Button Icon="@IconType.Outline.MinusSquare" OnClick="ZoomOut" />
     </div>
@@ -26,14 +25,21 @@
     [Parameter]
     public Dataset dataset { get; set; }
 
+    [Parameter]
+    public int Height { get; set; } = 300;
+
     private MetadataLineageDiagramViewModel viewModel;
     private const int COLUMN_WIDTH = 400;
     private const int ROW_HEIGHT = 200;
+    private const int NODE_WIDTH = 250;
+    private const int NODE_HEIGHT = 120;
     private const double ZOOM_INCREMENT = 0.2;
 
-    private bool _InitialResize = false;
-    private int _NumberCols = 1;
-    private int _NumberRows = 1;
+    private bool _ViewportInitialized = false;
+    private double _lastContainerWidth = -1;
+    private double _lastContainerHeight = -1;
+    private double _appliedPanX = 0;
+    private double _appliedPanY = 0;
     private List<List<bool>> _CellTracker = new List<List<bool>>(); // Column<Row<>>
 
     public BlazorDiagram Diagram { get; set; } = null!;
@@ -47,10 +53,30 @@
 
         Diagram = new BlazorDiagram();
         Diagram.Options.Zoom.Enabled = true;
+        Diagram.Options.Zoom.Inverse = true;
         Diagram.RegisterComponent<Caf.Midden.Wasm.Shared.MetadataLineage.MetadataLineageNode, Caf.Midden.Wasm.Shared.MetadataLineage.MetadataLineageWidget>();
         Diagram.ContainerChanged += OnContainerChanged;
 
         CreateNodes(datasetNode, 0, 0);
+    }
+
+    /// <summary>
+    /// Forces the diagram to re-measure its container and re-fit/re-center
+    /// itself. Intended to be called by a hosting component once it knows
+    /// its layout (e.g. a Modal) has fully settled, as a reliable
+    /// event-driven complement to the automatic viewport initialization.
+    /// </summary>
+    public void RefitDiagram()
+    {
+        if (Diagram?.Container == null || Diagram.Container.Width <= 0 || Diagram.Container.Height <= 0)
+        {
+            return;
+        }
+
+        FitAndCenterDiagram();
+        _lastContainerWidth = Diagram.Container.Width;
+        _lastContainerHeight = Diagram.Container.Height;
+        InvokeAsync(StateHasChanged);
     }
 
     private void ZoomIn()
@@ -73,23 +99,96 @@
         }
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!_ViewportInitialized)
+        {
+            await InitializeViewportAsync();
+        }
+    }
+
+    private async Task InitializeViewportAsync()
+    {
+        // With the modal's open animation disabled (see app.css), the
+        // container's ResizeObserver-reported bounds are accurate as soon as
+        // they're non-zero - no need to guess/wait-out an animation anymore.
+        for (int attempt = 0; attempt < 10; attempt++)
+        {
+            if (Diagram.Container != null && Diagram.Container.Width > 0 && Diagram.Container.Height > 0)
+            {
+                FitAndCenterDiagram();
+                _lastContainerWidth = Diagram.Container.Width;
+                _lastContainerHeight = Diagram.Container.Height;
+                _ViewportInitialized = true;
+                return;
+            }
+
+            await Task.Delay(40);
+        }
+    }
+
     private void OnContainerChanged()
     {
-        if(Diagram.Container != null && _InitialResize == false)
+        if (Diagram.Container == null || Diagram.Container.Width <= 0 || Diagram.Container.Height <= 0)
         {
-            Diagram.SetZoom(0.7);
-
-            // Centers base node -- derived from this: https://github.com/Blazor-Diagrams/Blazor.Diagrams/issues/269#issuecomment-1322025484
-            int margin = 0;
-
-            //var width = COLUMN_WIDTH * Diagram.Zoom; 
-            var width = Diagram.Zoom;
-            var scaledMargin = margin * Diagram.Zoom;
-            var deltaX = (Diagram.Container.Width / 2) - (width / 2) - scaledMargin;
-            Diagram.UpdatePan(deltaX, 0);
-
-            _InitialResize = true;
+            return;
         }
+
+        bool sizeChanged =
+            Math.Abs(Diagram.Container.Width - _lastContainerWidth) > 0.5 ||
+            Math.Abs(Diagram.Container.Height - _lastContainerHeight) > 0.5;
+
+        if (sizeChanged)
+        {
+            FitAndCenterDiagram();
+            _lastContainerWidth = Diagram.Container.Width;
+            _lastContainerHeight = Diagram.Container.Height;
+        }
+    }
+
+    /// <summary>
+    /// Computes a zoom level that fits the entire diagram within the current
+    /// container bounds, then centers the diagram within that container.
+    /// </summary>
+    private void FitAndCenterDiagram()
+    {
+        if (Diagram.Container == null || Diagram.Nodes.Count == 0)
+        {
+            return;
+        }
+
+        double minX = Diagram.Nodes.Min(node => node.Position.X);
+        double maxX = Diagram.Nodes.Max(node => node.Position.X) + NODE_WIDTH;
+        double minY = Diagram.Nodes.Min(node => node.Position.Y);
+        double maxY = Diagram.Nodes.Max(node => node.Position.Y) + NODE_HEIGHT;
+
+        double contentWidth = Math.Max(maxX - minX, 1);
+        double contentHeight = Math.Max(maxY - minY, 1);
+
+        const double padding = 40;
+        double availableWidth = Math.Max(Diagram.Container.Width - (padding * 2), 1);
+        double availableHeight = Math.Max(Diagram.Container.Height - (padding * 2), 1);
+
+        double zoom = Math.Min(availableWidth / contentWidth, availableHeight / contentHeight);
+
+        // Don't zoom in past 100% for small diagrams, and never let it collapse to nothing.
+        zoom = Math.Clamp(zoom, 0.1, 1.0);
+
+        Diagram.SetZoom(zoom);
+
+        double contentCenterX = (minX + maxX) / 2.0;
+        double contentCenterY = (minY + maxY) / 2.0;
+
+        double targetPanX = (Diagram.Container.Width / 2.0) - (contentCenterX * zoom);
+        double targetPanY = (Diagram.Container.Height / 2.0) - (contentCenterY * zoom);
+
+        double deltaX = targetPanX - _appliedPanX;
+        double deltaY = targetPanY - _appliedPanY;
+
+        Diagram.UpdatePan(deltaX, deltaY);
+
+        _appliedPanX = targetPanX;
+        _appliedPanY = targetPanY;
     }
 
     private void CreateNodes(DatasetNode datasetNode, int column, int row, NodeModel thisNode = null)

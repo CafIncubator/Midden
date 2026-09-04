@@ -1,6 +1,7 @@
 ﻿using AntDesign;
 using Caf.Midden.Core.Models.v0_2;
 using Caf.Midden.Wasm.Shared.Modals;
+using Caf.Midden.Wasm.Services;
 using Markdig;
 using Microsoft.AspNetCore.Components;
 using System;
@@ -12,6 +13,8 @@ namespace Caf.Midden.Wasm.Shared
 {
     public partial class ProjectDetails : IDisposable
     {
+        private IDisposable? _stateSubscription;
+
         [Parameter]
         public string ProjectName { get; set; }
 
@@ -24,8 +27,10 @@ namespace Caf.Midden.Wasm.Shared
 
         protected override void OnInitialized()
         {
-            State.StateChanged += async (source, property)
-                => await StateChanged(source, property);
+            _stateSubscription = State.Subscribe(
+                this,
+                OnStateChanged,
+                AppStateChange.Catalog);
 
             if (State?.Catalog != null)
             {
@@ -39,26 +44,17 @@ namespace Caf.Midden.Wasm.Shared
             }
         }
 
-        private async Task StateChanged(
-            ComponentBase source,
-            string property)
+        private async Task OnStateChanged(AppStateChangedEventArgs args)
         {
-            if (source != this)
+            SetProject();
+            if(Project != null)
             {
-                if (property == "UpdateCatalog")
-                {
-                    SetProject();
-                    if(Project != null)
-                    {
-                        SetMarkdown();
-                        SetNumberDatasets();
-                        SetNumberVariables();
-                    }
-                    
-                }
-
-                await InvokeAsync(StateHasChanged);
+                SetMarkdown();
+                SetNumberDatasets();
+                SetNumberVariables();
             }
+
+            await InvokeAsync(StateHasChanged);
         }
 
         private void SetProject()
@@ -110,8 +106,7 @@ namespace Caf.Midden.Wasm.Shared
 
         public void Dispose()
         {
-            State.StateChanged -= async (source, property)
-                => await StateChanged(source, property);
+            _stateSubscription?.Dispose();
         }
     }
 }

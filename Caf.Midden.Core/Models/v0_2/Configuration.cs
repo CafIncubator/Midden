@@ -4,13 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Caf.Midden.Core.Services.Configuration;
 
 namespace Caf.Midden.Core.Models.v0_2
 {
     public class Configuration
     {
         [JsonPropertyName("schemaVersion")]
-        public string SchemaVersion { get; set; }
+        public string SchemaVersion { get; set; } = AppConfigurationVersions.Current;
 
         [JsonPropertyName("isConfigured")]
         public bool IsConfigured { get; set; } = false;

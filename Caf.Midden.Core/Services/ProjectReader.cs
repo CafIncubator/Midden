@@ -1,47 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using Caf.Midden.Core.Models.v0_2;
 using System.Text;
-using System.Threading.Tasks;
-using Caf.Midden.Core.Models.v0_2;
 
-namespace Caf.Midden.Core.Services
+namespace Caf.Midden.Core.Services;
+
+public sealed class ProjectReader
 {
-    public class ProjectReader
+    private readonly IParseProjects parser;
+
+    public ProjectReader(IParseProjects parser)
     {
-        private readonly IParseProjects parser;
+        this.parser = parser;
+    }
 
-        public ProjectReader(
-            IParseProjects parser)
-        {
-            this.parser = parser;
-        }
+    public Project? Read(Stream stream)
+    {
+        ArgumentNullException.ThrowIfNull(stream);
 
-        public Project Read(
-            Stream stream)
-        {
-            Project project;
-            using (var sr = new StreamReader(stream, Encoding.UTF8))
-            {
-                project = parser.Parse(sr);
-            }
+        using var streamReader = new StreamReader(stream, Encoding.UTF8);
+        return parser.Parse(streamReader);
+    }
 
-            return project;
-        }
+    public Project? Read(string fileString)
+    {
+        ArgumentNullException.ThrowIfNull(fileString);
 
-        public Project Read(
-            string fileString)
-        {
-            Project project;
-            MemoryStream ms = new MemoryStream(Encoding.UTF8.GetBytes(fileString));
-            using(var sr = new StreamReader(ms, Encoding.UTF8))
-            {
-                project = parser.Parse(sr);
-            }
-            
-
-            return project;
-        }
+        using var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(fileString));
+        using var streamReader = new StreamReader(memoryStream, Encoding.UTF8);
+        return parser.Parse(streamReader);
     }
 }

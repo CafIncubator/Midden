@@ -14,6 +14,9 @@ namespace Caf.Midden.Wasm.Shared
 {
     public partial class MetadataLoaderFileSystem : ComponentBase
     {
+        [Inject]
+        private IMessageService MessageService { get; set; } = default!;
+
         [Parameter]
         public Metadata Metadata { get; set; }
 
@@ -26,16 +29,15 @@ namespace Caf.Midden.Wasm.Shared
         private async Task OnInputFileMetadataChange(
             InputFileChangeEventArgs e)
         {
-            isLoading = true;
-
             if (e.FileCount != 1)
             {
                 return;
             }
 
+            isLoading = true;
+
             try
             {
-                // TODO IoC?
                 MetadataReader metadataReader =
                         new MetadataReader(
                             new MetadataParser(
@@ -46,9 +48,13 @@ namespace Caf.Midden.Wasm.Shared
 
                 await MetadataChanged.InvokeAsync(this.Metadata);
             }
-            catch
+            catch (Exception)
             {
-                // TODO: Indicate error state
+                MessageService.Error(new MessageConfig
+                {
+                    Content = "The metadata file could not be read. Check that it is a valid .midden JSON file and try again.",
+                    Duration = 8
+                });
             }
             finally
             {

@@ -1,0 +1,29 @@
+@if (Items != null && Items.Count > 0)
+{
+    <AntList Bordered="@Bordered" DataSource="@Items">
+        <ChildContent Context="item">
+            <ListItem Style="overflow:auto;">
+                <div class="@(item.IsExpanded ? "details-preserve-lines" : "truncate details-preserve-lines")">@item.Content</div>
+                @if (item.CanExpand)
+                {
+                    <span class="catalog-read-more" @onclick="@(() => OnToggle.InvokeAsync(item))">@(item.IsExpanded ? "Show less" : "Read more")</span>
+                }
+            </ListItem>
+        </ChildContent>
+    </AntList>
+}
+else
+{
+    <Empty Simple />
+}
+
+@code {
+    [Parameter]
+    public List<MetadataDetails.ExpandableTextItem> Items { get; set; } = new();
+
+    [Parameter]
+    public bool Bordered { get; set; } = true;
+
+    [Parameter]
+    public EventCallback<MetadataDetails.ExpandableTextItem> OnToggle { get; set; }
+}

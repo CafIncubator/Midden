@@ -1,0 +1,155 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_NOLOGO: true
+
+jobs:
+  build-and-test:
+    name: Build and test (${{ matrix.name }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Linux
+            runner: ubuntu-latest
+          - name: Windows
+            runner: windows-latest
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - name: Restore
+        run: dotnet restore Caf.Midden.slnx
+
+      - name: Build
+        run: >-
+          dotnet build Caf.Midden.slnx
+          --configuration Release
+          --no-restore
+          --warnaserror
+          -p:VersionSuffix=dev.${{ github.run_number }}
+
+      - name: Test
+        run: dotnet test Caf.Midden.slnx --configuration Release --no-build
+
+  coverage:
+    name: Coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - name: Restore
+        run: dotnet restore Caf.Midden.slnx
+
+      - name: Build
+        run: >-
+          dotnet build Caf.Midden.slnx
+          --configuration Release
+          --no-restore
+          --warnaserror
+          -p:VersionSuffix=dev.${{ github.run_number }}
+
+      - name: Collect Core coverage
+        run: >-
+          dotnet test Caf.Midden.Core.Tests/Caf.Midden.Core.Tests.csproj
+          --configuration Release
+          --no-build
+          --collect:"XPlat Code Coverage"
+          --results-directory TestResults/Coverage/Core
+
+      - name: Collect CLI coverage
+        run: >-
+          dotnet test Caf.Midden.Cli.Tests/Caf.Midden.Cli.Tests.csproj
+          --configuration Release
+          --no-build
+          --collect:"XPlat Code Coverage"
+          --results-directory TestResults/Coverage/Cli
+
+      - name: Upload coverage reports
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-cobertura
+          path: TestResults/Coverage/**/coverage.cobertura.xml
+          if-no-files-found: error
+          retention-days: 14
+
+  accessibility:
+    name: Accessibility
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Restore Wasm
+        run: dotnet restore Caf.Midden.Wasm/Caf.Midden.Wasm.csproj
+
+      - name: Install accessibility dependencies
+        run: npm ci
+
+      - name: Verify bundled web assets
+        run: npm run verify:web-assets
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Test representative routes
+        run: npm run test:accessibility
+
+      - name: Upload accessibility diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: accessibility-diagnostics
+          path: TestResults/Accessibility
+          if-no-files-found: warn
+          retention-days: 14

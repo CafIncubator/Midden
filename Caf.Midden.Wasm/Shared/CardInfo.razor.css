@@ -1,0 +1,21 @@
+.card-info {
+    color: rgba(0, 0, 0, 0.35);
+    cursor: help;
+    display: inline-flex;
+    align-items: center;
+    font-size: 14px;
+    line-height: 1;
+    transition: color 0.2s;
+}
+
+/* The icon is a hint, not a control, so it stays quiet until sought out. */
+.card-info:hover,
+.card-info:focus {
+    color: #1890ff;
+}
+
+.card-info:focus-visible {
+    outline: 2px solid #1890ff;
+    outline-offset: 2px;
+    border-radius: 2px;
+}

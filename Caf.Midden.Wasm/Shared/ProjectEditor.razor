@@ -1,5 +1,6 @@
 ﻿@using AntDesign
 @inject Caf.Midden.Wasm.Services.StateContainer State
+@inject Caf.Midden.Wasm.Services.AutosaveService Autosave
 @inject ModalService ModalService
 @inject IJSRuntime JS
 
@@ -9,7 +10,7 @@
                     OkText="Reset"
                     CancelText="Cancel"
                     OnConfirm="NewProjectEdit">
-            <Button><Icon Type="plus" Theme="outline" /> New</Button>
+            <Button><Icon Type="plus" Theme="@IconThemeType.Outline" /> New</Button>
         </Popconfirm>
     </SpaceItem>
     <SpaceItem>
@@ -26,12 +27,34 @@
         }
     </div>
     </SpaceItem>
+    <SpaceItem>
+        <span class="autosave-status">@AutosaveStatusText</span>
+    </SpaceItem>
+    <SpaceItem>
+        <ValidationStatusChip Result="_validation" />
+    </SpaceItem>
 </Space>
 <AntDesign.Divider />
+
+@* Rendered declaratively (rather than via ConfirmService) so the prompt is owned by this
+   component's own render tree. The shared AntContainer resets its imperative dialog state on
+   NavigationManager.LocationChanged, which silently discarded confirm dialogs requested during
+   the navigation that creates this editor. *@
+<Modal Title="@("Resume Draft?")"
+       Visible="_draftRestorePromptVisible"
+       OkText="@("Yes")"
+       CancelText="@("No")"
+       OnOk="@(_ => OnDraftRestoreAccepted())"
+       OnCancel="@(_ => OnDraftRestoreDeclined())"
+       MaskClosable="false"
+       Closable="false">
+    <p>@DraftRestorePromptText</p>
+</Modal>
 @if(State?.ProjectEdit != null && State?.AppConfig != null)
 {
     <AntDesign.Form Model="State.ProjectEdit"
-                    Layout="@FormLayout.Vertical"> 
+                    Layout="@FormLayout.Vertical"
+                    OnFieldChanged="OnFormFieldChanged"> 
                 <FormItem Label="Name">
                     <AntDesign.Input @bind-Value="@context.Name"
                                         Placeholder="Name of project" />
@@ -53,12 +76,22 @@
                 </FormItem>
     </AntDesign.Form>
     <Divider />
-    <Row Justify="end">
-        <Button Type="primary" OnClick="SaveProject">
-            <Icon Type="download" />
-            Download
-        </Button>
+    <Row Justify="@RowJustify.End">
+        <Space>
+            @* Repeated from the toolbar so the state is visible at the point of action. *@
+            <SpaceItem>
+                <ValidationStatusChip Result="_validation" Announce="false" />
+            </SpaceItem>
+            <SpaceItem>
+                <Button Type="@ButtonType.Primary" OnClick="RequestDownload">
+                    <Icon Type="download" />
+                    Download
+                </Button>
+            </SpaceItem>
+        </Space>
     </Row>
+
+    <ValidationGate @ref="_validationGate" OnConfirmed="@(() => SaveProject())" />
 } else {
     <p>Loading...</p>
 }

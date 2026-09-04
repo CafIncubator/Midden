@@ -1,31 +1,56 @@
 ﻿@inject IJSRuntime JS
 @implements IAsyncDisposable
 
-<div @ref="map" id="map" style="height: 300px; width: 300px;"></div>
+@if (_errorMessage is not null)
+{
+    <p role="alert">@_errorMessage</p>
+}
+<div @ref="map" id="@_mapId" style="height: 300px; width: 300px;"></div>
 
 @code {
+    private readonly string _mapId = $"map-{Guid.NewGuid():N}";
+
     ElementReference map;
-    IJSObjectReference mapModule;
-    IJSObjectReference mapInstance;
+    IJSObjectReference? mapModule;
+    IJSObjectReference? mapInstance;
+    string? _errorMessage;
+    bool _loadAttempted;
 
     [Parameter]
-    public string Geometry { get; set; }
+    public string? Geometry { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        // Creates the map DOM element if it's not alreay created
-        if(mapModule == null && Geometry != null)
+        // Creates the map DOM element if it's not already created
+        if (!_loadAttempted && !string.IsNullOrWhiteSpace(Geometry))
         {
-            mapModule = await JS.InvokeAsync<IJSObjectReference>(
-                "import", "./geojsonMap.js");
-            mapInstance = await mapModule.InvokeAsync<IJSObjectReference>(
-                "create", map, this.Geometry);
+            _loadAttempted = true;
+
+            try
+            {
+                mapModule = await JS.InvokeAsync<IJSObjectReference>(
+                    "import", "./geojsonMap.js");
+                mapInstance = await mapModule.InvokeAsync<IJSObjectReference>(
+                    "create", map, Geometry);
+            }
+            catch (JSException)
+            {
+                _errorMessage = "The spatial preview could not be displayed. Check that the geometry contains valid GeoJSON.";
+                await InvokeAsync(StateHasChanged);
+            }
         }
     }
 
     async ValueTask IAsyncDisposable.DisposeAsync()
     {
-        await mapInstance.DisposeAsync();
-        await mapModule.DisposeAsync();
+        if (mapInstance != null)
+        {
+            await mapInstance.DisposeAsync();
+        }
+
+        if (mapModule != null)
+        {
+            await mapModule.DisposeAsync();
+        }
     }
 }

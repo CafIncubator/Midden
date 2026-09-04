@@ -5,199 +5,172 @@ using Caf.Midden.Cli.Common;
 using Caf.Midden.Core.Models.v0_2;
 using Caf.Midden.Core.Services;
 using Caf.Midden.Core.Services.Metadata;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Text;
 
-namespace Caf.Midden.Cli.Services
+namespace Caf.Midden.Cli.Services;
+
+public sealed class AzureFileShareCrawler : ICrawl
 {
-    public class AzureFileShareCrawler : ICrawl
+    private readonly string path;
+    private readonly ShareClient shareClient;
+    private readonly ICrawlLogger logger;
+    private List<(ShareDirectoryClient Directory, ShareFileItem Item)>? cachedFiles;
+
+    public AzureFileShareCrawler(string uri, string path, string sharedAccessSignature, ICrawlLogger? logger = null)
     {
-        private const string MIDDEN_FILE_EXTENSION = ".midden";
-        private const string MIPPEN_FILE_SEARCH_TERM = "DESCRIPTION.md";
+        ArgumentException.ThrowIfNullOrWhiteSpace(uri);
+        ArgumentException.ThrowIfNullOrWhiteSpace(path);
+        ArgumentException.ThrowIfNullOrWhiteSpace(sharedAccessSignature);
 
-        private readonly string uri;
-        private readonly string path;
-        private readonly AzureSasCredential sasCred;
+        this.path = path;
+        shareClient = new ShareClient(new Uri(uri), new AzureSasCredential(sharedAccessSignature));
+        this.logger = logger ?? ConsoleCrawlLogger.Instance;
+    }
 
-        private readonly ShareClient shareClient;
+    public void Dispose()
+    {
+        // ShareClient holds no unmanaged resources requiring explicit disposal.
+    }
 
-        public AzureFileShareCrawler(
-            string uri,
-            string path,
-            string sharedAccessSignature)
+    internal IReadOnlyList<string> GetFileNames(string fileExtension)
+    {
+        List<string> names = [];
+
+        try
         {
-            this.uri = uri;   
-            this.path = path;
-
-            this.sasCred = new AzureSasCredential(sharedAccessSignature);
-            this.shareClient = InitializeClient();
-        }
-
-        private ShareClient InitializeClient()
-        {
-            ShareClient shareClient = new ShareClient(
-                new Uri(this.uri),
-                this.sasCred);
-
-            return shareClient;
-        }
-
-        // Gets a list of midden file names
-        public List<string> GetFileNames(string fileExtension)
-        {
-            var names = new List<string>();
-
-            try
+            foreach (var (directory, item) in EnumerateFiles())
             {
-                var remaining = new Queue<ShareDirectoryClient>();
-
-                remaining.Enqueue(shareClient.GetDirectoryClient(this.path));
-                while (remaining.Count > 0)
+                if (!item.Name.EndsWith(fileExtension, StringComparison.OrdinalIgnoreCase))
                 {
-                    ShareDirectoryClient dir = remaining.Dequeue();
-                    foreach (ShareFileItem item in dir.GetFilesAndDirectories())
-                    {
-                        if (item.IsDirectory)
-                        {
-                            remaining.Enqueue(dir.GetSubdirectoryClient(item.Name));
-                        }
-                        else if (item.Name.Contains(fileExtension))
-                        {
-                            Console.WriteLine($"  In {dir.Name} found {item.Name}");
-
-                            names.Add(item.Name);
-                        }
-                    }
+                    continue;
                 }
 
-                Console.WriteLine($"Found a total of {names.Count} files");
-            }
-            catch(Exception e)
-            {
-                Console.WriteLine($"An error ocurred: {e}");
+                logger.Info($"  In {directory.Name} found {item.Name}");
+                names.Add(item.Name);
             }
 
-            return names;
+            logger.Info($"Found a total of {names.Count} files");
+        }
+        catch (Exception exception)
+        {
+            logger.Warning($"An error occurred while listing files: {exception.Message}");
         }
 
-        public List<Metadata> GetMetadatas(
-            IMetadataParser parser)
+        return names;
+    }
+
+    public IReadOnlyList<Metadata> GetMetadatas(IMetadataParser parser)
+    {
+        List<Metadata> metadatas = [];
+
+        try
         {
-            List<Metadata> metadatas = new List<Metadata>();
-
-            try
+            foreach (var (directory, item) in EnumerateFiles())
             {
-                var remaining = new Queue<ShareDirectoryClient>();
-
-                remaining.Enqueue(shareClient.GetDirectoryClient(this.path));
-                while (remaining.Count > 0)
+                if (!item.Name.EndsWith(MiddenFileConventions.MiddenFileExtension, StringComparison.OrdinalIgnoreCase))
                 {
-                    ShareDirectoryClient dir = remaining.Dequeue();
-                    foreach (ShareFileItem item in dir.GetFilesAndDirectories())
-                    {
-                        if (item.IsDirectory)
-                        {
-                            remaining.Enqueue(dir.GetSubdirectoryClient(item.Name));
-                        }
-                        else if (item.Name.Contains(MIDDEN_FILE_EXTENSION))
-                        {
-                            Console.WriteLine($"  In {dir.Uri.AbsolutePath} found {item.Name}");
-
-                            ShareFileClient file = dir.GetFileClient(item.Name);
-
-                            ShareFileDownloadInfo fileContents = file.Download();
-                            string json;
-                            using (MemoryStream ms = new MemoryStream())
-                            {
-                                fileContents.Content.CopyTo(ms);
-                                json = Encoding.UTF8.GetString(ms.ToArray());
-                            }
-
-                            // Parse json string
-                            Metadata metadata = parser.Parse(json);
-
-                            // Sets the dataset path relative to the Uri and Path specified in constructor
-                            var filePath = 
-                                Path.GetRelativePath(this.path, file.Path)
-                                .Replace(MIDDEN_FILE_EXTENSION, "");
-
-                            metadata.Dataset.DatasetPath = filePath;
-
-                            metadatas.Add(metadata);
-                        }
-                    }
+                    continue;
                 }
 
-                Console.WriteLine($"Found a total of {metadatas.Count} files");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine($"An error ocurred: {e}");
-            }
+                logger.Info($"  In {directory.Uri.AbsolutePath} found {item.Name}");
+                var file = directory.GetFileClient(item.Name);
+                var fileContents = file.Download();
 
-            return metadatas;
-        }
-
-        public List<Project> GetProjects(
-            ProjectReader reader)
-        {
-            List<Project> projects = new List<Project>();
-
-            try
-            {
-                var remaining = new Queue<ShareDirectoryClient>();
-
-                remaining.Enqueue(shareClient.GetDirectoryClient(this.path));
-                while (remaining.Count > 0)
+                string json;
+                using (var stream = fileContents.Value.Content)
+                using (var reader = new StreamReader(stream, Encoding.UTF8, detectEncodingFromByteOrderMarks: true))
                 {
-                    ShareDirectoryClient dir = remaining.Dequeue();
-                    foreach (ShareFileItem item in dir.GetFilesAndDirectories())
-                    {
-                        if (item.IsDirectory)
-                        {
-                            remaining.Enqueue(dir.GetSubdirectoryClient(item.Name));
-                        }
-                        else if (item.Name.Contains(MIPPEN_FILE_SEARCH_TERM))
-                        {
-                            Console.WriteLine($"  In {dir.Uri.AbsolutePath} found {item.Name}");
-
-                            ShareFileClient file = dir.GetFileClient(item.Name);
-
-                            ShareFileDownloadInfo fileContents = file.Download();
-                            Project project;
-                            using (var stream = fileContents.Content)
-                            {
-                                project = reader.Read(stream);
-                            }
-
-                            if(project is not null)
-                                projects.Add(project);
-                            //string fileString;
-                            //using (MemoryStream ms = new MemoryStream())
-                            //{
-                            //    fileContents.Content.CopyTo(ms);
-                            //    fileString = Encoding.UTF8.GetString(ms.ToArray());
-                            //}
-                            //
-                            //Project project = new Project()
-                            //{
-                            //    Name = file.Name.Replace(MIPPEN_FILE_EXTENSION, ""),
-                            //    Description = fileString
-                            //};
-                        }
-                    }
+                    json = reader.ReadToEnd();
                 }
 
-                Console.WriteLine($"Found a total of {projects.Count} files");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine($"An error ocurred: {e}");
+                var metadata = parser.Parse(json);
+
+                if (metadata.Dataset is null)
+                {
+                    logger.Warning($"Skipping file '{item.Name}': the file has no 'Dataset' section.");
+                    continue;
+                }
+
+                metadata.Dataset.DatasetPath = MiddenFileConventions.NormalizeDatasetPath(
+                    MiddenFileConventions.TrimSuffix(
+                        Path.GetRelativePath(path, file.Path),
+                        MiddenFileConventions.MiddenFileExtension));
+                metadatas.Add(metadata);
             }
 
-            return projects;
+            logger.Info($"Found a total of {metadatas.Count} files");
         }
+        catch (Exception exception)
+        {
+            logger.Warning($"An error occurred while reading metadata: {exception.Message}");
+        }
+
+        return metadatas;
+    }
+
+    public IReadOnlyList<Project> GetProjects(ProjectReader reader)
+    {
+        List<Project> projects = [];
+
+        try
+        {
+            foreach (var (directory, item) in EnumerateFiles())
+            {
+                if (!item.Name.EndsWith(MiddenFileConventions.MippenFileSearchTerm, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                logger.Info($"  In {directory.Uri.AbsolutePath} found {item.Name}");
+                var file = directory.GetFileClient(item.Name);
+                var fileContents = file.Download();
+
+                using var stream = fileContents.Value.Content;
+                var project = reader.Read(stream);
+
+                if (project is not null)
+                {
+                    projects.Add(project);
+                }
+            }
+
+            logger.Info($"Found a total of {projects.Count} files");
+        }
+        catch (Exception exception)
+        {
+            logger.Warning($"An error occurred while reading projects: {exception.Message}");
+        }
+
+        return projects;
+    }
+
+    private IEnumerable<(ShareDirectoryClient Directory, ShareFileItem Item)> EnumerateFiles()
+    {
+        if (cachedFiles is not null)
+        {
+            return cachedFiles;
+        }
+
+        cachedFiles = [];
+        var remaining = new Queue<ShareDirectoryClient>();
+        remaining.Enqueue(shareClient.GetDirectoryClient(path));
+
+        while (remaining.Count > 0)
+        {
+            var directory = remaining.Dequeue();
+
+            foreach (var item in directory.GetFilesAndDirectories())
+            {
+                if (item.IsDirectory)
+                {
+                    remaining.Enqueue(directory.GetSubdirectoryClient(item.Name));
+                    continue;
+                }
+
+                cachedFiles.Add((directory, item));
+            }
+        }
+
+        return cachedFiles;
     }
 }

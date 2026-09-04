@@ -1,0 +1,16 @@
+@if (Dataset?.Tags != null && Dataset.Tags.Any())
+{
+    @foreach (var tag in Dataset.Tags)
+    {
+        <Tag><a href="catalog/datasets/tags/@tag">@tag</a></Tag>
+    }
+}
+else
+{
+    <Empty Simple />
+}
+
+@code {
+    [Parameter]
+    public Caf.Midden.Core.Models.v0_2.Dataset? Dataset { get; set; }
+}
