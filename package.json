@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@geoman-io/leaflet-geoman-free": "2.20.0",
-    "leaflet": "1.7.1",
+    "leaflet": "1.9.4",
     "leaflet.heat": "0.2.0"
   },
   "overrides": {}
