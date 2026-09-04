@@ -16,9 +16,9 @@
     <PackageReference Include="Azure.Identity" Version="1.21.0" />
     <PackageReference Include="Azure.Storage.Files.DataLake" Version="12.27.1" />
     <PackageReference Include="Azure.Storage.Files.Shares" Version="12.27.1" />
-    <PackageReference Include="Google.Apis.Drive.v3" Version="1.75.0.4218" />
-    <PackageReference Include="System.CommandLine" Version="2.0.10" />
-    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.10" />
+    <PackageReference Include="Google.Apis.Drive.v3" Version="1.76.0.4252" />
+    <PackageReference Include="System.CommandLine" Version="2.0.11" />
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.11" />
   </ItemGroup>
 
   <ItemGroup>
