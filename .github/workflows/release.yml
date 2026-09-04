@@ -1,0 +1,346 @@
+name: Release artifacts
+
+on:
+  push:
+    branches:
+      - develop
+    tags:
+      - "v*"
+    paths:
+      - .github/workflows/release.yml
+      - Caf.Midden.slnx
+      - Directory.Build.props
+      - global.json
+      - "Caf.Midden.*/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_NOLOGO: true
+
+jobs:
+  metadata:
+    name: Resolve release metadata
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      is_release: ${{ steps.version.outputs.is_release }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Resolve and validate version
+        id: version
+        shell: pwsh
+        env:
+          REF_NAME: ${{ github.ref_name }}
+          REF_TYPE: ${{ github.ref_type }}
+          RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          [xml] $buildProperties = Get-Content Directory.Build.props
+          $versionPrefix = [string] $buildProperties.Project.PropertyGroup.VersionPrefix
+
+          if ($versionPrefix -notmatch '^\d+\.\d+\.\d+$') {
+            throw "VersionPrefix '$versionPrefix' is not a stable semantic version."
+          }
+
+          $isRelease = $env:REF_TYPE -eq 'tag'
+          if ($isRelease) {
+            $tag = $env:REF_NAME
+            if ($tag -notmatch '^v\d+\.\d+\.\d+$') {
+              throw "Release tags must use vMAJOR.MINOR.PATCH; received '$tag'."
+            }
+
+            $version = $tag.Substring(1)
+            if ($version -ne $versionPrefix) {
+              throw "Tag version '$version' does not match VersionPrefix '$versionPrefix'."
+            }
+
+            git fetch origin main:refs/remotes/origin/main
+            git merge-base --is-ancestor HEAD refs/remotes/origin/main
+            if ($LASTEXITCODE -ne 0) {
+              throw 'A stable release tag must point to a commit on main.'
+            }
+          }
+          else {
+            $version = "$versionPrefix-dev.$env:RUN_NUMBER"
+          }
+
+          "version=$version" >> $env:GITHUB_OUTPUT
+          "is_release=$($isRelease.ToString().ToLowerInvariant())" >> $env:GITHUB_OUTPUT
+          "Building Midden $version" >> $env:GITHUB_STEP_SUMMARY
+
+  validate:
+    name: Validate candidate
+    needs: metadata
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - name: Restore
+        run: dotnet restore Caf.Midden.slnx
+
+      - name: Build
+        run: >-
+          dotnet build Caf.Midden.slnx
+          --configuration Release
+          --no-restore
+          --warnaserror
+          -p:Version=${{ needs.metadata.outputs.version }}
+
+      - name: Test
+        run: >-
+          dotnet test Caf.Midden.slnx
+          --configuration Release
+          --no-build
+          -p:Version=${{ needs.metadata.outputs.version }}
+
+  package:
+    name: Package and smoke test (${{ matrix.rid }})
+    needs: [metadata, validate]
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 25
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - rid: win-x64
+            runner: windows-latest
+            executable: MiddenCli.exe
+            archive-extension: zip
+            ready-to-run: true
+          - rid: linux-x64
+            runner: ubuntu-latest
+            executable: MiddenCli
+            archive-extension: tar.gz
+            ready-to-run: false
+          - rid: osx-x64
+            runner: macos-15-intel
+            executable: MiddenCli
+            archive-extension: tar.gz
+            ready-to-run: false
+          - rid: osx-arm64
+            runner: macos-15
+            executable: MiddenCli
+            archive-extension: tar.gz
+            ready-to-run: false
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - name: Restore CLI
+        run: >-
+          dotnet restore Caf.Midden.Cli/Caf.Midden.Cli.csproj
+          --runtime ${{ matrix.rid }}
+          -p:Version=${{ needs.metadata.outputs.version }}
+          -p:PublishReadyToRun=${{ matrix.ready-to-run }}
+
+      - name: Publish CLI
+        run: >-
+          dotnet publish Caf.Midden.Cli/Caf.Midden.Cli.csproj
+          --configuration Release
+          --framework net10.0
+          --runtime ${{ matrix.rid }}
+          --self-contained true
+          --no-restore
+          --output publish/${{ matrix.rid }}
+          -p:Version=${{ needs.metadata.outputs.version }}
+          -p:PublishReadyToRun=${{ matrix.ready-to-run }}
+          -p:PublishSingleFile=true
+          -p:UseAppHost=true
+          -p:IncludeNativeLibrariesForSelfExtract=true
+          -p:DebugType=None
+          -p:DebugSymbols=false
+
+      - name: Smoke test CLI
+        shell: pwsh
+        run: |
+          $executable = Join-Path 'publish/${{ matrix.rid }}' '${{ matrix.executable }}'
+          & $executable --help
+          if ($LASTEXITCODE -ne 0) {
+            throw '--help failed.'
+          }
+
+          $actualVersion = (& $executable --version | Out-String).Trim()
+          if ($LASTEXITCODE -ne 0) {
+            throw '--version failed.'
+          }
+          if ($actualVersion -ne '${{ needs.metadata.outputs.version }}') {
+            throw "Expected version '${{ needs.metadata.outputs.version }}', received '$actualVersion'."
+          }
+
+      - name: Create Windows archive
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: >-
+          Compress-Archive
+          -Path 'publish/${{ matrix.rid }}/*'
+          -DestinationPath 'MiddenCli-${{ needs.metadata.outputs.version }}-${{ matrix.rid }}.zip'
+
+      - name: Create Unix archive
+        if: runner.os != 'Windows'
+        shell: bash
+        run: >-
+          tar -czf
+          "MiddenCli-${{ needs.metadata.outputs.version }}-${{ matrix.rid }}.tar.gz"
+          -C "publish/${{ matrix.rid }}" .
+
+      - name: Attest archive provenance
+        uses: actions/attest@v4
+        with:
+          subject-path: MiddenCli-${{ needs.metadata.outputs.version }}-${{ matrix.rid }}.${{ matrix.archive-extension }}
+
+      - name: Upload archive
+        uses: actions/upload-artifact@v7
+        with:
+          name: release-${{ matrix.rid }}
+          path: MiddenCli-${{ needs.metadata.outputs.version }}-${{ matrix.rid }}.${{ matrix.archive-extension }}
+          if-no-files-found: error
+          retention-days: 14
+
+  checksums:
+    name: Create checksum manifest
+    needs: [metadata, package]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+
+    steps:
+      - name: Download archives
+        uses: actions/download-artifact@v8
+        with:
+          pattern: release-*
+          path: release-assets
+          merge-multiple: true
+
+      - name: Create and verify checksum manifest
+        shell: pwsh
+        run: |
+          $archives = @(Get-ChildItem release-assets/MiddenCli-* -File | Sort-Object Name)
+          if ($archives.Count -ne 4) {
+            throw "Expected four release archives, found $($archives.Count)."
+          }
+
+          $manifest = foreach ($archive in $archives) {
+            $hash = (Get-FileHash $archive.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+            "$hash  $($archive.Name)"
+          }
+          $manifest | Set-Content release-assets/SHA256SUMS -Encoding ascii
+
+          Push-Location release-assets
+          sha256sum --check SHA256SUMS
+          if ($LASTEXITCODE -ne 0) {
+            throw 'Checksum verification failed.'
+          }
+          Pop-Location
+
+      - name: Attest checksum manifest
+        uses: actions/attest@v4
+        with:
+          subject-path: release-assets/SHA256SUMS
+
+      - name: Upload release assets
+        uses: actions/upload-artifact@v7
+        with:
+          name: release-assets
+          path: release-assets/*
+          if-no-files-found: error
+          retention-days: 14
+
+  publish:
+    name: Publish GitHub Release
+    if: needs.metadata.outputs.is_release == 'true'
+    needs: [metadata, checksums]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: release
+    permissions:
+      contents: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Download release assets
+        uses: actions/download-artifact@v8
+        with:
+          name: release-assets
+          path: release-assets
+
+      - name: Extract release notes from changelog
+        shell: pwsh
+        env:
+          VERSION: ${{ needs.metadata.outputs.version }}
+        run: |
+          $lines = @(Get-Content CHANGELOG.md)
+          $heading = "^## \[$([regex]::Escape($env:VERSION))\] - \d{4}-\d{2}-\d{2}$"
+          $start = -1
+          for ($index = 0; $index -lt $lines.Count; $index++) {
+            if ($lines[$index] -match $heading) {
+              $start = $index
+              break
+            }
+          }
+          if ($start -lt 0) {
+            throw "CHANGELOG.md has no dated section for $env:VERSION."
+          }
+
+          $end = $lines.Count
+          for ($index = $start + 1; $index -lt $lines.Count; $index++) {
+            if ($lines[$index] -match '^## \[') {
+              $end = $index
+              break
+            }
+          }
+
+          $lines[($start + 1)..($end - 1)] |
+            Set-Content RELEASE_NOTES.md -Encoding utf8
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh release create "${{ github.ref_name }}"
+          release-assets/*
+          --verify-tag
+          --title "Midden ${{ github.ref_name }}"
+          --notes-file RELEASE_NOTES.md

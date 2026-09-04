@@ -1,0 +1,81 @@
+name: Bug report
+description: Report reproducible behavior that is not working as expected
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting a problem. Search existing issues before submitting.
+        Do not include credentials, private URLs, identifying research data, or other sensitive information.
+        Report security vulnerabilities through the private process in SECURITY.md, not through this form.
+  - type: dropdown
+    id: component
+    attributes:
+      label: Affected component
+      options:
+        - Metadata editor
+        - Data catalog
+        - CLI
+        - Core library or validation
+        - Build or CI
+        - Documentation
+        - Other or unknown
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      description: Provide the release version or commit identifier where the problem occurs.
+      placeholder: v0.4.0 or a commit identifier
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Problem
+      description: Describe what happened and why it is a problem for your workflow.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Provide the smallest reliable sequence that demonstrates the problem.
+      placeholder: |
+        1. Start with ...
+        2. Run or select ...
+        3. Observe ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: Describe what you expected to happen.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Include relevant operating system, browser, .NET SDK, data-store type, and hosting details.
+      placeholder: Windows 11; .NET SDK 10.0.400; Google Chrome; local file-system crawl
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Additional diagnostics
+      description: Add sanitized logs, screenshots, or sample data that help explain the issue.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Submission checks
+      options:
+        - label: I searched existing issues for the same problem.
+          required: true
+        - label: I removed credentials, private URLs, identifying research data, and other sensitive information.
+          required: true
+        - label: This is not a security vulnerability.
+          required: true

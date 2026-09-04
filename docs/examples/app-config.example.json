@@ -1,0 +1,44 @@
+{
+  "schemaVersion": "v0.2",
+  "isConfigured": true,
+  "organizationName": "Example Research Organization",
+  "toolName": "Research Data Catalog",
+  "zones": [
+    "Raw",
+    "Working",
+    "Published"
+  ],
+  "roles": [
+    "Author",
+    "Principal investigator",
+    "Point of contact"
+  ],
+  "projectStatuses": [
+    "Active",
+    "Complete"
+  ],
+  "processingLevels": [
+    "Measured",
+    "Calculated",
+    "Modeled"
+  ],
+  "variableTypes": [
+    "Dimension",
+    "Metric"
+  ],
+  "geometries": [],
+  "tags": [
+    "Agriculture",
+    "Climate",
+    "Soils"
+  ],
+  "datasetStructures": [
+    "Single",
+    "Multiple"
+  ],
+  "qualityControlTags": [
+    "None",
+    "Reviewed"
+  ],
+  "catalogPath": "catalog.json"
+}

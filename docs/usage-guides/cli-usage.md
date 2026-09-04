@@ -136,7 +136,7 @@ MiddenCli validate C:\Path\To\Projects
 It reads every `.midden` and `DESCRIPTION.md` file it finds, checks them, and prints what is
 wrong and where:
 
-```
+```text
 C:\Path\To\Projects\Raw\CookEastMet.midden
   error: dataset.name: A dataset name is required.
     The .midden file and the catalog entry are both named from this.
@@ -514,7 +514,7 @@ or add the value to the configuration in the Editor.
 
 ## Known limitations
 
-Most items from the [CLI hardening plan](../implementation-plans/2026-08-05-cli-hardening.md)
+Most items from the [CLI hardening plan](../implementation-plans/20260805_cli-hardening.md)
 are now resolved: `collate` exits non-zero when a store fails or is skipped, Azure Data Lake
 crawling descends the full folder tree, Google Drive crawling pages past 100 files, and paths
 containing `.midden` more than once are trimmed correctly. A few items remain deferred by

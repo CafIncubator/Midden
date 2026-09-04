@@ -47,7 +47,12 @@ jobs:
         run: dotnet restore Caf.Midden.slnx
 
       - name: Build
-        run: dotnet build Caf.Midden.slnx --configuration Release --no-restore --warnaserror
+        run: >-
+          dotnet build Caf.Midden.slnx
+          --configuration Release
+          --no-restore
+          --warnaserror
+          -p:VersionSuffix=dev.${{ github.run_number }}
 
       - name: Test
         run: dotnet test Caf.Midden.slnx --configuration Release --no-build
@@ -72,7 +77,12 @@ jobs:
         run: dotnet restore Caf.Midden.slnx
 
       - name: Build
-        run: dotnet build Caf.Midden.slnx --configuration Release --no-restore --warnaserror
+        run: >-
+          dotnet build Caf.Midden.slnx
+          --configuration Release
+          --no-restore
+          --warnaserror
+          -p:VersionSuffix=dev.${{ github.run_number }}
 
       - name: Collect Core coverage
         run: >-

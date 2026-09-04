@@ -1,0 +1,11 @@
+{
+  "Version": "1.0.0",
+  "DataStores": [
+    {
+      "Name": "ResearchProjects",
+      "Type": "LocalFileSystem",
+      "Path": "C:\\Research\\Projects",
+      "ShouldCollateProjects": true
+    }
+  ]
+}

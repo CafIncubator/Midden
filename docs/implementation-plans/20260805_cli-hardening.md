@@ -364,7 +364,8 @@ cloud accounts.
   store's crawl finishes (item 24).
 - `Directory.Build.props` now sets `InvariantGlobalization`, `Authors`, and a single `Version`
   property shared by every project. `Caf.Midden.Cli.csproj` adds `Description` and
-  `PackageLicenseExpression` (matching the repository's CC0-1.0 license) and scopes
+  `PackageLicenseExpression` (originally CC0-1.0 and later updated with the repository license)
+  and scopes
   `TreatWarningsAsErrors` to itself only, since applying it solution-wide surfaced an unrelated
   pre-existing warning in `Caf.Midden.Wasm`. The duplicate `AssemblyVersion`/`FileVersion`/
   `Version` properties were removed in favor of the single `Version` from `Directory.Build.props`

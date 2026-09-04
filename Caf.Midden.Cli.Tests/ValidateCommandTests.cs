@@ -275,4 +275,26 @@ public class ValidateCommandTests : IDisposable
         Assert.Equal(2, exitCode);
         Assert.Contains("app configuration", error.ToString());
     }
+
+    [Fact]
+    public void Validate_UnsupportedAppConfigVersion_ReportsUsageError()
+    {
+        var file = WriteValidMetadata();
+        var appConfig = WriteFile(
+            "app-config.json",
+            """{"schemaVersion":"vBanana"}""");
+
+        var exitCode = ValidateCommand.HandleValidate(
+            [file],
+            appConfigPath: appConfig,
+            warningsAsErrors: false,
+            quiet: false,
+            output,
+            error);
+
+        Assert.Equal(2, exitCode);
+        Assert.Contains("is not supported", error.ToString());
+        Assert.Contains("v0.2", error.ToString());
+        Assert.Contains("v0.1", error.ToString());
+    }
 }

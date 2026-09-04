@@ -22,6 +22,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="..\docs\examples\app-config.example.json"
+          Link="Assets\ConfigFiles\app-config.example.json"
+          CopyToOutputDirectory="PreserveNewest" />
     <None Update="Assets\ConfigFiles\app-config_v0_1_0-alpha4.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

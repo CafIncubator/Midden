@@ -253,11 +253,8 @@ public static class ValidateCommand
 
         try
         {
-            // Matches the case-insensitive read the Configuration editor performs, so a file
-            // exported from the editor is accepted here without reformatting.
-            appConfiguration = JsonSerializer.Deserialize<AppConfiguration>(
-                File.ReadAllText(appConfigPath),
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            appConfiguration = Caf.Midden.Core.Services.Configuration.AppConfigurationParser.Parse(
+                File.ReadAllText(appConfigPath));
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or JsonException)
         {

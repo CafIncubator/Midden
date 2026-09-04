@@ -23,6 +23,17 @@ public class ConfigurationValidatorTests
     }
 
     [Fact]
+    public void Validate_UnknownSchemaVersion_IsAnError()
+    {
+        var configuration = ValidConfiguration();
+        configuration.SchemaVersion = "vBanana";
+
+        var result = validator.Validate(configuration);
+
+        Assert.Contains(result.Errors, i => i.Code == "configuration.schemaVersion.unsupported");
+    }
+
+    [Fact]
     public void Validate_NullModel_Throws()
     {
         Assert.Throws<ArgumentNullException>(() => validator.Validate(null!));
