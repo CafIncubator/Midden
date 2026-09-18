@@ -28,9 +28,10 @@ Notable changes to Midden are recorded here. This project follows
 ### Fixed
 
 - Corrected project paging, combined zone filtering and search, malformed crawler input handling,
-  static asset fingerprinting, and relative deployment paths.
+  static asset fingerprinting, osm tile layer issues, and relative deployment paths.
 - Made the default test suite independent of live cloud credentials and normalized corrupt secret
   store failures.
+- Made the default test suite independent of user-defined catalog.json
 
 ### Migration notes
 

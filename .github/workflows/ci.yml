@@ -52,7 +52,7 @@ jobs:
           --configuration Release
           --no-restore
           --warnaserror
-          -p:VersionSuffix=dev.${{ github.run_number }}
+          -p:CommitIdentifier=${{ github.sha }}
 
       - name: Test
         run: dotnet test Caf.Midden.slnx --configuration Release --no-build
@@ -82,7 +82,7 @@ jobs:
           --configuration Release
           --no-restore
           --warnaserror
-          -p:VersionSuffix=dev.${{ github.run_number }}
+          -p:CommitIdentifier=${{ github.sha }}
 
       - name: Collect Core coverage
         run: >-
