@@ -5,8 +5,8 @@
     <Nullable>enable</Nullable>
     <InvariantGlobalization>true</InvariantGlobalization>
     <Authors>R.J. Cook Agronomy Farm Long-Term Agroecosystem Research</Authors>
-    <VersionPrefix>1.0.0</VersionPrefix>
-    <PrereleaseChannel></PrereleaseChannel>
+    <VersionPrefix>1.1.0</VersionPrefix>
+    <PrereleaseChannel>beta</PrereleaseChannel>
     <VersionSuffix Condition="'$(Version)' == '' and '$(VersionSuffix)' == '' and '$(PrereleaseChannel)' != '' and '$(CommitIdentifier)' != ''">$(PrereleaseChannel).$(CommitIdentifier)</VersionSuffix>
     <VersionSuffix Condition="'$(Version)' == '' and '$(VersionSuffix)' == '' and '$(PrereleaseChannel)' != ''">$(PrereleaseChannel).local</VersionSuffix>
     <VersionSuffix Condition="'$(Version)' == '' and '$(VersionSuffix)' == '' and '$(CommitIdentifier)' != ''">dev.$(CommitIdentifier)</VersionSuffix>
