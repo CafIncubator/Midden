@@ -181,6 +181,9 @@ The root `package.json` pins Playwright and the Playwright axe integration. The 
 test starts the Blazor application through Playwright's deterministic web-server readiness,
 runs Chromium against `/editor/dataset` and `/catalog/datasets`, and attaches the full axe result.
 The CI workflow installs Chromium and uploads Playwright diagnostics when the job fails.
+The catalog route intercepts `catalog.json` with a small representative fixture owned by the
+accessibility suite. Deployments and forks may replace the bundled catalog, so deployment data
+must not change the reviewed CI baseline.
 
 The first review fixed app-owned defects that were inexpensive and low risk: the missing document
 language, the unnamed configuration link and metadata upload, decorative shared-layout and
@@ -196,7 +199,7 @@ reviewed maximum-count baseline:
 | Dataset catalog | `aria-required-attr` | 3 | AntDesign search and select semantics |
 | Dataset catalog | `aria-valid-attr-value` | 1 | AntDesign search semantics |
 | Dataset catalog | `button-name` | 1 | AntDesign-generated paging control |
-| Dataset catalog | `color-contrast` | 29 | Catalog metadata links and controls |
+| Dataset catalog | `color-contrast` | 8 | Catalog metadata links and controls |
 | Dataset catalog | `label` | 3 | Search and select controls |
 | Dataset catalog | `role-img-alt` | 1 | AntDesign-generated paging icon |
 

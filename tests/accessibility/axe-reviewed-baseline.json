@@ -39,12 +39,10 @@
       "[\".ant-menu-submenu-selected > .ant-menu-submenu-title[role=\\\"button\\\"][aria-haspopup=\\\"true\\\"] > .ant-menu-title-content > span[b-*=\\\"\\\"] > span[b-*=\\\"\\\"]\"]": 1,
       "[\".active > span[b-*=\\\"\\\"]\"]": 1,
       "[\".ant-select-selection-overflow > .ant-select-selection-placeholder\"]": 1,
-      "[\"#ant-blazor-* > .ant-card-body > .catalog-meta-line > span:nth-child(1) > a[href$=\\\"Production\\\"]\"]": 9,
-      "[\"#ant-blazor-* > .ant-card-body > .catalog-meta-line > span:nth-child(2) > a[href$=\\\"TestProject\\\"]\"]": 3,
-      "[\"a[href$=\\\"Work\\\"]\"]": 1,
-      "[\"#ant-blazor-* > .ant-card-body > .catalog-meta-line > span:nth-child(1) > a[href$=\\\"Raw\\\"]\"]": 2,
-      "[\"#ant-blazor-* > .ant-card-body > .catalog-meta-line > span:nth-child(2) > a\"]": 9,
-      "[\"a[href$=\\\"saga-gis.org/\\\"]\"]": 1,
+      "[\"a[href$=\\\"Published\\\"]\"]": 1,
+      "[\"#ant-blazor-* > .ant-card-body > .catalog-meta-line > span:nth-child(2) > a\"]": 1,
+      "[\"a[href$=\\\"Working\\\"]\"]": 1,
+      "[\"a[href$=\\\"SoilResearch\\\"]\"]": 1,
       "[\"#ant-blazor-* > a[b-*=\\\"\\\"]\"]": 1
     },
     "label": {
