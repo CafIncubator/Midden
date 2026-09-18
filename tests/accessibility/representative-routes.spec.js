@@ -3,6 +3,7 @@ const { expect, test } = require("@playwright/test");
 const fs = require("node:fs");
 const path = require("node:path");
 const reviewedBaseline = require("./axe-reviewed-baseline.json");
+const representativeCatalogPath = path.join(__dirname, "representative-catalog.json");
 
 const routes = [
   {
@@ -19,6 +20,10 @@ const routes = [
 
 for (const route of routes) {
   test(`${route.name} does not exceed the reviewed axe baseline`, async ({ page }, testInfo) => {
+    await page.route("**/catalog.json*", catalogRoute => catalogRoute.fulfill({
+      contentType: "application/json",
+      path: representativeCatalogPath
+    }));
     await page.goto(route.path);
     await route.waitUntilReady(page);
 
