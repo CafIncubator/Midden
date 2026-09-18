@@ -8,7 +8,7 @@ work. They are not the authoritative description of current product behavior; us
 
 | Plan | Status | Outcome or next step |
 |---|---|---|
-| [Open-source readiness](20260902_open-source-readiness.md) | In progress | Phases 0-5 are complete; Phase 6 promotion remains |
+| [Open-source readiness](20260902_open-source-readiness.md) | In progress | Phases 0-5 are complete; Phase 6 launch remains |
 | [Web accessibility remediation](20260904_web-accessibility-remediation-plan.md) | Deferred follow-up | Address the recorded keyboard, focus, semantics, contrast, and NVDA gaps |
 
 ## Completed work

@@ -4,8 +4,12 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <InvariantGlobalization>true</InvariantGlobalization>
-    <Authors>CAF Incubator</Authors>
+    <Authors>R.J. Cook Agronomy Farm Long-Term Agroecosystem Research</Authors>
     <VersionPrefix>1.0.0</VersionPrefix>
+    <PrereleaseChannel></PrereleaseChannel>
+    <VersionSuffix Condition="'$(Version)' == '' and '$(VersionSuffix)' == '' and '$(PrereleaseChannel)' != '' and '$(CommitIdentifier)' != ''">$(PrereleaseChannel).$(CommitIdentifier)</VersionSuffix>
+    <VersionSuffix Condition="'$(Version)' == '' and '$(VersionSuffix)' == '' and '$(PrereleaseChannel)' != ''">$(PrereleaseChannel).local</VersionSuffix>
+    <VersionSuffix Condition="'$(Version)' == '' and '$(VersionSuffix)' == '' and '$(CommitIdentifier)' != ''">dev.$(CommitIdentifier)</VersionSuffix>
     <VersionSuffix Condition="'$(Version)' == '' and '$(VersionSuffix)' == ''">dev.local</VersionSuffix>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
   </PropertyGroup>

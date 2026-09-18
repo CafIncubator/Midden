@@ -25,24 +25,23 @@ should discuss substantial compatibility changes in an issue or discussion befor
 
 ## Development versions
 
-`Directory.Build.props` contains the single `VersionPrefix` for the next intended release. Project
-files must inherit it unless a component has a documented reason to differ.
+`Directory.Build.props` contains the `VersionPrefix` for the next intended release and a
+`PrereleaseChannel` describing the current development stage. Project files must inherit them
+unless a component has a documented reason to differ.
 
 Development builds use a SemVer prerelease suffix:
 
-- A local build uses `MAJOR.MINOR.PATCH-dev.local` so it cannot be mistaken for a release.
-- GitHub Actions uses `MAJOR.MINOR.PATCH-dev.RUN_NUMBER`, where `RUN_NUMBER` is the workflow's
-  monotonically increasing Actions run number.
+- After a stable release, `develop` advances to the next `VersionPrefix` with channel `beta`.
+- A local build uses `MAJOR.MINOR.PATCH-beta.local`.
+- GitHub Actions uses `MAJOR.MINOR.PATCH-beta.COMMIT_SHA`.
+- At feature freeze, the maintainer changes the channel to `rc`; local and Actions builds become
+  `MAJOR.MINOR.PATCH-rc.local` and `MAJOR.MINOR.PATCH-rc.COMMIT_SHA`.
+- When no channel is selected, local and Actions builds use `dev.local` and `dev.COMMIT_SHA`.
 - Development versions are not tagged, published as GitHub Releases, or supported under the
   security support policy.
 
-The CI build number replaces the former manually incremented `dev.N` value. Contributors do not
-edit a development counter when merging feature branches.
-
-Release candidates may use `MAJOR.MINOR.PATCH-rc.N` when maintainers need externally identifiable
-prerelease testing. The current release workflow accepts stable tags only; it and the release
-runbook must be updated before publishing an `rc.N` tag. Ordinary `develop` builds remain
-`dev.RUN_NUMBER` builds.
+The commit SHA makes a development version reproducible across the upstream repository and forks.
+Contributors do not edit the channel or identifier in feature branches.
 
 ## Stable releases
 
@@ -52,5 +51,11 @@ rejects a tag when its version does not exactly match `VersionPrefix`.
 Release tags are immutable. A transient workflow failure may be rerun against the same commit and
 tag. A correction that changes code or release content requires a new patch version and tag.
 
-After a stable release, maintainers select the next intended version, update `VersionPrefix` on
-`develop`, and record subsequent work under the changelog's `Unreleased` section.
+After a stable release, maintainers select the next intended version, update `VersionPrefix`, set
+the channel to `beta` on `develop`, and record subsequent work under the changelog's `Unreleased`
+section.
+
+Production hotfixes branch from the latest stable commit on `main`, increment `PATCH`, and return
+to `main` through a pull request. After publication, `main` is merged back into `develop`; any
+version conflict keeps the next planned `VersionPrefix` on `develop`. The complete operational
+sequence is maintained in [RELEASING.md](RELEASING.md).

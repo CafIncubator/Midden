@@ -5,6 +5,8 @@ Notable changes to Midden are recorded here. This project follows
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-09-18
+
 ### Added
 
 - Deterministic Linux and Windows CI, test coverage collection, dependency review, and CodeQL
@@ -28,9 +30,10 @@ Notable changes to Midden are recorded here. This project follows
 ### Fixed
 
 - Corrected project paging, combined zone filtering and search, malformed crawler input handling,
-  static asset fingerprinting, and relative deployment paths.
+  static asset fingerprinting, osm tile layer issues, and relative deployment paths.
 - Made the default test suite independent of live cloud credentials and normalized corrupt secret
   store failures.
+- Made the default test suite independent of user-defined catalog.json
 
 ### Migration notes
 
@@ -82,7 +85,8 @@ Notable changes to Midden are recorded here. This project follows
 - Initial beta release of the Midden metadata editor, catalog viewer, Core models, and catalog
   generation CLI.
 
-[Unreleased]: https://github.com/CafIncubator/Midden/compare/v0.4.0...develop
+[Unreleased]: https://github.com/CafIncubator/Midden/compare/v1.0.0...develop
+[1.0.0]: https://github.com/CafIncubator/Midden/compare/v0.4.0...v1.0.0
 [0.4.0]: https://github.com/CafIncubator/Midden/releases/tag/v0.4.0
 [0.3.0]: https://github.com/CafIncubator/Midden/releases/tag/v0.3.0
 [0.2.0]: https://github.com/CafIncubator/Midden/releases/tag/v0.2.0

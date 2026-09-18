@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | In progress (Phases 0-5 complete; Phase 6 promotion pending) |
+| **Status** | In progress (Phases 0-5 complete; Phase 6 launch pending) |
 | **Created** | 2026-09-02 |
 | **Scope** | Repository governance, contributor experience, CI, releases, security, and documentation |
 
@@ -265,8 +265,9 @@ Evaluate them from demonstrated user demand rather than making the first release
 depend on all package ecosystems.
 
 **Implementation record:** Phase 4 was completed on 2026-09-04.
-Product versioning is centralized in `Directory.Build.props`; local builds use `dev.local`, and
-GitHub Actions assigns `dev.RUN_NUMBER` without feature-branch version edits. `VERSIONING.md`,
+Product versioning is centralized in `Directory.Build.props`; local builds use the active
+development channel with `.local`, and GitHub Actions appends the commit SHA without feature-branch
+version edits. `VERSIONING.md`,
 `CHANGELOG.md`, and `RELEASING.md` define the shared product version, the four released beta
 versions, stable release preparation, immutable tags, rollback, and support expectations.
 
@@ -311,6 +312,10 @@ be launched as `v1.0.0` without any earlier partial synchronization to `main`.
 | 46 | Verify default-branch automation | The post-merge `main` CI and CodeQL runs pass on Linux and Windows; coverage is uploaded; Dependabot accepts its configuration and targets version updates to `develop` while security updates target `main`; scheduled workflows and security features report healthy status |
 | 47 | Protect main | After the new checks have produced stable check names, require them on `main` together with at least one approving review and resolved conversations; block force pushes and deletion |
 | 48 | Launch and synchronize | Create the protected `v1.0.0` tag and GitHub Release only after items 46 and 47 pass, verify published artifacts and checksums, then merge any release-only `main` changes back into `develop` |
+
+**Progress record:** The cumulative `develop`-to-`main` promotion completed through PR #167 at
+commit `cb963a0`. The protected `v1.0.0` tag, GitHub Release, artifact verification, and final
+`main`-to-`develop` synchronization remain pending.
 
 The new workflows cannot be relied on as required checks for the promotion pull request if their
 definitions do not yet exist on `main`. Compensate by requiring the exact candidate commit to pass

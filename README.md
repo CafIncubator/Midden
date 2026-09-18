@@ -41,9 +41,9 @@ Official versions and self-contained CLI downloads are published through
 [changelog](CHANGELOG.md) for release history and upgrade notes, and the
 [versioning policy](VERSIONING.md) for the shared CLI, Core, and Wasm version rules.
 
-Only the latest GitHub Release receives fixes; older releases and development builds are not
-supported. See [SECURITY.md](SECURITY.md) for the complete support and private vulnerability
-reporting policy.
+Only the latest stable GitHub Release receives fixes; beta and release-candidate builds, older
+stable releases, and other development builds are not supported. See [SECURITY.md](SECURITY.md) for the
+complete support and private vulnerability reporting policy.
 
 ### The Editor
 

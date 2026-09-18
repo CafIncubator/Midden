@@ -158,7 +158,8 @@ request. No `Signed-off-by` commit trailer is required.
 
 Midden's components share the version policy in [VERSIONING.md](VERSIONING.md). Contributors do
 not increment development versions in feature branches; GitHub Actions assigns the
-`dev.RUN_NUMBER` suffix. Release maintainers make stable version and changelog changes through the process in
+active development channel and commit identifier. Release maintainers manage beta and RC transitions,
+stable versions, changelog finalization, and production hotfix synchronization through
 [RELEASING.md](RELEASING.md).
 
 ## Community expectations
