@@ -1,0 +1,45 @@
+{
+  "schemaVersion": "v0.2",
+  "creationDate": "2026-09-01T00:00:00Z",
+  "projects": [],
+  "metadatas": [
+    {
+      "schemaVersion": "v0.2",
+      "creationDate": "2026-08-01T00:00:00Z",
+      "modifiedDate": "2026-09-01T00:00:00Z",
+      "dataset": {
+        "zone": "Published",
+        "project": "ClimateResearch",
+        "name": "DailyTemperature",
+        "description": "Daily temperature observations for a representative research site.",
+        "datasetPath": "climate/daily-temperature",
+        "format": "CSV",
+        "tags": ["climate", "temperature"],
+        "contacts": [],
+        "methods": ["Weather station observation"],
+        "variables": [],
+        "derivedWorks": [],
+        "parentDatasets": []
+      }
+    },
+    {
+      "schemaVersion": "v0.2",
+      "creationDate": "2026-07-01T00:00:00Z",
+      "modifiedDate": "2026-08-15T00:00:00Z",
+      "dataset": {
+        "zone": "Working",
+        "project": "SoilResearch",
+        "name": "SoilMoisture",
+        "description": "Soil moisture measurements used to exercise catalog cards and filters.",
+        "datasetPath": "soil/moisture",
+        "format": "CSV",
+        "tags": ["soil", "water"],
+        "contacts": [],
+        "methods": ["Field sensor observation"],
+        "variables": [],
+        "derivedWorks": [],
+        "parentDatasets": []
+      }
+    }
+  ]
+}

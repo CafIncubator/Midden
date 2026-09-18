@@ -31,7 +31,7 @@ dotnet test Caf.Midden.slnx --configuration Release --no-build
 
 ## Checklist
 
-- [ ] The pull request targets `develop` unless it is an approved release or hotfix change.
+- [ ] The pull request targets `develop` unless it follows the release or production-hotfix process in `RELEASING.md`.
 - [ ] The change is focused and does not include unrelated formatting or refactoring.
 - [ ] Tests cover changed behavior, or the validation section explains why tests do not apply.
 - [ ] Logs, examples, screenshots, and fixtures contain no credentials or sensitive research data.

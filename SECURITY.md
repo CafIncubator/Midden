@@ -5,13 +5,14 @@ and research data.
 
 ## Supported versions
 
-Midden supports only the latest published GitHub Release. This policy applies before and after
-the first stable release.
+Midden supports only the latest stable GitHub Release. Internal beta and release-candidate builds
+are for testing and are not supported production versions.
 
 | Version | Supported |
 |---|---|
-| Latest GitHub Release | Yes |
-| Older releases | No |
+| Latest stable GitHub Release | Yes |
+| Beta and release-candidate builds | No |
+| Older stable releases | No |
 | `develop` and other unreleased builds | No |
 
 Security fixes are normally delivered in a new release rather than backported. Users must
