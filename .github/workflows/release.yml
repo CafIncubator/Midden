@@ -149,8 +149,6 @@ jobs:
     timeout-minutes: 25
     permissions:
       contents: read
-      id-token: write
-      attestations: write
     strategy:
       fail-fast: false
       matrix:
@@ -289,11 +287,6 @@ jobs:
           "MiddenCli-${{ needs.metadata.outputs.version }}-${{ matrix.rid }}.tar.gz"
           -C "publish/${{ matrix.rid }}" .
 
-      - name: Attest archive provenance
-        uses: actions/attest@v4
-        with:
-          subject-path: MiddenCli-${{ needs.metadata.outputs.version }}-${{ matrix.rid }}.${{ matrix.archive-extension }}
-
       - name: Upload archive
         uses: actions/upload-artifact@v7
         with:
@@ -311,6 +304,7 @@ jobs:
       contents: read
       id-token: write
       attestations: write
+      artifact-metadata: write
 
     steps:
       - name: Download archives
@@ -340,6 +334,11 @@ jobs:
             throw 'Checksum verification failed.'
           }
           Pop-Location
+
+      - name: Attest archive provenance
+        uses: actions/attest@v4
+        with:
+          subject-checksums: release-assets/SHA256SUMS
 
       - name: Attest checksum manifest
         uses: actions/attest@v4
