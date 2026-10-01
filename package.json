@@ -11,8 +11,8 @@
     "@playwright/test": "1.62.1"
   },
   "dependencies": {
-    "@geoman-io/leaflet-geoman-free": "2.20.0",
-    "leaflet": "1.7.1",
+    "@geoman-io/leaflet-geoman-free": "2.20.2",
+    "leaflet": "1.9.4",
     "leaflet.heat": "0.2.0"
   },
   "overrides": {}
