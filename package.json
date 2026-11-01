@@ -7,8 +7,8 @@
     "test:accessibility": "playwright test"
   },
   "devDependencies": {
-    "@axe-core/playwright": "4.13.0",
-    "@playwright/test": "1.62.1"
+    "@axe-core/playwright": "4.14.0",
+    "@playwright/test": "1.64.1"
   },
   "dependencies": {
     "@geoman-io/leaflet-geoman-free": "2.20.0",
